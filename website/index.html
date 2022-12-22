@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lyte2D</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism.min.css" crossorigin="anonymous" />
+    <style>
+      @font-face {
+        font-family: 'm5x7';
+        font-weight:normal;
+        font-style: normal;
+        src: url('m5x7.ttf');
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        /* background-color: white; */
+        background-color: bisque;
+        background-color: lightyellow;
+        background-color: white;
+        background-color: azure;
+        color: darkslategray;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+      }
+      body {
+        min-width: 300px;
+        --bw: 1200px;
+        max-width: var(--bw);
+        --lm1: calc(100%/2);
+        --bw2: calc(var(--bw)/2);
+        --lm2: calc(var(--lm1) - var(--bw2));
+        --lm3: max(0px, var(--lm2));
+        margin-left: var(--lm3);
+      }
+      a {
+        color: brown;
+
+      }
+      li {
+        padding-bottom: 4px;
+      }
+      button {
+        background: none!important;
+        border: none;
+        padding: 10px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
+        color: brown;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      header, footer {
+        text-align: center;
+      }
+      header {
+        /* padding-top: 10px; */
+        padding-bottom: 20px;
+      }
+      footer {
+        font-size: 14px;
+        padding: 20px;
+        /* padding-left: 20px; */
+        /* text-align: center; */
+      }
+      main {
+
+        /* box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px; */
+        /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset; */
+        /* box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px; */
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        padding: 20px;
+        padding-top: 0px;
+        /* margin-top: -60px; */
+        background-color: white;
+        background-color: whitesmoke;
+      }
+      #apipre {
+        /* max-height: 900px; */
+        height: 500px;
+        overflow: auto;
+      }
+      #api {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+      .logo {
+        /* font-family: "Arial Black", sans-serif; */
+        font-family: "m5x7", sans-serif;
+        font-size: 50px;
+        padding-bottom: 5px;
+        text-decoration: none;
+        color: darkslategray;
+        text-shadow: 0px 4px 3px rgba(0,0,0,0.4),
+             0px 8px 13px rgba(0,0,0,0.1),
+             0px 18px 23px rgba(0,0,0,0.1);
+        text-align: center;
+      }
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .dropdown-toggle {
+        text-decoration: none;
+        font-weight: bold;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        /* color: #333; */
+        cursor: pointer;
+        display: inline-block;
+        /* font-size: 14px; */
+        /* font-weight: 400; */
+        /* line-height: 1.42857143; */
+        padding: 8px 16px;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .dropdown-toggle:hover,
+      .dropdown-toggle:focus {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+
+      .dropdown-menu {
+
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1;
+        background-color: whitesmoke;
+        padding: 10px;
+        margin: 0px;
+        list-style: none;
+        max-height: 400px;
+        min-width: 250px;;
+        width: 100%;
+        overflow-y: auto;
+      }
+      .links {
+        /* padding-left: 20px; */
+        padding-top: 10px;
+      }
+      .menulink {
+        /* padding-top: 10px; */
+        padding-right: 6px;
+        text-shadow: 0px 4px 3px rgba(0.2,0,0,0.2),
+             0px 8px 13px rgba(0.2,0,0,0.1),
+             0px 18px 23px rgba(0.2,0,0,0.1);
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      .menulinkext {
+        padding-left: 6px;
+        text-shadow: 0px 4px 3px rgba(0.2,0,0,0.2),
+             0px 8px 13px rgba(0.2,0,0,0.1),
+             0px 18px 23px rgba(0.2,0,0,0.1);
+      }
+      .sections {
+        padding-top: 10px;
+        padding-bottom: 35px;
+      }
+      .resizer { display:flex;margin:0; padding:0; resize:both; overflow:hidden;}
+      .resizer2 { display:flex;margin:0; padding:0; resize:horizontal; overflow:auto;}
+      .resizer > .resized { flex-grow:1; margin:0; padding:0; border:0 }
+      .ugly {   margin:0; padding:0; border:2px dashed black;  width: 880px; height: 400px;  }
+      .source-area {  margin:0; padding:0;   height: 100%; min-width:300px; }
+      .lyte-iframe { background-color: black; width: 440px}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/prism.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/components/prism-lua.min.js" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <header>
+      <section class="links">
+        <a class="logo" href="index.html#about">
+          <img src="icon.png" height="25px"/>
+          Lyte2D
+        </a>
+      </section>
+      <section class="links">
+        <a class="menulink" href="index.html#about"> About </a>
+        <a class="menulink" href="index.html#examples"> Examples </a>
+        <a class="menulink" href="index.html#games"> Games </a>
+        <a class="menulink" href="index.html#start"> Getting Started </a>
+        <a class="menulink" href="index.html#guide"> User Guide </a>
+        <a class="menulink" href="index.html#api"> API </a>
+      </section>
+    </header>
+    <main>
+      <section id="about" class="sections">
+        <!-- <div class="logo"> lyte2d? </div> -->
+        <p>
+          Lyte2D is a simple, free and opensource lightweight Lua framework for writing games and other applications. It's inspired by Love2D.
+        </p>
+          Hello world in Lyte2D:
+          <pre><code class="language-lua">function frame()
+  draw_text("Hello, world", 0, 0)
+end</code> </pre>
+        <p>
+          Lyte2D is small (Windows binary is less than 1MB zipped) and support HTML5 by compiling into WASM.
+        </p>
+        <p style="color: brown">
+          Lyte2D is currently "alpha" software. Unless you know what you're doing, you probably shouldn't use it in "production."
+          Website and documentation is lacking! But if you have some programming experience, especially with LOVE2D you should be fine.
+        </p>
+      </section>
+
+      <section id="examples" class="sections">
+        <div class="logo"> examples </div>
+        <div class="dropdown">
+          <div>
+            <button class="dropdown-toggle" type="button" id="dropdownMenuButton" onclick="toggleDropdownMenu()">
+              Examples ▼
+            </button>
+            <span id="examplename"></span>
+            <a id="examplenewlink" target="_blank" class="menulink" href=""></a>
+          </div>
+          <ul id="examplesdropdown" class="dropdown-menu">
+            <li> <a class="menulink" target="demos" onclick="on_examplelink_click(event, 'empty')" href="about:blank">(None)</a> </li>
+            <!-- Examples will be added here -->
+          </ul>
+        </div>
+        <div class="resizer ugly">
+          <div class="resizer2">
+            <div class="resized source-area">
+              <pre><code id="examplecode" class="language-lua"></code></pre>
+            </div>
+          </div>
+          <iframe id="demosiframe" name="demos" class="resized lyte-iframe"> </iframe>
+        </div>
+      </section>
+
+
+      <section id="games" class="sections">
+        <div class="logo"> sample games </div>
+        <ul>
+          <li>
+            <span><b>Pong Out!</b></span>
+            <ul>
+              <li>
+                <a class="menulink" target="_blank" href="lyte2d.html?zip=pongout.zip">run game (browser)</a>
+              </li>
+              <li>
+                <a class="menulink" target="_blank" href="https://github.com/morew4rd/lyte2d/">sources @ github</a>⧉
+              </li>
+              <li>
+                <a class="menulink" target="_blank" href="https://m04r.itch.io/pong-out">game homepage @ itch.io (browser + executable)</a>⧉
+              </li>
+              <p> "Pong + Breakout / 3"  Simple game. </p>
+            </ul>
+          </li>
+          <li>
+            <span><b>(TBD)</b></span>
+          </li>
+        </ul>
+      </section>
+
+      <section id="start" class="sections">
+        <div class="logo"> getting started </div>
+        <b>Basics of Lyte2D</b>
+        <p>
+          Lyte2D currently only works on Windows and HTML5. Linux builds should be trivial, and will be supported at a later release.
+          Windows binaries work well on a SteamDeck with latest supported Proton.
+        </p>
+        <p>
+          <b>Downloads</b>
+          <ul>
+            <li>
+              Binaries (itch) <a class="menulinkext" target="_blank" href="https://morew4rd.itch.io/lyte2d"> itch.io</a>⧉
+            </li>
+            <li>
+              Source snapshot <a class="menulinkext" target="_blank" href="https://github.com/morew4rd/lyte2d"> github</a>⧉
+            </li>
+          </ul>
+        </p>
+        <p>
+          Once you download the binary zip, just put lyte2d.exe somewhere in your path (or in a local directory where you'll write your game.)
+        </p>
+      </section>
+
+      <section name="guide" class="sections">
+        <div class="logo"> user guide </div>
+        <p>
+          To get started
+          <ul>
+            <li>
+              Create an <code>app.lua</code> file
+            </li>
+            <li>
+              Implement a global function with the name <code>frame</code>.  (See examples)
+            </li>
+            <li>Start it with <code>lyte2d</code></li>
+            <li>To start an app in another directory you can do <code>lyte2d dir=/sources/games/mycoolgame</code>.  Only "/" is supported as the directory seperator</li>
+            <li>To start an app with a different name  you can do <code>lyte2d app=mygame.lua</code>.  Can be mixed with <code>dir</code> argument</li>
+            <li>You can also start a game from a zip file with <code>lyte2d zip=myapp.zip</code> If there's a file named app.zip, it'll automatically be loaded</li>
+            <li>Lyte2D supports LOVE2D style app fusing. You can create a single executable (fused exe + zip).  Documents TBD, but Makefile has an example for the Pong Out game</li>
+          </ul>
+        </p>
+        <p>
+          <b>Known issues (version 0.1 alpha):</b>
+          <ul>
+            <li> Error messages </li>
+            <li> Circle drawing can have minor issues </li>
+            <li> Font rendering can have minor issues </li>
+            <li> Missing features (coming up in later release): shaders, physics, etc.</li>
+          </ul>
+        </p>
+      </section>
+
+
+      <section id="api" class="sections">
+        <div class="logo"> API </div>
+        <pre id="apipre" class="resizer">
+          <code id="apicode" class="resized language-lua">
+            <!-- API will be added here -->
+          </code></pre>
+      </section>
+
+    </main>
+    <footer>
+      (c) morew4rd
+      <a class="menulinkext" target="_blank" href="https://morew4rd.com">web</a>⧉
+      <a class="menulinkext" target="_blank" href="https://twitter.com/morew4rd">twitter</a>⧉
+      <a class="menulinkext" target="_blank" href="https://github.com/morew4rd"> github</a>⧉
+      <!-- <a class="menulinkext" href="">mastadon</a>⧉ -->
+    </footer>
+  </body>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-223929623-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-223929623-1');
+  </script>
+  <script>
+    let examples, api_text;
+  </script>
+  <script>
+    function toggleDropdownMenu() {
+      let dropdownMenu = document.querySelector(".dropdown-menu");
+      if (dropdownMenu.style.display === "block") {
+        dropdownMenu.style.display = "none";
+      } else {
+        dropdownMenu.style.display = "block";
+      }
+    }
+
+    function closeDropdownMenu() {
+      let dropdownMenu = document.querySelector(".dropdown-menu");
+      dropdownMenu.style.display = "none";
+    }
+
+    function on_examplelink_click(ev, app) {
+      closeDropdownMenu();
+
+      // title
+      let el1 = document.getElementById("examplename");
+      el1.innerText = examples[app].app
+
+      // code
+      let el3 = document.getElementById("examplecode");
+      el3.innerHTML = examples[app].src;
+      Prism.highlightElement(el3);
+
+
+      if (app != "empty") {
+        // iframe
+        let el0 = document.getElementById('demosiframe');
+        el0.setAttribute("src", "lyte2d.html?zip=examples.zip&app=" + examples[app].app);
+
+        // newtab link
+        let el2 = document.getElementById("examplenewlink");
+        el2.setAttribute("href", "lyte2d.html?zip=examples.zip&app=" + examples[app].app)
+        el2.innerText = "Open " + examples[app].app + " in new tab";
+      } else {
+        // iframe
+        let el0 = document.getElementById('demosiframe');
+        el0.setAttribute("src", "about:blank" + examples[app].app);
+
+        // newtab link
+        let el2 = document.getElementById("examplenewlink");
+        el2.setAttribute("href", "" + examples[app].app)
+        el2.innerText = "";
+      }
+    }
+
+    function update_api_text() {
+      let el = document.getElementById("apicode");
+      el.innerHTML = api_text;
+      Prism.highlightElement(el);
+    }
+
+  </script>
+  <script id="script-examples" src="gen_examples.js"></script>
+  <script id="script-api" src="gen_api.js"></script>
+  <script>
+    update_api_text();
+    let el = document.getElementById("examplesdropdown");
+    Object.keys(examples).forEach((k) => {
+      if (k != "empty") {
+        let ex = examples[k];
+        var li = document.createElement("li");
+        li.innerHTML = `<li> <a class="menulink" target="demos" onclick="on_examplelink_click(event, '${k}')">${ex.title}</a> </li>`;
+        el.appendChild(li);
+      }
+    });
+  </script>
+</html>
+
