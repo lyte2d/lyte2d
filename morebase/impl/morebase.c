@@ -1431,12 +1431,17 @@ M_Image M_canvas_get_image(M_Canvas canvas) {
 void M_canvas_set(M_Canvas canvas) {
     _lib->current_canvas = canvas;
     sgp_begin(canvas.width, canvas.height);
+    sgp_set_blend_mode(_lib->blendmode);
+    sgp_scale(1.0, -1.0);
+    sgp_translate(0, -canvas.height);
+    sgp_push_transform();
     // sgp_project(0, 128, 128, 0);
     // draw_triangles();
-
 }
 
+
 void M_canvas_unset(void) {
+    sgp_pop_transform();
     sg_pass canvas_pass = (sg_pass){.id=_lib->current_canvas.id_pass};
     sg_pass_action pass_action;
     memset(&pass_action, 0, sizeof(sg_pass_action));
@@ -1450,6 +1455,7 @@ void M_canvas_unset(void) {
     sgp_flush();
     sgp_end();
     sg_end_pass();
+
 }
 
 
@@ -1477,15 +1483,25 @@ void M_gfx_drawline(float x1, float y1, float x2, float y2) {
 }
 
 void M_gfx_drawrect(float x, float y, float w, float h) {
-    sgp_point points[5] = {
-        {x, y},
-        {x+w, y},
-        {x+w, y+h},
-        {x, y+h},
-        {x, y},
+    // sgp_point points[5] = {
+    //     {x, y},
+    //     {x+w, y},
+    //     {x+w, y+h},
+    //     {x, y+h},
+    //     {x, y},
+    // };
+    // sgp_draw_lines_strip(points, 5);
+
+
+    sgp_line lines[4] = {
+        (sgp_line){{x, y}, {x, y+h}},
+        (sgp_line){{x, y+h}, {x+w, y+h}},
+        (sgp_line){{x+w, y+h}, {x+w, y}},
+        (sgp_line){{x+w, y}, {x, y+1}},
     };
 
-    sgp_draw_lines_strip(points, 5);
+    sgp_draw_lines(lines, 4);
+
 }
 
 void M_gfx_drawrect_filled(float x, float y, float w, float h) {
@@ -1568,10 +1584,10 @@ void M_image_cleanup(M_Image image) {
 
 void M_image_draw(M_Image image, float x, float y) {
     sg_image img = (sg_image){.id=image.id};
-    sgp_set_blend_mode(_lib->blendmode);
     if (img.id != 0) {
+        sgp_set_blend_mode(_lib->blendmode);
         sgp_set_image(0, img);
-        sgp_set_color(1,1,1,1);
+        //sgp_set_color(1,1,1,1);
         sgp_draw_textured_rect(x, y, image.width, image.height);
         sgp_reset_image(0); // todo check the channels
     }
@@ -1579,11 +1595,11 @@ void M_image_draw(M_Image image, float x, float y) {
 
 void M_image_draw_rect(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height) {
     sg_image img = (sg_image){.id=image.id};
-    sgp_set_blend_mode(_lib->blendmode);
+    //sgp_set_blend_mode(_lib->blendmode);
     if (img.id != 0) {
         // LOG("draw: %f %f %f %f %f %f\n", x, y, img_x, img_y, rect_width, rec_height);
         sgp_set_image(0, img);
-        sgp_set_color(1,1,1,1);
+        //sgp_set_color(1,1,1,1);
         // sgp_draw_textured_rect(x, y, image.width, image.height);
         sgp_draw_textured_rect_ex(0, (sgp_rect){x, y, rect_width, rec_height}, (sgp_rect){img_x, img_y, rect_width, rec_height});
         sgp_reset_image(0); // todo check the channels
@@ -1684,8 +1700,10 @@ static inline void frame(void) {
         glfwGetFramebufferSize(_lib->window, &win_w, &win_h);
 #endif
 
-        _lib->width = win_w - RECT_DELT_L - RECT_DELT_R;
-        _lib->height = win_h - RECT_DELT_T - RECT_DELT_B;
+        int fwidth = win_w - RECT_DELT_L - RECT_DELT_R;
+        int fheight = win_h - RECT_DELT_T - RECT_DELT_B; // BUGG?
+        _lib->width = win_w;
+        _lib->height = win_h;
         bool resized = false;
         if (prev_w != _lib->width || prev_h != _lib->height) {
             resized = true;
@@ -1706,11 +1724,11 @@ static inline void frame(void) {
 
         sgp_begin(win_w, win_h);
         sgp_viewport(EMPTY_L, EMPTY_T, win_w-EMPTY_L-EMPTY_R, win_h-EMPTY_T-EMPTY_B);
-        sgp_project(-RECT_DELT_L, _lib->width+RECT_DELT_R, -RECT_DELT_T, _lib->height+RECT_DELT_B);
+        sgp_project(-RECT_DELT_L, fwidth+RECT_DELT_R, -RECT_DELT_T, fheight+RECT_DELT_B);
         sgp_set_blend_mode(_lib->blendmode);
 
         M_gfx_pushmatrix();
-        _lib->frame_fn(_lib->app_data, delta_time,  _lib->width, _lib->height, resized, _lib->fullscreen);
+        _lib->frame_fn(_lib->app_data, delta_time, win_w, win_h, resized, _lib->fullscreen);
         M_gfx_popmatrix();
 
 

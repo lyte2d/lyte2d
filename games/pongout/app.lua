@@ -56,13 +56,13 @@ function LOG(...)
 end
 
 function draw_text_centered(str, x, y)
-    local w, h = measure_text(str)
-    draw_text(str, x - w / 2, y - h / 2)
+    local w, h = lyte.measure_text(str)
+    lyte.draw_text(str, x - w / 2, y - h / 2)
 end
 
 function draw_text_rightaligned(str, x, y)
-    local w, _h = measure_text(str)
-    draw_text(str, x - w, y)
+    local w, _h = lyte.measure_text(str)
+    lyte.draw_text(str, x - w, y)
 end
 
 
@@ -78,19 +78,19 @@ function set_scene(name)
 end
 
 local function load_assets()
-    Assets.font1 = load_font("/assets/fonts/m5x7.ttf", 14)
-    Assets.music_elev = load_music("/assets/music/elev.mp3")
+    Assets.font1 = lyte.load_font("/assets/fonts/m5x7.ttf", 14)
+    Assets.music_elev = lyte.Music("/assets/music/elev.mp3")
 
-    Assets.sd_brick_dt = load_sounddata("/assets/snd/sfx_pellet.ogg")
-    set_sounddatavolume(Assets.sd_brick_dt, 0.3)
-    Assets.sd_paddle_dt = load_sounddata("/assets/snd/shoot.ogg")
-    set_sounddatavolume(Assets.sd_paddle_dt, 0.3)
-    Assets.sd_hurt_dt = load_sounddata("/assets/snd/sfx_hurt.wav")
-    set_sounddatavolume(Assets.sd_hurt_dt, 0.3)
+    Assets.sd_brick_dt = lyte.SoundData("/assets/snd/sfx_pellet.ogg")
+    Assets.sd_brick_dt.volume = 0.3
+    Assets.sd_paddle_dt = lyte.SoundData("/assets/snd/shoot.ogg")
+    Assets.sd_paddle_dt.volume = 0.3
+    Assets.sd_hurt_dt = lyte.SoundData("/assets/snd/sfx_hurt.wav")
+    Assets.sd_hurt_dt.volume = 0.3
 
-    Assets.sc_brick = new_sound(Assets.sd_brick_dt)
-    Assets.sc_paddle = new_sound(Assets.sd_paddle_dt)
-    Assets.sc_hurt = new_sound(Assets.sd_hurt_dt)
+    Assets.sc_brick = lyte.Sound(Assets.sd_brick_dt)
+    Assets.sc_paddle = lyte.Sound(Assets.sd_paddle_dt)
+    Assets.sc_hurt = lyte.Sound(Assets.sd_hurt_dt)
 end
 
 local function debug_draw(DT)
@@ -121,7 +121,7 @@ local function adjust_scale()
     end
 end
 
-function frame(delta_time, width, height, resized, fullscreen)
+function lyte.frame(delta_time, width, height, resized, fullscreen)
     if resized then
         Window.width = width
         Window.height = height
@@ -131,24 +131,24 @@ function frame(delta_time, width, height, resized, fullscreen)
 
     -- System keys
     -- F4: quit
-    if is_keypressed("f4") or is_gamepadpressed(0, "but_back") then quit() end
+    if lyte.is_keypressed("f4") or lyte.is_gamepadpressed(0, "but_back") then quit() end
     -- Alt-F11: pixel perfect vs regular scaling
-    if (is_keydown('left_alt') or is_keydown('right_alt')) and is_keypressed("f11") then
+    if (lyte.is_keydown('left_alt') or lyte.is_keydown('right_alt')) and lyte.is_keypressed("f11") then
         Window.PIXEL_PERFFECT = not Window.PIXEL_PERFFECT
         adjust_scale()
         return
     end
 
     -- F11: fullscreen/exit fullscreen
-    if is_keypressed("f11") or is_gamepadpressed(0, "but_start") then set_fullscreen(not fullscreen) end
+    if lyte.is_keypressed("f11") or lyte.is_gamepadpressed(0, "but_start") then set_fullscreen(not fullscreen) end
     -- Alt-F12: debug info drawn/not drawn
-    if (is_keydown('left_alt') or is_keydown('right_alt')) and is_keypressed("f12") then
+    if (lyte.is_keydown('left_alt') or lyte.is_keydown('right_alt')) and lyte.is_keypressed("f12") then
         Window.DRAW_DEBUG = not Window.DRAW_DEBUG
         return
     end
 
-    if is_keypressed("f8") then set_vsync(false) end
-    if is_keypressed("f9") then set_vsync(true) end
+    if lyte.is_keypressed("f8") then set_vsync(false) end
+    if lyte.is_keypressed("f9") then set_vsync(true) end
 
     -- App update
     if current_scene == "menu" then
@@ -160,9 +160,9 @@ function frame(delta_time, width, height, resized, fullscreen)
     end
 
     -- Draw: App -> Canvas
-    set_canvas(Window.canvas)
-    push_matrix()
-    translate(0, (TOP_SPACE))
+    lyte.set_canvas(Window.canvas)
+    lyte.push_matrix()
+    lyte.translate(0, (TOP_SPACE))
     if current_scene == "menu" then
         play_scene.draw(false)
         menu_scene.draw()
@@ -171,51 +171,51 @@ function frame(delta_time, width, height, resized, fullscreen)
     else
         error("Unknown scene to draw: " .. current_scene)
     end
-    pop_matrix()
-    reset_canvas()
+    lyte.pop_matrix()
+    lyte.reset_canvas()
 
     -- Draw Canvas -> Window
-    push_matrix()
+    lyte.push_matrix()
     if Window.DRAW_DEBUG then
-        clear(0.15, 0.15, 0.15, 1)
+        lyte.clear(0.15, 0.15, 0.15, 1)
     else
-        clear(0, 0, 0, 1)
+        lyte.clear(0, 0, 0, 1)
     end
-    translate(0.5, (CH + TOP_SPACE + BOTTOM_SPACE) * Window.scale + 0.5);
-    scale(Window.scale, -Window.scale)
-    draw_image(Window.canvas.image,
+    -- translate(0.5, (CH + TOP_SPACE + BOTTOM_SPACE) * Window.scale + 0.5);
+    lyte.scale(Window.scale, Window.scale)
+    lyte.draw_image(Window.canvas.image,
         math.floor(Window.width / Window.scale / 2 - CW / 2),
-        math.floor(-Window.height / Window.scale / 2 + (CH + TOP_SPACE+BOTTOM_SPACE) / 2))
-    pop_matrix()
+        math.floor(Window.height / Window.scale / 2 - (CH + TOP_SPACE+BOTTOM_SPACE) / 2))
+    lyte.pop_matrix()
 
     -- Draw: Debug info
     if Window.DRAW_DEBUG then
-        push_matrix()
+        lyte.push_matrix()
         debug_draw(delta_time)
-        pop_matrix()
+        lyte.pop_matrix()
     end
 end
 
 local function start()
     -- set_margins(1, 1, 1, 1)
     -- set_paddings(0, 0, 0, 0)
-    set_vsync(false)
-    set_windowminsize(CW*3,(CH+TOP_SPACE+BOTTOM_SPACE)*3)
-    set_windowtitle("Pong Out!")
-    set_windowicon("/assets/images/icon.png")
+    lyte.window.vsync = true
+    lyte.window.size = { width = CW*3, height = (CH+TOP_SPACE+BOTTOM_SPACE)*3 }
+    lyte.window.title = "Pong Out!"
+    lyte.window.icon = "/assets/images/icon.png"
 
-    Window.width = get_windowwidth()
-    Window.height = get_windowheight()
-    Window.canvas = new_canvas(CW, (CH + TOP_SPACE + BOTTOM_SPACE))
+    Window.width = lyte.window.size.width
+    Window.height = lyte.window.size.height
+    Window.canvas = lyte.Canvas(CW, (CH + TOP_SPACE + BOTTOM_SPACE))
     adjust_scale()
 
     load_assets()
 
-    set_font(Assets.font1)
+    lyte.set_font(Assets.font1)
     menu_scene.init()
     play_scene.init()
-    set_musicvolume(Assets.music_elev, 0.3)
-    play_music(Assets.music_elev)
+    Assets.music_elev.volume = 0.3
+    Assets.music_elev:play()
 
 end
 

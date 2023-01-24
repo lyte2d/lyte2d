@@ -4,7 +4,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 project(lyte2d C)
 message("===============> Project: ${PROJECT_NAME}")
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED true)
 
 add_executable(${PROJECT_NAME})
@@ -41,16 +41,30 @@ endif()
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 else ()
-    target_compile_options(${PROJECT_NAME} PUBLIC -std=c17 -O3 -Wall -Wextra -Wpedantic -Werror -Werror=vla)
+    target_compile_options(${PROJECT_NAME} PUBLIC -std=c11 -O3 -Wall -Wextra -Wpedantic -Werror -Werror=vla)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../morebase ${CMAKE_CURRENT_BINARY_DIR}/morebase)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../external/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../external/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     morebase
     lua51-static
+    isocline
 )
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    set(CMAKE_HAVE_THREADS_LIBRARY 1)
+    set(CMAKE_USE_WIN32_THREADS_INIT 0)
+    set(CMAKE_USE_PTHREADS_INIT 1)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        GL 
+        GLU
+    )
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ./src
@@ -59,5 +73,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_sources(${PROJECT_NAME} PRIVATE
     ./src/api.c
     ./src/cfg.c
+    ./src/nbchar.c
+    ./src/repl.c
     ./src/lyte.c
 )

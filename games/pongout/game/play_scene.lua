@@ -77,8 +77,7 @@ function init_bricks()
             b = b + 1
         end
     end
-    play_sound(Assets.sc_brick)
-    get_soundvolume(Assets.sc_brick)
+    Assets.sc_brick:play();
 end
 
 local function init_paddles_and_ball()
@@ -113,15 +112,12 @@ end
 
 local function update_paddles(DT)
     local speed = State.paddle_speed * DT
-    if is_keydown("f1") then set_musicpitch(1) end
-    if is_keydown("f2") then set_musicpitch(1.2) end
-    if is_keydown("f3") then set_musicpitch(0.8) end
 
-    if is_keydown("w") or is_gamepaddown(0, "but_dpad_up") then PaddleLeft.y = PaddleLeft.y - speed end
-    if is_keydown("s") or is_gamepaddown(0, "but_dpad_down") then PaddleLeft.y = PaddleLeft.y + speed end
+    if lyte.is_keydown("w") or lyte.is_gamepaddown(0, "but_dpad_up") then PaddleLeft.y = PaddleLeft.y - speed end
+    if lyte.is_keydown("s") or lyte.is_gamepaddown(0, "but_dpad_down") then PaddleLeft.y = PaddleLeft.y + speed end
 
-    if is_keydown("up") or is_gamepaddown(1, "but_dpad_up") then PaddleRight.y = PaddleRight.y - speed end
-    if is_keydown("down") or is_gamepaddown(1, "but_dpad_down") then PaddleRight.y = PaddleRight.y + speed end
+    if lyte.is_keydown("up") or lyte.is_gamepaddown(1, "but_dpad_up") then PaddleRight.y = PaddleRight.y - speed end
+    if lyte.is_keydown("down") or lyte.is_gamepaddown(1, "but_dpad_down") then PaddleRight.y = PaddleRight.y + speed end
 
     local paddle_delta = 1
     if PaddleLeft.y < 0 + paddle_delta + WALL_THICK then PaddleLeft.y = 0 + paddle_delta + WALL_THICK end
@@ -152,7 +148,8 @@ local function update_ball(DT)
             Ball.y = Ball.y1
             Ball.x = Ball.x1
             if hor then
-                play_sound(Assets.sc_brick)
+                -- play_sound(Assets.sc_brick)
+                Assets.sc_brick:play()
                 Ball.vy = Ball.vy * -1
             end
             if ver then
@@ -163,7 +160,8 @@ local function update_ball(DT)
                     State.left_points = State.left_points + State.lvl_points
                 end
                 State.lvl_points = 0
-                play_sound(Assets.sc_hurt)
+                -- play_sound(Assets.sc_hurt)
+                Assets.sc_hurt:play()
                 init_paddles_and_ball()
             end
         end
@@ -176,7 +174,8 @@ local function update_ball(DT)
             if c then
                 brick.active = false
                 State.lvl_points = State.lvl_points + 1
-                play_sound(Assets.sc_brick)
+                -- play_sound(Assets.sc_brick)
+                Assets.sc_brick:play()
                 if hor then
                     Ball.y = Ball.y - speedy / 2
                     Ball.vy = Ball.vy * -1
@@ -197,7 +196,8 @@ local function update_ball(DT)
         local c1, hor1, ver1 = rect_collision(Ball, PaddleLeft)
         local c2, hor2, ver2 = rect_collision(Ball, PaddleRight)
         if c1 then
-            play_sound(Assets.sc_paddle)
+            -- play_sound(Assets.sc_paddle)
+            Assets.sc_paddle:play()
             LOG("+++ paddle_left -- " .. tostring(hor1) .. " | " .. tostring(ver1))
             if hor1 then
                 Ball.y = Ball.y - speedy / 2
@@ -209,7 +209,8 @@ local function update_ball(DT)
             end
         end
         if c2 then
-            play_sound(Assets.sc_paddle)
+            -- play_sound(Assets.sc_paddle)
+            Assets.sc_paddle:play()
             LOG("+++ paddle_right -- " .. tostring(hor2) .. " | " .. tostring(ver2))
             if hor2 then
                 Ball.y = Ball.y - speedy / 2
@@ -248,7 +249,7 @@ end
 
 
 function M.update(DT)
-    if is_keypressed("escape") then
+    if lyte.is_keypressed("escape") then
         set_scene("menu")
         State.paused = true
     end
@@ -257,28 +258,28 @@ function M.update(DT)
 end
 
 function M.draw(active)
-    clear(0, 0, 0, 1)
+    lyte.clear(0, 0, 0, 1)
 
     if active then
 
-        set_color(0.9, 0.6, 0.5, 1)
-        draw_text("" .. State.left_points, 0 + 2, -TOP_SPACE - 5)
-        set_color(0.5, 0.6, 0.9, 1)
+        lyte.set_color(0.9, 0.6, 0.5, 1)
+        lyte.draw_text("" .. State.left_points, 0 + 2, -TOP_SPACE - 5)
+        lyte.set_color(0.5, 0.6, 0.9, 1)
         draw_text_rightaligned(State.right_points .. "", CW - 2, -TOP_SPACE - 5)
 
-        set_color(0.4, 0.6, 0.4, 1)
+        lyte.set_color(0.4, 0.6, 0.4, 1)
         draw_text_centered(string.rep('|', State.lvl_points), CW / 2, -TOP_SPACE + 14 / 2 - 5)
 
 
-        set_color(0.9, 0.6, 0.5, 1)
-        draw_rect_filled(PaddleLeft.x, PaddleLeft.y, PaddleLeft.w, PaddleLeft.h)
+        lyte.set_color(0.9, 0.6, 0.5, 1)
+        lyte.draw_rect_filled(PaddleLeft.x, PaddleLeft.y, PaddleLeft.w, PaddleLeft.h)
 
 
-        set_color(0.5, 0.6, 0.9, 1)
-        draw_rect_filled(PaddleRight.x, PaddleRight.y, PaddleRight.w, PaddleRight.h)
+        lyte.set_color(0.5, 0.6, 0.9, 1)
+        lyte.draw_rect_filled(PaddleRight.x, PaddleRight.y, PaddleRight.w, PaddleRight.h)
 
-        set_color(0.8, 0.8, 0.4, 1)
-        draw_rect_filled(Ball.x, Ball.y, Ball.w, Ball.h)
+        lyte.set_color(0.8, 0.8, 0.4, 1)
+        lyte.draw_rect_filled(Ball.x, Ball.y, Ball.w, Ball.h)
 
         local b = 1
         for y = 1, State.num_brickrows do
@@ -286,8 +287,8 @@ function M.draw(active)
                 local v = Bricks[b];
                 if v then
                     if (v.active) then
-                        set_color(v.r, v.g, v.b, 1.0)
-                        draw_rect_filled(v.x, v.y, v.w, v.h)
+                        lyte.set_color(v.r, v.g, v.b, 1.0)
+                        lyte.draw_rect_filled(v.x, v.y, v.w, v.h)
                     end
                     b = b + 1
                 end
@@ -297,8 +298,8 @@ function M.draw(active)
 
 
     for _, wall in ipairs(Walls) do
-        set_color(0.5, 0.6, 0.5, 1)
-        draw_rect_filled(wall.x, wall.y, wall.w, wall.h)
+        lyte.set_color(0.5, 0.6, 0.5, 1)
+        lyte.draw_rect_filled(wall.x, wall.y, wall.w, wall.h)
 
     end
 

@@ -1,0 +1,14 @@
+## Lyte2D alpha v0.2 (2023.12.24)
+- Linux support (works on Ubuntu 18+ and SteamDeck)
+- APIs moved to 'lyte' namespace
+- Experimental: Fennel language support
+- REPL support. Change stuff while your game is running.
+  - `lyte repl=lua`  or `lyte repl=fennel` to get started
+- Bugfixes
+* Meta
+- Website: API reference is now in new TS based syntax
+- Website: Web page is auto generated from template
+- Repo: Changelog file (this file) created :)
+
+## Lyte2D alpha v0.1 (2022.12.21)
+- Initial release

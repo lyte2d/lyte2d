@@ -11,6 +11,9 @@
 #include "lyte.h"
 
 
+// #define LYTE_DIRECT_API "_lyte_direct_api"
+#define LYTE_DIRECT_API "lyte"
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -176,6 +179,83 @@ static int api_new_music_load(lua_State *L) {
     return 1;
 }
 
+
+// metadata index... (width/height as properties)
+enum music_keys_idx {
+    IDX_music_volume,
+    IDX_music_pitch,
+    IDX_music_pan,
+    IDX_music_length,
+    IDX_music_length_played,
+    IDX_music_playing,
+    //
+    IDX_music_play,
+    IDX_music_pause,
+    IDX_music_stop,
+    IDX_music_resume,
+    IDX_music_seek,
+    NUM_MUSIC_KEYS,
+};
+static const char *music_keys[] = {
+    "volume",
+    "pitch",
+    "pan",
+    "length",
+    "length_played",
+    "playing",
+    //
+    "play",
+    "pause",
+    "stop",
+    "resume",
+    "seek",
+
+    NULL, // sentinel
+};
+
+//  [ music key -- value ]
+static int music_md_index(lua_State *L) {
+    // M_Music *music = luaL_checkudata(L, -2, "lyte.Music");
+    int key_id = luaL_checkoption(L, -1, NULL, music_keys);
+    //lua_pop(L, 2); // remove the music object and key (str)
+    lua_pop(L, 1); // remove the key (str)
+    switch (key_id) {
+        case IDX_music_volume: { api_music_getvolume(L); } break;
+        case IDX_music_pan: { api_music_getpan(L); } break;
+        case IDX_music_pitch: { api_music_getpitch(L); } break;
+        case IDX_music_length: { api_music_getlength(L); } break;
+        case IDX_music_length_played: { api_music_getlength_played(L); } break;
+        case IDX_music_playing: { api_music_isplaying(L); } break;
+        // methods
+        case IDX_music_play: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "play_music"); lua_remove(L, -2); } break;
+        case IDX_music_pause: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "pause_music"); lua_remove(L, -2); } break;
+        case IDX_music_stop: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "stop_music"); lua_remove(L, -2); } break;
+        case IDX_music_resume: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "resume_music"); lua_remove(L, -2); } break;
+        case IDX_music_seek: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "seek_music"); lua_remove(L, -2); } break;
+    }
+    return 1;
+}
+
+//  [ music key newval -- ]
+static int music_md_newindex(lua_State *L) {
+    int key_id = luaL_checkoption(L, 2, NULL, music_keys);
+    lua_remove(L, 2); // remove the key (str)
+    CHK_STACK(2);
+    switch (key_id) {
+        case IDX_music_volume: { api_music_setvolume(L); } break;
+        case IDX_music_pan: { api_music_setpan(L); } break;
+        case IDX_music_pitch: { api_music_setpitch(L); } break;
+        default: {
+            printf("Field is not settable.\n");
+            lua_error(L);
+        } break;
+
+    }
+    CHK_STACK(2);
+    lua_settop(L, 0);
+    return 0;
+}
+
 static int music_md_tostring(lua_State *L) {
     M_Music *mus = luaL_checkudata(L, 1, "lyte.Music");
     (void)mus;
@@ -189,6 +269,8 @@ static int music_md_gc(lua_State *L) {
     return 1;
 }
 static const struct luaL_Reg music_metadata[] = {
+    {"__index", music_md_index},
+    {"__newindex", music_md_newindex},
     {"__tostring", music_md_tostring},
     {"__gc", music_md_gc},
     {NULL, NULL} /* sentinel */
@@ -280,6 +362,56 @@ static int api_new_sounddata_load(lua_State *L) {
     return 1;
 }
 
+
+// metadata index... (width/height as properties)
+enum sounddata_keys_idx {
+    IDX_sounddata_volume,
+    IDX_sounddata_pitch,
+    IDX_sounddata_pan,
+    NUM_SOUNDDATA_KEYS,
+};
+static const char *sounddata_keys[] = {
+    "volume",
+    "pitch",
+    "pan",
+
+    NULL, // sentinel
+};
+
+//  [ sounddata key -- value ]
+static int sounddata_md_index(lua_State *L) {
+    // M_SoundData *sounddata = luaL_checkudata(L, -2, "lyte.SoundData");
+    int key_id = luaL_checkoption(L, -1, NULL, sounddata_keys);
+    //lua_pop(L, 2); // remove the sounddata object and key (str)
+    lua_pop(L, 1); // remove the key (str)
+    switch (key_id) {
+        case IDX_sounddata_volume: { api_sounddata_getvolume(L); } break;
+        case IDX_sounddata_pan: { api_sounddata_getpan(L); } break;
+        case IDX_sounddata_pitch: { api_sounddata_getpitch(L); } break;
+    }
+    return 1;
+}
+
+//  [ sounddata key newval -- ]
+static int sounddata_md_newindex(lua_State *L) {
+    int key_id = luaL_checkoption(L, 2, NULL, sounddata_keys);
+    lua_remove(L, 2); // remove the key (str)
+    CHK_STACK(2);
+    switch (key_id) {
+        case IDX_sounddata_volume: { api_sounddata_setvolume(L); } break;
+        case IDX_sounddata_pan: { api_sounddata_setpan(L); } break;
+        case IDX_sounddata_pitch: { api_sounddata_setpitch(L); } break;
+        default: {
+            printf("Field is not settable.\n");
+            lua_error(L);
+        } break;
+
+    }
+    CHK_STACK(2);
+    lua_settop(L, 0);
+    return 0;
+}
+
 static int sounddata_md_tostring(lua_State *L) {
     M_SoundData *sd = luaL_checkudata(L, 1, "lyte.SoundData");
     (void)sd;
@@ -293,6 +425,8 @@ static int sounddata_md_gc(lua_State *L) {
     return 1;
 }
 static const struct luaL_Reg sounddata_metadata[] = {
+    {"__index", sounddata_md_index},
+    {"__newindex", sounddata_md_newindex},
     {"__tostring", sounddata_md_tostring},
     {"__gc", sounddata_md_gc},
     {NULL, NULL} /* sentinel */
@@ -422,6 +556,79 @@ static int api_new_sound(lua_State *L) {
     return 1;
 }
 
+
+
+
+// meta index... (width/height as properties)
+enum sound_keys_idx {
+    IDX_sound_volume,
+    IDX_sound_pitch,
+    IDX_sound_pan,
+    IDX_sound_playing,
+    //
+    IDX_sound_play,
+    IDX_sound_pause,
+    IDX_sound_stop,
+    IDX_sound_resume,
+    NUM_SOUND_KEYS,
+};
+static const char *sound_keys[] = {
+    "volume",
+    "pitch",
+    "pan",
+    "playing",
+    //
+    "play",
+    "pause",
+    "stop",
+    "resume",
+
+    NULL, // sentinel
+};
+
+//  [ sound key -- value ]
+static int sound_md_index(lua_State *L) {
+    // M_Sound *sound = luaL_checku(L, -2, "lyte.Sound");
+    int key_id = luaL_checkoption(L, -1, NULL, sound_keys);
+    //lua_pop(L, 2); // remove the sound object and key (str)
+    lua_pop(L, 1); // remove the key (str)
+    switch (key_id) {
+        case IDX_sound_volume: { api_sound_getvolume(L); } break;
+        case IDX_sound_pan: { api_sound_getpan(L); } break;
+        case IDX_sound_pitch: { api_sound_getpitch(L); } break;
+        case IDX_sound_playing: { api_sound_isplaying(L); } break;
+        // methods
+        case IDX_sound_play: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "play_sound"); lua_remove(L, -2); } break;
+        case IDX_sound_pause: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "pause_sound"); lua_remove(L, -2); } break;
+        case IDX_sound_stop: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "stop_sound"); lua_remove(L, -2); } break;
+        case IDX_sound_resume: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "resume_sound"); lua_remove(L, -2); } break;
+    }
+    return 1;
+}
+
+
+
+//  [ sound key newval -- ]
+static int sound_md_newindex(lua_State *L) {
+    int key_id = luaL_checkoption(L, 2, NULL, sound_keys);
+    lua_remove(L, 2); // remove the key (str)
+    CHK_STACK(2);
+    switch (key_id) {
+        case IDX_sound_volume: { api_sound_setvolume(L); } break;
+        case IDX_sound_pan: { api_sound_setpan(L); } break;
+        case IDX_sound_pitch: { api_sound_setpitch(L); } break;
+        default: {
+            printf("Field is not settable.\n");
+            lua_error(L);
+        } break;
+
+    }
+    CHK_STACK(2);
+    lua_settop(L, 0);
+    return 0;
+}
+
+
 static int sound_md_tostring(lua_State *L) {
     M_Sound *sc = luaL_checkudata(L, 1, "lyte.Sound");
     (void)sc;
@@ -435,6 +642,8 @@ static int sound_md_gc(lua_State *L) {
     return 1;
 }
 static const struct luaL_Reg sound_metadata[] = {
+    {"__index", sound_md_index},
+    {"__newindex", sound_md_newindex},
     {"__tostring", sound_md_tostring},
     {"__gc", sound_md_gc},
     {NULL, NULL} /* sentinel */
@@ -453,60 +662,58 @@ static int luaopen_sound_metadata(lua_State *L) {
 
 // AUDIO LIB
 
-static const struct luaL_Reg lyte_audio_lib[] = {
-    // audio
-    {"set_mastervolume", api_set_mastervolume},
-    {"get_mastervolume", api_get_mastervolume},
-    // music
-    {"load_music", api_new_music_load},
-    {"play_music", api_music_start},
-    {"pause_music", api_music_pause},
-    {"resume_music", api_music_resume},
-    {"stop_music", api_music_stop},
-    {"seek_music", api_music_seek},
-    {"get_musiclength", api_music_getlength},
-    {"get_musiclength_played", api_music_getlength_played},
-    {"set_musicvolume", api_music_setvolume},
-    {"get_musicvolume", api_music_getvolume},
-    {"set_musicpitch", api_music_setpitch},
-    {"get_musicpitch", api_music_getpitch},
-    {"set_musicpan", api_music_setpan},
-    {"get_musicpan", api_music_getpan},
-    {"is_musicplaying", api_music_isplaying},
+// static const struct luaL_Reg lyte_audio_api_lib[] = {
 
-    // sounddata
-    {"load_sounddata", api_new_sounddata_load},
-    {"set_sounddatavolume", api_sounddata_setvolume},
-    {"get_sounddatavolume", api_sounddata_getvolume},
-    {"set_sounddatapitch", api_sounddata_setpitch},
-    {"get_sounddatapitch", api_sounddata_getpitch},
-    {"set_sounddatapan", api_sounddata_setpan},
-    {"get_sounddatapan", api_sounddata_getpan},
+//     // music
+//     {"load_music", api_new_music_load},
+//     {"play_music", api_music_start},
+//     {"pause_music", api_music_pause},
+//     {"resume_music", api_music_resume},
+//     {"stop_music", api_music_stop},
+//     {"seek_music", api_music_seek},
+//     {"get_musiclength", api_music_getlength},
+//     {"get_musiclength_played", api_music_getlength_played},
+//     {"set_musicvolume", api_music_setvolume},
+//     {"get_musicvolume", api_music_getvolume},
+//     {"set_musicpitch", api_music_setpitch},
+//     {"get_musicpitch", api_music_getpitch},
+//     {"set_musicpan", api_music_setpan},
+//     {"get_musicpan", api_music_getpan},
+//     {"is_musicplaying", api_music_isplaying},
 
-    // sound
-    {"new_sound", api_new_sound},
-    {"set_soundvolume", api_sound_setvolume},
-    {"get_soundvolume", api_sound_getvolume},
-    {"set_soundpitch", api_sound_setpitch},
-    {"get_soundpitch", api_sound_getpitch},
-    {"set_soundpan", api_sound_setpan},
-    {"get_soundpan", api_sound_getpan},
-    {"play_sound", api_sound_play},
-    {"pause_sound", api_sound_pause},
-    {"resume_sound", api_sound_resume},
-    {"stop_sound", api_sound_stop},
-    {"is_soundplaying", api_sound_isplaying},
+//     // sounddata
+//     {"load_sounddata", api_new_sounddata_load},
+//     {"set_sounddatavolume", api_sounddata_setvolume},
+//     {"get_sounddatavolume", api_sounddata_getvolume},
+//     {"set_sounddatapitch", api_sounddata_setpitch},
+//     {"get_sounddatapitch", api_sounddata_getpitch},
+//     {"set_sounddatapan", api_sounddata_setpan},
+//     {"get_sounddatapan", api_sounddata_getpan},
+
+//     // sound
+//     {"new_sound", api_new_sound},
+//     {"set_soundvolume", api_sound_setvolume},
+//     {"get_soundvolume", api_sound_getvolume},
+//     {"set_soundpitch", api_sound_setpitch},
+//     {"get_soundpitch", api_sound_getpitch},
+//     {"set_soundpan", api_sound_setpan},
+//     {"get_soundpan", api_sound_getpan},
+//     {"play_sound", api_sound_play},
+//     {"pause_sound", api_sound_pause},
+//     {"resume_sound", api_sound_resume},
+//     {"stop_sound", api_sound_stop},
+//     {"is_soundplaying", api_sound_isplaying},
 
 
-    {NULL, NULL} /* sentinel */
-};
+//     {NULL, NULL} /* sentinel */
+// };
 
 // -- open
 int luaopen_lyte_audio(lua_State *L) {
     luaopen_music_metadata(L);
     luaopen_sounddata_metadata(L);
     luaopen_sound_metadata(L);
-    luaL_register(L, "lyte", lyte_audio_lib);
+    // luaL_register(L, LYTE_DIRECT_API, lyte_audio_api_lib);
     lua_pop(L, 1); // regitered table
     return 0;
 }
@@ -1066,7 +1273,7 @@ static const char *canvas_keys[] = {
 static int canvas_md_index(lua_State *L) {
     M_Canvas *cvs = luaL_checkudata(L, -2, "lyte.Canvas");
     int key_id = luaL_checkoption(L, -1, NULL, canvas_keys);
-    lua_pop(L, 2); // remove the Config and key (str)
+    lua_pop(L, 2); // remove the canvas object and key (str)
     switch (key_id) {
         case IDX_canvas_width: { lua_pushinteger(L, cvs->height); } break;
         case IDX_canvas_height: { lua_pushinteger(L, cvs->height); } break;
@@ -1080,7 +1287,7 @@ static int canvas_md_index(lua_State *L) {
 
 static int canvas_md_tostring(lua_State *L) {
     M_Canvas *cvs = luaL_checkudata(L, 1, "lyte.Canvas");
-    lua_pushfstring(L, "[lyte.Canvas w: %d h: %d]", cvs->width, cvs->height);
+    lua_pushfstring(L, "[lyte.Canvas width: %d height: %d]", cvs->width, cvs->height);
     return 1;
 }
 static int canvas_md_gc(lua_State *L) {
@@ -1188,7 +1395,7 @@ static int image_md_index(lua_State *L) {
 
 static int image_md_tostring(lua_State *L) {
     M_Image *img = luaL_checkudata(L, 1, "lyte.Image");
-    lua_pushfstring(L, "[lyte.Image w: %d h: %d]", img->width, img->height);
+    lua_pushfstring(L, "[lyte.Image 'width' %d 'height': %d]", img->width, img->height);
     return 1;
 }
 static int image_md_gc(lua_State *L) {
@@ -1326,12 +1533,15 @@ static const struct luaL_Reg lyte_graphics_lib[] = {
     {"set_filtermode", api_set_filtermode},
     {"reset_filtermode", api_reset_filtermode},
 
-    {"new_canvas", api_new_canvas},
+    // in direct api, and Image/Canvas ctors now
+    // {"new_canvas", api_new_canvas},
+    // {"load_image", api_new_image_load},
+
+
     // {"get_canvas_image", api_set_canvas_image}, // canvas has .image property
     {"set_canvas", api_set_canvas},
     {"reset_canvas", api_reset_canvas},
 
-    {"load_image", api_new_image_load},
     {"draw_image", api_draw_image},
     {"draw_imagerect", api_draw_imagerect},
 
@@ -1365,7 +1575,7 @@ int luaopen_lyte_graphics(lua_State *L) {
     luaopen_canvas_metadata(L);
     luaopen_image_metadata(L);
     luaopen_font_metadata(L);
-    luaL_register(L, "_G", lyte_graphics_lib);
+    luaL_register(L, "lyte", lyte_graphics_lib);
     lua_pop(L, 1);
     return 0;
 }
@@ -1672,7 +1882,7 @@ static const struct luaL_Reg lyte_input_lib[] = {
 
 // -- open
 int luaopen_lyte_input(lua_State *L) {
-    luaL_register(L, "_G", lyte_input_lib);
+    luaL_register(L, "lyte", lyte_input_lib);
     lua_pop(L, 1);
     return 0;
 }
@@ -1827,33 +2037,141 @@ static int api_set_paddings(lua_State *L) {
     return 0;
 }
 
+static const struct luaL_Reg lyte_filesystem_lib[] = {
+    {"read", api_loadtext},
+    {"write", api_savetext},
+    {"append", api_savetextappend},
+};
+int luaopen_lyte_filesystem(lua_State *L) {
+    LOG("luaopen: filesystem\n");
+    // luaL_register(L, "lyte.filesystem", lyte_filesystem_lib);
+    luaL_register(L, "lyte", lyte_filesystem_lib);
+    lua_pop(L, 1);
+    return 0;
+}
+
+
 static const struct luaL_Reg lyte_runtime_lib[] = {
-    {"load_text", api_loadtext},
-    {"save_text", api_savetext},
-    {"save_text_append", api_savetextappend},
+    // constructors
+    {"Music", api_new_music_load},
+    {"SoundData", api_new_sounddata_load},
+    {"Sound", api_new_sound},
+
+    {"Canvas", api_new_canvas},
+    {"Image", api_new_image_load},
     {"quit", api_quit},
-    {"get_windowwidth",api_getwindowwidth},
-    {"get_windowheight",api_getwindowheight},
-    {"set_windowsize",api_setwindowsize},
-    {"set_windowminsize",api_setwindowminsize},
-    {"set_fullscreen", api_setfullscreen},
-    {"get_fullscreen", api_getfullscreen},
-    {"set_windowtitle",api_setwindowtitle},
-    {"set_windowicon",api_setwindowicon},
-    {"set_vsync", api_setvsync},
-    {"get_vsync", api_getvsync},
-    {"set_margins", api_set_margins},
-    {"set_paddings", api_set_paddings},
+
     {NULL, NULL} /* sentinel */
 };
 
 // -- open
 int luaopen_lyte_runtime(lua_State *L) {
     LOG("luaopen: lyte_runtime\n");
-    luaL_register(L, "_G", lyte_runtime_lib);
+    luaL_register(L, "lyte", lyte_runtime_lib);
     lua_pop(L, 1);
     return 0;
 }
+
+
+
+static const struct luaL_Reg lyte_direct_api_lib[] = {
+
+    // music
+    {"load_music", api_new_music_load},
+    {"play_music", api_music_start},
+    {"pause_music", api_music_pause},
+    {"resume_music", api_music_resume},
+    {"stop_music", api_music_stop},
+    {"seek_music", api_music_seek},
+    {"get_musiclength", api_music_getlength},
+    {"get_musiclength_played", api_music_getlength_played},
+    {"set_musicvolume", api_music_setvolume},
+    {"get_musicvolume", api_music_getvolume},
+    {"set_musicpitch", api_music_setpitch},
+    {"get_musicpitch", api_music_getpitch},
+    {"set_musicpan", api_music_setpan},
+    {"get_musicpan", api_music_getpan},
+    {"is_musicplaying", api_music_isplaying},
+
+    // sounddata
+    {"load_sounddata", api_new_sounddata_load},
+    {"set_sounddatavolume", api_sounddata_setvolume},
+    {"get_sounddatavolume", api_sounddata_getvolume},
+    {"set_sounddatapitch", api_sounddata_setpitch},
+    {"get_sounddatapitch", api_sounddata_getpitch},
+    {"set_sounddatapan", api_sounddata_setpan},
+    {"get_sounddatapan", api_sounddata_getpan},
+
+    // sound
+    {"new_sound", api_new_sound},
+    {"set_soundvolume", api_sound_setvolume},
+    {"get_soundvolume", api_sound_getvolume},
+    {"set_soundpitch", api_sound_setpitch},
+    {"get_soundpitch", api_sound_getpitch},
+    {"set_soundpan", api_sound_setpan},
+    {"get_soundpan", api_sound_getpan},
+    {"play_sound", api_sound_play},
+    {"pause_sound", api_sound_pause},
+    {"resume_sound", api_sound_resume},
+    {"stop_sound", api_sound_stop},
+    {"is_soundplaying", api_sound_isplaying},
+
+    // filesystem
+    {"file_read", api_loadtext},
+    {"file_write", api_savetext},
+    {"file_append", api_savetextappend},
+
+    // graphics
+    {"new_canvas", api_new_canvas},
+    {"load_image", api_new_image_load},
+
+    // audio
+    {"set_mastervolume", api_set_mastervolume},
+    {"get_mastervolume", api_get_mastervolume},
+
+    // window
+    {"set_windowtitle",api_setwindowtitle},
+    {"get_windowwidth",api_getwindowwidth},
+    {"get_windowheight",api_getwindowheight},
+    {"set_windowsize",api_setwindowsize},
+    {"set_windowminsize",api_setwindowminsize},
+    {"set_fullscreen", api_setfullscreen},
+    {"get_fullscreen", api_getfullscreen},
+    {"set_vsync", api_setvsync},
+    {"get_vsync", api_getvsync},
+    {"set_margins", api_set_margins},
+    {"set_paddings", api_set_paddings},
+    {"set_windowicon",api_setwindowicon},
+
+
+    {NULL, NULL} /* sentinel */
+};
+
+
+int luaopen_lyte_direct_api(lua_State *L) {
+    LOG("luaopen: direct_api\n");
+    luaL_register(L, LYTE_DIRECT_API, lyte_direct_api_lib);
+    // lua_pop(L, 1);
+    return 0;
+}
+
+
+// static const struct luaL_Reg lyte_runtime_direct_api_lib[] = {
+//     {"file_read", api_loadtext},
+//     {"file_write", api_savetext},
+//     {"file_append", api_savetextappend},
+//     {"new_canvas", api_new_canvas},
+//     {"load_image", api_new_image_load},
+
+
+// };
+
+// int luaopen_lyte_runtime_direct_api(lua_State *L) {
+//     LOG("luaopen: runtime direct api\n");
+//     luaL_register(L, LYTE_DIRECT_API, lyte_runtime_direct_api_lib);
+//     lua_pop(L, 1);
+//     return 0;
+// }
 
 
 
@@ -1867,5 +2185,8 @@ int lyteapi_open(lua_State *L) {
     luaopen_lyte_input(L);
     luaopen_lyte_graphics(L);
     luaopen_lyte_audio(L);
+    luaopen_lyte_filesystem(L);
+    // direct API
+    luaopen_lyte_direct_api(L);
     return 0;
 }

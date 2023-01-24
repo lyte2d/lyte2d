@@ -32,7 +32,9 @@ end
 -- class(A) instead of A:extend()
 function lyte.class(C)
     if C then
-        return C:_extend()
+        local cls = Object._extend(C) -- instead of C:_extend()
+        Object.mixin(cls, Object)
+        return cls
     else
         return Object:_extend()
     end

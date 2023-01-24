@@ -19,4 +19,22 @@
 int get_config(M_Config *cfg, int argc, char *argv[]);
 int lyteapi_open(lua_State *L);
 
+// REPL (+nbchar)
+int nbchar(void);
+
+// #ifdef __linux__
+// void nbchar_enable_raw_mode();
+// void nbchar_disable_raw_mode();
+// #endif
+
+typedef enum LYTE_LANG {
+    LUA,
+    FENNEL,
+} LYTE_LANG;
+
+void repl_setup(LYTE_LANG lang);
+bool repl_check(lua_State *L); // returns: skip frame hint
+void repl_prompt(void);
+
+
 #endif /* LYTE_H_INCLUDED */

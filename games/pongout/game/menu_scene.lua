@@ -21,8 +21,8 @@ local active_item = 1
 
 function M.init()
     menu_state.alpha = 0.0
-    set_font(Assets.font1)
-    tweens.goin = tween.new(2.0, menu_state, { alpha = 1.0 }, 'inOutQuad')
+    lyte.set_font(Assets.font1)
+    tweens.goin = lyte.tween.new(2.0, menu_state, { alpha = 1.0 }, 'inOutQuad')
     tweens.demo_starter = nil
     active_item = 1
 end
@@ -42,11 +42,11 @@ function M.update(dt)
         end
     end
 
-    if is_keypressed("space") or is_keypressed("enter") or is_gamepadpressed(0, "but_a") then
+    if lyte.is_keypressed("space") or lyte.is_keypressed("enter") or lyte.is_gamepadpressed(0, "but_a") then
         tweens.demo_starter = nil
         if menu_items[active_item].id == "c" then
             tweens.goin:set(10.0)
-            tweens.goout = tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
+            tweens.goout = lyte.tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
         elseif menu_items[active_item].id == "n" then
             State.left_points = 0
             State.right_points = 0
@@ -62,17 +62,17 @@ function M.update(dt)
 
             State.lvl_points = 0
             tweens.goin:set(10.0)
-            tweens.goout = tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
+            tweens.goout = lyte.tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
         elseif menu_items[active_item].id == "q" then
             quit()
         end
     end
 
-    if is_keypressed("up") or is_keypressed("w") or is_gamepadpressed(0, "but_dpad_up") then
+    if lyte.is_keypressed("up") or lyte.is_keypressed("w") or lyte.is_gamepadpressed(0, "but_dpad_up") then
         tweens.demo_starter = nil
         active_item = active_item - 1
     end
-    if is_keypressed("down") or is_keypressed("s") or is_gamepadpressed(0, "but_dpad_down") then
+    if lyte.is_keypressed("down") or lyte.is_keypressed("s") or lyte.is_gamepadpressed(0, "but_dpad_down") then
         tweens.demo_starter = nil
         active_item = active_item + 1
     end
@@ -88,16 +88,16 @@ function M.update(dt)
 end
 
 function M.draw()
-    push_matrix()
-    translate(CW / 2, 50)
-    scale(3, 3)
+    lyte.push_matrix()
+    lyte.translate(CW / 2, 50)
+    lyte.scale(3, 3)
 
-    set_color(1, 0.5, 0.5, menu_state.alpha)
+    lyte.set_color(1, 0.5, 0.5, menu_state.alpha)
     draw_text_centered("PONG    !", 0, 0)
     draw_text_centered("PONG    !", 0, 0)
     draw_text_centered("PONG    !", 0, 0)
 
-    set_color(0.5, 1, 1, menu_state.alpha)
+    lyte.set_color(0.5, 1, 1, menu_state.alpha)
     draw_text_centered("     OUT!", 0, 0)
     draw_text_centered("     OUT!", 0, 0)
     draw_text_centered("     OUT!", 0, 0)
@@ -107,17 +107,17 @@ function M.draw()
         start = 1
     end
 
-    pop_matrix()
+    lyte.pop_matrix()
     for i = start, #menu_items do
         local mi = menu_items[i]
         if i == active_item then
-            set_color(1, 1, 0, 1)
+            lyte.set_color(1, 1, 0, 1)
         else
-            set_color(0.7, 0.7, 0.7, 1)
+            lyte.set_color(0.7, 0.7, 0.7, 1)
         end
-        draw_text(mi.title, CW / 2 - 50, (70 + i * 20))
-        draw_text(mi.title, CW / 2 - 50, (70 + i * 20))
-        draw_text(mi.title, CW / 2 - 50, (70 + i * 20))
+        lyte.draw_text(mi.title, CW / 2 - 50, (70 + i * 20))
+        lyte.draw_text(mi.title, CW / 2 - 50, (70 + i * 20))
+        lyte.draw_text(mi.title, CW / 2 - 50, (70 + i * 20))
     end
 end
 

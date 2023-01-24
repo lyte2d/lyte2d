@@ -1,0 +1,12 @@
+Notes for development.
+
+* Linux builds targeting glibc 2.27
+ubuntu-18.0.4
+cmake20 (15+) built, needs libssl, build-essentials (gcc ...)
+libx11-dev
+libxrandr-dev
+libxinerama-dev
+libxcursor-dev
+libxi-dev
+libglu1-mesa-dev
+
