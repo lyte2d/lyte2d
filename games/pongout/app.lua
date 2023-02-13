@@ -2,10 +2,8 @@
 
 -- contants
 
-TOP_SPACE = 15
-BOTTOM_SPACE = 5
 CW = 64 * 6 -- game area width
-CH = 40 * 6 - TOP_SPACE - BOTTOM_SPACE -- game area height
+CH = 40 * 6 -- game area height
 WALL_THICK = 5
 
 -- global state
@@ -107,13 +105,13 @@ local function debug_draw(DT)
     -- set_color(1, 1, 1, 0.4)
     translate(
         math.floor((Window.width - CW * Window.scale) / 2) - 0.5,
-        math.floor((Window.height - (CH + TOP_SPACE+BOTTOM_SPACE) * Window.scale) / 2) - 0.5)
-    draw_rect(0, 0, mathx.round(CW * Window.scale), mathx.round((CH+TOP_SPACE+BOTTOM_SPACE) * Window.scale))
+        math.floor((Window.height - CH * Window.scale) / 2) - 0.5)
+    draw_rect(0, 0, mathx.round(CW * Window.scale), mathx.round(CH * Window.scale))
 
 end
 
 local function adjust_scale()
-    local sc = (math.min(Window.width / CW, Window.height / (CH + TOP_SPACE + BOTTOM_SPACE)))
+    local sc = (math.min(Window.width / CW, Window.height / CH))
     if Window.PIXEL_PERFFECT then
         Window.scale = math.floor(sc)
     else
@@ -131,7 +129,7 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
 
     -- System keys
     -- F4: quit
-    if lyte.is_keypressed("f4") or lyte.is_gamepadpressed(0, "but_back") then quit() end
+    if lyte.is_keypressed("f4") or lyte.is_gamepadpressed(0, "but_back") then lyte.quit() end
     -- Alt-F11: pixel perfect vs regular scaling
     if (lyte.is_keydown('left_alt') or lyte.is_keydown('right_alt')) and lyte.is_keypressed("f11") then
         Window.PIXEL_PERFFECT = not Window.PIXEL_PERFFECT
@@ -140,15 +138,15 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
     end
 
     -- F11: fullscreen/exit fullscreen
-    if lyte.is_keypressed("f11") or lyte.is_gamepadpressed(0, "but_start") then set_fullscreen(not fullscreen) end
+    if lyte.is_keypressed("f11") or lyte.is_gamepadpressed(0, "but_start") then lyte.set_fullscreen(not fullscreen) end
     -- Alt-F12: debug info drawn/not drawn
     if (lyte.is_keydown('left_alt') or lyte.is_keydown('right_alt')) and lyte.is_keypressed("f12") then
         Window.DRAW_DEBUG = not Window.DRAW_DEBUG
         return
     end
 
-    if lyte.is_keypressed("f8") then set_vsync(false) end
-    if lyte.is_keypressed("f9") then set_vsync(true) end
+    if lyte.is_keypressed("f8") then lyte.set_vsync(false) end
+    if lyte.is_keypressed("f9") then lyte.set_vsync(true) end
 
     -- App update
     if current_scene == "menu" then
@@ -162,7 +160,7 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
     -- Draw: App -> Canvas
     lyte.set_canvas(Window.canvas)
     lyte.push_matrix()
-    lyte.translate(0, (TOP_SPACE))
+    lyte.translate(0,0)
     if current_scene == "menu" then
         play_scene.draw(false)
         menu_scene.draw()
@@ -181,11 +179,9 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
     else
         lyte.clear(0, 0, 0, 1)
     end
-    -- translate(0.5, (CH + TOP_SPACE + BOTTOM_SPACE) * Window.scale + 0.5);
     lyte.scale(Window.scale, Window.scale)
-    lyte.draw_image(Window.canvas.image,
-        math.floor(Window.width / Window.scale / 2 - CW / 2),
-        math.floor(Window.height / Window.scale / 2 - (CH + TOP_SPACE+BOTTOM_SPACE) / 2))
+    lyte.translate(Window.width / Window.scale / 2 - CW / 2, (Window.height / Window.scale / 2 - CH / 2));
+    lyte.draw_image(Window.canvas.image, 0, 0)
     lyte.pop_matrix()
 
     -- Draw: Debug info
@@ -197,16 +193,16 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
 end
 
 local function start()
-    -- set_margins(1, 1, 1, 1)
-    -- set_paddings(0, 0, 0, 0)
-    lyte.window.vsync = true
-    lyte.window.size = { width = CW*3, height = (CH+TOP_SPACE+BOTTOM_SPACE)*3 }
-    lyte.window.title = "Pong Out!"
-    lyte.window.icon = "/assets/images/icon.png"
+    lyte.set_vsync(false)
+    lyte.set_windowminsize(CW*3,CH*3)
+    lyte.set_windowsize(CW*3,CH*3)
+    lyte.set_windowtitle("Pong Out!")
+    lyte.set_windowicon("/assets/images/icon.png")
 
-    Window.width = lyte.window.size.width
-    Window.height = lyte.window.size.height
-    Window.canvas = lyte.Canvas(CW, (CH + TOP_SPACE + BOTTOM_SPACE))
+    Window.width = lyte.get_windowwidth()
+    Window.height = lyte.get_windowheight()
+    Window.canvas = lyte.new_canvas(CW, CH)
+
     adjust_scale()
 
     load_assets()

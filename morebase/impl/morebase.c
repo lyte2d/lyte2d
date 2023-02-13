@@ -4,9 +4,14 @@
 
 #define LOG
 
+#define SGP_UNIFORM_CONTENT_SLOTS 1024
+#define SGP_TEXTURE_SLOTS 8
+// #define SGP_BATCH_OPTIMIZER_DEPTH 0
+// #define SOKOL_VALIDATE_NON_FATAL
+#define SOKOL_IMPL
+
 #define TRACELOG LOG
 #define SOKOL_LOG(s) LOG(s)
-#define SOKOL_IMPL
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
@@ -52,6 +57,7 @@
 
 #include <sokol_args.h>
 
+
 //
 // DATA SHAPES
 //
@@ -76,6 +82,15 @@ typedef struct GLFWgamepadstate
 // GLOBAL DATA
 //
 
+
+typedef struct ShaderInternal {
+    float *_uniform_data;
+    uint32_t *_uniform_images;
+    bool * _uniform_image_deletes;
+
+    uint32_t _uniform_data_count;
+    uint32_t _uniform_images_count;
+} ShaderInternal;
 
 // "global"  _input
 static struct {
@@ -128,7 +143,11 @@ static struct {
     float margin_top;
     float margin_bottom;
     M_Canvas current_canvas;
+    float current_color[4];
     GLFWvidmode* mode;
+    M_ShaderDef shaderdefs[M_MAX_SHADERDEFS];
+    uint32_t last_shaderid;
+    ShaderInternal *_current_shader;
 } __m_lib_data = {0}, *_lib = &__m_lib_data;
 
 // "global"  _fs
@@ -336,17 +355,24 @@ M_SoundData M_newsounddata_load(const char *path) {
 void M_sounddata_cleanup(M_SoundData sounddata) {
     struct SoundInfo *info = audio_find_sounddatainfo(sounddata.id);
     if (info) {
-        UnloadWave(info->wave);
-        free(info->data);
-        for(int i=0; i< info->num_channels; i++) {
-            if (info->channels[i].in_use) {
-                M_Sound ch = {0};
-                ch.data_id = sounddata.id;
-                ch.channel_idx = i;
-                M_sound_cleanup(ch);
+        if (info->channels) {
+            for(int i=0; i< info->num_channels; i++) {
+                if (info->channels[i].in_use) {
+                    M_Sound ch = {0};
+                    ch.data_id = sounddata.id;
+                    ch.channel_idx = i;
+                    M_sound_cleanup(ch);
+                }
             }
+            free(info->channels);
+            info->channels = NULL;
         }
-        free(info->channels);
+        if (info->data)
+        {
+            free(info->data);
+            info->data = NULL;
+        }
+        // UnloadWave(info->wave);
     }
 }
 
@@ -726,7 +752,6 @@ static void fons__renderDraw(void* userPtr, const float* verts, const float* tco
     // LOG("~~~ Font Draw %d: \n", nverts);
     M_Canvas *c = (M_Canvas *)userPtr;
     M_Image img = M_canvas_get_image(*c);
-
     sgp_set_image(0,(sg_image){.id=img.id});
     sgp_set_blend_mode(_lib->blendmode);
     int W = _lib->width;
@@ -1344,9 +1369,11 @@ void M_gfx_setdefaultblendmode(M_BlendMode blendmode) {
 }
 void M_gfx_setblendmode(M_BlendMode blendmode) {
     _lib->blendmode = blendmode;
+    sgp_set_blend_mode(_lib->blendmode);
 }
 void M_gfx_resetblendmode() {
     _lib->blendmode = _lib->defaultblendmode;
+    sgp_set_blend_mode(_lib->blendmode);
 }
 void M_gfx_setdefaultfiltermode(M_FilterMode filtermode) {
     _lib->defaultfiltermode = filtermode;
@@ -1458,7 +1485,420 @@ void M_canvas_unset(void) {
 
 }
 
+// shader
 
+#if !defined(__EMSCRIPTEN__)
+static const char *shader_header = "\n\n#version 330\n// ---\n\n";
+// static const char *shader_header = "#version 330 core\n// ---\n";
+#else
+static const char *shader_header = "#version 300 es\nprecision highp float;\n// ---\n";
+//static const char *shader_header = "#version 300 es\nprecision mediump float;\n// ---\n";
+// static const char *shader_header = "\n\n#version 300 es\n// ---\n\n";
+#endif
+
+static const char *vert_footer = "\n// ---\nvoid main() { vert_main(); }\n";
+static const char *frag_footer = "\n// ---\nvoid main() { frag_main(); }\n";
+static const char *frag_header_1 = "uniform sampler2D current_image;\n";
+static const char *frag_header_2 = "uniform vec4 current_color;\n";
+static const char *frag_sep = "// ---\n\n";
+
+static inline char *_get_uniforms_text(struct M_UniformDef *uniforms, size_t num_uniforms) {
+
+    char *ret = malloc(256*(num_uniforms+1)); // freed in new shader;
+                                          //
+    sprintf(ret, "// uniform declarations...\n");
+    for (int i=0; i<num_uniforms;i++) {
+        const char *type = NULL;
+        M_UniformType utype = uniforms[i].type;
+        switch (utype) {
+            case M_UNIFORM_FLOAT: {type = "float";} break;
+            case M_UNIFORM_FLOAT2: {type = "vec2";} break;
+            case M_UNIFORM_FLOAT3: {type = "vec3";} break;
+            case M_UNIFORM_FLOAT4: {type = "vec4";} break;
+            case M_UNIFORM_INT: {type = "int";} break;
+            case M_UNIFORM_INT2: {type = "ivec3";} break;
+            case M_UNIFORM_INT3: {type = "ivec3";} break;
+            case M_UNIFORM_INT4: {type = "ivec4";} break;
+            case M_UNIFORM_MAT4: {type = "mat4";} break;
+            case M_UNIFORM_SAMPLER2D: {type = "sampler2D";} break;
+            default: {
+                printf("Unknown uniform type: %d", utype);
+                exit(1);
+            } break;
+        }
+        const char *name = uniforms[i].name;
+        sprintf(ret+strlen(ret), "uniform %s %s;\n", type, name);
+    }
+    return ret;
+}
+
+static inline char *_get_vert_code(const char *str, const char *uniforms_text) {
+    size_t orig_len = strlen(str);
+    size_t new_len = orig_len + 1000;
+    char *ret = malloc(new_len); // freed in new_shader
+    memset(ret, 0, new_len);
+    // printf("VERT: %s%s%s", shader_header, str, vert_footer);
+    // sprintf(ret, "%s", str);
+    sprintf(ret, "%s%s%s%s%s%s", shader_header, uniforms_text, frag_sep, str, frag_sep, vert_footer);
+    return ret;
+}
+
+static inline char *_get_frag_code(const char *str, const char *uniforms_text) {
+    size_t orig_len = strlen(str);
+    size_t new_len = orig_len + 1000;
+    char *ret =malloc(new_len); // freed in newshader
+    memset(ret, 0, new_len);
+    // printf("FRAG: %s%s%s%s%s", shader_header, frag_header_1, frag_header_2, frag_header_3, str, frag_footer);
+    // sprintf(ret, "%s", str);
+    sprintf(ret, "%s%s%s%s%s%s%s%s", shader_header, frag_header_1, frag_header_2, frag_sep, uniforms_text, frag_sep, str, frag_footer);
+    return ret;
+}
+
+static inline int _get_uniform_count(M_UniformType t) {
+    int ret = 0;
+    switch (t) {
+            case M_UNIFORM_FLOAT:
+            case M_UNIFORM_INT: { ret = 1; } break;
+            case M_UNIFORM_FLOAT2:
+            case M_UNIFORM_INT2: { ret = 2; } break;
+            case M_UNIFORM_FLOAT3:
+            case M_UNIFORM_INT3: { ret = 3; } break;
+            case M_UNIFORM_FLOAT4:
+            case M_UNIFORM_INT4: { ret = 4; } break;
+            case M_UNIFORM_MAT4: { ret = 16; } break;
+
+    }
+    return ret;
+}
+
+static uint32_t shader_add_shaderdef(M_ShaderDef *def) {
+    uint32_t id = 0;
+    for (size_t i=0; i<M_MAX_SHADERDEFS; i++) {
+        if (_lib->shaderdefs[i]._shader_id == 0) {
+            id = _lib->last_shaderid++;
+            memcpy(&_lib->shaderdefs[i], def, sizeof(M_ShaderDef));
+            _lib->shaderdefs[i]._shader_id = id;
+            _lib->shaderdefs[i]._impl = malloc(sizeof(ShaderInternal)); // free in cleanup_shader
+            _lib->last_shaderid = id;
+            break;
+        }
+    }
+    return id;
+}
+
+static M_ShaderDef *shader_find_shaderdef(uint32_t shader_id) {
+    struct M_ShaderDef *def = NULL;
+    for (size_t i=0; i<M_MAX_SHADERDEFS; i++) {
+        if (_lib->shaderdefs[i]._shader_id == shader_id) {
+            def = &_lib->shaderdefs[i];
+            break;
+        }
+    }
+    return def;
+}
+
+
+
+// static sg_pipeline _shader_pip;
+// static float _uniform_vals[SGP_TEXTURE_SLOTS] = {0};
+// size_t _total_uniforms_size = 0;
+
+M_Shader M_newshader(M_ShaderDef shaderdef) {
+    // TODO: id
+    uint32_t id = shader_add_shaderdef(&shaderdef);
+    if (id == 0) {
+        printf("Can't add more shaders, Max number reached: %d\n", M_MAX_SHADERDEFS);
+        exit(-1);
+    }
+
+    M_Shader shader = { .id = id };
+
+    const char *frag_code = shaderdef.frag;
+    const char *vert_code = shaderdef.vert;
+    struct M_UniformDef *uniforms = shaderdef.uniforms;
+    size_t num_uniforms = shaderdef.num_uniforms;
+
+    const char *uniforms_text = _get_uniforms_text(uniforms, num_uniforms);
+    const char *vert_code_full = _get_vert_code(vert_code, uniforms_text);
+    const char *frag_code_full = _get_frag_code(frag_code, uniforms_text);
+
+
+    M_ShaderDef *_def = shader_find_shaderdef(id);
+    ShaderInternal *_idef = (ShaderInternal *) _def->_impl;
+
+    _idef->_uniform_data_count = SGP_UNIFORM_CONTENT_SLOTS;
+    _idef->_uniform_data = malloc(SGP_UNIFORM_CONTENT_SLOTS*sizeof(float));
+    _idef->_uniform_images_count = SGP_TEXTURE_SLOTS;
+    _idef->_uniform_images = malloc(SGP_TEXTURE_SLOTS*sizeof(uint32_t));
+    _idef->_uniform_image_deletes = malloc(SGP_TEXTURE_SLOTS*sizeof(bool));
+
+    memset(_idef->_uniform_data, 0, SGP_UNIFORM_CONTENT_SLOTS*sizeof(float));
+    memset(_idef->_uniform_images, 0, SGP_TEXTURE_SLOTS*sizeof(uint32_t));
+    memset(_idef->_uniform_image_deletes, 0, SGP_TEXTURE_SLOTS*sizeof(bool));
+
+    // initialize shader pipeline
+    sgp_pipeline_desc pip_desc = {0};
+
+    pip_desc.blend_mode = _lib->blendmode;
+
+    // shader desc
+    sg_shader_desc shader_desc = {0};
+    shader_desc.vs.source = vert_code_full;
+    shader_desc.fs.source = frag_code_full;
+    shader_desc.vs.entry = "main";
+    shader_desc.fs.entry = "main";
+    shader_desc.label = "lyteshaderprogram";
+
+
+
+    // default color (MAGIC name current_color)
+    shader_desc.fs.uniform_blocks->uniforms[0].name = "current_color";
+    shader_desc.fs.uniform_blocks->uniforms[0].type = (sg_uniform_type)M_UNIFORM_FLOAT4;
+    shader_desc.fs.uniform_blocks->uniforms[0].array_count = 1;
+
+    shader_desc.vs.uniform_blocks->uniforms[0].name = "current_color";
+    shader_desc.vs.uniform_blocks->uniforms[0].type = (sg_uniform_type)M_UNIFORM_FLOAT4;
+    shader_desc.vs.uniform_blocks->uniforms[0].array_count = 1;
+
+    _idef->_uniform_data_count = 4;
+
+    // if user calls draw_image, this is the corresponding MAGIC image name
+    shader_desc.fs.images[0].name="current_image";
+    shader_desc.fs.images[0].image_type=SG_IMAGETYPE_2D;
+    shader_desc.fs.images[0].sampler_type=SG_SAMPLERTYPE_FLOAT;
+
+    // shader_desc.vs.images[0].name="current_image";
+    // shader_desc.vs.images[0].image_type=SG_IMAGETYPE_2D;
+    // shader_desc.vs.images[0].sampler_type=SG_SAMPLERTYPE_FLOAT;
+
+    // fill
+    int img_idx = 1; // idx 0 is for current_image
+    int dat_idx = 1; // idx 0..3 (float4) is for current_color
+    // enumerate other uniforms
+
+    for (int i=0; i<num_uniforms; i++) {
+        const char *name = uniforms[i].name;
+        M_UniformType type = uniforms[i].type;
+        // this uniform should have this many elemenets
+        size_t c = _get_uniform_count(type);
+        uniforms[i]._num_elems = c;
+
+        if (type > M_UNIFORM_INVALID && type < M_UNIFORM_SAMPLER2D) {
+            uniforms[i]._loc = dat_idx-1;
+            // printf("SHD: uniform types: %s: %d\n", name, type);
+            // uniforms in fragment shader
+            //shader_desc.fs.uniform_blocks->size
+            shader_desc.fs.uniform_blocks[0].uniforms[dat_idx].name = name;
+            shader_desc.fs.uniform_blocks[0].uniforms[dat_idx].type = type;
+            shader_desc.fs.uniform_blocks[0].uniforms[dat_idx].array_count = 1;
+            // uniforms in vertex shader (same)
+            shader_desc.vs.uniform_blocks[0].uniforms[dat_idx].name = name;
+            shader_desc.vs.uniform_blocks[0].uniforms[dat_idx].type = type;
+            shader_desc.vs.uniform_blocks[0].uniforms[dat_idx].array_count = 1;
+
+            _idef->_uniform_data_count += c;
+            dat_idx++;
+        } else if (type == M_UNIFORM_SAMPLER2D) {
+            uniforms[i]._loc = img_idx;
+            // printf("SHD: uniform sampler2D: %s at idx %d\n", name, img_idx);
+            shader_desc.fs.images[img_idx].name=name;
+            shader_desc.fs.images[img_idx].image_type=SG_IMAGETYPE_2D;
+            shader_desc.fs.images[img_idx].sampler_type=SG_SAMPLERTYPE_FLOAT;
+            img_idx++;
+        } else {
+            printf("Error: unknown uniform type: %s --> %d\n", name, type);
+            exit(-1);
+        }
+    }
+
+    shader_desc.fs.uniform_blocks[0].size = _idef->_uniform_data_count * 4;
+
+    // enmumarete other sampler2Ds
+
+
+    // printf("make pipeline...(total uniforms size: %d\n", _total_uniforms_size);
+    pip_desc.shader = shader_desc;
+    shader.pip_id = sgp_make_pipeline(&pip_desc).id;
+    sg_resource_state state = sg_query_pipeline_state((sg_pipeline){.id=shader.pip_id});
+    if (state != SG_RESOURCESTATE_VALID) {
+        fprintf(stderr, "Error: failed to make custom pipeline: %d\n ", state);
+        exit(-1);
+    }
+
+    // printf("//=== NEW_SHADER_READY\n//VERTEX\n%s//FRAGMENT\n%s\n//================\n", vert_code_full, frag_code_full);
+
+    free (uniforms_text);
+    free (vert_code_full);
+    free (frag_code_full);
+
+    return shader;
+}
+
+// M_Shader M_newshader_load(const char *path) {
+//     (void)path;
+//     // TODO implement
+//     const char *code = NULL;
+//     printf("SHD: load shader\n");
+//     M_Shader shader = M_newshader(code);
+//     return shader;
+// }
+
+void M_shader_cleanup(M_Shader shader) {
+    printf("SHD: cleanup shader\n");
+    sg_destroy_pipeline((sg_pipeline){.id=shader.pip_id});
+    M_ShaderDef *def = shader_find_shaderdef(shader.id);
+    ShaderInternal *_idef = (ShaderInternal *) def->_impl;
+    free(_idef->_uniform_data);
+    free(_idef->_uniform_images);
+    free(_idef->_uniform_image_deletes);
+    free(def->_impl);
+
+    *def = (M_ShaderDef){0};
+    // remove memory allocated (check if any)
+}
+
+
+void _shader_update_images(M_ShaderDef *def) {
+    ShaderInternal *_idef = (ShaderInternal *) def->_impl;
+    // image 0 is for "current_image"
+    for (int i=1; i<_idef->_uniform_images_count; i++) {
+        if (_idef->_uniform_image_deletes[i]) {
+            // delete{
+            if (_idef->_uniform_images[i] != 0) {
+                sgp_reset_image(i);
+                _idef->_uniform_image_deletes[i] = false;
+                _idef->_uniform_data[i] = 0;
+            } else {
+                // printf("       !! shouldn't happen\n");
+            }
+        } else {
+            if (_idef->_uniform_images[i] != 0) {
+                uint32_t id = _idef->_uniform_images[i];
+                sg_image _sgimg = (sg_image){.id=id};
+                sgp_set_image(i, _sgimg);
+            }
+        }
+    }
+}
+
+void M_shader_set(M_Shader shader) {
+    (void)shader;
+    // printf("SHD: set shader\n");
+    M_ShaderDef *def = shader_find_shaderdef(shader.id);
+    ShaderInternal *_idef = (ShaderInternal *) def->_impl;
+
+    sgp_set_pipeline((sg_pipeline){.id=shader.pip_id});
+
+    // MAGIC current_color
+    // TODO: correct amount of uniforms
+    // store the "uniforms" state in the object
+    // sgp_set_uniform(_lib->current_color, 4*4);
+    // memcpy(_uniform_vals, _lib->current_color, 16);
+    memcpy(_idef->_uniform_data, _lib->current_color, 16);
+    // sgp_set_uniform(_uniform_vals, _total_uniforms_size);
+
+    sgp_set_uniform(_idef->_uniform_data, _idef->_uniform_data_count*4 );
+    // M_shader_send(shader, NULL, 0);
+    _shader_update_images(def);
+    sgp_set_blend_mode(_lib->blendmode);
+    _lib->_current_shader = _idef;
+}
+
+void M_shader_unset(void) {
+    // printf("SHD: reset shader\n");
+    // TODO clean uniforms here
+     sgp_reset_pipeline();
+     _lib->_current_shader = NULL;
+}
+
+
+void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count) {
+    M_ShaderDef *def = shader_find_shaderdef(shader.id);
+    ShaderInternal *_idef = (ShaderInternal *)def->_impl;
+    // float *_vals = _idef->_uniform_data;
+
+    if (def == NULL) {
+        printf("Shader definition not found: id %d\n", shader.id);
+        exit(-1);
+    }
+
+    if (count > def->num_uniforms) {
+        printf("Too many uniforms are sent: %d. Expected %d\n", count, def->num_uniforms);
+        exit(1);
+    }
+
+
+    for (int i=0; i<count; i++) {
+        M_ShaderUniform uf = uniforms[i];
+        float *uf_data = (float *)uf.data;
+        const char *uf_name = uf.name;
+        int cnt_floats = uf.count;
+        M_UniformType deftype = M_UNIFORM_INVALID;
+        int def_cnt_floats = 0;
+        int def_loc = 0;
+        bool wipe_uniform = false;
+
+        // find the uniform declaration (type, location, and number of elements)
+        for (int j=0; j<def->num_uniforms; j++) {
+            if (strcmp(def->uniforms[j].name, uf_name) == 0) {
+                deftype = def->uniforms[j].type;
+                def_cnt_floats = def->uniforms[j]._num_elems;
+                def_loc = def->uniforms[j]._loc;
+                break;
+            }
+        }
+
+        if (deftype == M_UNIFORM_INVALID) {
+            printf("Uniform definition not found for name: %s\n", uf_name);
+            exit(-1);
+        }
+
+        if (def_cnt_floats != cnt_floats) {
+            if (cnt_floats == 1 && uf_data[0] == 0.0f) {
+                wipe_uniform = true;
+            } else {
+                printf("Expecting %d numbers, but got %d for uniform: %s\n", def_cnt_floats, cnt_floats, uf_name);
+                exit(-1);
+            }
+        }
+
+        if (cnt_floats == 0) {
+            // sampler2D TODO: set binding
+            M_Image *img = uf.data;
+
+            // sg_image _sgimg = (sg_image){.id=img->id};
+            // sgp_set_image(def_loc, _sgimg);
+            _idef->_uniform_image_deletes[def_loc] = false;
+            _idef->_uniform_images[def_loc] = img->id;
+
+        } else {
+
+            if (wipe_uniform) {
+                if (deftype == M_UNIFORM_SAMPLER2D) {
+                    // sgp_reset_image(def_loc);
+                    _idef->_uniform_image_deletes[def_loc] = true;
+
+                } else {
+                    // memset(&_vals[def_loc+4], 0, def_cnt_floats*4);
+                    memset(& _idef->_uniform_data[def_loc+4], 0, def_cnt_floats*4);
+                }
+            } else {
+                // memcpy(&_vals[def_loc+4], uf_data, def_cnt_floats*4);
+                memcpy(& _idef->_uniform_data[def_loc+4], uf_data, def_cnt_floats*4);
+            }
+        }
+
+    }
+    // current_color
+    memcpy(_idef->_uniform_data, _lib->current_color, 16);
+    // sgp_set_uniform(_vals, _idef->_uniform_data_count * 4);
+    sgp_set_uniform( _idef->_uniform_data, _idef->_uniform_data_count * 4);
+
+    _shader_update_images(def);
+}
+
+
+///////////
 
 void M_gfx_clear(float r, float g, float b, float a) {
     sgp_set_color(r,g,b,a);
@@ -1467,11 +1907,24 @@ void M_gfx_clear(float r, float g, float b, float a) {
 }
 
 void M_gfx_setcolor(float r, float g, float b, float a) {
-    sgp_set_color(r,g,b,a);
+    _lib->current_color[0] = r;
+    _lib->current_color[1] = g;
+    _lib->current_color[2] = b;
+    _lib->current_color[3] = a;
+
+    if (!_lib->_current_shader) {
+        sgp_set_color(r,g,b,a);
+    } else {
+        ShaderInternal *_idef = _lib->_current_shader;
+        memcpy(_idef->_uniform_data, _lib->current_color, 16);
+        sgp_set_uniform( _idef->_uniform_data, _idef->_uniform_data_count * 4);
+    }
+
 }
 
 void M_gfx_resetcolor() {
-    sgp_reset_color();
+    //sgp_reset_color();
+    M_gfx_setcolor(1.0,1.0,1.0,1.0);
 }
 
 void M_gfx_drawpoint(float x, float y) {
@@ -1540,7 +1993,7 @@ M_Image M_newimage_load(const char *path) {
     // TODO: size?
     uint8_t buffer[1024*1024/2]; // half meg?
     size_t len = M_path_readbytes(path, buffer, sizeof(buffer));
-    LOG("---> read image file with len: %zu\n", len);
+    LOG("--->  read image file with len: %zu\n", len);
 
 
     int width, height, channels;
@@ -1586,6 +2039,7 @@ void M_image_draw(M_Image image, float x, float y) {
     sg_image img = (sg_image){.id=image.id};
     if (img.id != 0) {
         sgp_set_blend_mode(_lib->blendmode);
+
         sgp_set_image(0, img);
         //sgp_set_color(1,1,1,1);
         sgp_draw_textured_rect(x, y, image.width, image.height);
@@ -1598,6 +2052,7 @@ void M_image_draw_rect(M_Image image, float x, float y, float img_x, float img_y
     //sgp_set_blend_mode(_lib->blendmode);
     if (img.id != 0) {
         // LOG("draw: %f %f %f %f %f %f\n", x, y, img_x, img_y, rect_width, rec_height);
+
         sgp_set_image(0, img);
         //sgp_set_color(1,1,1,1);
         // sgp_draw_textured_rect(x, y, image.width, image.height);
@@ -1721,8 +2176,8 @@ static inline void frame(void) {
             // glfwSwapBuffers(_lib->window);
         }
 
-
         sgp_begin(win_w, win_h);
+
         sgp_viewport(EMPTY_L, EMPTY_T, win_w-EMPTY_L-EMPTY_R, win_h-EMPTY_T-EMPTY_B);
         sgp_project(-RECT_DELT_L, fwidth+RECT_DELT_R, -RECT_DELT_T, fheight+RECT_DELT_B);
         sgp_set_blend_mode(_lib->blendmode);
@@ -1731,32 +2186,22 @@ static inline void frame(void) {
         _lib->frame_fn(_lib->app_data, delta_time, win_w, win_h, resized, _lib->fullscreen);
         M_gfx_popmatrix();
 
-
-        // Begin a render pass.
         sg_pass_action pass_action = {0};
         sg_begin_default_pass(&pass_action, win_w, win_h);
-        // Dispatch all draw commands to Sokol GFX.
         sgp_flush();
-        // End render pass.
-        sg_end_pass();
-        // Finish a draw command queue, clearing it.
         sgp_end();
-        // Commit Sokol render.
+        sg_end_pass();
         sg_commit();
-        /* Swap buffers */
+
         glfwSwapBuffers(_lib->window);
-        // audio updates (music stream)
+
         audio_dowork();
-        // sfetch.. file downloads
         sfetch_dowork();
-        // handle input devices
         _frame_input_next();
 
-        //------------------------------------------
-        // last thing is to poll. this may prevent updates so should be after swap.
-        //------------------------------------------
+        // Note: this has to be the last (or after inputs at least)
+        // otherwise keypressed events won't work
         glfwPollEvents();
-        //------------------------------------------
 }
 
 //
@@ -1913,6 +2358,7 @@ int M_app_init(M_Config *config) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 #if defined(__EMSCRIPTEN__)
     _lib->window = glfwCreateWindow(emsc_width(), emsc_height(), config->title, NULL, NULL);
@@ -1960,6 +2406,10 @@ int M_app_init(M_Config *config) {
         fprintf(stderr, "Failed to create glfw window\n");
         return 2222;
     }
+
+    // shader definitions
+    _lib->last_shaderid = 100;
+    memset(_lib->shaderdefs, 0, sizeof(M_ShaderDef)*M_MAX_SHADERDEFS);
 
     // init audio
     audio_init();

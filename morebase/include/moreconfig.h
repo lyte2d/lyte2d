@@ -12,7 +12,7 @@
 //
 
 #define M_FILESYSTEM_MAX_PATHS 10 // maximum paths in filesystem (as zip file)
-
+                                  //
 #define M_FONT_MULT 1.0
 #define M_FONTATLAS_SIZE  1024
 
@@ -23,5 +23,8 @@
 #define NUM_MUSICSTREAMUPDATES_PER_FRAME 10
 
 #define MAX_FONT_ITEMS 100
+
+
+#define M_MAX_SHADERDEFS 1024
 
 #endif  /* MORECONFIG_H_INCLUDED */

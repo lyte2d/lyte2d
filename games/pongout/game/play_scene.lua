@@ -263,12 +263,12 @@ function M.draw(active)
     if active then
 
         lyte.set_color(0.9, 0.6, 0.5, 1)
-        lyte.draw_text("" .. State.left_points, 0 + 2, -TOP_SPACE - 5)
+        lyte.draw_text("" .. State.left_points, 0 + 2 + 10, 5)
         lyte.set_color(0.5, 0.6, 0.9, 1)
-        draw_text_rightaligned(State.right_points .. "", CW - 2, -TOP_SPACE - 5)
+        draw_text_rightaligned(State.right_points .. "", CW - 2 - 10, 5)
 
         lyte.set_color(0.4, 0.6, 0.4, 1)
-        draw_text_centered(string.rep('|', State.lvl_points), CW / 2, -TOP_SPACE + 14 / 2 - 5)
+        draw_text_centered(string.rep('|', State.lvl_points), CW / 2, 1 )
 
 
         lyte.set_color(0.9, 0.6, 0.5, 1)
@@ -298,7 +298,7 @@ function M.draw(active)
 
 
     for _, wall in ipairs(Walls) do
-        lyte.set_color(0.5, 0.6, 0.5, 1)
+        lyte.set_color(0.5, 0.6, 0.5, 0.3)
         lyte.draw_rect_filled(wall.x, wall.y, wall.w, wall.h)
 
     end

@@ -305,7 +305,7 @@ if(UNIX)
         COMMENT "Building source tarball '${PHYSFS_TARBALL}'..."
     )
 
-    set(PHYSFS_TARGETNAME_UNINSTALL "uninstall" CACHE STRING "Name of 'uninstall' build target")
+    set(PHYSFS_TARGETNAME_UNINSTALL "uninstall_" CACHE STRING "Name of 'uninstall' build target")
     add_custom_target(
         ${PHYSFS_TARGETNAME_UNINSTALL}
         "${CMAKE_CURRENT_SOURCE_DIR}/extras/uninstall.sh"

@@ -8,6 +8,7 @@ local function Head(title)
         H.link {rel="stylesheet", href="public/style.css"},
         H.script {src="public/prism.min.js"},
         H.script {src="public/prism-lua.min.js"},
+        H.script {src="public/prism-typescript.min.js"},
     }
 end
 

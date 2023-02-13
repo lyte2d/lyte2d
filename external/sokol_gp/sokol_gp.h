@@ -1576,7 +1576,9 @@ void sgp_reset_pipeline(void) {
 
 void sgp_set_uniform(const void* data, uint32_t size) {
     SOKOL_ASSERT(_sgp.init_cookie == _SGP_INIT_COOKIE);
-    SOKOL_ASSERT(_sgp.state.pipeline.id != SG_INVALID_ID);
+    // MG I removed this because I want to set this
+    // before or after setting a pipeline
+    //SOKOL_ASSERT(_sgp.state.pipeline.id != SG_INVALID_ID);
     SOKOL_ASSERT(size <= sizeof(float) * SGP_UNIFORM_CONTENT_SLOTS);
     if(size > 0) {
         SOKOL_ASSERT(data);
@@ -1584,7 +1586,9 @@ void sgp_set_uniform(const void* data, uint32_t size) {
     }
     if(size < _sgp.state.uniform.size) {
         // zero old uniform data
-        memset((uint8_t*)(&_sgp.state.uniform) + size, 0, _sgp.state.uniform.size - size);
+        // MG: not zeroing this out
+        // will zero from user side
+        //memset((uint8_t*)(&_sgp.state.uniform) + size, 0, _sgp.state.uniform.size - size);
     }
     _sgp.state.uniform.size = size;
 }
@@ -1613,8 +1617,10 @@ void sgp_set_color(float r, float g, float b, float a) {
 
     // update uniform for the default pipeline
     if(_sgp.state.pipeline.id == SG_INVALID_ID) {
-        memset(&_sgp.state.uniform, 0, sizeof(sgp_uniform));
-        _sgp.state.uniform.size = sizeof(sgp_color);
+        // MG: removed zeroing the memory
+        // so that current_color can be set after a shader
+        //memset(&_sgp.state.uniform, 0, sizeof(sgp_uniform));
+        //_sgp.state.uniform.size = sizeof(sgp_color);
         _sgp.state.uniform.content[0] = color.r;
         _sgp.state.uniform.content[1] = color.g;
         _sgp.state.uniform.content[2] = color.b;

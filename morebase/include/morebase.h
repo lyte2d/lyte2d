@@ -40,6 +40,21 @@ typedef enum M_BlendMode {
     M_NUM_BLENDMODES,
 } M_BlendMode;
 
+// order and numbering important. must match sokol_gp and api.c
+typedef enum M_UniformType {
+    M_UNIFORM_INVALID = 0,
+    M_UNIFORM_FLOAT = 1,
+    M_UNIFORM_FLOAT2 = 2,
+    M_UNIFORM_FLOAT3 = 3,
+    M_UNIFORM_FLOAT4 = 4,
+    M_UNIFORM_INT = 5,
+    M_UNIFORM_INT2 = 6,
+    M_UNIFORM_INT3 = 7,
+    M_UNIFORM_INT4 = 8,
+    M_UNIFORM_MAT4 = 9,
+    M_UNIFORM_SAMPLER2D = 10,
+} M_UniformType;
+
 typedef void (*M_FuncSimple)(void *app_data);
 
 typedef void (*M_FuncFull)(void *app_data, float delta_time, int width, int height, bool resized, bool fullscreen);
@@ -85,6 +100,37 @@ typedef struct M_Canvas {
     int height;
     int _ref; //
 } M_Canvas;
+
+typedef struct M_ShaderDef {
+    uint32_t _shader_id;
+    void *_impl;
+        // float *_uniform_data;
+        // size_t _uniform_data_size;
+        // uint32_t *_uniform_images;
+        // bool * _uniform_image_deletes; // whether this image should be deleted
+        // size_t _num_uniform_images; // array count, not image count
+    struct M_UniformDef {
+        const char *name;
+        M_UniformType type;
+        uint32_t _num_elems;
+        uint32_t _loc;
+    } *uniforms;
+    size_t num_uniforms;
+    const char *vert;
+    const char *frag;
+} M_ShaderDef;
+
+typedef struct M_ShaderUniform {
+    const char *name;
+    void *data;
+    size_t count;
+} M_ShaderUniform;
+
+typedef struct M_Shader {
+    //const char *code;
+    uint32_t id;
+    uint32_t pip_id;
+} M_Shader;
 
 typedef struct M_Font {
     uint32_t id;
@@ -210,6 +256,14 @@ void M_image_cleanup(M_Image image);
 void M_image_draw(M_Image image, float x, float y);
 void M_image_draw_rect(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height);
 // multiple rects from single image to help with batching
+
+// shader
+M_Shader M_newshader(M_ShaderDef shaderdef);
+// M_Shader M_newshader_load(const char *path);
+void M_shader_cleanup(M_Shader shader);
+void M_shader_set(M_Shader shader);
+void M_shader_unset(void);
+void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count);
 
 // font
 M_Font M_newfont_load(const char *path, float size);

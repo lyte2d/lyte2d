@@ -1,3 +1,14 @@
+## Lyte2D alpha v0.3 (2023.02.13)
+- Custom shader support
+- Executable name changed 'lyte2d' to 'lyte'
+- Bugfixes
+* Meta
+- Semantic API docs/types in Lua tables
+  - Website is generated from that
+  - API doc (.d.ts file) is generated from that
+  - (Future) REPL completions will use that
+- Better webpage, examples, guide
+
 ## Lyte2D alpha v0.2 (2023.12.24)
 - Linux support (works on Ubuntu 18+ and SteamDeck)
 - APIs moved to 'lyte' namespace

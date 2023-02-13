@@ -7,32 +7,19 @@ do
     -- simple1 = tostring(file:read("*a"))
     -- print("[[["..simple1.."]]]")
     -- file:close()
-    local file = io.open("../lyte2d/etc/lyte.d.ts", "r")
+    local file = io.open("../lyte/etc/lyte.d.ts", "r")
     Data.apitxt = file:read("*a")
     file:close()
 end
 
 Data.examples = {
-    {
-        title = "Hello world #1",
-        app = "hello1"
-    },
-    {
-        title = "Hello world #2",
-        app = "hello2",
-    },
-    {
-        title =  "Shapes #1",
-        app = "shapes1",
-    },
-    {
-        title = "Image #1",
-        app =  "image1",
-    },
-    {
-        title = "Image #2",
-        app =  "image2",
-    },
+    { title = "Hello World", app = "s01_hello" },
+    { title = "Movement, Input", app = "s02_movement", },
+    { title =  "Music, Pan, Pitch", app = "s03_music", },
+    { title = "Sound FX", app =  "s04_soundfx", },
+    { title = "Canvas", app =  "s05_canvas", },
+    { title = "Basic Shader", app =  "s06_basic_shader", },
+    { title = "Shader with samplers", app =  "s07_basic_shader2", },
 }
 
 do
