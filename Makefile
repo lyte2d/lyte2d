@@ -1,10 +1,12 @@
-VERSION=0.3
+VERSION=0.4
 
 LYTE_WIN=lyte.exe
+LYTE_WINGUI=lyte_gui.exe
 LYTE_LINUX=lyte
 
-ZIP_WIN=lyte.v${VERSION}.win_x64.zip
-ZIP_LINUX=lyte.v${VERSION}.linux_x64.zip
+ZIP_WINGUI=lyte.v${VERSION}.wingui.x64.zip
+ZIP_WIN=lyte.v${VERSION}.win.x64.zip
+ZIP_LINUX=lyte.v${VERSION}.linux.x64.zip
 ZIP_WASM=lyte.v${VERSION}.wasm.zip
 
 PONGOUT_SRC_ZIP=pongout_src.zip
@@ -18,6 +20,9 @@ default:
 clean-dev:
 	rm -rf builds/dev/CMakeCache.txt
 	rm -f builds/dev/lyte.exe
+clean-wingui:
+	rm -rf builds/wingui/CMakeCache.txt
+	rm -f builds/wingui/lyte_gui.exe
 
 clean-win:
 	rm -rf builds/win/CMakeCache.txt
@@ -34,6 +39,9 @@ clean-wasm:
 config-dev:
 	cmake -S ./lyte -B ./builds/dev -G "Visual Studio 16"
 
+config-wingui:
+	cmake -S ./lyte -B ./builds/wingui -DWIN_GUI=1 -G "Visual Studio 16"
+
 config-win:
 	cmake -S ./lyte -B ./builds/win -G "Visual Studio 16"
 
@@ -42,6 +50,11 @@ config-linux:
 
 config-wasm:
 	emcmake cmake  -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -S ./lyte -B ./builds/wasm
+
+
+pack-wingui: wingui
+	rm -f out/${ZIP_WINGUI}
+	cd out && zip -9 -u -r ${ZIP_WINGUI} readme.md lyte_gui.exe && cd ..
 
 pack-win: win
 	rm -f out/${ZIP_WIN}
@@ -59,6 +72,12 @@ dev:
 	rm -f out/lyte.exe
 	cmake --build builds/dev --config Debug
 	cp -r builds/dev/Debug/lyte.exe out/lyte.exe
+	ls -al out
+
+wingui:
+	rm -f out/lyte_gui.exe
+	cmake --build builds/wingui --config MinSizeRel
+	cp -r builds/wingui/MinSizeRel/lyte_gui.exe out/lyte_gui.exe
 	ls -al out
 
 win:
@@ -101,7 +120,7 @@ webpage:
 
 pongout:
 	rm -f out/${PONGOUT_SRC_ZIP}
-	cd games/pongout && zip -9 -u -r ../../out/${PONGOUT_SRC_ZIP} . -i app.cfg app.lua  boot/\* game/\* assets/\* -x ".*" *.tl  && cd ../..
+	cd games/pongout && zip -9 -u -r ../../out/${PONGOUT_SRC_ZIP} . -i app.lua  libs/\* game/\* assets/\* -x ".*" *.tl  && cd ../..
 	cat out/${LYTE_WIN} out/${PONGOUT_SRC_ZIP} > out/pongout_win.exe
 	cat out/${LYTE_LINUX} out/${PONGOUT_SRC_ZIP} > out/pongout_linux
 	cd out && zip -9 -u -r ${PONGOUT_WIN_ZIP} pongout_win.exe && cd ..
@@ -128,9 +147,8 @@ host-website:
 
 # personal use
 L:
+	rm \lua\l.exe
 	cp out/lyte.exe \lua/lyte.exe
-	# cp -r out/index.html ./scratch
-	# cp -r out/lyte.js ./scratch
-	# cp -r out/lyte.wasm ./scratch
+	ln -s \lua/lyte.exe \lua/l.exe
 S:
 	l dir=scratch

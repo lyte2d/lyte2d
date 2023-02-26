@@ -1,5 +1,8 @@
 --[[ (c) mg ]]
 
+-- libs
+mathx = require "libs.mathx"
+
 -- contants
 
 CW = 64 * 6 -- game area width
@@ -33,7 +36,7 @@ Window = {
     canvas = nil,
 
     DRAW_DEBUG = false,
-    PIXEL_PERFFECT = true,
+    PIXEL_PERFFECT = false,
 }
 
 Assets = {
@@ -54,12 +57,12 @@ function LOG(...)
 end
 
 function draw_text_centered(str, x, y)
-    local w, h = lyte.measure_text(str)
+    local w, h = lyte.get_text_size(str)
     lyte.draw_text(str, x - w / 2, y - h / 2)
 end
 
 function draw_text_rightaligned(str, x, y)
-    local w, _h = lyte.measure_text(str)
+    local w, _h = lyte.get_text_size(str)
     lyte.draw_text(str, x - w, y)
 end
 
@@ -98,7 +101,7 @@ local function debug_draw(DT)
 
     set_color(1, 0, 0, 1)
     -- window rect
-    draw_rect(1, 1, Window.width - 1, Window.height - 1)
+    draw_rect_line(1, 1, Window.width - 1, Window.height - 1)
 
     -- canvas rect
     set_color(0, 1, 0, 1)
@@ -106,7 +109,7 @@ local function debug_draw(DT)
     translate(
         math.floor((Window.width - CW * Window.scale) / 2) - 0.5,
         math.floor((Window.height - CH * Window.scale) / 2) - 0.5)
-    draw_rect(0, 0, mathx.round(CW * Window.scale), mathx.round(CH * Window.scale))
+    draw_rect_line(0, 0, mathx.round(CW * Window.scale), mathx.round(CH * Window.scale))
 
 end
 
@@ -119,7 +122,7 @@ local function adjust_scale()
     end
 end
 
-function lyte.frame(delta_time, width, height, resized, fullscreen)
+function lyte.tick(delta_time, width, height, resized, fullscreen)
     if resized then
         Window.width = width
         Window.height = height
@@ -129,24 +132,24 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
 
     -- System keys
     -- F4: quit
-    if lyte.is_keypressed("f4") or lyte.is_gamepadpressed(0, "but_back") then lyte.quit() end
+    if lyte.is_key_pressed("f4") or lyte.is_gamepad_pressed(0, "back") then lyte.quit() end
     -- Alt-F11: pixel perfect vs regular scaling
-    if (lyte.is_keydown('left_alt') or lyte.is_keydown('right_alt')) and lyte.is_keypressed("f11") then
+    if (lyte.is_key_down('left_alt') or lyte.is_key_down('right_alt')) and lyte.is_key_pressed("f11") then
         Window.PIXEL_PERFFECT = not Window.PIXEL_PERFFECT
         adjust_scale()
         return
     end
 
     -- F11: fullscreen/exit fullscreen
-    if lyte.is_keypressed("f11") or lyte.is_gamepadpressed(0, "but_start") then lyte.set_fullscreen(not fullscreen) end
+    if lyte.is_key_pressed("f11") or lyte.is_gamepad_pressed(0, "start") then lyte.set_fullscreen(not fullscreen) end
     -- Alt-F12: debug info drawn/not drawn
-    if (lyte.is_keydown('left_alt') or lyte.is_keydown('right_alt')) and lyte.is_keypressed("f12") then
+    if (lyte.is_key_down('left_alt') or lyte.is_key_down('right_alt')) and lyte.is_key_pressed("f12") then
         Window.DRAW_DEBUG = not Window.DRAW_DEBUG
         return
     end
 
-    if lyte.is_keypressed("f8") then lyte.set_vsync(false) end
-    if lyte.is_keypressed("f9") then lyte.set_vsync(true) end
+    if lyte.is_key_pressed("f8") then lyte.set_window_vsync(false) end
+    if lyte.is_key_pressed("f9") then lyte.set_window_vsync(true) end
 
     -- App update
     if current_scene == "menu" then
@@ -175,9 +178,9 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
     -- Draw Canvas -> Window
     lyte.push_matrix()
     if Window.DRAW_DEBUG then
-        lyte.clear(0.15, 0.15, 0.15, 1)
+        lyte.cls(0.15, 0.15, 0.15, 1)
     else
-        lyte.clear(0, 0, 0, 1)
+        lyte.cls(0, 0, 0, 1)
     end
     lyte.scale(Window.scale, Window.scale)
     lyte.translate(Window.width / Window.scale / 2 - CW / 2, (Window.height / Window.scale / 2 - CH / 2));
@@ -193,14 +196,14 @@ function lyte.frame(delta_time, width, height, resized, fullscreen)
 end
 
 local function start()
-    lyte.set_vsync(false)
-    lyte.set_windowminsize(CW*3,CH*3)
-    lyte.set_windowsize(CW*3,CH*3)
-    lyte.set_windowtitle("Pong Out!")
-    lyte.set_windowicon("/assets/images/icon.png")
+    lyte.set_window_vsync(false)
+    lyte.set_window_minsize(CW*3,CH*3)
+    -- lyte.set_window_size(CW*3,CH*3)
+    lyte.set_window_title("Pong Out!")
+    lyte.set_window_icon("/assets/images/icon.png")
 
-    Window.width = lyte.get_windowwidth()
-    Window.height = lyte.get_windowheight()
+    Window.width, Window.height = lyte.get_window_size()
+
     Window.canvas = lyte.new_canvas(CW, CH)
 
     adjust_scale()

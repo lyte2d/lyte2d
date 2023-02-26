@@ -121,7 +121,7 @@ static double curr_t, delta_time, last_t;
 static struct {
     bool quit;
     void *app_data;
-    M_FuncFull frame_fn;
+    M_TickFunc tick_fn;
     GLFWwindow* window;
     GLFWmonitor* monitor;
     bool fullscreen;
@@ -1285,26 +1285,37 @@ void M_app_setpaddings(int left, int right, int top, int bottom) {
     _lib->padding_bottom = bottom;
 }
 
-int M_app_getwindowwidth() {
-    int w, h;
-#if defined(__EMSCRIPTEN__)
-        w = emsc_width();
-        h = emsc_height();
-#else
-    glfwGetWindowSize(_lib->window, &w, &h);
-#endif
-    return w;
-}
+// int M_app_getwindowwidth() {
+//     int w, h;
+// #if defined(__EMSCRIPTEN__)
+//         w = emsc_width();
+//         h = emsc_height();
+// #else
+//     glfwGetWindowSize(_lib->window, &w, &h);
+// #endif
+//     return w;
+// }
 
-int M_app_getwindowheight() {
-    int w, h;
+// int M_app_getwindowheight() {
+//     int w, h;
+// #if defined(__EMSCRIPTEN__)
+//         w = emsc_width();
+//         h = emsc_height();
+// #else
+//     glfwGetWindowSize(_lib->window, &w, &h);
+// #endif
+//     return h;
+// }
+
+M_SizeI M_app_getwindowsize(void) {
+    M_SizeI size = {0};
 #if defined(__EMSCRIPTEN__)
-        w = emsc_width();
-        h = emsc_height();
+        size.w = emsc_width();
+        size.h = emsc_height();
 #else
-    glfwGetWindowSize(_lib->window, &w, &h);
+    glfwGetWindowSize(_lib->window, &size.w, &size.h);
 #endif
-    return h;
+    return size;
 }
 
 void M_app_setwindowsize(int w, int h) {
@@ -1978,13 +1989,13 @@ void M_gfx_drawtriangles_filled(M_Triangle *triangles, int cnt) {
     sgp_draw_filled_triangles((const sgp_triangle *)(void *)triangles, cnt);
 }
 
-void M_gfx_drawstriplines(M_Point *pts, int cnt) {
-    sgp_draw_lines_strip((const sgp_point *)(void *)pts, cnt);
-}
+// void M_gfx_drawstriplines(M_Point *pts, int cnt) {
+//     sgp_draw_lines_strip((const sgp_point *)(void *)pts, cnt);
+// }
 
-void M_gfx_drawstriptriangles_filled(M_Point *pts, int cnt) {
-    sgp_draw_filled_triangles_strip((const sgp_point *)(void *)pts, cnt);
-}
+// void M_gfx_drawstriptriangles_filled(M_Point *pts, int cnt) {
+//     sgp_draw_filled_triangles_strip((const sgp_point *)(void *)pts, cnt);
+// }
 
 
 M_Image M_newimage_load(const char *path) {
@@ -2047,7 +2058,7 @@ void M_image_draw(M_Image image, float x, float y) {
     }
 }
 
-void M_image_draw_rect(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height) {
+void M_image_draw_rect_line(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height) {
     sg_image img = (sg_image){.id=image.id};
     //sgp_set_blend_mode(_lib->blendmode);
     if (img.id != 0) {
@@ -2065,8 +2076,8 @@ void M_image_draw_rect(M_Image image, float x, float y, float img_x, float img_y
 // FRAME FUNCTION
 //
 
-// frame input helper
-static inline void _frame_input_next() {
+// tick input helper
+static inline void _tick_input_next() {
     // keyboard keys
     memcpy(_input->keys_prev, _input->keys_cur, M_NUM_KEYBOARD_KEYS);
     memset(_input->keys_rep, 0, M_NUM_KEYBOARD_KEYS);
@@ -2113,13 +2124,13 @@ static inline void _frame_input_next() {
 
 }
 // int setting_fullscreen = 0;
-// frame: used by both regular glfw and emscripten one
+// tick: used by both regular glfw and emscripten one
 // that's why it's a separate function
-static inline void frame(void) {
+static inline void tick(void) {
 
 
 #if defined(__EMSCRIPTEN__)
-    // Note this is for emscripten case. Non-emscripten quit is handled in M_app_startframeloop()
+    // Note this is for emscripten case. Non-emscripten quit is handled in M_app_startloop()
     if(_lib->quit) {
         emscripten_cancel_main_loop();
     }
@@ -2164,7 +2175,7 @@ static inline void frame(void) {
             resized = true;
         }
 
-        // fullscreen check and update. at the end of the frame (hope this fixes tearing)
+        // fullscreen check and update. at the end of the tick (hope this fixes tearing)
         if (_lib->fullscreen != _lib->fullscreen_next) {
             glfwSwapInterval(0);
             _update_to_nextfullscreen();
@@ -2183,21 +2194,24 @@ static inline void frame(void) {
         sgp_set_blend_mode(_lib->blendmode);
 
         M_gfx_pushmatrix();
-        _lib->frame_fn(_lib->app_data, delta_time, win_w, win_h, resized, _lib->fullscreen);
+        _lib->tick_fn(_lib->app_data, delta_time, win_w, win_h, resized, _lib->fullscreen);
         M_gfx_popmatrix();
 
+        // NOTE: at this point only sgp state has been changed, and sg has not
+        // so for optimization, we can decide if any drawing was done or not here
+        // and possibly skip all this, including swapping of buffers.
+        // this way, it can be kind of like a non-immediate mode gui for app that like it
         sg_pass_action pass_action = {0};
         sg_begin_default_pass(&pass_action, win_w, win_h);
         sgp_flush();
         sgp_end();
         sg_end_pass();
         sg_commit();
-
         glfwSwapBuffers(_lib->window);
 
         audio_dowork();
         sfetch_dowork();
-        _frame_input_next();
+        _tick_input_next();
 
         // Note: this has to be the last (or after inputs at least)
         // otherwise keypressed events won't work
@@ -2449,7 +2463,7 @@ int M_app_init(M_Config *config) {
     sfetch_setup(&(sfetch_desc_t){0});
 
     // setup input callbacks for mouse cursor loc, mouse buttons, keyboard state, joystic (gamepad) connetions
-    // other input state (such as gamepad buttons, axes, etc) is polled each frame.
+    // other input state (such as gamepad buttons, axes, etc) is polled each tick.
     glfwSetCursorPosCallback(_lib->window, cursor_position_callback);
     glfwSetMouseButtonCallback(_lib->window, mouse_button_callback);
     glfwSetKeyCallback(_lib->window, key_callback);
@@ -2457,14 +2471,14 @@ int M_app_init(M_Config *config) {
     return 0;
 }
 
-void M_app_startframeloop(M_FuncFull frame_fn, void *app_data) {
-    _lib->frame_fn = frame_fn;
+void M_app_startloop(M_TickFunc tick_fn, void *app_data) {
+    _lib->tick_fn = tick_fn;
     _lib->app_data = app_data;
     // LOOP BEGINS HERE---------------------------------------------
     #ifdef EMSCRIPTEN
-    emscripten_set_main_loop(frame, 0, 1);
+    emscripten_set_main_loop(tick, 0, 1);
     #else
-    while(!(glfwWindowShouldClose(_lib->window) || _lib->quit)) { frame(); }
+    while(!(glfwWindowShouldClose(_lib->window) || _lib->quit)) { tick(); }
     #endif
     // LOOP ENDS HERE------------------------------------------------
 }

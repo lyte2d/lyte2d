@@ -13,7 +13,7 @@ local shader_1 = lyte.new_shader({
         transparent_mode = "int",
     },
     vert = [[
-        in vec4 coords;        
+        in vec4 coords;
         out vec2 image_uv;
         void vert_main() {
             gl_Position = vec4(coords.xy, 0.0, 1.0);
@@ -30,7 +30,7 @@ local shader_1 = lyte.new_shader({
             } else {
                 // add some "washed" transparency by using alpha and the location on screen
                 frag_color = texture(my_img, image_uv) * current_color * (2.5*gl_FragCoord.x/screen_size.x);
-            }        
+            }
             if (frag_color.a < 0.01) {
                 // don't even
                 discard;
@@ -42,47 +42,47 @@ local shader_1 = lyte.new_shader({
 
 
 local function draw_some_rects(x,y)
-    -- draw some rectangles on different 
-    lyte.draw_rect_filled(x+10, y, 60, 20)
-    lyte.draw_rect_filled(x+80, y, 60, 20)
-    lyte.draw_rect_filled(x+150, y, 60, 20)
-    lyte.draw_rect_filled(x+220, y, 60, 20)
+    -- draw some rectangles on different
+    lyte.draw_rect(x+10, y, 60, 20)
+    lyte.draw_rect(x+80, y, 60, 20)
+    lyte.draw_rect(x+150, y, 60, 20)
+    lyte.draw_rect(x+220, y, 60, 20)
 end
 
 
-function lyte.frame(dt, width, height)
+function lyte.tick(dt, width, height)
     -- UPDATE
     total_time = total_time + dt
-    
+
     shader_1:send({ transparent_mode = 0, screen_size = {width, height} })
-   
-    if lyte.is_keydown("space") or lyte.is_mousedown("m_1") then
+
+    if lyte.is_key_down("space") or lyte.is_mouse_down("mb1") then
         shader_1:send({ transparent_mode = 1 })
     end
 
     -- DRAW
-    lyte.clear(0, 0, 0, 1)
+    lyte.cls(0, 0, 0, 1)
 
     -- transparent gray color
     lyte.set_color(1,1,1,0.4)
     lyte.set_shader(shader_1)
-    
+
     shader_1:send({ my_img = img_1 })
 
-    lyte.draw_rect_filled(10, 10, width-20, 40)
-    
+    lyte.draw_rect(10, 10, width-20, 40)
+
     shader_1:send({ my_img = img_2 })
     draw_some_rects(10, 60)
-    
+
     shader_1:send({ my_img = img_3 })
     draw_some_rects(30, 90)
-    
-    shader_1:send({ my_img = img_1 }) 
+
+    shader_1:send({ my_img = img_1 })
     draw_some_rects(60, 120)
-    
+
     lyte.push_matrix()
     lyte.rotate_at(total_time/2, width/2, height/2)
-    lyte.draw_rect_filled(width/2-height*4/9, height/2-25, height*8/9, 50)
+    lyte.draw_rect(width/2-height*4/9, height/2-25, height*8/9, 50)
     lyte.pop_matrix()
 
     lyte.reset_shader()

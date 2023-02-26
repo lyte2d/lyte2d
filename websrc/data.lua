@@ -20,6 +20,9 @@ Data.examples = {
     { title = "Canvas", app =  "s05_canvas", },
     { title = "Basic Shader", app =  "s06_basic_shader", },
     { title = "Shader with samplers", app =  "s07_basic_shader2", },
+    -- == todo: investigate issues on wasm build  wih these new shaders
+    -- { title = "Shader spin (ported from Love2D)", app =  "s08_shader_spinning_plus", },
+    -- { title = "Shader + canvas", app =  "s09_shader_canvas", },
 }
 
 do

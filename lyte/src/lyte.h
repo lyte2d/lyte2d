@@ -33,7 +33,7 @@ typedef enum LYTE_LANG {
 } LYTE_LANG;
 
 void repl_setup(LYTE_LANG lang);
-bool repl_check(lua_State *L); // returns: skip frame hint
+bool repl_check(lua_State *L); // returns: skip hint (after a repl pause 1 loop iteration is skipped to make dt normal sized)
 void repl_prompt(void);
 
 

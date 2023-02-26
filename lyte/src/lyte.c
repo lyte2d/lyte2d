@@ -79,7 +79,7 @@ static int _try_load(lua_State *L, bool error_if_missing) {
                 fprintf(stderr, "Warning: couldn't find file: %s.lua or %s.fnl\n", module_name, module_name);
                 lua_error(L);
             } else {
-                fprintf(stderr, "Error: couldn't find file: %s.lua or %s.fnl\n", module_name, module_name);
+                fprintf(stderr, "Couldn't find file: %s.lua or %s.fnl\n", module_name, module_name);
                 CHK_STACK(0);
                 return 0;
             }
@@ -95,7 +95,7 @@ static int _try_load(lua_State *L, bool error_if_missing) {
     LOG("lyte_loader: mod: %s, path: %s\n", module_name, path_name);
     lua_pop(L, 1);
     int sz, err=0; (void)err;
-    uint8_t *module_file_buf = malloc(LUA_MODULE_FILES_MAX_SIZE);
+    char *module_file_buf = malloc(LUA_MODULE_FILES_MAX_SIZE);
     memset(module_file_buf, 0,LUA_MODULE_FILES_MAX_SIZE);
 
     char *fennel_eval_open = "";
@@ -115,7 +115,7 @@ static int _try_load(lua_State *L, bool error_if_missing) {
 
     size_t MAX_LEN = LUA_MODULE_FILES_MAX_SIZE - 1024; //TODO: strlen(fennel_eval_open) - strlen(fennel_eval_close);
 
-    sz = M_path_readbytes(path_name, module_file_buf + strlen(fennel_eval_open), MAX_LEN);
+    sz = M_path_readbytes(path_name, (const uint8_t *)(module_file_buf + strlen(fennel_eval_open)), MAX_LEN);
     if (sz == 0) {
         LOG("Error: file not found: %s\n", path_name);
         lua_error(L);
@@ -134,7 +134,13 @@ static int _try_load(lua_State *L, bool error_if_missing) {
     lua_pushstring(L, module_name);
     CHK_STACK(3);
 
-    err = luaL_dostring(L, (const char *)module_file_buf);
+    //err = luaL_dostring(L, (const char *)module_file_buf);
+    char path_with_at[1024] = {0};
+    sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepatha and not part of code
+    err = luaL_loadbuffer(L, (const char *)module_file_buf, strlen(module_file_buf), (const char *)path_with_at);
+    if (err == 0) {
+        err = lua_pcall(L, 0, LUA_MULTRET, 0);
+    }
     if (err != 0)  {
         LOG("ERROR: dostring() on file %s\n", path_name);
         lua_error(L);
@@ -211,7 +217,11 @@ static void check_binary_downloads(lua_State *L) {
 
 static int _lua_panic_fn(lua_State *L) {
     const char *str = lua_tostring(L, -1);
-    fprintf(stderr, "\nError: %s\n\n", str);
+    if (str) {
+        fprintf(stderr, "\n%s\n", str);
+    } else {
+        fprintf(stderr, "\nQuitting with error.\n");
+    }
     return 0;
 }
 
@@ -219,9 +229,9 @@ static int _lua_panic_fn(lua_State *L) {
 float _angle = 0.0f;
 float _loading_time = 0.0f;
 
-bool _skip_frame = false;
+bool _skip_tick = false;
 
-static void frame_fn(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
+static void tick_fn(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
     lua_State *L = data;
     CHK_STACK(0);
     if(need_to_load_binaries) {
@@ -244,10 +254,10 @@ static void frame_fn(void *data, float dt, int width, int height, bool resized, 
 
 
     } else {
-        if (!_skip_frame) {
-            // TODO make some error checks before starting.. like frame exists..
+        if (!_skip_tick) {
+            // TODO make some error checks before starting.. like tick exists..
             lua_getglobal(L, "lyte");
-            lua_pushstring(L, "frame");
+            lua_pushstring(L, "tick");
             lua_gettable(L, -2);
             lua_remove(L, -2);
 
@@ -258,10 +268,10 @@ static void frame_fn(void *data, float dt, int width, int height, bool resized, 
             lua_pushboolean(L,fullscreen);
             lua_call(L,5,0);
         } else {
-            _skip_frame = false;
+            _skip_tick = false;
         }
         if (has_repl) {
-            _skip_frame = repl_check(L);
+            _skip_tick = repl_check(L);
         }
     }
 }
@@ -334,14 +344,14 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(lang, "fennel") == 0 || strcmp(lang, "fnl") == 0) {
             repl_lang = FENNEL;
         } else {
-            printf("Unknown value for 'repl' parameter: '%s' ", lang);
+            printf("Unknown value for 'repl' parameter: '%s'\n", lang);
             lua_error(L);
         }
         repl_setup(repl_lang);
     }
 #endif
 
-    M_app_startframeloop(frame_fn, L);
+    M_app_startloop(tick_fn, L);
     // lua_gc(L, LUA_GCCOLLECT, 0);
 
     ////////////////////////////////////////////////////////////////////////////////

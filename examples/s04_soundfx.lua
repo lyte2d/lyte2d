@@ -22,29 +22,29 @@ sfx_hurt_3.pan = 0.0
 sfx_shoot_1.pan = 1.0
 sfx_shoot_2.pan = 0.0
 
-function lyte.frame(dt, width, height)
+function lyte.tick(dt, width, height)
     -- UPDATE
 
     -- lmb/rmb for shooting sounds
-    if lyte.is_mousepressed("m_1") then
+    if lyte.is_mouse_pressed("mb1") then
         sfx_shoot_1:play()
     end
-    if lyte.is_mousepressed("m_2") then
+    if lyte.is_mouse_pressed("mb2") then
         sfx_shoot_2:play()
     end
     -- keys 1/2/3 for hurting sounds
-    if lyte.is_keypressed("1") then
+    if lyte.is_key_pressed("1") then
         sfx_hurt_1:play()
     end
-    if lyte.is_keypressed("2") then
+    if lyte.is_key_pressed("2") then
         sfx_hurt_2:play()
     end
-    if lyte.is_keypressed("3") then
+    if lyte.is_key_pressed("3") then
         sfx_hurt_3:play()
     end
 
     -- DRAW
-    lyte.clear(0.0, 0.15, 0.05, 1)
+    lyte.cls(0.0, 0.15, 0.05, 1)
     lyte.draw_text("Sounds FX", 10, 10)
     lyte.draw_text("LMB/RMB for 'shooting'", 10, 60)
     lyte.draw_text("1/2/3 for 'hurting'", 10, 80)

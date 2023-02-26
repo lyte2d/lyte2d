@@ -2,36 +2,94 @@
 
 lyte = lyte or {}
 
-
-lyte.mathx = require "bootlibs.mathx"
-
-
-lyte.tween = require "bootlibs.tween"
-
-require "bootlibs.graphics"
-require "bootlibs.classic"
-
-require "bootlibs.libraries"
-
-fennel = require "fennel"
-
-
 table.unpack = table.unpack or unpack
 unpack = unpack or table.unpack
 
-_G.tostring_lua = function(n) return tostring(n) end
-_G.tostring_fennel = function(n) return fennel.view(n) end
+local default_font = lyte.load_font("/bootassets/monogram-extended.ttf", 24)
+
+function lyte.reset_font()
+    lyte.set_font(default_font)
+end
+
+lyte.reset_font(default_font)
+
+lyte.set_window_icon("bootassets/icon.png")
+
+---------------------------------------------------------------
+---------------------------------------------------------------
+---------------------------------------------------------------
 
 
-_G.tool_eval_fennel = function(str, fn)
-    fn = fn or "(repl)"
-    str = str or ""
-    return unpack { fennel.eval(str, {correlate=true, filename=fn, allowedGlobals=false}) };
+function lyte.draw_circle_line(xc, yc, r)
+    local segments = math.max(7, (2*r/math.pi))
+    -- if segments%2 == 1 then segments = segments - 1 end -- even?
+    local ang = 2*math.pi/segments
+    local points = {}
+    local lines = {}
+    local angle = 0
+    -- local p = {}
+    for i=0, segments+1 do
+        local x = xc + r/2 * math.sin(angle)
+        local y = yc - r/2 * math.cos(angle);
+        angle = angle + ang
+        points[i+1] = {x=x,y=y}
+    end
+
+    points[#points].x = points[1].x
+    points[#points].y = points[1].y
+
+    for i=1, segments+1 do
+        lines[i] = {
+            x1 = points[i].x,
+            y1 = points[i].y,
+            x2 = points[i+1].x,
+            y2 = points[i+1].y,
+        }
+    end
+    lyte.draw_many_lines(lines)
+end
+
+function lyte.draw_circle(xc, yc, r)
+    local segments = math.max(7, (2*r/math.pi))
+    -- if segments%2 == 1 then segments = segments - 1 end -- even?
+    local ang = 2*math.pi/segments
+    local points = {}
+    local triangles = {}
+    local angle = 0
+    -- local p = {}
+    for i=0, segments+1 do
+        local x = xc + r/2 * math.sin(angle)
+        local y = yc - r/2 * math.cos(angle);
+        angle = angle + ang
+        points[i+1] = {x=x,y=y}
+    end
+
+    points[#points-1].x = points[1].x
+    points[#points-1].y = points[1].y
+
+    for i=1, segments+1 do
+        triangles[i] = {
+            x1 = xc,
+            y1 = yc,
+            x2 = points[i].x,
+            y2 = points[i].y,
+            x3 = points[i+1].x,
+            y3 = points[i+1].y,
+        }
+    end
+
+
+    lyte.draw_many_triangles(triangles);
 end
 
 
 
-lyte.window.icon = "bootassets/icon.png"
+
+
+---------------------------------------------------------------
+---------------------------------------------------------------
+---------------------------------------------------------------
+
 
 
 ----------------------------
@@ -47,13 +105,15 @@ lyte.window.icon = "bootassets/icon.png"
 --     _G[k] = v
 -- end
 
--- temporary frame (for repl)
+-- temporary tick (for repl)
 
-lyte.frame = function()
-    lyte.clear(0.1,0.1,0.1,0)
+lyte.tick = function()
+    lyte.cls(0.1,0.1,0.1,0)
     lyte.set_color(0.8,0.8,0.8,1)
-    local w, h = lyte.draw_text("GURU MEDITATION", 7, 10)
-    local w2, h2 = lyte.draw_text("Couldn't find 'lyte.frame' function", 7, 32)
+    local w, h = lyte.get_text_size("GURU MEDITATION")
+    lyte.draw_text("GURU MEDITATION", 7, 10)
+    local w2, h2 = lyte.get_text_size("Couldn't find 'lyte.tick' function")
+    lyte.draw_text("Couldn't find 'lyte.tick' function", 7, 32)
     lyte.set_color(0.9,0,0,1)
-    lyte.draw_rect(4,12, math.max(w, w2) + 6, h2 + 30)
+    lyte.draw_rect_line(4,12, math.max(w, w2) + 6, h2 + 30)
 end

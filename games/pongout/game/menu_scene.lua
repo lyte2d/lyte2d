@@ -2,6 +2,8 @@
 
 local M = {}
 
+local tween = require "libs.tween"
+
 local menu_state = {
     alpha = 0.0,
 }
@@ -22,7 +24,7 @@ local active_item = 1
 function M.init()
     menu_state.alpha = 0.0
     lyte.set_font(Assets.font1)
-    tweens.goin = lyte.tween.new(2.0, menu_state, { alpha = 1.0 }, 'inOutQuad')
+    tweens.goin = tween.new(2.0, menu_state, { alpha = 1.0 }, 'inOutQuad')
     tweens.demo_starter = nil
     active_item = 1
 end
@@ -42,11 +44,11 @@ function M.update(dt)
         end
     end
 
-    if lyte.is_keypressed("space") or lyte.is_keypressed("enter") or lyte.is_gamepadpressed(0, "but_a") then
+    if lyte.is_key_pressed("space") or lyte.is_key_pressed("enter") or lyte.is_gamepad_pressed(0, "pad_a") then
         tweens.demo_starter = nil
         if menu_items[active_item].id == "c" then
             tweens.goin:set(10.0)
-            tweens.goout = lyte.tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
+            tweens.goout = tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
         elseif menu_items[active_item].id == "n" then
             State.left_points = 0
             State.right_points = 0
@@ -62,17 +64,17 @@ function M.update(dt)
 
             State.lvl_points = 0
             tweens.goin:set(10.0)
-            tweens.goout = lyte.tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
+            tweens.goout = tween.new(0.3, menu_state, { alpha = 0.0 }, 'outQuad')
         elseif menu_items[active_item].id == "q" then
-            quit()
+            lyte.quit()
         end
     end
 
-    if lyte.is_keypressed("up") or lyte.is_keypressed("w") or lyte.is_gamepadpressed(0, "but_dpad_up") then
+    if lyte.is_key_pressed("up") or lyte.is_key_pressed("w") or lyte.is_gamepad_pressed(0, "dpad_up") then
         tweens.demo_starter = nil
         active_item = active_item - 1
     end
-    if lyte.is_keypressed("down") or lyte.is_keypressed("s") or lyte.is_gamepadpressed(0, "but_dpad_down") then
+    if lyte.is_key_pressed("down") or lyte.is_key_pressed("s") or lyte.is_gamepad_pressed(0, "dpad_down") then
         tweens.demo_starter = nil
         active_item = active_item + 1
     end

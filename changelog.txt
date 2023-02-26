@@ -1,3 +1,14 @@
+## Lyte2D alpha v0.4 (2023.02.   )
+- Error messages now contain the filename
+- More consistent API and string contants
+- Removed some experimental APIs
+- WIP: Removed built-in fennel support
+  - TODO in 0.5: remove but make it easy to use any other lua language
+- Added a fennel sample
+- Windows GUI exe, for distrubution.
+  - This one does not create a CMD window
+  - Mainly aimed at players, not devs
+
 ## Lyte2D alpha v0.3 (2023.02.13)
 - Custom shader support
 - Executable name changed 'lyte2d' to 'lyte'

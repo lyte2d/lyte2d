@@ -57,7 +57,7 @@ typedef enum M_UniformType {
 
 typedef void (*M_FuncSimple)(void *app_data);
 
-typedef void (*M_FuncFull)(void *app_data, float delta_time, int width, int height, bool resized, bool fullscreen);
+typedef void (*M_TickFunc)(void *app_data, float delta_time, int width, int height, bool resized, bool fullscreen);
 
 typedef struct M_Config {
     char *title, *icon;
@@ -154,14 +154,15 @@ typedef struct M_Sound {
 //-----------------------------
 bool M_system_WASM(void);
 int M_app_init(M_Config *config);
-void M_app_startframeloop(M_FuncFull frame_fn, void *app_data);
+void M_app_startloop(M_TickFunc tick_fn, void *app_data);
 void M_app_cleanup(void);
 
 void M_app_quit(void);
 bool M_app_getfullscreen(void);
 void M_app_setfullscreen(bool fullscreen);
-int M_app_getwindowwidth(void);
-int M_app_getwindowheight(void);
+//int M_app_getwindowwidth(void);
+//int M_app_getwindowheight(void);
+M_SizeI M_app_getwindowsize(void);
 void M_app_setwindowsize(int w, int h);
 void M_app_setwindowminsize(int w, int h);
 
@@ -254,7 +255,7 @@ void M_canvas_unset(void);
 M_Image M_newimage_load(const char *path);
 void M_image_cleanup(M_Image image);
 void M_image_draw(M_Image image, float x, float y);
-void M_image_draw_rect(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height);
+void M_image_draw_rect_line(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height);
 // multiple rects from single image to help with batching
 
 // shader
@@ -285,8 +286,8 @@ void M_gfx_drawlines(M_Line *lines, int cnt);
 void M_gfx_drawrects_filled(M_Rect *rects, int cnt);
 void M_gfx_drawtriangles_filled(M_Triangle *triangles, int cnt);
 
-void M_gfx_drawstriplines(M_Point *pts, int cnt);
-void M_gfx_drawstriptriangles_filled(M_Point *pts, int cnt);
+// void M_gfx_drawstriplines(M_Point *pts, int cnt);
+// void M_gfx_drawstriptriangles_filled(M_Point *pts, int cnt);
 
 
 // audio

@@ -3,7 +3,7 @@
 local total_time = 0
 
 -- creating a shader program. single argument is a dictionary
--- which defines the shader. 
+-- which defines the shader.
 -- (as of alpha) currently all values need to be passed.
 local shader_1 = lyte.new_shader({
     -- uniforms and their types must be defined beforehand. accepted types:
@@ -22,15 +22,15 @@ local shader_1 = lyte.new_shader({
     -- other can be added by the dev
     vert = [[
         // draw rect sends x, y positions and w/h, 4 floats
-        in vec4 coords;        
+        in vec4 coords;
         out vec2 image_uv;
         void vert_main() {
             gl_Position = vec4(coords.xy, 0.0, 1.0);
             image_uv = coords.zw;
         }
     ]],
-    -- code for fragment shader. 
-    -- frag_main function must be defined. 
+    -- code for fragment shader.
+    -- frag_main function must be defined.
     -- must output a vec4 value representing rgba
     -- image_uv name is shared between vertex -> fragment shaders
     frag = [[
@@ -53,35 +53,35 @@ local shader_1 = lyte.new_shader({
 
 
 local function draw_some_rects(x,y)
-    -- draw some rectangles on different 
-    lyte.draw_rect_filled(x+10, y, 60, 20)
-    lyte.draw_rect_filled(x+80, y, 60, 20)
-    lyte.draw_rect_filled(x+150, y, 60, 20)
-    lyte.draw_rect_filled(x+220, y, 60, 20)
+    -- draw some rectangles on different
+    lyte.draw_rect(x+10, y, 60, 20)
+    lyte.draw_rect(x+80, y, 60, 20)
+    lyte.draw_rect(x+150, y, 60, 20)
+    lyte.draw_rect(x+220, y, 60, 20)
 end
 
 
-function lyte.frame(dt, width, height)
+function lyte.tick(dt, width, height)
     -- UPDATE
     total_time = total_time + dt
-    
+
     shader_1:send({ screen_size = {width, height} })
-    
+
     -- DRAW
-    lyte.clear(0, 0, 0, 1)
+    lyte.cls(0, 0, 0, 1)
     lyte.reset_color()
 
     lyte.set_shader(shader_1)
-  
-    lyte.draw_rect_filled(10, 10, width-20, 40)
-    
+
+    lyte.draw_rect(10, 10, width-20, 40)
+
     draw_some_rects(10, 60)
     draw_some_rects(30, 90)
     draw_some_rects(60, 120)
-    
+
     lyte.push_matrix()
     lyte.rotate_at(total_time/2, width/2, height/2)
-    lyte.draw_rect_filled(width/2-height/3, height/2-25, height*2/3, 50)
+    lyte.draw_rect(width/2-height/3, height/2-25, height*2/3, 50)
     lyte.pop_matrix()
 
     lyte.reset_shader()

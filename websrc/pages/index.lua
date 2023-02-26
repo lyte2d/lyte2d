@@ -6,7 +6,7 @@ local MenuLinkExt = require "lib.menulinkext"
 local Data = require "data"
 
 local simple1 = [[
-function lyte.frame()
+function lyte.tick()
     lyte.draw_text("Hello, world", 0, 0)
 end
 ]]
@@ -89,7 +89,7 @@ local function Page()
             H.p "Download the executable and place it somewhere in your path. 'lyte.exe' (or 'lyte' on linux) is assumed to be in your path.",
             H.ul {
                 H.li "Create an <code>app.lua</code> file.",
-                H.li "Implement <code>lyte.frame</code> function.  (See examples) ",
+                H.li "Implement <code>lyte.tick</code> function.  (See examples) ",
                 H.li "Make sure you're in the same directory in your shell/cmd window",
                 H.li "Start your game with <code>lyte</code>.",
             },
@@ -104,6 +104,7 @@ local function Page()
                 H.li "Ready to share your game with others? Cool!",
                 H.li "Create an 'app.zip' file. Inside the zip, 'app.lua' should be at the root/topmost location",
                 H.li "Copy 'lyte.exe', and rename it to 'mygame.exe' (swap 'mygame' for your chosen binary name)",
+                H.li "Alternatively, consider using 'lyte_gui.exe' on Windows, for no-console launch",
                 H.li "Running <code>mygame</code> will automatically load app.zip if it's in the same directory.",
                 H.li "Option 1: you can share the exe and the zip file, and your players can play it as it is",
                 H.li "Option 2: Fuse your app (next section.)",
@@ -126,12 +127,10 @@ local function Page()
                 H.li "On Windows just typing a letter will pause the game. And you can start using lyte as a Lua REPL.",
                 H.li "Similar on Linux, however the key is not captured. So after the first key (any key), you can type the commands.",
                 H.li "Hit enter on an empty line to unpause the game loop.",
-                H.li "Fennel: Lyte2D has built-in support for Fennel language. You can use .fnl files instead of .lua files. And fennel repl can be start with <code>lyte repl=fnl</code>.",
             },
             H.b "Known issues with alpha",
             H.ul {
                 H.li "Functions do not have default arguments, so all arguments must be passed to each function. This will be fixed in a later release.",
-                H.li "Error messages do not always display the filename.",
                 H.li "Line/Circle drawing can have minor issues with very small sizes.",
                 H.li "Font rendering can have minor issues",
                 H.li "Browser version has rendering problems with pixels. Desktop versions look much better",

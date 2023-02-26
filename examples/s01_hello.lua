@@ -4,27 +4,27 @@
 local image_1 = lyte.load_image("assets/hero.png")
 
 
-function lyte.frame(dt, width, height)    
+function lyte.tick(dt, width, height)
     -- background color
-    lyte.clear(0, 0, 0, 1)
+    lyte.cls(0, 0, 0, 1)
 
     -- foreground color for the rectangles, red with alpha
     lyte.set_color(1, 0, 0, 0.3)
 
     -- draw 4 filled overlapping rectangles
-    for i=1,4 do 
+    for i=1,4 do
         local x = i * width/7
         local y = i * height/7
-        lyte.draw_rect_filled(x, y, width/3, height/3)
+        lyte.draw_rect(x, y, width/3, height/3)
     end
-    
+
     -- foreground color for the circles, green with alpha
     lyte.set_color(0, 1, 0, 0.3)
     -- draw 4 filled overlapping circles
-    for i=1,4 do 
+    for i=1,4 do
         local x = width - ((i+1) * width/7)
         local y = i * height/7
-        lyte.draw_circle_filled(x, y, (width+height)/6)
+        lyte.draw_circle(x, y, (width+height)/6)
     end
 
     lyte.reset_color() -- sets color to: (1, 1, 1, 1)
@@ -41,9 +41,9 @@ function lyte.frame(dt, width, height)
 
     -- full image
     lyte.draw_image(image_1, 10, 70)
-    -- a portion of the image (sprite's frames are 16x16. draw #3)
-    lyte.draw_imagerect(image_1, 10, 90, 16*(3-1), 0, 16, 16)
-    
+    -- a portion of the image (sprite's ticks are 16x16. draw #3)
+    lyte.draw_image_rect(image_1, 10, 90, 16*(3-1), 0, 16, 16)
+
     lyte.pop_matrix()
 end
 

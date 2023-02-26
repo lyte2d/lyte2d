@@ -155,7 +155,7 @@ bool repl_check(lua_State *L) {
                 if (repl_lang == FENNEL) {
                     lua_getglobal(L, "tostring_fennel");
                 } else {
-                    lua_getglobal(L, "tostring_lua");
+                    lua_getglobal(L, "tostring");
                 }
                 lua_pushvalue(L, i);
                 lua_pcall(L, 1, 1, 0);

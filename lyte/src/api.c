@@ -671,38 +671,38 @@ static int luaopen_sound_metadata(lua_State *L) {
 //     {"resume_music", api_music_resume},
 //     {"stop_music", api_music_stop},
 //     {"seek_music", api_music_seek},
-//     {"get_musiclength", api_music_getlength},
-//     {"get_musiclength_played", api_music_getlength_played},
-//     {"set_musicvolume", api_music_setvolume},
-//     {"get_musicvolume", api_music_getvolume},
-//     {"set_musicpitch", api_music_setpitch},
-//     {"get_musicpitch", api_music_getpitch},
-//     {"set_musicpan", api_music_setpan},
-//     {"get_musicpan", api_music_getpan},
-//     {"is_musicplaying", api_music_isplaying},
+//     {"get_music_length", api_music_getlength},
+//     {"get_music_length_played", api_music_getlength_played},
+//     {"set_music_volume", api_music_setvolume},
+//     {"get_music_volume", api_music_getvolume},
+//     {"set_music_pitch", api_music_setpitch},
+//     {"get_music_pitch", api_music_getpitch},
+//     {"set_music_pan", api_music_setpan},
+//     {"get_music_pan", api_music_getpan},
+//     {"is_music_playing", api_music_isplaying},
 
 //     // sounddata
 //     {"load_sounddata", api_new_sounddata_load},
-//     {"set_sounddatavolume", api_sounddata_setvolume},
-//     {"get_sounddatavolume", api_sounddata_getvolume},
-//     {"set_sounddatapitch", api_sounddata_setpitch},
-//     {"get_sounddatapitch", api_sounddata_getpitch},
-//     {"set_sounddatapan", api_sounddata_setpan},
-//     {"get_sounddatapan", api_sounddata_getpan},
+//     {"set_sounddata_volume", api_sounddata_setvolume},
+//     {"get_sounddata_volume", api_sounddata_getvolume},
+//     {"set_sounddata_pitch", api_sounddata_setpitch},
+//     {"get_sounddata_pitch", api_sounddata_getpitch},
+//     {"set_sounddata_pan", api_sounddata_setpan},
+//     {"get_sounddata_pan", api_sounddata_getpan},
 
 //     // sound
 //     {"new_sound", api_new_sound},
-//     {"set_soundvolume", api_sound_setvolume},
-//     {"get_soundvolume", api_sound_getvolume},
-//     {"set_soundpitch", api_sound_setpitch},
-//     {"get_soundpitch", api_sound_getpitch},
-//     {"set_soundpan", api_sound_setpan},
-//     {"get_soundpan", api_sound_getpan},
+//     {"set_sound_volume", api_sound_setvolume},
+//     {"get_sound_volume", api_sound_getvolume},
+//     {"set_sound_pitch", api_sound_setpitch},
+//     {"get_sound_pitch", api_sound_getpitch},
+//     {"set_sound_pan", api_sound_setpan},
+//     {"get_sound_pan", api_sound_getpan},
 //     {"play_sound", api_sound_play},
 //     {"pause_sound", api_sound_pause},
 //     {"resume_sound", api_sound_resume},
 //     {"stop_sound", api_sound_stop},
-//     {"is_soundplaying", api_sound_isplaying},
+//     {"is_sound_playing", api_sound_isplaying},
 
 
 //     {NULL, NULL} /* sentinel */
@@ -738,7 +738,7 @@ static int api_pop_matrix(lua_State *L) {
     return 0;
 }
 
-static int api_identity_matrix(lua_State *L) {
+static int api_reset_matrix(lua_State *L) {
     (void)L;
     M_gfx_identitymatrix();
     return 0;
@@ -789,7 +789,7 @@ static int api_scale_at(lua_State *L) {
 
 
 // [  r g b a --  ]
-static int api_clear(lua_State *L) {
+static int api_cls(lua_State *L) {
     float r = luaL_checknumber(L, 1);
     float g = luaL_checknumber(L, 2);
     float b = luaL_checknumber(L, 3);
@@ -824,7 +824,7 @@ static const char *_blendmode_str_values[] = {
     "mul" // M_BLENDMODE_MUL
 };
 
-static int api_set_defaultblendmode(lua_State *L) {
+static int api_set_default_blendmode(lua_State *L) {
     const char *str = luaL_checkstring(L, 1);
     int intval = 1;
     for (int i=0; i<M_NUM_BLENDMODES; i++) {
@@ -870,7 +870,7 @@ static const char *_filtermode_str_values[] = {
 };
 
 
-static int api_set_defaultfiltermode(lua_State *L) {
+static int api_set_default_filtermode(lua_State *L) {
     const char *str = luaL_checkstring(L, 1);
     int intval = 1;
     for (int i=0; i<M_NUM_FILTERMODES; i++) {
@@ -906,20 +906,20 @@ static int api_reset_filtermode(lua_State *L) {
     return 0;
 }
 
+// static int api_draw_circle_line(lua_State *L) {
+//     int x = luaL_checkint(L, 1);
+//     int y = luaL_checkint(L, 2);
+//     int r = luaL_checkint(L, 3);
+//     M_draw_circle_line(x, y, r);
+//     return 0;
+// }
+
+
 // static int api_draw_circle(lua_State *L) {
 //     int x = luaL_checkint(L, 1);
 //     int y = luaL_checkint(L, 2);
 //     int r = luaL_checkint(L, 3);
 //     M_draw_circle(x, y, r);
-//     return 0;
-// }
-
-
-// static int api_draw_circle_filled(lua_State *L) {
-//     int x = luaL_checkint(L, 1);
-//     int y = luaL_checkint(L, 2);
-//     int r = luaL_checkint(L, 3);
-//     M_draw_circle_filled(x, y, r);
 //     return 0;
 // }
 
@@ -939,7 +939,7 @@ static int api_draw_line(lua_State *L) {
     return 0;
 }
 
-static int api_draw_rect(lua_State *L) {
+static int api_draw_rect_line(lua_State *L) {
     float x = luaL_checknumber(L, 1);
     float y = luaL_checknumber(L, 2);
     float w = luaL_checknumber(L, 3);
@@ -948,7 +948,7 @@ static int api_draw_rect(lua_State *L) {
     return 0;
 }
 
-static int api_draw_rect_filled(lua_State *L) {
+static int api_draw_rect(lua_State *L) {
     float x = luaL_checknumber(L, 1);
     float y = luaL_checknumber(L, 2);
     float w = luaL_checknumber(L, 3);
@@ -1109,7 +1109,7 @@ static inline void _set_buf_triangles(lua_State *L, int i) {
 }
 
 // [ {Point} --  ]
-static int api_draw_points(lua_State *L) {
+static int api_draw_many_points(lua_State *L) {
     if (lua_istable(L, -1) != 1) {
         lua_error(L);
     }
@@ -1122,7 +1122,7 @@ static int api_draw_points(lua_State *L) {
 }
 
 // [ {Line} --  ]
-static int api_draw_lines(lua_State *L) {
+static int api_draw_many_lines(lua_State *L) {
     if (lua_istable(L, -1) != 1) {
         lua_error(L);
     }
@@ -1135,7 +1135,7 @@ static int api_draw_lines(lua_State *L) {
 }
 
 // [ {Rect} --  ]
-static int api_draw_rects_filled(lua_State *L) {
+static int api_draw_many_rects(lua_State *L) {
     if (lua_istable(L, -1) != 1) {
         lua_error(L);
     }
@@ -1148,7 +1148,7 @@ static int api_draw_rects_filled(lua_State *L) {
 }
 
 // [ {Triangle} --  ]
-static int api_draw_triangles_filled(lua_State *L) {
+static int api_draw_many_triangles(lua_State *L) {
     if (lua_istable(L, -1) != 1) {
         lua_error(L);
     }
@@ -1160,31 +1160,31 @@ static int api_draw_triangles_filled(lua_State *L) {
     return 0;
 }
 
-// [ {Point} --  ]
-static int api_draw_striplines(lua_State *L) {
-    if (lua_istable(L, -1) != 1) {
-        lua_error(L);
-    }
-    int cnt = lua_objlen(L, -1);
-    for (int i=1; i<=cnt; i++){
-        _set_buf_points(L, i);
-    }
-    M_gfx_drawstriplines(_buf_points, cnt);
-    return 0;
-}
+// // [ {Point} --  ]
+// static int api_draw_line_strips(lua_State *L) {
+//     if (lua_istable(L, -1) != 1) {
+//         lua_error(L);
+//     }
+//     int cnt = lua_objlen(L, -1);
+//     for (int i=1; i<=cnt; i++){
+//         _set_buf_points(L, i);
+//     }
+//     M_gfx_drawstriplines(_buf_points, cnt);
+//     return 0;
+// }
 
-// [ {Point} --  ]
-static int api_draw_striptriangles_filled(lua_State *L) {
-    if (lua_istable(L, -1) != 1) {
-        lua_error(L);
-    }
-    int cnt = lua_objlen(L, -1);
-    for (int i=1; i<=cnt; i++){
-        _set_buf_points(L, i);
-    }
-    M_gfx_drawstriptriangles_filled(_buf_points, cnt);
-    return 0;
-}
+// // [ {Point} --  ]
+// static int api_draw_triangle_strips(lua_State *L) {
+//     if (lua_istable(L, -1) != 1) {
+//         lua_error(L);
+//     }
+//     int cnt = lua_objlen(L, -1);
+//     for (int i=1; i<=cnt; i++){
+//         _set_buf_points(L, i);
+//     }
+//     M_gfx_drawstriptriangles_filled(_buf_points, cnt);
+//     return 0;
+// }
 
 
 ////////////////////
@@ -1335,7 +1335,7 @@ static int api_draw_image(lua_State *L) {
 
 
 // [ Image number number number number number number-- ]
-static int api_draw_imagerect(lua_State *L) {
+static int api_draw_image_rect(lua_State *L) {
     M_Image *img = luaL_checkudata(L, 1, "lyte.Image");
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
@@ -1344,7 +1344,7 @@ static int api_draw_imagerect(lua_State *L) {
     int im_w = luaL_checkinteger(L, 6);
     int im_h = luaL_checkinteger(L, 7);
 
-    M_image_draw_rect(*img, x, y, im_x, im_y, im_w, im_h);
+    M_image_draw_rect_line(*img, x, y, im_x, im_y, im_w, im_h);
     return 0;
 }
 
@@ -1442,19 +1442,21 @@ static int api_set_font(lua_State *L) {
 
 
 
-// string x y  -- w h
+// string x y  --     //  w h
 static int api_draw_text(lua_State *L) {
     const char *str = luaL_checkstring(L, 1);
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
     M_SizeI sz = M_font_drawtext(str, x, y);
-    lua_pushinteger(L, sz.w);
-    lua_pushinteger(L, sz.h);
-    return 2;
+    (void)sz;
+    //lua_pushinteger(L, sz.w);
+    //lua_pushinteger(L, sz.h);
+    //return 2;
+    return 0;
 }
 
 // string -- w h
-static int api_measure_text(lua_State *L) {
+static int api_get_text_size(lua_State *L) {
     const char *str = luaL_checkstring(L, 1);
     M_SizeI sz = M_font_measuretext(str);
     lua_pushinteger(L, sz.w);
@@ -1702,7 +1704,7 @@ static int shader_md_index(lua_State *L) {
     switch (key_id) {
         // case IDX_shader_code: { api_shader_getcode(L); } break;
         // methods
-        case IDX_shader_send: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "send_shader"); lua_remove(L, -2); } break;
+        case IDX_shader_send: { lua_getglobal(L, LYTE_DIRECT_API); lua_getfield(L, -1, "send_shader_uniforms"); lua_remove(L, -2); } break;
  break;
     }
     return 1;
@@ -1813,19 +1815,19 @@ static int luaopen_font_metadata(lua_State *L) {
 static const struct luaL_Reg lyte_graphics_lib[] = {
     {"push_matrix", api_push_matrix},
     {"pop_matrix", api_pop_matrix},
-    {"identity_matrix", api_identity_matrix},
+    {"reset_matrix", api_reset_matrix},
     {"translate", api_translate},
     {"rotate", api_rotate},
     {"rotate_at", api_rotate_at},
     {"scale", api_scale},
     {"scale_at", api_scale_at},
-    {"clear", api_clear},
+    {"cls", api_cls},
     {"set_color", api_set_color},
     {"reset_color", api_reset_color},
-    {"set_defaultblendmode", api_set_defaultblendmode},
+    {"set_default_blendmode", api_set_default_blendmode},
     {"set_blendmode", api_set_blendmode},
     {"reset_blendmode", api_reset_blendmode},
-    {"set_defaultfiltermode", api_set_defaultfiltermode},
+    {"set_default_filtermode", api_set_default_filtermode},
     {"set_filtermode", api_set_filtermode},
     {"reset_filtermode", api_reset_filtermode},
 
@@ -1839,11 +1841,11 @@ static const struct luaL_Reg lyte_graphics_lib[] = {
     {"reset_canvas", api_reset_canvas},
 
     {"draw_image", api_draw_image},
-    {"draw_imagerect", api_draw_imagerect},
+    {"draw_image_rect", api_draw_image_rect},
 
     {"new_shader", api_new_shader},
     // {"load_shader", api_new_shader_load},
-    {"send_shader", api_shader_send},
+    {"send_shader_uniforms", api_shader_send},
     {"set_shader", api_set_shader},
     {"reset_shader", api_reset_shader},
     // {"get_shadercode", api_shader_getcode},
@@ -1852,22 +1854,22 @@ static const struct luaL_Reg lyte_graphics_lib[] = {
     {"set_font", api_set_font},
     // {"get_font", api_get_font},
     {"draw_text", api_draw_text},
-    {"measure_text", api_measure_text},
+    {"get_text_size", api_get_text_size},
 
+    // {"draw_circle_line", api_draw_circle_line},
     // {"draw_circle", api_draw_circle},
-    // {"draw_circle_filled", api_draw_circle_filled},
 
     {"draw_point", api_draw_point},
     {"draw_line", api_draw_line},
+    {"draw_rect_line", api_draw_rect_line},
     {"draw_rect", api_draw_rect},
-    {"draw_rect_filled", api_draw_rect_filled},
 
-    {"draw_points", api_draw_points},
-    {"draw_lines", api_draw_lines},
-    {"draw_rects_filled", api_draw_rects_filled},
-    {"draw_triangles_filled", api_draw_triangles_filled},
-    {"draw_striplines", api_draw_striplines},
-    {"draw_striptriangles_filled", api_draw_striptriangles_filled},
+    {"draw_many_points", api_draw_many_points},
+    {"draw_many_lines", api_draw_many_lines},
+    {"draw_many_rects", api_draw_many_rects},
+    {"draw_many_triangles", api_draw_many_triangles},
+    // {"draw_line_strips", api_draw_line_strips},
+    // {"draw_triangle_strips", api_draw_triangle_strips},
 
 
     {NULL, NULL} /* sentinel */
@@ -1897,14 +1899,14 @@ int luaopen_lyte_graphics(lua_State *L) {
 
 // order important
 static const char *_mouse_key_str_values[] = {
-    "m_1",
-    "m_2",
-    "m_3",
-    "m_4",
-    "m_5",
-    "m_6",
-    "m_7",
-    "m_8",
+    "mb1",
+    "mb2",
+    "mb3",
+    "mb4",
+    "mb5",
+    "mb6",
+    "mb7",
+    "mb8",
     // "m_wh_up",
     // "m_wh_down",
     // "m_wh_left",
@@ -1914,50 +1916,50 @@ static const char *_mouse_key_str_values[] = {
 // order important
 static const char *_gamepad_key_str_values[] = {
 #if defined(__EMSCRIPTEN__)
-    "but_a",
-    "but_b",
-    "but_x",
-    "but_y",
-    "but_leftbumper",
-    "but_rightbumper",
+    "pad_a",
+    "pad_b",
+    "pad_x",
+    "pad_y",
+    "left_bumper",
+    "right_bumper",
     "but_internal_left_trigger", // Emscripten only. will be mapped to axis
     "but_internal_right_trigger", // Emscripten only. will be mapped to axis
-    "but_back",
-    "but_start",
-    "but_leftthumb",
-    "but_rightthumb",
-    "but_dpad_up",
-    "but_dpad_down",
-    "but_dpad_left",
-    "but_dpad_right",
-    "but_guide",
+    "back",
+    "start",
+    "left_thumb",
+    "right_thumb",
+    "dpad_up",
+    "dpad_down",
+    "dpad_left",
+    "dpad_right",
+    "guide",
 #else
-    "but_a",
-    "but_b",
-    "but_x",
-    "but_y",
-    "but_leftbumper",
-    "but_rightbumper",
-    "but_back",
-    "but_start",
-    "but_guide",
-    "but_leftthumb",
-    "but_rightthumb",
-    "but_dpad_up",
-    "but_dpad_right",
-    "but_dpad_down",
-    "but_dpad_left",
+    "pad_a",
+    "pad_b",
+    "pad_x",
+    "pad_y",
+    "left_bumper",
+    "right_bumper",
+    "back",
+    "start",
+    "guide",
+    "left_thumb",
+    "right_thumb",
+    "dpad_up",
+    "dpad_right",
+    "dpad_down",
+    "dpad_left",
 #endif
 };
 
 // order important
 static const char *_gamepad_axis_str_values[] = {
-    "axis_left_x",
-    "axis_left_y",
-    "axis_right_x",
-    "axis_right_y",
-    "axis_trigger_left",
-    "axis_trigger_right",
+    "left_x",
+    "left_y",
+    "right_x",
+    "right_y",
+    "left_trigger",
+    "right_trigger",
 };
 
 
@@ -2025,7 +2027,7 @@ static inline M_KeyboardKey _keycode_str_to_keycode(lua_State *L, const char *ke
 
 
 // [ keycode -- bool ]]
-static int api_is_keydown(lua_State *L) {
+static int api_is_key_down(lua_State *L) {
     const char *keycode_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_KeyboardKey keycode = _keycode_str_to_keycode(L, keycode_str);
@@ -2035,7 +2037,7 @@ static int api_is_keydown(lua_State *L) {
 }
 
 // [ keycode -- bool ]]
-static int api_is_keypresssed(lua_State *L) {
+static int api_is_key_presssed(lua_State *L) {
     const char *keycode_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_KeyboardKey keycode = _keycode_str_to_keycode(L, keycode_str);
@@ -2045,7 +2047,7 @@ static int api_is_keypresssed(lua_State *L) {
 }
 
 // [ keycode -- bool ]]
-static int api_is_keyrepeat(lua_State *L) {
+static int api_is_key_repeat(lua_State *L) {
     const char *keycode_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_KeyboardKey keycode = _keycode_str_to_keycode(L, keycode_str);
@@ -2055,7 +2057,7 @@ static int api_is_keyrepeat(lua_State *L) {
 }
 
 // [ keycode -- bool ]]
-static int api_is_keyreleased(lua_State *L) {
+static int api_is_key_released(lua_State *L) {
     const char *keycode_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_KeyboardKey keycode = _keycode_str_to_keycode(L, keycode_str);
@@ -2066,7 +2068,7 @@ static int api_is_keyreleased(lua_State *L) {
 
 
 // [ mousekey -- bool ]]
-static int api_is_mousedown(lua_State *L) {
+static int api_is_mouse_down(lua_State *L) {
     const char *mousekey_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_MouseButton mousekey = _mousekey_str_to_mousekey(L, mousekey_str);
@@ -2076,7 +2078,7 @@ static int api_is_mousedown(lua_State *L) {
 }
 
 // [ mousekey -- bool ]]
-static int api_is_mousepresssed(lua_State *L) {
+static int api_is_mouse_presssed(lua_State *L) {
     const char *mousekey_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_MouseButton mousekey = _mousekey_str_to_mousekey(L, mousekey_str);
@@ -2086,7 +2088,7 @@ static int api_is_mousepresssed(lua_State *L) {
 }
 
 // [ mousekey -- bool ]]
-static int api_is_mousereleased(lua_State *L) {
+static int api_is_mouse_released(lua_State *L) {
     const char *mousekey_str = luaL_checkstring(L, 1);
     lua_pop(L,1);
     M_MouseButton mousekey = _mousekey_str_to_mousekey(L, mousekey_str);
@@ -2096,7 +2098,7 @@ static int api_is_mousereleased(lua_State *L) {
 }
 
 // [  -- number number  ]]
-static int api_get_mouse(lua_State *L) {
+static int api_get_mouse_position(lua_State *L) {
     // M_Vec2i res = M_input_mouse();
     int x = M_input_mouse_x();
     int y = M_input_mouse_y();
@@ -2106,13 +2108,13 @@ static int api_get_mouse(lua_State *L) {
 }
 
 // [  -- number ]
-static int api_num_gamepads(lua_State *L) {
+static int api_get_gamepad_count(lua_State *L) {
     lua_pushinteger(L, M_input_numgamepads());
     return 1;
 }
 
 // [  number -- string ]
-static int api_get_gamepadname(lua_State *L) {
+static int api_get_gamepad_name(lua_State *L) {
     int idx = luaL_checkinteger(L, 1);
     lua_pushstring(L,M_input_gamepadname(idx));
     return 1;
@@ -2167,20 +2169,20 @@ static int api_gamepad_released(lua_State *L) {
 
 
 static const struct luaL_Reg lyte_input_lib[] = {
-    {"is_keydown", api_is_keydown},
-    {"is_keyrepeat", api_is_keyrepeat},
-    {"is_keypressed", api_is_keypresssed},
-    {"is_keyreleased", api_is_keyreleased},
-    {"is_mousedown", api_is_mousedown},
-    {"is_mousepressed", api_is_mousepresssed},
-    {"is_mousereleased", api_is_mousereleased},
-    {"get_mouse", api_get_mouse},
-    {"num_gamepads", api_num_gamepads},
-    {"get_gamepadname", api_get_gamepadname},
-    {"get_gamepadaxis", api_gamepad_axis},
-    {"is_gamepaddown", api_gamepad_down},
-    {"is_gamepadpressed", api_gamepad_pressed},
-    {"is_gamepadreleased", api_gamepad_released},
+    {"is_key_down", api_is_key_down},
+    {"is_key_repeat", api_is_key_repeat},
+    {"is_key_pressed", api_is_key_presssed},
+    {"is_key_released", api_is_key_released},
+    {"is_mouse_down", api_is_mouse_down},
+    {"is_mouse_pressed", api_is_mouse_presssed},
+    {"is_mouse_released", api_is_mouse_released},
+    {"get_mouse_position", api_get_mouse_position},
+    {"get_gamepad_count", api_get_gamepad_count},
+    {"get_gamepad_name", api_get_gamepad_name},
+    {"get_gamepad_axis", api_gamepad_axis},
+    {"is_gamepad_down", api_gamepad_down},
+    {"is_gamepad_pressed", api_gamepad_pressed},
+    {"is_gamepad_released", api_gamepad_released},
     {NULL, NULL} /* sentinel */
 };
 
@@ -2246,21 +2248,32 @@ static int api_quit(lua_State *L) {
 }
 
 
-// [  -- number ]
-static int api_getwindowwidth(lua_State *L) {
-    (void)L;
-    int w = M_app_getwindowwidth();
-    lua_pushinteger(L, w);
-    return 1;
-}
+// // [  -- number ]
+// static int api_getwindowwidth(lua_State *L) {
+//     (void)L;
+//     int w = M_app_getwindowwidth();
+//     lua_pushinteger(L, w);
+//     return 1;
+// }
+
+// // [  -- number ]
+// static int api_getwindowheight(lua_State *L) {
+//     (void)L;
+//     int h = M_app_getwindowheight();
+//     lua_pushinteger(L, h);
+//     return 1;
+// }
 
 // [  -- number ]
-static int api_getwindowheight(lua_State *L) {
+static int api_getwindowsize(lua_State *L) {
     (void)L;
-    int h = M_app_getwindowheight();
-    lua_pushinteger(L, h);
-    return 1;
+    M_SizeI size = M_app_getwindowsize();
+    lua_pushinteger(L, size.w);
+    lua_pushinteger(L, size.h);
+    return 2;
 }
+
+
 
 // [ boolean --  ]
 static int api_setfullscreen(lua_State *L) {
@@ -2322,7 +2335,7 @@ static int api_getvsync(lua_State *L) {
 }
 
 // [ number number number number --  ]
-static int api_set_margins(lua_State *L) {
+static int api_set_window_margins(lua_State *L) {
     int l = luaL_checkinteger(L, 1);
     int r = luaL_checkinteger(L, 2);
     int t = luaL_checkinteger(L, 3);
@@ -2332,7 +2345,7 @@ static int api_set_margins(lua_State *L) {
 }
 
 // [ number number number number --  ]
-static int api_set_paddings(lua_State *L) {
+static int api_set_window_paddings(lua_State *L) {
     int l = luaL_checkinteger(L, 1);
     int r = luaL_checkinteger(L, 2);
     int t = luaL_checkinteger(L, 3);
@@ -2387,43 +2400,43 @@ static const struct luaL_Reg lyte_direct_api_lib[] = {
     {"resume_music", api_music_resume},
     {"stop_music", api_music_stop},
     {"seek_music", api_music_seek},
-    {"get_musiclength", api_music_getlength},
-    {"get_musiclength_played", api_music_getlength_played},
-    {"set_musicvolume", api_music_setvolume},
-    {"get_musicvolume", api_music_getvolume},
-    {"set_musicpitch", api_music_setpitch},
-    {"get_musicpitch", api_music_getpitch},
-    {"set_musicpan", api_music_setpan},
-    {"get_musicpan", api_music_getpan},
-    {"is_musicplaying", api_music_isplaying},
+    {"get_music_length", api_music_getlength},
+    {"get_music_length_played", api_music_getlength_played},
+    {"set_music_volume", api_music_setvolume},
+    {"get_music_volume", api_music_getvolume},
+    {"set_music_pitch", api_music_setpitch},
+    {"get_music_pitch", api_music_getpitch},
+    {"set_music_pan", api_music_setpan},
+    {"get_music_pan", api_music_getpan},
+    {"is_music_playing", api_music_isplaying},
 
     // sounddata
     {"load_sounddata", api_new_sounddata_load},
-    {"set_sounddatavolume", api_sounddata_setvolume},
-    {"get_sounddatavolume", api_sounddata_getvolume},
-    {"set_sounddatapitch", api_sounddata_setpitch},
-    {"get_sounddatapitch", api_sounddata_getpitch},
-    {"set_sounddatapan", api_sounddata_setpan},
-    {"get_sounddatapan", api_sounddata_getpan},
+    {"set_sounddata_volume", api_sounddata_setvolume},
+    {"get_sounddata_volume", api_sounddata_getvolume},
+    {"set_sounddata_pitch", api_sounddata_setpitch},
+    {"get_sounddata_pitch", api_sounddata_getpitch},
+    {"set_sounddata_pan", api_sounddata_setpan},
+    {"get_sounddata_pan", api_sounddata_getpan},
 
     // sound
     {"new_sound", api_new_sound},
-    {"set_soundvolume", api_sound_setvolume},
-    {"get_soundvolume", api_sound_getvolume},
-    {"set_soundpitch", api_sound_setpitch},
-    {"get_soundpitch", api_sound_getpitch},
-    {"set_soundpan", api_sound_setpan},
-    {"get_soundpan", api_sound_getpan},
+    {"set_sound_volume", api_sound_setvolume},
+    {"get_sound_volume", api_sound_getvolume},
+    {"set_sound_pitch", api_sound_setpitch},
+    {"get_sound_pitch", api_sound_getpitch},
+    {"set_sound_pan", api_sound_setpan},
+    {"get_sound_pan", api_sound_getpan},
     {"play_sound", api_sound_play},
     {"pause_sound", api_sound_pause},
     {"resume_sound", api_sound_resume},
     {"stop_sound", api_sound_stop},
-    {"is_soundplaying", api_sound_isplaying},
+    {"is_sound_playing", api_sound_isplaying},
 
     // filesystem
-    {"file_read", api_loadtext},
-    {"file_write", api_savetext},
-    {"file_append", api_savetextappend},
+    {"load_file", api_loadtext},
+    {"save_file_write", api_savetext},
+    {"save_file_append", api_savetextappend},
 
     // graphics
     {"new_canvas", api_new_canvas},
@@ -2434,18 +2447,19 @@ static const struct luaL_Reg lyte_direct_api_lib[] = {
     {"get_mastervolume", api_get_mastervolume},
 
     // window
-    {"set_windowtitle",api_setwindowtitle},
-    {"get_windowwidth",api_getwindowwidth},
-    {"get_windowheight",api_getwindowheight},
-    {"set_windowsize",api_setwindowsize},
-    {"set_windowminsize",api_setwindowminsize},
+    {"set_window_title",api_setwindowtitle},
+    // {"get_window_width",api_getwindowwidth},
+    // {"get_window_height",api_getwindowheight},
+    {"get_window_size",api_getwindowsize},
+    {"set_window_size",api_setwindowsize},
+    {"set_window_minsize",api_setwindowminsize},
     {"set_fullscreen", api_setfullscreen},
-    {"get_fullscreen", api_getfullscreen},
-    {"set_vsync", api_setvsync},
-    {"get_vsync", api_getvsync},
-    {"set_margins", api_set_margins},
-    {"set_paddings", api_set_paddings},
-    {"set_windowicon",api_setwindowicon},
+    {"is_fullscreen", api_getfullscreen},
+    {"set_window_vsync", api_setvsync},
+    {"is_window_vsync", api_getvsync},
+    {"set_window_margins", api_set_window_margins},
+    {"set_window_paddings", api_set_window_paddings},
+    {"set_window_icon",api_setwindowicon},
 
 
     {NULL, NULL} /* sentinel */
@@ -2461,9 +2475,9 @@ int luaopen_lyte_direct_api(lua_State *L) {
 
 
 // static const struct luaL_Reg lyte_runtime_direct_api_lib[] = {
-//     {"file_read", api_loadtext},
-//     {"file_write", api_savetext},
-//     {"file_append", api_savetextappend},
+//     {"load_file", api_loadtext},
+//     {"save_file_write", api_savetext},
+//     {"save_file_append", api_savetextappend},
 //     {"new_canvas", api_new_canvas},
 //     {"load_image", api_new_image_load},
 

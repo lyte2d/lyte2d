@@ -8,33 +8,33 @@ local music_1 = lyte.load_music("assets/elev.mp3")
 -- start playing right away
 music_1:play()
 
-function lyte.frame(dt, width, height)
+function lyte.tick(dt, width, height)
     -- UPDATE
     total_time = total_time + dt
 
     -- up/down keys to change the pitch
-    if lyte.is_keypressed("up") then
-        music_1.pitch = (music_1.pitch + 0.01) 
-    elseif lyte.is_keypressed("down") then
-        music_1.pitch = (music_1.pitch - 0.01) 
+    if lyte.is_key_pressed("up") then
+        music_1.pitch = (music_1.pitch + 0.01)
+    elseif lyte.is_key_pressed("down") then
+        music_1.pitch = (music_1.pitch - 0.01)
     end
     -- left/right keys to change the pan
-    if lyte.is_keypressed("left") then
+    if lyte.is_key_pressed("left") then
         music_1.pan = math.min(music_1.pan + 0.1, 1)
-    elseif lyte.is_keypressed("right") then
+    elseif lyte.is_key_pressed("right") then
         music_1.pan = math.max(music_1.pan - 0.1, 0)
     end
     -- rmb start/pause music
-    if lyte.is_mousepressed("m_2") then
+    if lyte.is_mouse_pressed("mb2") then
         if music_1.playing then
             music_1:pause()
-        else 
+        else
             music_1:play()
         end
     end
 
     -- DRAW
-    lyte.clear(0.0, 0.1, 0.2, 1)
+    lyte.cls(0.0, 0.1, 0.2, 1)
     lyte.draw_text(("played: %1.2f/%3.1f secs"):format(music_1.length_played, music_1.length), 10, 10)
     lyte.draw_text(("pitch: %1.2f, pan: %1.2f "):format(music_1.pitch, music_1.pan), 10, 30)
     lyte.set_color(1,1,0.2,1)

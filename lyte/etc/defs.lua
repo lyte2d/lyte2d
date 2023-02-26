@@ -103,15 +103,6 @@ end
 -- defs pretty printer: typesript .d.ts
 --------------------------------------------------------
 
-local function _basic_types(def)
-    local str = ""
-    if def == "Number" then str = "number"
-    elseif def == "String" then str = "string"
-    elseif def == "Boolean" then str = "boolean"
-    elseif def == "Nil" then str = "nil"
-    else str = "<UNKNOWN basicdef: '" .. def .."'>" end
-    return str
-end
 
 local function pairs_by_def(t, v)
     local a = {}
@@ -119,7 +110,7 @@ local function pairs_by_def(t, v)
         if (v and v.__def) then
             local left = v.__def
             if left == "Enum" then left = "Z9_Enum" end -- take it to the last:
-            if left == "Function" and n == "frame" then left = "A0_SpecialFunc" end
+            if left == "Function" and n == "tick" then left = "A0_SpecialFunc" end
             if left == "Alias" then left = "G1_aliases" end
             local k = left .. "@" .. n
             table.insert(a, k)
@@ -147,18 +138,26 @@ function defs.pp_typescript_d_ts(name, table_, initial_depth, tab_size)
     assert(type(table_)=="table")
     assert(table_.__def == "NS")
 
+    local function _basic_types(def)
+        local str = ""
+        if def == "Number" then str = "number"
+        elseif def == "String" then str = "string"
+        elseif def == "Boolean" then str = "boolean"
+        elseif def == "Nil" then str = "nil"
+        else str = "<UNKNOWN basicdef: '" .. def .."'>" end
+        return str
+    end
+
+
+
     initial_depth = initial_depth or 1
     tab_size = tabsize or 4
 
     local function recurse(tbl, ret, name, depth)
-        -- Base type case
-        if type(tbl) == "string" then
-            ret = ret .. _basic_types(def)
-        elseif type(tbl) == "table" then
+        if type(tbl) == "table" then
             local def = tbl.__def
 
             if def == "Number" or def == "String" or def == "Boolean" or def == "Nil" then
-                -- return _basic_types(def)
                 ret = ret .. _basic_types(def)
             elseif def == "NS" then
                 ret = ret .. (" "):rep((depth - 1) * tab_size) .. "declare namespace " .. name .. " {\n"
@@ -294,11 +293,9 @@ function defs.pp_typescript_d_ts(name, table_, initial_depth, tab_size)
                 -- error("<UNKNOWN def: '" .. def .. "'>")
                 ret = ret .. ("<UNKNOWN def: '" .. def .. "'>")
             end
-        elseif not tbl then
-            error ("Empty for name: " .. name)
-        else
-            error("Unknown: '" .. tbl .. "'")
-        end
+        elseif not tbl then error ("Empty for name: " .. name)
+        else error("Unknown: '" .. tbl .. "' for name: " .. name) end
+
         return ret
     end
 

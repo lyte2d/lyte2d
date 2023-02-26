@@ -113,11 +113,11 @@ end
 local function update_paddles(DT)
     local speed = State.paddle_speed * DT
 
-    if lyte.is_keydown("w") or lyte.is_gamepaddown(0, "but_dpad_up") then PaddleLeft.y = PaddleLeft.y - speed end
-    if lyte.is_keydown("s") or lyte.is_gamepaddown(0, "but_dpad_down") then PaddleLeft.y = PaddleLeft.y + speed end
+    if lyte.is_key_down("w") or lyte.is_gamepad_down(0, "dpad_up") then PaddleLeft.y = PaddleLeft.y - speed end
+    if lyte.is_key_down("s") or lyte.is_gamepad_down(0, "dpad_down") then PaddleLeft.y = PaddleLeft.y + speed end
 
-    if lyte.is_keydown("up") or lyte.is_gamepaddown(1, "but_dpad_up") then PaddleRight.y = PaddleRight.y - speed end
-    if lyte.is_keydown("down") or lyte.is_gamepaddown(1, "but_dpad_down") then PaddleRight.y = PaddleRight.y + speed end
+    if lyte.is_key_down("up") or lyte.is_gamepad_down(1, "dpad_up") then PaddleRight.y = PaddleRight.y - speed end
+    if lyte.is_key_down("down") or lyte.is_gamepad_down(1, "dpad_down") then PaddleRight.y = PaddleRight.y + speed end
 
     local paddle_delta = 1
     if PaddleLeft.y < 0 + paddle_delta + WALL_THICK then PaddleLeft.y = 0 + paddle_delta + WALL_THICK end
@@ -249,7 +249,7 @@ end
 
 
 function M.update(DT)
-    if lyte.is_keypressed("escape") then
+    if lyte.is_key_pressed("escape") then
         set_scene("menu")
         State.paused = true
     end
@@ -258,7 +258,7 @@ function M.update(DT)
 end
 
 function M.draw(active)
-    lyte.clear(0, 0, 0, 1)
+    lyte.cls(0, 0, 0, 1)
 
     if active then
 
@@ -272,14 +272,14 @@ function M.draw(active)
 
 
         lyte.set_color(0.9, 0.6, 0.5, 1)
-        lyte.draw_rect_filled(PaddleLeft.x, PaddleLeft.y, PaddleLeft.w, PaddleLeft.h)
+        lyte.draw_rect(PaddleLeft.x, PaddleLeft.y, PaddleLeft.w, PaddleLeft.h)
 
 
         lyte.set_color(0.5, 0.6, 0.9, 1)
-        lyte.draw_rect_filled(PaddleRight.x, PaddleRight.y, PaddleRight.w, PaddleRight.h)
+        lyte.draw_rect(PaddleRight.x, PaddleRight.y, PaddleRight.w, PaddleRight.h)
 
         lyte.set_color(0.8, 0.8, 0.4, 1)
-        lyte.draw_rect_filled(Ball.x, Ball.y, Ball.w, Ball.h)
+        lyte.draw_rect(Ball.x, Ball.y, Ball.w, Ball.h)
 
         local b = 1
         for y = 1, State.num_brickrows do
@@ -288,7 +288,7 @@ function M.draw(active)
                 if v then
                     if (v.active) then
                         lyte.set_color(v.r, v.g, v.b, 1.0)
-                        lyte.draw_rect_filled(v.x, v.y, v.w, v.h)
+                        lyte.draw_rect(v.x, v.y, v.w, v.h)
                     end
                     b = b + 1
                 end
@@ -299,7 +299,7 @@ function M.draw(active)
 
     for _, wall in ipairs(Walls) do
         lyte.set_color(0.5, 0.6, 0.5, 0.3)
-        lyte.draw_rect_filled(wall.x, wall.y, wall.w, wall.h)
+        lyte.draw_rect(wall.x, wall.y, wall.w, wall.h)
 
     end
 
