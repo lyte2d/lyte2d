@@ -1,0 +1,37 @@
+name: Build Lyte2D, prep draft release
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-with-docker:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout Lyte2D
+        uses: actions/checkout@v3
+
+      - name: Prep buildx (for docker builds)
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Lyte2D builder Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: build_scripts/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true  # save locally for next set of tasks
+          tags: more/builder:latest
+
+      - name: Official Lyte2D build (via docker)
+        run: make do-official-build
+
+      - name: Create github release for Lyte2D
+        uses: marvinpinto/action-automatic-releases@v1.2.1
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: true
+          draft: true
+          automatic_release_tag: v0
+          files: out/rel/zip/*.zip

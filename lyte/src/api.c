@@ -264,7 +264,6 @@ static int music_md_tostring(lua_State *L) {
 }
 static int music_md_gc(lua_State *L) {
     M_Music *mus = luaL_checkudata(L, 1, "lyte.Music");
-    LOG(" ~~ gc ~~ Music: %d\n", mus->id);
     M_music_cleanup(*mus);
     return 1;
 }
@@ -288,7 +287,9 @@ static int luaopen_music_metadata(lua_State *L) {
 
 // SOUNDDATA
 
-
+    // set_sounddata_volume ======> function
+    //     arg[1] sounddata :: lyte.SoundData
+    //     arg[2] volume :: number
 // [ SoundData number -- ]
 static int api_sounddata_setvolume(lua_State *L) {
     M_SoundData *snddata = luaL_checkudata(L, 1, "lyte.SoundData");
@@ -420,7 +421,6 @@ static int sounddata_md_tostring(lua_State *L) {
 }
 static int sounddata_md_gc(lua_State *L) {
     M_SoundData *sd = luaL_checkudata(L, 1, "lyte.SoundData");
-    LOG(" ~~ gc ~~ SoundData: %d\n", sd->id);
     M_sounddata_cleanup(*sd);
     return 1;
 }
@@ -637,7 +637,6 @@ static int sound_md_tostring(lua_State *L) {
 }
 static int sound_md_gc(lua_State *L) {
     M_Sound *sc = luaL_checkudata(L, 1, "lyte.Sound");
-    LOG(" ~~ gc ~~ Sound: %d/%d\n", sc->data_id, sc->channel_idx);
     M_sound_cleanup(*sc);
     return 1;
 }
@@ -1291,9 +1290,7 @@ static int canvas_md_tostring(lua_State *L) {
     return 1;
 }
 static int canvas_md_gc(lua_State *L) {
-    LOG("canvas_md\n");
     M_Canvas *cvs = luaL_checkudata(L, 1, "lyte.Canvas");
-    LOG(" ~~ gc ~~ Canvas: %d\n", cvs->id_image);
     luaL_unref(L, LUA_REGISTRYINDEX, cvs->_ref);
     M_canvas_cleanup(*cvs);
     return 1;
@@ -1400,7 +1397,6 @@ static int image_md_tostring(lua_State *L) {
 }
 static int image_md_gc(lua_State *L) {
     M_Image *img = luaL_checkudata(L, 1, "lyte.Image");
-    LOG("~~ gc ~~ Image:  %d -- %dx%d\n" ,img->id, img->width, img->height);
     M_image_cleanup(*img);
     return 1;
 }
@@ -1739,7 +1735,6 @@ static int shader_md_tostring(lua_State *L) {
 }
 static int shader_md_gc(lua_State *L) {
     M_Shader *shader = luaL_checkudata(L, 1, "lyte.Shader");
-    LOG(" ~~ gc ~~ Shader: %s/\n", shader->code);
     M_shader_cleanup(*shader);
     return 1;
 }
@@ -2211,12 +2206,9 @@ static int api_loadtext(lua_State *L) {
         size_t read_bytes = M_path_readbytes(path, (void *)data, data_size);
         ASSERT_(data_size == read_bytes, "load text size issue");
         lua_pushlstring(L, data, data_size);
-        LOG("DATA (%d): %s)\n",data_size, data);
         free(data);
     } else {
         // noop?
-        // TODO:
-        LOG("Could not find file: %s\n", path);
         lua_pushnil(L);
     }
     return 1;
@@ -2360,7 +2352,6 @@ static const struct luaL_Reg lyte_filesystem_lib[] = {
     {"append", api_savetextappend},
 };
 int luaopen_lyte_filesystem(lua_State *L) {
-    LOG("luaopen: filesystem\n");
     // luaL_register(L, "lyte.filesystem", lyte_filesystem_lib);
     luaL_register(L, "lyte", lyte_filesystem_lib);
     lua_pop(L, 1);
@@ -2383,7 +2374,6 @@ static const struct luaL_Reg lyte_runtime_lib[] = {
 
 // -- open
 int luaopen_lyte_runtime(lua_State *L) {
-    LOG("luaopen: lyte_runtime\n");
     luaL_register(L, "lyte", lyte_runtime_lib);
     lua_pop(L, 1);
     return 0;
@@ -2467,7 +2457,6 @@ static const struct luaL_Reg lyte_direct_api_lib[] = {
 
 
 int luaopen_lyte_direct_api(lua_State *L) {
-    LOG("luaopen: direct_api\n");
     luaL_register(L, LYTE_DIRECT_API, lyte_direct_api_lib);
     // lua_pop(L, 1);
     return 0;
@@ -2485,7 +2474,6 @@ int luaopen_lyte_direct_api(lua_State *L) {
 // };
 
 // int luaopen_lyte_runtime_direct_api(lua_State *L) {
-//     LOG("luaopen: runtime direct api\n");
 //     luaL_register(L, LYTE_DIRECT_API, lyte_runtime_direct_api_lib);
 //     lua_pop(L, 1);
 //     return 0;
@@ -2503,7 +2491,7 @@ int lyteapi_open(lua_State *L) {
     luaopen_lyte_input(L);
     luaopen_lyte_graphics(L);
     luaopen_lyte_audio(L);
-    luaopen_lyte_filesystem(L);
+    // luaopen_lyte_filesystem(L);
     // direct API
     luaopen_lyte_direct_api(L);
     return 0;

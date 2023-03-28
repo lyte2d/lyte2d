@@ -3,10 +3,6 @@
 #ifndef LYTE_H_INCLUDED
 #define LYTE_H_INCLUDED
 
-#ifndef LOG
-#define LOG(...)
-#endif
-
 #include <lua.h>
 #include <morebase.h>
 

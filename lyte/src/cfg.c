@@ -7,11 +7,10 @@
 int get_config(M_Config *cfg, int argc, char *argv[]) {
     (void)argc;
     (void)argv;
-    // TODO: sokol_args + use exe name to set ziparchive loc
     int err = 0;
-    for (int i=0; i<argc; i++) {
-        LOG("arg: %d value: %s\n", i, argv[i]);
-    }
+    // for (int i=0; i<argc; i++) {
+    //     printf("arg: %d value: %s\n", i, argv[i]);
+    // }
 
     // TODO: read these from app.cfg (or sth) file
     cfg->title = "lyte";

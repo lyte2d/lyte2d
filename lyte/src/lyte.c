@@ -1,7 +1,5 @@
 /* (c) mg */
 
-#define LOG(...)
-
 #include <morebase.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,9 +47,7 @@ static inline bool _lyte_find_module_path(lua_State *L, char *str, const char *m
     (void)err;
     const char *path_name = luaL_checkstring(L, 1);
     (void)path_name;
-    LOG(".... lyte_path: %s\n", path_name);
     bool exists = M_path_exists(path_name);
-    LOG("lyte_loader: mod: %s, path: %s, exists: %d\n", module_name, path_name, exists);
     return exists;
 }
 
@@ -91,8 +87,6 @@ static int _try_load(lua_State *L, bool error_if_missing) {
     CHK_STACK(1);
     //
     const char *path_name = luaL_checkstring(L, -1);
-    LOG("lyte_loader: mod: %s, path: %s\n", module_name, path_name);
-    LOG("lyte_loader: mod: %s, path: %s\n", module_name, path_name);
     lua_pop(L, 1);
     int sz, err=0; (void)err;
     char *module_file_buf = malloc(LUA_MODULE_FILES_MAX_SIZE);
@@ -117,7 +111,6 @@ static int _try_load(lua_State *L, bool error_if_missing) {
 
     sz = M_path_readbytes(path_name, (const uint8_t *)(module_file_buf + strlen(fennel_eval_open)), MAX_LEN);
     if (sz == 0) {
-        LOG("Error: file not found: %s\n", path_name);
         lua_error(L);
     }
     if (is_fennel) {
@@ -142,15 +135,13 @@ static int _try_load(lua_State *L, bool error_if_missing) {
         err = lua_pcall(L, 0, LUA_MULTRET, 0);
     }
     if (err != 0)  {
-        LOG("ERROR: dostring() on file %s\n", path_name);
+        printf("ERROR: dostring() on file %s\n", path_name);
         lua_error(L);
     }
-    LOG("...-> %d %d\n", lua_gettop(L), lua_type(L, -1));
     if (lua_gettop(L) == 3) {
-        LOG("pushing value boolean into lib: %s\n", module_name);
         lua_pushboolean(L, true);
     } else {
-        LOG("package:  %s  top: %d \n", module_name, lua_gettop(L));
+        //printf("package:  %s  top: %d \n", module_name, lua_gettop(L));
     }
 
     CHK_STACK(4);
@@ -184,7 +175,6 @@ static void update_package_loaders(lua_State *L) {
     int err=0; (void)err;
     lua_register(L, "_lyte_searcher", _lyte_searcher);
     err = luaL_dostring(L, "table.insert(package.loaders, 2, _lyte_searcher) \n");
-    LOG("Updating package loaders: %d\n", err);
     CHK_STACK(0);
 }
 
@@ -195,7 +185,6 @@ static inline int _load_lua_file(lua_State *L, const char *path, bool error_if_m
 
 
 static void check_binary_downloads(lua_State *L) {
-    // LOG("checking resources....:");
     bool archive_done = M_filesystem_zippath_is_done(_archive_filename);
     bool binary_done = M_filesystem_zippath_is_done(LUA_GAME_BINARY);
     if (need_to_load_binaries && archive_done && binary_done) {
@@ -242,7 +231,6 @@ static void tick_fn(void *data, float dt, int width, int height, bool resized, b
             _angle += dt * 1;
         }
         // loading screen
-        LOG("need to load resources: %d\n", need_to_load_binaries);
         M_gfx_pushmatrix();
         M_gfx_translate(width/2,height/2);
         M_gfx_rotate(_angle);
@@ -278,12 +266,6 @@ static void tick_fn(void *data, float dt, int width, int height, bool resized, b
 
 
 int main(int argc, char *argv[]) {
-    LOG("\n=== !main entry ===================================================================================\n\n");
-    LOG("ARGS: \n");
-    for (int i=0; i<argc; i++) {
-        LOG("arg at %d is '%s'\n", i, argv[i]);
-    }
-    LOG("/ARGS\n");
     lua_State *L = luaL_newstate();
     // lua_gc(L, LUA_GCCOLLECT, 0);
     lua_atpanic(L, _lua_panic_fn);
@@ -293,10 +275,10 @@ int main(int argc, char *argv[]) {
     // lua_gc(L, LUA_GCCOLLECT, 0);
     int err = 0;
     err = get_config(&cfg, argc, argv);
-    if(err) { LOG("\nErrror: (get_config): %d\n", err); return err; }
+    if(err) { printf("\nErrror: (get_config): %d\n", err); return err; }
     // lua_gc(L, LUA_GCCOLLECT, 0);
     err = M_app_init(&cfg);
-    if(err) { LOG("\nError! (app_init): %d\n", err); return err; }
+    if(err) { printf("\nError! (app_init): %d\n", err); return err; }
     // lua_gc(L, LUA_GCCOLLECT, 0);
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -306,12 +288,12 @@ int main(int argc, char *argv[]) {
 
     // check: 'zip' first. acrhive file name change.  default "app.zip"
     if (M_app_hasarg("zip")) {
-        archivepath = M_app_getarg("zip");
+        archivepath = (char *)M_app_getarg("zip");
     }
 
     // check: 'dir' second. default: "./"
     if (M_app_hasarg("dir")) {
-        localpath = M_app_getarg("dir");
+        localpath = (char *)M_app_getarg("dir");
         char path[1024];
         ASSERT_(strlen(localpath)<1000, "local_path max length is 1000\n");
         sprintf(path, "%s/%s", localpath, _archive_filename);
@@ -321,10 +303,10 @@ int main(int argc, char *argv[]) {
     // check: 'app'.  default: "app.lua"
     // TODO: check fennel version of the file too
     if (M_app_hasarg("app")) {
-        _app_filename = M_app_getarg("app");
+        _app_filename = (char *)M_app_getarg("app");
     }
 
-    LOG("LOCAL PATH: %s\n", localpath);
+    //printf("LOCAL PATH: %s\n", localpath);
     M_filesystem_set_writepath(localpath);
     M_filesystem_add_localpath("local", localpath, "/");
     M_filesystem_add_memoryzippath_withbuf(LUA_BOOT_ZIP, "/", boot_zip, boot_zip_len);
@@ -355,11 +337,7 @@ int main(int argc, char *argv[]) {
     // lua_gc(L, LUA_GCCOLLECT, 0);
 
     ////////////////////////////////////////////////////////////////////////////////
-    LOG("ABOUT TO CLEAN UP (GC first)\n");
     lua_gc(L, LUA_GCCOLLECT, 0);
-    LOG("ABOUT TO CLEAN UP (Now cleanup)\n");
     M_app_cleanup();
-
-    LOG("\n\n=== !main exit ====================================================================================\n");
 }
 

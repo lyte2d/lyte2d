@@ -1,154 +1,164 @@
-VERSION=0.4
-
-LYTE_WIN=lyte.exe
-LYTE_WINGUI=lyte_gui.exe
-LYTE_LINUX=lyte
-
-ZIP_WINGUI=lyte.v${VERSION}.wingui.x64.zip
-ZIP_WIN=lyte.v${VERSION}.win.x64.zip
-ZIP_LINUX=lyte.v${VERSION}.linux.x64.zip
-ZIP_WASM=lyte.v${VERSION}.wasm.zip
-
-PONGOUT_SRC_ZIP=pongout_src.zip
-PONGOUT_WIN_ZIP=pongout_win64.zip
-PONGOUT_LINUX_ZIP=pongout_linux64.zip
-PONGOUT_HTML_ZIP=pongout_html.zip
+VERSION=${shell cat version.txt}
 
 default:
 	cat Makefile
+	echo "VERSION ${VERSION}"
 
-clean-dev:
-	rm -rf builds/dev/CMakeCache.txt
-	rm -f builds/dev/lyte.exe
-clean-wingui:
-	rm -rf builds/wingui/CMakeCache.txt
-	rm -f builds/wingui/lyte_gui.exe
-
-clean-win:
-	rm -rf builds/win/CMakeCache.txt
-	rm -f builds/win/lyte.exe
-
-clean-linux:
-	rm -rf builds/linux/CMakeCache.txt
-	rm -f builds/linux/lyte
-
-clean-wasm:
-	rm -rf builds/wasm/CMakeCache.txt
-	rm -f builds/wasm/lyte.*
-
-config-dev:
-	cmake -S ./lyte -B ./builds/dev -G "Visual Studio 16"
-
-config-wingui:
-	cmake -S ./lyte -B ./builds/wingui -DWIN_GUI=1 -G "Visual Studio 16"
-
-config-win:
-	cmake -S ./lyte -B ./builds/win -G "Visual Studio 16"
-
-config-linux:
-	cmake  -DCMAKE_BUILD_TYPE=MinSizeRel  -S ./lyte -B ./builds/linux
-
-config-wasm:
-	emcmake cmake  -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -S ./lyte -B ./builds/wasm
+# Note: Every target is "PHONY" in this Makefile
 
 
-pack-wingui: wingui
-	rm -f out/${ZIP_WINGUI}
-	cd out && zip -9 -u -r ${ZIP_WINGUI} readme.md lyte_gui.exe && cd ..
+# Code generators (local development use)
 
-pack-win: win
-	rm -f out/${ZIP_WIN}
-	cd out && zip -9 -u -r ${ZIP_WIN} readme.md lyte.exe && cd ..
-
-pack-linux: # dev.... make sure linux build is ready
-	rm -f out/${ZIP_LINUX}
-	cd out && zip -9 -u -r ${ZIP_LINUX} readme.md lyte && cd ..
-
-pack-wasm: wasm
-	rm -f out/${ZIP_WASM}
-	cd out && zip -9 -u -r ${ZIP_WASM} readme.md index.html lyte.js lyte.wasm
-
-dev:
-	rm -f out/lyte.exe
-	cmake --build builds/dev --config Debug
-	cp -r builds/dev/Debug/lyte.exe out/lyte.exe
-	ls -al out
-
-wingui:
-	rm -f out/lyte_gui.exe
-	cmake --build builds/wingui --config MinSizeRel
-	cp -r builds/wingui/MinSizeRel/lyte_gui.exe out/lyte_gui.exe
-	ls -al out
-
-win:
-	rm -f out/lyte.exe
-	cmake --build builds/win --config MinSizeRel
-	cp -r builds/win/MinSizeRel/lyte.exe out/lyte.exe
-	ls -al out
-
-linux:
-	rm -f out/lyte
-	cmake --build builds/linux --config MinSizeRel
-	cp -r builds/linux/lyte out/lyte
-	ls -al out
-
-wasm:
-	rm -f out/lyte.html
-	rm -f out/lyte.js
-	rm -f out/lyte.wasm
-	cmake --build builds/wasm
-	cp -r builds/wasm/lyte* out
-	cp out/lyte.html out/index.html
-	ls -al out
-
-bootzip:
+codegen-bootzip-header:
 	rm -f out/boot.zip
 	cd lyte/boot && zip -9 -u -r ../../out/boot.zip . -x *.tl && cd ../..
-	cd out && xxd -i boot.zip ../lyte/src/_boot_zip.h && cd ..
+	cd out && xxd -i boot.zip ../lyte/src/_boot_zip.h && cd ../..
+	rm -f out/boot.zip
 
-exampleszip:
-	rm -f out/examples.zip
-	cd examples && zip -9 -u -r ../out/examples.zip . && cd ..
 
-webpage:
-	rm -rf website/**
-	make -C webgen
-	cp -r out/lyte.html website
-	cp -r out/lyte.js website
-	cp -r out/lyte.wasm website
-	cp -r out/examples.zip website
+# Local / Dev builds
+
+local-config-msvc-minsizerel:
+	echo "---> CONFIG: Local (msvc console, minsizerel)"
+	cmake  -DCMAKE_BUILD_TYPE=MinSizeRel  -S ./lyte -B ./out/builds/msvc_minsizerel -G "Visual Studio 16"
+
+local-build-msvc-minsizerel:
+	echo "---> BUILD: Local (msvc console, minsizerel)"
+	cmake --build ./out/builds/msvc_minsizerel  --config MinSizeRel
+	cp -f ./out/builds/msvc_minsizerel/MinSizeRel/* ./out/
+
+local-config-msvc-debug:
+	echo "---> CONFIG: Local (msvc console, debug)"
+	cmake  -DCMAKE_BUILD_TYPE=Debug  -S ./lyte -B ./out/builds/msvc_debug -G "Visual Studio 16"
+
+local-build-msvc-debug:
+	echo "---> BUILD: Local (msvc console, debug)"
+	cmake --build ./out/builds/msvc_debug  --config Debug
+	cp -f ./out/builds/msvc_debug/Debug/* ./out/
+
+local-config-gcc-minsizerel:
+	echo "---> CONFIG: Local (gcc console, minsizerel)"
+	cmake  -DCMAKE_BUILD_TYPE=MinSizeRel  -S ./lyte -B ./out/builds/gcc_minsizerel
+
+local-build-gcc-minsizerel:
+	echo "---> BUILD: Local (gcc console, minsizerel)"
+	cmake --build ./out/builds/gcc_minsizerel
+	cp -f ./out/builds/gcc_minsizerel ./out/
+
+local-config-gcc-debug:
+	echo "---> CONFIG: Local (gcc console, debug)"
+	cmake  -DCMAKE_BUILD_TYPE=Debug  -S ./lyte -B ./out/builds/gcc_debug
+
+local-build-gcc-debug:
+	echo "---> BUILD: Local (gcc console, debug)"
+	cmake --build ./out/builds/gcc_debug
+	cp -f ./out/builds/gcc_debug ./out/
+
+
+######################################################################################
+
+# Docker based official build
+
+DOCKER_RUN_INTERACTIVE=docker run -it --rm --name=builder \
+    	--mount type=bind,source=${PWD},target=/src \
+		--workdir /src \
+    	-t more/builder:latest
+
+DOCKER_RUN_CI=docker run --rm --name=builder \
+    	--mount type=bind,source=${PWD},target=/src \
+		--workdir /src \
+    	-t more/builder:latest
+
+DO_RUN=${DOCKER_RUN_CI}
+
+# Build "builder" image itself
+docker-image-build:
+	./build_scripts/image_build.sh 0.1
+
+# Shell on the builder image for debugging build issues
+docker-bash:
+	${DOCKER_RUN_INTERACTIVE} bash
+
+# Build all binaries and pack all zips
+do-official-build: do-config do-build do-copy do-pack
+	echo "do-official-build: finished running."
+
+do-config:
+	${DO_RUN} bash build_scripts/do_config.sh
+
+do-build:
+	${DO_RUN} bash ./build_scripts/do_build.sh
+	ls -al ./out/docker
+
+do-copy:
+	rm -rf ./out/rel/bin
+	${DO_RUN} bash ./build_scripts/do_copy.sh
+	ls -al ./out/rel/bin
+
+
+do-pack:
+	rm -rf ./out/rel/zip
+	${DO_RUN} bash ./build_scripts/do_pack.sh ${VERSION}
+	ls -al ./out/rel/zip
+
+######################################################################################
+
+# MG: personal use/concenience
+
+clean-docker:
+	rm -rf /src/out/rel
+	rm -rf /src/out/docker
+
+clean-out-bins:
+	rm -rf ./out/lyte*.*
+
+copy-rel-out: clean-out-bins
+	cp ./out/rel/bin/* ./out/
+	ls -al ./out/
 
 pongout:
-	rm -f out/${PONGOUT_SRC_ZIP}
-	cd games/pongout && zip -9 -u -r ../../out/${PONGOUT_SRC_ZIP} . -i app.lua  libs/\* game/\* assets/\* -x ".*" *.tl  && cd ../..
-	cat out/${LYTE_WIN} out/${PONGOUT_SRC_ZIP} > out/pongout_win.exe
-	cat out/${LYTE_LINUX} out/${PONGOUT_SRC_ZIP} > out/pongout_linux
-	cd out && zip -9 -u -r ${PONGOUT_WIN_ZIP} pongout_win.exe && cd ..
-	cd out && zip -9 -u -r ${PONGOUT_LINUX_ZIP} pongout_linux && cd ..
-	cd out && cp ${PONGOUT_SRC_ZIP} app.zip && zip -9 -u -r ${PONGOUT_HTML_ZIP} app.zip index.html lyte.js lyte.wasm && rm app.zip && cd ..
-	ls -al out
+	rm -rf ./out/pongout
+	mkdir ./out/pongout
+	games/pongout/build.sh ./out/rel/bin ./out/pongout
 
-# Make sure to have linux binary ready
-build-rel: bootzip win pack-win wasm pack-wasm pack-linux
+website:
+	rm -rf out/website
+	mkdir -p out/website
+	# copy lyte wasm files to the website folder
+	cp ./out/docker/wasm/lyte.html ./out/website
+	cp ./out/docker/wasm/lyte.js ./out/website
+	cp ./out/docker/wasm/lyte.wasm ./out/website
+	# make examples.zip inside the website folder
+	cd ./examples && zip -9 -u -r ../out/website/examples.zip * && cd ..
+	# make the website
+	make -C website_src
 
-build-website: wasm pongout exampleszip webpage
+# To host web pages locally for testing:
+#   with python: python -m http.server
+#   with node: http-server (install with npm install -g http-server)
 
-build-all: build-rel build-website
-
-host-out:
-	# with python: python -m http.server
-	# with node: http-server (install with npm install -g http-server)
-	cd out && http-server && cd ..
+host-pongout:
+	cd out/pongout/web && http-server . && cd ../../..
 
 host-website:
-	# with python: python -m http.server
-	# with node: http-server (install with npm install -g http-server)
-	cd website && http-server ./ && cd ..
+	cd out/website && http-server . && cd ..
 
-# personal use
-L:
+# SHORTCUTS: MOST USED DURING DEVELOPMENT
+
+# codegen things
+
+gen: codegen-bootzip-header
+
+# currently used build target
+# should be one of the local-config-* or local-build-* (the star part)
+LOCAL_TARGET=msvc-debug
+
+cfg: local-config-${LOCAL_TARGET}
+
+bld: local-build-${LOCAL_TARGET}
+	ls -al ./out/
+
+dev: bld
 	rm \lua\l.exe
 	cp out/lyte.exe \lua/lyte.exe
 	ln -s \lua/lyte.exe \lua/l.exe
-S:
-	l dir=scratch
