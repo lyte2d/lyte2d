@@ -2,12 +2,14 @@ local Head = require "views.head"
 local Header = require "views.header"
 local Footer = require "views.footer"
 
-local _gtag_script = H.script {src="https://www.googletagmanager.com/gtag/js?id=UA-223929623-1"}
+local _gtag_script = H.script {src="https://www.googletagmanager.com/gtag/js?id=G-ZCQ9FCCMV2"}
 local _gtag_run = H.script [[
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-223929623-1');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZCQ9FCCMV2');
+
 ]]
 
 local function Layout(title, ...)

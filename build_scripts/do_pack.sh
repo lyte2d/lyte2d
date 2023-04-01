@@ -1,4 +1,5 @@
-#!/usr/bin/bash
+#!//bin/sh
+
 VERSION=$1
 
 CURRDIR=$(pwd)

@@ -9,6 +9,8 @@
 #include <lauxlib.h>
 #include <lualib.h>
 
+#include <signal.h>
+
 #include "lyte.h"
 
 #include "_boot_zip.h"
@@ -40,6 +42,64 @@ static M_Config cfg = {0};
 char *_app_filename = "app";
 char *_archive_filename = "app.zip";
 
+///////////////////// (copied from lua interpreter)
+
+static lua_State *globalL = NULL;
+
+static void l_message (const char *pname, const char *msg) {
+  if (pname) fprintf(stderr, "%s: ", pname);
+  fprintf(stderr, "%s\n", msg);
+  fflush(stderr);
+}
+
+static void lstop (lua_State *L, lua_Debug *ar) {
+  (void)ar;  /* unused arg. */
+  lua_sethook(L, NULL, 0, 0);
+  luaL_error(L, "interrupted!");
+}
+
+
+static void laction (int i) {
+  signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
+                              terminate process (default action) */
+  lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+}
+
+static int traceback (lua_State *L) {
+  if (!lua_isstring(L, 1))  /* 'message' not a string? */
+    return 1;  /* keep it intact */
+  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  if (!lua_istable(L, -1)) {
+    lua_pop(L, 1);
+    return 1;
+  }
+  lua_getfield(L, -1, "traceback");
+  if (!lua_isfunction(L, -1)) {
+    lua_pop(L, 2);
+    return 1;
+  }
+  lua_pushvalue(L, 1);  /* pass error message */
+  lua_pushinteger(L, 2);  /* skip this function and traceback */
+  lua_call(L, 2, 1);  /* call debug.traceback */
+  return 1;
+}
+
+
+static int docall (lua_State *L, int narg, int clear) {
+  int status;
+  int base = lua_gettop(L) - narg;  /* function index */
+  lua_pushcfunction(L, traceback);  /* push traceback function */
+  lua_insert(L, base);  /* put it under chunk and args */
+  signal(SIGINT, laction);
+  status = lua_pcall(L, narg, (clear ? 0 : LUA_MULTRET), base);
+  signal(SIGINT, SIG_DFL);
+  lua_remove(L, base);  /* remove traceback function */
+  /* force a complete garbage collection in case of errors */
+  if (status != 0) lua_gc(L, LUA_GCCOLLECT, 0);
+  return status;
+}
+
+/////////////////////
 
 static inline bool _lyte_find_module_path(lua_State *L, char *str, const char *module_name, const char *ext) {
     sprintf(str, "return (string.gsub('%s', '(%%w+)[.]', '%%1/') .. '%s')\n", module_name, ext);
@@ -132,16 +192,35 @@ static int _try_load(lua_State *L, bool error_if_missing) {
     sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepatha and not part of code
     err = luaL_loadbuffer(L, (const char *)module_file_buf, strlen(module_file_buf), (const char *)path_with_at);
     if (err == 0) {
-        err = lua_pcall(L, 0, LUA_MULTRET, 0);
-    }
-    if (err != 0)  {
+        // err = lua_pcall(L, 0, LUA_MULTRET, 0);
+        //lua_call(L, 0, LUA_MULTRET);
+         err = docall(L, 0, 0);
+        if (err &&  lua_gettop(L) > 0) {
+            // remove loaded modules..
+            lua_remove(L, 1);
+            lua_remove(L, 1);
+            lua_remove(L, 1);
+            lua_getglobal(L, "print");
+            lua_insert(L, 1);
+            if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0) {
+                l_message(path_name, lua_pushfstring(L,
+                                    "error calling " LUA_QL("print") " (%s)",
+                                    lua_tostring(L, -1)));
+            }
+            // quit on error for now
+            exit(1);
+        }
+    } else if (err != 0)  {
         printf("ERROR: dostring() on file %s\n", path_name);
+        // traceback(L);
         lua_error(L);
+        exit(1);
     }
     if (lua_gettop(L) == 3) {
         lua_pushboolean(L, true);
+        //printf("error??");
     } else {
-        //printf("package:  %s  top: %d \n", module_name, lua_gettop(L));
+        // printf("package:  %s  top: %d \n", module_name, lua_gettop(L));
     }
 
     CHK_STACK(4);
@@ -205,6 +284,7 @@ static void check_binary_downloads(lua_State *L) {
 
 
 static int _lua_panic_fn(lua_State *L) {
+    traceback(L);
     const char *str = lua_tostring(L, -1);
     if (str) {
         fprintf(stderr, "\n%s\n", str);
@@ -222,6 +302,7 @@ bool _skip_tick = false;
 
 static void tick_fn(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
     lua_State *L = data;
+    int status = 0;
     CHK_STACK(0);
     if(need_to_load_binaries) {
         _loading_time += dt;
@@ -254,7 +335,18 @@ static void tick_fn(void *data, float dt, int width, int height, bool resized, b
             lua_pushinteger(L,height);
             lua_pushboolean(L,resized);
             lua_pushboolean(L,fullscreen);
-            lua_call(L,5,0);
+            status = docall(L, 5, 0);
+            if (status &&  lua_gettop(L) > 0) {
+                lua_getglobal(L, "print");
+                lua_insert(L, 1);
+                if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
+                    l_message("program_name", lua_pushfstring(L,
+                                        "error calling " LUA_QL("print") " (%s)",
+                                        lua_tostring(L, -1)));
+                // quit on error for now
+                exit(1);
+            }
+            //lua_call(L,5,0);
         } else {
             _skip_tick = false;
         }
@@ -269,6 +361,7 @@ int main(int argc, char *argv[]) {
     lua_State *L = luaL_newstate();
     // lua_gc(L, LUA_GCCOLLECT, 0);
     lua_atpanic(L, _lua_panic_fn);
+    globalL = L;
     luaL_openlibs(L);
     // lua_gc(L, LUA_GCCOLLECT, 0);
     lyteapi_open(L);

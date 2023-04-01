@@ -10,7 +10,7 @@ local shader_1 = lyte.new_shader({
     uniforms = {
         screen_size = "vec2",
         my_img = "sampler2D",
-        transparent_mode = "int",
+        transparent_mode = "float",
     },
     vert = [[
         in vec4 coords;
@@ -24,7 +24,7 @@ local shader_1 = lyte.new_shader({
         in vec2 image_uv;
         out vec4 frag_color;
         void frag_main() {
-            if (transparent_mode == 0) {
+            if (transparent_mode == 0.0) {
                 // current color, but override alpha with 1.0
                 frag_color = texture(my_img, image_uv) * vec4((current_color.rgb), 1.0) ;
             } else {

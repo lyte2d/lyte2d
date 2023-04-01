@@ -21,11 +21,11 @@ jobs:
           file: build_scripts/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true  # save locally for next set of tasks
+          load: true
           tags: more/builder:latest
 
       - name: Official Lyte2D build (via docker)
-        run: make do-official-build
+        run: bash ./build_scripts/official_build.sh
 
       - name: Create github release for Lyte2D
         uses: marvinpinto/action-automatic-releases@v1.2.1

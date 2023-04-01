@@ -32,7 +32,7 @@ local shader1 = lyte.new_shader({
             return uv.x*uv.y;
         }
 
-        float cross(in vec2 _st, float _size) {
+        float xcross(in vec2 _st, float _size) {
             return  box(_st, vec2(_size,_size/4.)) + box(_st, vec2(_size/4.,_size));
         }
 
@@ -54,7 +54,7 @@ local shader1 = lyte.new_shader({
             color2 = vec3(st.x,st.y,0.0);
 
             // Add the shape on the foreground
-            color2 += vec3(cross(st,0.4));
+            color2 += vec3(xcross(st,0.4));
             frag_color = vec4(color2, 1.0);
 
         }
