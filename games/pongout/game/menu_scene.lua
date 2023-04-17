@@ -19,6 +19,7 @@ local menu_items = {
 
 local active_item = 1
 
+local FPS = 0
 
 
 function M.init()
@@ -30,6 +31,7 @@ function M.init()
 end
 
 function M.update(dt)
+    FPS = 1/dt
     local _goin_done = tweens.goin:update(dt)
     if tweens.demo_starter then
     end
@@ -110,6 +112,7 @@ function M.draw()
     end
 
     lyte.pop_matrix()
+    lyte.draw_text(string.format("FPS: %3.0f", FPS), 10, 10)
     for i = start, #menu_items do
         local mi = menu_items[i]
         if i == active_item then

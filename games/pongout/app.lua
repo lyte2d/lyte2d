@@ -7,6 +7,10 @@ mathx = require "libs.mathx"
 
 CW = 64 * 6 -- game area width
 CH = 40 * 6 -- game area height
+
+-- CW = 64 * 10 -- game area width
+-- CH = 40 * 10 -- game area height
+
 WALL_THICK = 5
 
 -- global state
@@ -57,12 +61,14 @@ function LOG(...)
 end
 
 function draw_text_centered(str, x, y)
-    local w, h = lyte.get_text_size(str)
+    local w = lyte.get_text_width(str)
+    local h = lyte.get_text_height(str)
     lyte.draw_text(str, x - w / 2, y - h / 2)
 end
 
 function draw_text_rightaligned(str, x, y)
-    local w, _h = lyte.get_text_size(str)
+    local w = lyte.get_text_width(str)
+    local _h = lyte.get_text_height(str)
     lyte.draw_text(str, x - w, y)
 end
 
@@ -80,18 +86,20 @@ end
 
 local function load_assets()
     Assets.font1 = lyte.load_font("/assets/fonts/m5x7.ttf", 14)
-    Assets.music_elev = lyte.Music("/assets/music/elev.mp3")
+    Assets.music_elev = lyte.load_music("/assets/music/elev.mp3")
 
-    Assets.sd_brick_dt = lyte.SoundData("/assets/snd/sfx_pellet.ogg")
+    Assets.sd_brick_dt = lyte.load_sounddata("/assets/snd/sfx_pellet.ogg")
+    print(Assets.sd_brick_dt.volume)
     Assets.sd_brick_dt.volume = 0.3
-    Assets.sd_paddle_dt = lyte.SoundData("/assets/snd/shoot.ogg")
+    print(Assets.sd_brick_dt.volume)
+    Assets.sd_paddle_dt = lyte.load_sounddata("/assets/snd/shoot.ogg")
     Assets.sd_paddle_dt.volume = 0.3
-    Assets.sd_hurt_dt = lyte.SoundData("/assets/snd/sfx_hurt.wav")
+    Assets.sd_hurt_dt = lyte.load_sounddata("/assets/snd/sfx_hurt.wav")
     Assets.sd_hurt_dt.volume = 0.3
 
-    Assets.sc_brick = lyte.Sound(Assets.sd_brick_dt)
-    Assets.sc_paddle = lyte.Sound(Assets.sd_paddle_dt)
-    Assets.sc_hurt = lyte.Sound(Assets.sd_hurt_dt)
+    Assets.sc_brick = lyte.new_sound(Assets.sd_brick_dt)
+    Assets.sc_paddle = lyte.new_sound(Assets.sd_paddle_dt)
+    Assets.sc_hurt = lyte.new_sound(Assets.sd_hurt_dt)
 end
 
 local function debug_draw(DT)
@@ -202,7 +210,8 @@ local function start()
     lyte.set_window_title("Pong Out!")
     lyte.set_window_icon("/assets/images/icon.png")
 
-    Window.width, Window.height = lyte.get_window_size()
+    Window.width = lyte.get_window_width()
+    Window.height = lyte.get_window_height()
 
     Window.canvas = lyte.new_canvas(CW, CH)
 

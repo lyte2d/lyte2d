@@ -13,7 +13,7 @@
     }
 
 int get_config(M_Config *cfg, int argc, char *argv[]);
-int lyteapi_open(lua_State *L);
+int register_lyte(lua_State *L);
 
 // REPL (+nbchar)
 int nbchar(void);

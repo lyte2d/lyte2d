@@ -85,7 +85,7 @@ static int traceback (lua_State *L) {
 }
 
 
-static int docall (lua_State *L, int narg, int clear) {
+static inline int docall (lua_State *L, int narg, int clear) {
   int status;
   int base = lua_gettop(L) - narg;  /* function index */
   lua_pushcfunction(L, traceback);  /* push traceback function */
@@ -321,8 +321,10 @@ static void tick_fn(void *data, float dt, int width, int height, bool resized, b
         M_gfx_popmatrix();
         check_binary_downloads(L);
 
-
+        // TODO: once done, set tick func again. we should have multiple tick fns.
+        // one for the error case as well
     } else {
+        // can skip one frame when returning from repl (so that DT isn't crazy high!)
         if (!_skip_tick) {
             // TODO make some error checks before starting.. like tick exists..
             lua_getglobal(L, "lyte");
@@ -364,7 +366,7 @@ int main(int argc, char *argv[]) {
     globalL = L;
     luaL_openlibs(L);
     // lua_gc(L, LUA_GCCOLLECT, 0);
-    lyteapi_open(L);
+    register_lyte(L);
     // lua_gc(L, LUA_GCCOLLECT, 0);
     int err = 0;
     err = get_config(&cfg, argc, argv);
@@ -425,6 +427,10 @@ int main(int argc, char *argv[]) {
         repl_setup(repl_lang);
     }
 #endif
+
+    err = M_app_init_graphics(&cfg);
+    if(err) { printf("\nError! (app_init_graphics): %d\n", err); return err; }
+
 
     M_app_startloop(tick_fn, L);
     // lua_gc(L, LUA_GCCOLLECT, 0);

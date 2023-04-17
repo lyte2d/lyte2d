@@ -31,6 +31,11 @@ declare namespace lyte {
     function get_text_height(text: string): integer;
     function get_window_width(): integer;
     function get_window_height(): integer;
+    function get_image_width(image: Image): integer;
+    function get_image_height(image: Image): integer;
+    function get_canvas_width(canvas: Canvas): integer;
+    function get_canvas_height(canvas: Canvas): integer;
+    function get_canvas_image(canvas: Canvas): Image;
     function is_fullscreen(): boolean;
     function is_gamepad_down(index: integer, gamepad_button: GamepadButton): boolean;
     function is_gamepad_pressed(index: integer, gamepad_button: GamepadButton): boolean;
@@ -106,6 +111,15 @@ declare namespace lyte {
     function stop_music(music: Music): void;
     function stop_sound(sound: Sound): void;
     function translate(delta_x: integer, delta_y: integer): void;
+    type ShaderUniforms = {[key: string]: integer | number | integer[] | number[] | Image};
+    interface ShaderDef {
+        frag: string;
+        vert: string;
+        uniforms: {[key: string]: UniformType};
+    };
+    interface Shader {
+        send: (uniforms: ShaderUniforms) => (void);
+    };
     interface Canvas {
         image: Image;
         width: integer;
@@ -144,39 +158,12 @@ declare namespace lyte {
         pitch: number;
         volume: number;
     };
-    interface ShaderDef {
-        frag: string;
-        vert: string;
-        uniforms: {[key: string]: UniformType};
-    };
-    interface Shader {
-        send: (uniforms: ShaderUniforms) => (void);
-    };
-    type ShaderUniforms = {[key: string]: integer | number | integer[] | number[] | Image};
-    type UniformType =
-        'float'  | 'vec2'  | 'vec3'  | 'vec4'  | 'int'  | 'ivec2'  | 'ivec3'  | 'ivec4'  | 'mat4'  | 'sampler2D' ;
-    type BlendMode =
-        'blend'  | 'add'  | 'mod'  | 'mul'  | 'none' ;
-    type FilterMode =
-        'nearest'  | 'linear' ;
-    type GamepadAxis =
-        'left_x'  | 'left_y'  | 'right_x'  | 'right_y'  | 'left_trigger'  | 'right_trigger' ;
-    type GamepadButton =
-        'pad_a'  | 'pad_b'  | 'pad_x'  | 'pad_y'  | 'left_bumper'  | 'right_bumper'  | 'back'  | 'start'  |
-        'guide'  | 'left_thumb'  | 'right_thumb'  | 'dpad_up'  | 'dpad_right'  | 'dpad_down'  | 'dpad_left' ;
-    type MouseButton =
-        'mb1'  | 'mb2'  | 'mb3'  | 'mb4'  | 'mb5'  | 'mb6'  | 'mb7'  | 'mb8' ;
-    type KeyboardKey =
-        'space'  | '\''  | ','  | '-'  | '.'  | '/'  | '0'  | '1'  | '2'  | '3'  | '4'  | '5'  | '6'  | '7'  | '8'  |
-        '9'  | ', '  | '='  | 'a'  | 'b'  | 'c'  | 'd'  | 'e'  | 'f'  | 'g'  | 'h'  | 'i'  | 'j'  | 'k'  | 'l'  |
-        'm'  | 'n'  | 'o'  | 'p'  | 'q'  | 'r'  | 's'  | 't'  | 'u'  | 'v'  | 'w'  | 'x'  | 'y'  | 'z'  | '['  | '\\'  |
-        ']'  | '`'  | 'world_1'  | 'world_2'  | 'escape'  | 'enter'  | 'tab'  | 'backspace'  | 'insert'  | 'delete'  |
-        'right'  | 'left'  | 'down'  | 'up'  | 'page_up'  | 'page_down'  | 'home'  | 'end'  | 'caps_lock'  | 'scroll_lock'  |
-        'num_lock'  | 'print_screen'  | 'pause'  | 'f1'  | 'f2'  | 'f3'  | 'f4'  | 'f5'  | 'f6'  | 'f7'  | 'f8'  | 'f9'  |
-        'f10'  | 'f11'  | 'f12'  | 'f13'  | 'f14'  | 'f15'  | 'f16'  | 'f17'  | 'f18'  | 'f19'  | 'f20'  | 'f21'  | 'f22'  |
-        'f23'  | 'f24'  | 'f25'  | 'kp_0'  | 'kp_1'  | 'kp_2'  | 'kp_3'  | 'kp_4'  | 'kp_5'  | 'kp_6'  | 'kp_7'  | 'kp_8'  |
-        'kp_9'  | 'kp_decimal'  | 'kp_divide'  | 'kp_multiply'  | 'kp_subtract'  | 'kp_add'  | 'kp_enter'  | 'kp_equal'  |
-        'left_shift'  | 'left_control'  | 'left_alt'  | 'left_super'  | 'right_shift'  | 'right_control'  | 'right_alt'  |
-        'right_super'  | 'menu' ;
+    type UniformType = '_invalid'  | 'float'  | 'vec2'  | 'vec3'  | 'vec4'  | 'int'  | 'ivec2'  | 'ivec3'  | 'ivec4'  | 'mat4'  | 'sampler2D' ;
+    type BlendMode = 'none'  | 'blend'  | 'add'  | 'mod'  | 'mul' ;
+    type FilterMode = '_invalid'  | 'nearest'  | 'linear' ;
+    type GamepadAxis = 'left_x'  | 'left_y'  | 'right_x'  | 'right_y'  | 'left_trigger'  | 'right_trigger' ;
+    type GamepadButton = 'pad_a'  | 'pad_b'  | 'pad_x'  | 'pad_y'  | 'left_bumper'  | 'right_bumper'  | 'back'  | 'start'  | 'guide'  | 'left_thumb'  | 'right_thumb'  | 'dpad_up'  | 'dpad_right'  | 'dpad_down'  | 'dpad_left' ;
+    type MouseButton = 'mb1'  | 'mb2'  | 'mb3'  | 'mb4'  | 'mb5'  | 'mb6'  | 'mb7'  | 'mb8' ;
+    type KeyboardKey = 'space'  | '\''  | ','  | '-'  | '.'  | '/'  | '0'  | '1'  | '2'  | '3'  | '4'  | '5'  | '6'  | '7'  | '8'  | '9'  | ';'  | '='  | 'a'  | 'b'  | 'c'  | 'd'  | 'e'  | 'f'  | 'g'  | 'h'  | 'i'  | 'j'  | 'k'  | 'l'  | 'm'  | 'n'  | 'o'  | 'p'  | 'q'  | 'r'  | 's'  | 't'  | 'u'  | 'v'  | 'w'  | 'x'  | 'y'  | 'z'  | '['  | '\\'  | ']'  | '`'  | 'world_1'  | 'world_2'  | 'escape'  | 'enter'  | 'tab'  | 'backspace'  | 'insert'  | 'delete'  | 'right'  | 'left'  | 'down'  | 'up'  | 'page_up'  | 'page_down'  | 'home'  | 'end'  | 'caps_lock'  | 'scroll_lock'  | 'num_lock'  | 'print_screen'  | 'pause'  | 'f1'  | 'f2'  | 'f3'  | 'f4'  | 'f5'  | 'f6'  | 'f7'  | 'f8'  | 'f9'  | 'f10'  | 'f11'  | 'f12'  | 'f13'  | 'f14'  | 'f15'  | 'f16'  | 'f17'  | 'f18'  | 'f19'  | 'f20'  | 'f21'  | 'f22'  | 'f23'  | 'f24'  | 'f25'  | 'kp_0'  | 'kp_1'  | 'kp_2'  | 'kp_3'  | 'kp_4'  | 'kp_5'  | 'kp_6'  | 'kp_7'  | 'kp_8'  | 'kp_9'  | 'kp_decimal'  | 'kp_divide'  | 'kp_multiply'  | 'kp_subtract'  | 'kp_add'  | 'kp_enter'  | 'kp_equal'  | 'left_shift'  | 'left_control'  | 'left_alt'  | 'left_super'  | 'right_shift'  | 'right_control'  | 'right_alt'  | 'right_super'  | 'menu' ;
 }
 

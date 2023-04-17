@@ -153,7 +153,10 @@ typedef struct M_Sound {
 // app model
 //-----------------------------
 bool M_system_WASM(void);
+
 int M_app_init(M_Config *config);
+int M_app_init_graphics(M_Config *config);
+
 void M_app_startloop(M_TickFunc tick_fn, void *app_data);
 void M_app_cleanup(void);
 
@@ -183,6 +186,11 @@ const char *M_app_getarg(const char *key);
 // set/get title?
 // set/get icon?
 
+
+// timer
+//----------------------------
+double M_app_gettime(void);
+double M_app_gettime_since(double t);
 
 // filesystem
 //-----------------------------

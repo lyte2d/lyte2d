@@ -1452,12 +1452,17 @@ static int api_draw_text(lua_State *L) {
 }
 
 // string -- w h
-static int api_get_text_size(lua_State *L) {
+static int api_get_text_width(lua_State *L) {
     const char *str = luaL_checkstring(L, 1);
     M_SizeI sz = M_font_measuretext(str);
     lua_pushinteger(L, sz.w);
+    return 1;
+}
+static int api_get_text_height(lua_State *L) {
+    const char *str = luaL_checkstring(L, 1);
+    M_SizeI sz = M_font_measuretext(str);
     lua_pushinteger(L, sz.h);
-    return 2;
+    return 1;
 }
 
 //==================================================================================================================
@@ -1849,7 +1854,8 @@ static const struct luaL_Reg lyte_graphics_lib[] = {
     {"set_font", api_set_font},
     // {"get_font", api_get_font},
     {"draw_text", api_draw_text},
-    {"get_text_size", api_get_text_size},
+    {"get_text_width", api_get_text_width},
+    {"get_text_height", api_get_text_height},
 
     // {"draw_circle_line", api_draw_circle_line},
     // {"draw_circle", api_draw_circle},
@@ -2092,14 +2098,18 @@ static int api_is_mouse_released(lua_State *L) {
     return 1;
 }
 
-// [  -- number number  ]]
-static int api_get_mouse_position(lua_State *L) {
-    // M_Vec2i res = M_input_mouse();
+// [  -- number  ]]
+static int api_get_mouse_x(lua_State *L) {
     int x = M_input_mouse_x();
-    int y = M_input_mouse_y();
     lua_pushinteger(L, x);
+    return 1;
+}
+
+// [  -- number  ]]
+static int api_get_mouse_y(lua_State *L) {
+    int y = M_input_mouse_y();
     lua_pushinteger(L, y);
-    return 2;
+    return 1;
 }
 
 // [  -- number ]
@@ -2171,7 +2181,8 @@ static const struct luaL_Reg lyte_input_lib[] = {
     {"is_mouse_down", api_is_mouse_down},
     {"is_mouse_pressed", api_is_mouse_presssed},
     {"is_mouse_released", api_is_mouse_released},
-    {"get_mouse_position", api_get_mouse_position},
+    {"get_mouse_x", api_get_mouse_x},
+    {"get_mouse_y", api_get_mouse_y},
     {"get_gamepad_count", api_get_gamepad_count},
     {"get_gamepad_name", api_get_gamepad_name},
     {"get_gamepad_axis", api_gamepad_axis},
@@ -2240,29 +2251,20 @@ static int api_quit(lua_State *L) {
 }
 
 
-// // [  -- number ]
-// static int api_getwindowwidth(lua_State *L) {
-//     (void)L;
-//     int w = M_app_getwindowwidth();
-//     lua_pushinteger(L, w);
-//     return 1;
-// }
-
-// // [  -- number ]
-// static int api_getwindowheight(lua_State *L) {
-//     (void)L;
-//     int h = M_app_getwindowheight();
-//     lua_pushinteger(L, h);
-//     return 1;
-// }
 
 // [  -- number ]
-static int api_getwindowsize(lua_State *L) {
+static int api_getwindowwidth(lua_State *L) {
     (void)L;
     M_SizeI size = M_app_getwindowsize();
     lua_pushinteger(L, size.w);
+    return 1;
+}
+// [  -- number ]
+static int api_getwindowheight(lua_State *L) {
+    (void)L;
+    M_SizeI size = M_app_getwindowsize();
     lua_pushinteger(L, size.h);
-    return 2;
+    return 1;
 }
 
 
@@ -2440,7 +2442,8 @@ static const struct luaL_Reg lyte_direct_api_lib[] = {
     {"set_window_title",api_setwindowtitle},
     // {"get_window_width",api_getwindowwidth},
     // {"get_window_height",api_getwindowheight},
-    {"get_window_size",api_getwindowsize},
+    {"get_window_width",api_getwindowwidth},
+    {"get_window_height",api_getwindowheight},
     {"set_window_size",api_setwindowsize},
     {"set_window_minsize",api_setwindowminsize},
     {"set_fullscreen", api_setfullscreen},
@@ -2485,7 +2488,7 @@ int luaopen_lyte_direct_api(lua_State *L) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-int lyteapi_open(lua_State *L) {
+int register_lyte(lua_State *L) {
     (void)L;
     luaopen_lyte_runtime(L);
     luaopen_lyte_input(L);

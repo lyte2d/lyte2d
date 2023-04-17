@@ -68,25 +68,25 @@ lyte.set_window_minsize(400, 300)
 function lyte.tick(dt, width, height, resized)
   state.totaltime = (state.totaltime + dt)
 
-  -- shader uniforms
-
-  local mx, my = lyte.get_mouse_position()
+  local mx = lyte.get_mouse_x()
+  local my = lyte.get_mouse_y()
 
   -- draw on the canvas with the shader
   lyte.set_canvas(canvas)
   lyte.cls(0, 0, 0, 1)
-  -- send should be after cls (current limitation)
+  -- send should be after cls (a current limitation)
   shader1:send({ time = state.totaltime, screensize = {canvas.width, canvas.height} })
   lyte.set_shader(shader1)
   lyte.set_color(1, 1, 1, 1)
   lyte.draw_rect(10, 10, (canvas.width - 20), (canvas.height - 20))
   lyte.reset_shader()
   lyte.reset_canvas()
-  lyte.cls(0, 0, 0, 1)
+
 
   -- draw the canvas image on the screen
+  lyte.cls(0, 0, 0, 1)
   lyte.push_matrix()
-  lyte.translate(mx,my)
+  lyte.translate(mx, my)
   lyte.rotate(-state.totaltime)
   lyte.draw_image(canvas.image, -canvas.width/2, -canvas.height/2)
   lyte.pop_matrix()

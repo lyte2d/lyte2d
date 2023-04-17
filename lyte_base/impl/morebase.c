@@ -891,6 +891,17 @@ M_SizeI M_font_measuretext(const char *str) {
 // PUBLIC API
 //
 
+
+double M_app_gettime(void) {
+    return glfwGetTime();
+}
+
+double M_app_gettime_since(double t) {
+    return glfwGetTime() - t;
+}
+
+
+
 static const char *_show_physfs_error() {
     int err = PHYSFS_getLastErrorCode();
     const char *err_str = PHYSFS_getErrorByCode(err);
@@ -2075,11 +2086,28 @@ static inline void _tick_input_next() {
     }
 
 }
+
+
+#define PERF_BEGIN() _t1 = M_app_gettime()
+#define PERF_END(n) if(_prt_perf) printf("%s:\t%f\n", (n), M_app_gettime_since(_t1))
+
+
 // int setting_fullscreen = 0;
 // tick: used by both regular glfw and emscripten one
 // that's why it's a separate function
 static inline void tick(void) {
+    // bool _prt_perf = M_input_keypressed(M_KEY_SEMICOLON);
+    bool _prt_perf = M_input_keydown(M_KEY_SEMICOLON);
+    double _t1 = 0.0;
 
+    if (_prt_perf) {
+        printf("---\n");
+    }
+
+
+    // PERF_BEGIN();
+
+    // show perf when ; is down
 
 #if defined(__EMSCRIPTEN__)
     // Note this is for emscripten case. Non-emscripten quit is handled in M_app_startloop()
@@ -2145,29 +2173,51 @@ static inline void tick(void) {
         sgp_project(-RECT_DELT_L, fwidth+RECT_DELT_R, -RECT_DELT_T, fheight+RECT_DELT_B);
         sgp_set_blend_mode((sgp_blend_mode)_lib->blendmode);
 
+        // PERF_END("head");
+
+
+
+        PERF_BEGIN();
         M_gfx_pushmatrix();
         _lib->tick_fn(_lib->app_data, delta_time, win_w, win_h, resized, _lib->fullscreen);
         M_gfx_popmatrix();
+        PERF_END("tick");
 
         // NOTE: at this point only sgp state has been changed, and sg has not
         // so for optimization, we can decide if any drawing was done or not here
         // and possibly skip all this, including swapping of buffers.
         // this way, it can be kind of like a non-immediate mode gui for app that like it
+
+        // PERF_BEGIN();
         sg_pass_action pass_action = {0};
         sg_begin_default_pass(&pass_action, win_w, win_h);
         sgp_flush();
         sgp_end();
         sg_end_pass();
         sg_commit();
-        glfwSwapBuffers(_lib->window);
+        // PERF_END("work");
 
+        PERF_BEGIN();
+        glfwSwapBuffers(_lib->window);
+        PERF_END("swap");
+
+        // PERF_BEGIN();
+        // PERF_BEGIN();
         audio_dowork();
+        // PERF_END("audio");
+        // PERF_BEGIN();
         sfetch_dowork();
+        // PERF_END("fetch");
+        // PERF_BEGIN();
         _tick_input_next();
+        // PERF_END("input");
+        // PERF_END("misc");
 
         // Note: this has to be the last (or after inputs at least)
         // otherwise keypressed events won't work
+        // PERF_BEGIN();
         glfwPollEvents();
+        // PERF_END("poll");
 }
 
 //
@@ -2273,12 +2323,6 @@ bool M_system_WASM() {
 #endif
 }
 
-
-//
-// ENTRY POINT
-//
-
-
 int M_app_init(M_Config *config) {
 
     _lib->vsync = config->vsync;
@@ -2288,6 +2332,33 @@ int M_app_init(M_Config *config) {
 
     _lib->defaultfiltermode = config->defaultfiltermode;
     _lib->filtermode = _lib->filtermode;
+
+
+    // init: physfs. this is to use zip files as folders!
+    int success = PHYSFS_init("");
+    if (!success) {
+        int errcode = PHYSFS_getLastErrorCode();
+        fprintf(stderr, "Failed to init PHYSFS: %d %d, %s\n", success, errcode, PHYSFS_getErrorByCode(errcode));
+        return 5555;
+    }
+
+
+    // init audio
+    audio_init();
+
+    // init font system
+    font_init();
+
+
+    // init: sokol-fetch. this is to asynchronously retrieve files from filesystem (win/linux) or web (wasm)
+    sfetch_setup(&(sfetch_desc_t){0});
+
+    sargs_setup(&(sargs_desc){
+        .argc = config->argc,
+        .argv = config->argv
+    });
+
+
 
 #ifndef __EMSCRIPTEN__
     bool first_arg_update = false;
@@ -2318,12 +2389,11 @@ int M_app_init(M_Config *config) {
         config->argv[1] = first_arg_new;
     }
 #endif
+    return 0;
+}
 
-    sargs_setup(&(sargs_desc){
-        .argc = config->argc,
-        .argv = config->argv
-    });
 
+int M_app_init_graphics(M_Config *config) {
 
 
 #if defined(__EMSCRIPTEN__)
@@ -2397,12 +2467,6 @@ int M_app_init(M_Config *config) {
     _lib->last_shaderid = 100;
     memset(_lib->shaderdefs, 0, sizeof(M_ShaderDef)*M_MAX_SHADERDEFS);
 
-    // init audio
-    audio_init();
-
-    // init font system
-    font_init();
-
     // init: sokol
     sg_desc sgdesc = {0};
     sg_setup(&sgdesc);
@@ -2423,16 +2487,6 @@ int M_app_init(M_Config *config) {
     }
 
 
-    // init: physfs. this is to use zip files as folders!
-    int success = PHYSFS_init("");
-    if (!success) {
-        int errcode = PHYSFS_getLastErrorCode();
-        fprintf(stderr, "Failed to init PHYSFS: %d %d, %s\n", success, errcode, PHYSFS_getErrorByCode(errcode));
-        return 5555;
-    }
-
-    // init: sokol-fetch. this is to asynchronously retrieve files from filesystem (win/linux) or web (wasm)
-    sfetch_setup(&(sfetch_desc_t){0});
 
     // setup input callbacks for mouse cursor loc, mouse buttons, keyboard state, joystic (gamepad) connetions
     // other input state (such as gamepad buttons, axes, etc) is polled each tick.
