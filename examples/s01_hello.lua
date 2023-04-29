@@ -27,8 +27,12 @@ function lyte.tick(dt, width, height)
         lyte.draw_circle(x, y, (width+height)/6)
     end
 
-    lyte.reset_color() -- sets color to: (1, 1, 1, 1)
 
+    lyte.set_color(1,1,0,1)
+
+    lyte.draw_circle_line(width/2, height/2, (width+height)/4);
+
+    lyte.reset_color() -- sets color to: (1, 1, 1, 1)
     -- draw the text on the top
     lyte.draw_text("Hello, Lyte2D", 4, 4)
 

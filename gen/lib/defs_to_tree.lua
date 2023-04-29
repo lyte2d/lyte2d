@@ -8,7 +8,7 @@ local tab = "    "
 
 local TreePrinter = { result = ""}
 
-function TreePrinter.Type(value, name)
+function TreePrinter.Type(value, name, depth)
     TreePrinter.result = TreePrinter.result .. " <" .. value .. "> " .. name .. "\n"
 end
 
@@ -20,7 +20,7 @@ function TreePrinter.Dict(key, value, depth, name, tags, traverse_fn)
 end
 
 function TreePrinter.List(value, depth, name, tags, traverse_fn)
-    TreePrinter.result = TreePrinter.result .. " List<" .. value .. "> " .. name .. "\n"
+    TreePrinter.result = TreePrinter.result .. " List<" .. value.value .. "> " .. name .. "\n"
 end
 
 function TreePrinter.Enum(choices, depth, name, tags, traverse_fn)

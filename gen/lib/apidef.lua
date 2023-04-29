@@ -17,6 +17,10 @@ function M.Integer()
     return _basetype("integer")
 end
 
+function M.Float()
+    return _basetype("float")
+end
+
 function M.Number()
     return _basetype("number")
 end
@@ -83,11 +87,12 @@ end
 -- end
 
 -- oneofs have options (themselves types)
-function M.OneOf(options, tags)
+function M.OneOf(name, options, tags)
     assert(type(options) == "table")
     local rec = {}
     rec._kind = "oneof"
     rec._tags = tags
+    rec._name = name
     rec.options = options
     return rec
 end
@@ -95,6 +100,7 @@ end
 -- Helper to define an Option for OneOf types
 function M.Option(itemdef, tags)
     local ret = {}
+    ret._kind = "option"
     ret._tags = tags
     ret.value = itemdef
     return ret
@@ -126,7 +132,7 @@ function M.List(value, tags)
     local ret = {}
     ret._kind = "list"
     ret._tags = tags
-    ret.list_value = value
+    ret.value = value
     return ret;
 end
 
@@ -190,7 +196,7 @@ end
 local function traverse(defs, PP, depth)
 
     if type(defs) == "string" then
-        PP.Type(defs, "")
+        PP.Type(defs, "", depth)
         return
     end
 
@@ -221,7 +227,7 @@ local function traverse(defs, PP, depth)
         end
 
     if type(value) == "string" then
-        PP.Type(value, name)
+        PP.Type(value, name, depth)
     elseif type(value) == "table" then
 
         if (value._kind) then
@@ -257,8 +263,8 @@ local function traverse(defs, PP, depth)
                 local dict_value = value.dict_value
                 PP.Dict(dict_key, dict_value, depth, name, tags, traverse)
             elseif k == "list" then
-                local list_value = value.list_value
-                PP.List(list_value, depth, name, tags, traverse)
+                -- local list_value = value.list_value
+                PP.List(value, depth, name, tags, traverse)
 
             else
                 error("Internal (25): Shouldn't happen.")

@@ -156,7 +156,8 @@ gen: codegen-bootzip-header
 
 ## currently used build target
 ## should be one of the local-config-* or local-build-* (the star part)
-LOCAL_TARGET=msvc-debug
+# LOCAL_TARGET=msvc-debug
+LOCAL_TARGET=msvc-minsizerel
 
 cfg: local-config-${LOCAL_TARGET}
 

@@ -22,5 +22,5 @@ This project is licensed under the terms of the MIT license. See [/docs/LICENSE.
 
 Lyte2D depends on other software which have various licenses:
 
-- [licenses.txt](licenses.txt) file for all the licenses in one file, or
+- [/docs/licenses.txt](/docs/licenses.txt) file for all the licenses in one file, or
 - [/dependencies](/dependencies) directory for all dependencies and their respective licenses.

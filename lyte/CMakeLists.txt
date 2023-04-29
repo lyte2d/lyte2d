@@ -68,7 +68,7 @@ if( WIN_GUI )
     endif()
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_base ${CMAKE_CURRENT_BINARY_DIR}/lyte_base)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
 
@@ -92,11 +92,12 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ./src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
     ./src/api.c                 # original handcoded implementation
-    #./src/api_generated.c     # new generated implementation (work in progress)
+    # ./src/api_generated.c     # new generated implementation (work in progress)
     ./src/cfg.c
     ./src/nbchar.c
     ./src/repl.c

@@ -62,7 +62,6 @@
             _kind = "function",
             _name = "draw_circle",
             _tags = {
-                c_api_skip = true,
                 d = "Draw a filled circle."
             },
             args = { {
@@ -80,7 +79,6 @@
             _kind = "function",
             _name = "draw_circle_line",
             _tags = {
-                c_api_skip = true,
                 d = "Draw a circle border."
             },
             args = { {
@@ -588,57 +586,6 @@
                 } }
         }, {
             _kind = "function",
-            _name = "get_canvas_width",
-            _tags = {
-                d = "Get the width of the canvase"
-            },
-            args = { {
-                    _name = "canvas",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Canvas"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_canvas_height",
-            _tags = {
-                d = "Get the height of the canvas."
-            },
-            args = { {
-                    _name = "canvas",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Canvas"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_canvas_image",
-            _tags = {
-                d = "Get the current attached image object of the canvas."
-            },
-            args = { {
-                    _name = "canvas",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Canvas"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "Image"
-                } }
-        }, {
-            _kind = "function",
             _name = "is_fullscreen",
             _tags = {
                 d = "Check if the window is set to fullscreen."
@@ -874,6 +821,23 @@
                 } }
         }, {
             _kind = "function",
+            _name = "is_image_canvas",
+            _tags = {
+                d = "Check if the image was created as a canvas."
+            },
+            args = { {
+                    _name = "image",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Image"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
+        }, {
+            _kind = "function",
             _name = "load_file",
             _tags = {
                 d = "Load the file in the path."
@@ -966,7 +930,7 @@
             _name = "new_canvas",
             _tags = {
                 ctor = true,
-                d = "Create a canvas with given width and height."
+                d = "Create a canvas image with given width and height."
             },
             args = { {
                     _name = "width",
@@ -980,12 +944,13 @@
                     _tags = {
                         nativetype = "udata"
                     },
-                    value = "Canvas"
+                    value = "Image"
                 } }
         }, {
             _kind = "function",
             _name = "new_shader",
             _tags = {
+                c_api_skip = true,
                 ctor = true,
                 d = "Create a shader with given specification."
             },
@@ -1297,26 +1262,6 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "send_shader_uniforms",
-            _tags = {
-                d = "Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."
-            },
-            args = { {
-                    _name = "shader",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Shader"
-                }, {
-                    _name = "uniforms",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "ShaderUniforms"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
             _name = "set_blendmode",
             _tags = {
                 d = "Set the effective blendmode."
@@ -1333,14 +1278,14 @@
             _kind = "function",
             _name = "set_canvas",
             _tags = {
-                d = "Set the effective canvas. All draw operations will go to this canvas until it's reset."
+                d = "Set the effective canvas image. All draw operations will go to this canvas until it's reset."
             },
             args = { {
-                    _name = "canvas",
+                    _name = "canvas_image",
                     _tags = {
                         nativetype = "udata"
                     },
-                    value = "Canvas"
+                    value = "Image"
                 } },
             rets = {}
         }, {
@@ -1755,42 +1700,208 @@
                 } },
             rets = {}
         }, {
-            _kind = "alias",
-            _name = "ShaderUniforms",
-            alias_value = {
-                _kind = "dict",
-                _tags = {
-                    d = "ShaderUniforms record. Table of names mapped to uniform values."
-                },
-                dict_key = "string",
-                dict_value = {
-                    _kind = "oneof",
-                    options = { {
-                            value = "integer"
+            _kind = "function",
+            _name = "new_shaderbuilder",
+            _tags = {
+                ctor = true,
+                d = "Create a ShaderBuilder object."
+            },
+            args = {},
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "ShaderBuilder"
+                } }
+        }, {
+            _kind = "function",
+            _name = "shaderbuilder_uniform",
+            _tags = {
+                d = "Add uniform definition to the shaderbuilder"
+            },
+            args = { {
+                    _name = "shaderbuilder",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "ShaderBuilder"
+                }, {
+                    _name = "uniform_name",
+                    value = "string"
+                }, {
+                    _name = "uniform_type",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "UniformType"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "shaderbuilder_vertex",
+            _tags = {
+                d = "Add vertex code to the shaderbuilder"
+            },
+            args = { {
+                    _name = "shaderbuilder",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "ShaderBuilder"
+                }, {
+                    _name = "vertex_code",
+                    value = "string"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "shaderbuilder_fragment",
+            _tags = {
+                d = "Add fragment to the shaderbuilder"
+            },
+            args = { {
+                    _name = "shaderbuilder",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "ShaderBuilder"
+                }, {
+                    _name = "fragment_code",
+                    value = "string"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "shaderbuilder_build",
+            _tags = {
+                ctor = "true",
+                d = "Add fragment to the shaderbuilder"
+            },
+            args = { {
+                    _name = "shaderbuilder",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "ShaderBuilder"
+                } },
+            rets = { {
+                    _name = "shader",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Shader"
+                } }
+        }, {
+            _kind = "function",
+            _name = "send_shader_uniform",
+            _tags = {
+                d = "Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."
+            },
+            args = { {
+                    _name = "shader",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Shader"
+                }, {
+                    _name = "uniform_name",
+                    value = "string"
+                }, {
+                    _name = "uniform_value",
+                    _tags = {
+                        nativetype = "union"
+                    },
+                    value = "ShaderUniformValue"
+                } },
+            rets = {}
+        }, {
+            _kind = "oneof",
+            _name = "ShaderUniformValue",
+            options = { {
+                    _kind = "option",
+                    value = "float"
+                }, {
+                    _kind = "option",
+                    value = {
+                        _kind = "list",
+                        _tags = {
+                            max_count = 4
+                        },
+                        value = "float"
+                    }
+                }, {
+                    _kind = "option",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Image"
+                } }
+        }, {
+            _kind = "record",
+            _name = "ShaderBuilder",
+            _tags = {
+                d = "ShaderBuilder type"
+            },
+            items = { {
+                    _kind = "method",
+                    _name = "uniform",
+                    _tags = {
+                        map_to = "shaderbuilder_uniform"
+                    },
+                    args = { {
+                            _name = "uniform_name",
+                            value = "string"
                         }, {
-                            value = "number"
-                        }, {
-                            value = {
-                                _kind = "list",
-                                list_value = "integer"
-                            }
-                        }, {
-                            value = {
-                                _kind = "list",
-                                list_value = "number"
-                            }
-                        }, {
+                            _name = "uniform_type",
+                            _tags = {
+                                nativetype = "enumstring"
+                            },
+                            value = "UniformType"
+                        } },
+                    rets = {}
+                }, {
+                    _kind = "method",
+                    _name = "vertex",
+                    _tags = {
+                        map_to = "shaderbuilder_vertex"
+                    },
+                    args = { {
+                            _name = "vertex_code",
+                            value = "string"
+                        } },
+                    rets = {}
+                }, {
+                    _kind = "method",
+                    _name = "fragment",
+                    _tags = {
+                        map_to = "shaderbuilder_fragment"
+                    },
+                    args = { {
+                            _name = "fragment_code",
+                            value = "string"
+                        } },
+                    rets = {}
+                }, {
+                    _kind = "method",
+                    _name = "build",
+                    _tags = {
+                        map_to = "shaderbuilder_build"
+                    },
+                    args = {},
+                    rets = { {
+                            _name = "shader",
                             _tags = {
                                 nativetype = "udata"
                             },
-                            value = "Image"
+                            value = "Shader"
                         } }
-                }
-            }
+                } }
         }, {
             _kind = "record",
             _name = "ShaderDef",
             _tags = {
+                c_api_skip = true,
                 d = "Shader definition: uniforms declaration, vertex and fragment shader code."
             },
             items = { {
@@ -1806,9 +1917,6 @@
                     _name = "uniforms",
                     value = {
                         _kind = "dict",
-                        _tags = {
-                            value_nativetype = "enumstring"
-                        },
                         dict_key = "string",
                         dict_value = "UniformType"
                     }
@@ -1822,56 +1930,26 @@
             items = { {
                     _kind = "method",
                     _name = "send",
+                    _tags = {
+                        map_to = "send_shader_uniform"
+                    },
                     args = { {
-                            _name = "uniforms",
+                            _name = "uniform_name",
+                            value = "string"
+                        }, {
+                            _name = "uniform_value",
                             _tags = {
-                                nativetype = "udata"
+                                nativetype = "union"
                             },
-                            value = "ShaderUniforms"
+                            value = "ShaderUniformValue"
                         } },
                     rets = {}
                 } }
         }, {
             _kind = "record",
-            _name = "Canvas",
-            _tags = {
-                d = "Canvas type. Can be used for offscreen drawing to create images."
-            },
-            items = { {
-                    _kind = "prop",
-                    _name = "image",
-                    _tags = {
-                        map_read = "get_canvas_image",
-                        nativetype = "udata"
-                    },
-                    value = "Image"
-                }, {
-                    _kind = "prop",
-                    _name = "width",
-                    _tags = {
-                        map_read = "get_canvas_width"
-                    },
-                    value = "integer"
-                }, {
-                    _kind = "prop",
-                    _name = "height",
-                    _tags = {
-                        map_read = "get_canvas_height"
-                    },
-                    value = "integer"
-                } }
-        }, {
-            _kind = "record",
-            _name = "Font",
-            _tags = {
-                d = "Font type."
-            },
-            items = {}
-        }, {
-            _kind = "record",
             _name = "Image",
             _tags = {
-                d = "Image type."
+                d = "Image type"
             },
             items = { {
                     _kind = "prop",
@@ -1887,7 +1965,21 @@
                         map_read = "get_image_height"
                     },
                     value = "integer"
+                }, {
+                    _kind = "prop",
+                    _name = "is_canvas",
+                    _tags = {
+                        map_read = "is_image_canvas"
+                    },
+                    value = "boolean"
                 } }
+        }, {
+            _kind = "record",
+            _name = "Font",
+            _tags = {
+                d = "Font type."
+            },
+            items = {}
         }, {
             _kind = "record",
             _name = "Music",

@@ -2,6 +2,7 @@ local apidef = require "lib.apidef"
 
 local String = apidef.String
 local Integer = apidef.Integer
+local Float = apidef.Float
 local Number = apidef.Number
 local Boolean = apidef.Boolean
 local Nil = apidef.Nil
@@ -43,13 +44,13 @@ return Namespace("lyte", {
         Arg("dest_x", Integer()),
         Arg("dest_y", Integer()),
         Arg("radius", Integer()),
-    }, nil, {d="Draw a filled circle.", c_api_skip=true}),
+    }, nil, {d="Draw a filled circle."}),
 
     Function("draw_circle_line", {
         Arg("dest_x", Integer()),
         Arg("dest_y", Integer()),
         Arg("radius", Integer()),
-    }, nil, {d="Draw a circle border.", c_api_skip=true}),
+    }, nil, {d="Draw a circle border."}),
 
     Function("draw_image", {
         Arg("image", Type("Image"), {nativetype="udata"}),
@@ -226,23 +227,23 @@ return Namespace("lyte", {
         Ret("val", Integer()),
     }, {d="Get the height of the image."}),
 
-    Function("get_canvas_width", {
-        Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the width of the canvase"}),
+    -- Function("get_canvas_width", {
+    --     Arg("canvas", Type("Canvas"), {nativetype="udata"}),
+    -- }, {
+    --     Ret("val", Integer()),
+    -- }, {d="Get the width of the canvase"}),
 
-    Function("get_canvas_height", {
-        Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the height of the canvas."}),
+    -- Function("get_canvas_height", {
+    --     Arg("canvas", Type("Canvas"), {nativetype="udata"}),
+    -- }, {
+    --     Ret("val", Integer()),
+    -- }, {d="Get the height of the canvas."}),
 
-    Function("get_canvas_image", {
-        Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    }, {
-        Ret("val", Type("Image")),
-    }, {d="Get the current attached image object of the canvas."}),
+    -- Function("get_canvas_image", {
+    --     Arg("canvas", Type("Canvas"), {nativetype="udata"}),
+    -- }, {
+    --     Ret("val", Type("Image")),
+    -- }, {d="Get the current attached image object of the canvas."}),
 
 
     Function("is_fullscreen", nil, {
@@ -328,6 +329,12 @@ return Namespace("lyte", {
         Ret("val", Boolean()),
     }, {d="Check if the window vsync flag is set."}),
 
+    Function("is_image_canvas",  {
+        Arg("image", Type("Image"), {nativetype="udata"}),
+    }, {
+        Ret("val", Boolean()),
+    }, {d="Check if the image was created as a canvas."}),
+
     Function("load_file", {
         Arg("file_path", String()),
     },{
@@ -363,14 +370,14 @@ return Namespace("lyte", {
         Arg("width", Integer()),
         Arg("height", Integer()),
     },{
-        Ret("val", Type("Canvas"), {nativetype="udata"}),
-    }, {d="Create a canvas with given width and height.", ctor=true}),
+        Ret("val", Type("Image"), {nativetype="udata"}),
+    }, {d="Create a canvas image with given width and height.", ctor=true}),
 
     Function("new_shader", {
         Arg("shaderdef", Type("ShaderDef"), {nativetype="udata"}),
     },{
         Ret("val", Type("Shader"), {nativetype="udata"}),
-    }, {d="Create a shader with given specification.", ctor=true}),
+    }, {d="Create a shader with given specification.", ctor=true, c_api_skip=true}),
 
     Function("new_sound", {
         Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
@@ -459,18 +466,13 @@ return Namespace("lyte", {
         Arg("secs", Number()),
     }, nil, {d="Move the music time played to the given value."}),
 
-    Function("send_shader_uniforms", {
-        Arg("shader", Type("Shader"), {nativetype="udata"}),
-        Arg("uniforms", Type("ShaderUniforms"), {nativetype="udata"}),
-    }, nil, {d="Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."}),
-
     Function("set_blendmode", {
         Arg("blendmode", Type("BlendMode"), {nativetype="enumstring"}),
     }, nil, {d="Set the effective blendmode."}),
 
     Function("set_canvas", {
-        Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    }, nil, {d="Set the effective canvas. All draw operations will go to this canvas until it's reset."}),
+        Arg("canvas_image", Type("Image"), {nativetype="udata"}),
+    }, nil, {d="Set the effective canvas image. All draw operations will go to this canvas until it's reset."}),
 
     Function("set_color", {
         Arg("r", Number()),
@@ -601,38 +603,98 @@ return Namespace("lyte", {
         Arg("delta_y", Integer()),
     }, nil, {d="Apply translation (changes transform matrix.)"}),
 
-    Alias("ShaderUniforms", Dict(String(), OneOf({
-        Option(Integer()),
-        Option(Number()),
-        Option(List(Integer())),
-        Option(List(Number())),
+    Function("new_shaderbuilder", nil, {
+        Ret("val", Type("ShaderBuilder"), {nativetype="udata"}),
+    }, {d="Create a ShaderBuilder object.", ctor=true}),
+
+    Function("shaderbuilder_uniform", {
+        Arg("shaderbuilder", Type("ShaderBuilder"), {nativetype="udata"}),
+        Arg("uniform_name", String()),
+        Arg("uniform_type", Type("UniformType"), {nativetype="enumstring"}),
+    }, nil, {d="Add uniform definition to the shaderbuilder"}),
+
+    Function("shaderbuilder_vertex", {
+        Arg("shaderbuilder", Type("ShaderBuilder"), {nativetype="udata"}),
+        Arg("vertex_code", String()),
+    }, nil, {d="Add vertex code to the shaderbuilder"}),
+
+    Function("shaderbuilder_fragment", {
+        Arg("shaderbuilder", Type("ShaderBuilder"), {nativetype="udata"}),
+        Arg("fragment_code", String()),
+    }, nil, {d="Add fragment to the shaderbuilder"}),
+
+    Function("shaderbuilder_build", {
+        Arg("shaderbuilder", Type("ShaderBuilder"), {nativetype="udata"}),
+    }, {
+        Ret("shader", Type("Shader"), {nativetype="udata"})
+    }, {d="Add fragment to the shaderbuilder", ctor="true"}),
+
+
+    -- Function("send_shader_uniforms", {
+    --     Arg("shader", Type("Shader"), {nativetype="udata"}),
+    --     Arg("uniforms", Type("ShaderUniforms"), {nativetype="udata"}),
+    -- }, nil, {d="Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."}),
+
+    Function("send_shader_uniform", {
+        Arg("shader", Type("Shader"), {nativetype="udata"}),
+        Arg("uniform_name", String()),
+        Arg("uniform_value", Type("ShaderUniformValue"), {nativetype="union"}),
+    }, nil, {d="Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."}),
+
+
+    OneOf("ShaderUniformValue", {
+        Option(Float()),
+        Option(List(Float(), {max_count=4})),
         Option(Type("Image"), {nativetype="udata"}),
-    }), {d="ShaderUniforms record. Table of names mapped to uniform values."})),
+    }),
+
+    -- Alias("ShaderUniforms", Dict(String(), Type("ShaderUniformValue") , {d="ShaderUniforms record. Table of names mapped to uniform values."})),
+
+    Record("ShaderBuilder", {
+        Method("uniform", {
+            Arg("uniform_name", String()),
+            Arg("uniform_type", Type("UniformType"), {nativetype="enumstring"}),
+        }, nil, {map_to="shaderbuilder_uniform"}),
+        Method("vertex", {
+            Arg("vertex_code", String()),
+        }, nil, {map_to="shaderbuilder_vertex"}),
+        Method("fragment", {
+            Arg("fragment_code", String()),
+        }, nil, {map_to="shaderbuilder_fragment"}),
+        Method("build", nil, {
+            Ret("shader", Type("Shader"), {nativetype="udata"})
+        }, {map_to="shaderbuilder_build"}),
+    }, {d="ShaderBuilder type"}),
 
     Record("ShaderDef", {
         Field("frag", String()),
         Field("vert", String()),
-        Field("uniforms", Dict(String(), Type("UniformType"), {value_nativetype="enumstring"})),
-    }, {d="Shader definition: uniforms declaration, vertex and fragment shader code."}),
+        Field("uniforms", Dict(String(), Type("UniformType"))),
+    }, {d="Shader definition: uniforms declaration, vertex and fragment shader code.", c_api_skip=true}),
 
     Record("Shader", {
+        -- Method("send", {
+        --     Arg("uniforms", Type("ShaderUniforms"), {nativetype="udata"}),
+        -- }, nil),
         Method("send", {
-            Arg("uniforms", Type("ShaderUniforms"), {nativetype="udata"}),
-        }, nil),
+            Arg("uniform_name", String()),
+            Arg("uniform_value", Type("ShaderUniformValue"), {nativetype="union"}),
+        }, nil, {map_to = "send_shader_uniform"}),
     }, {d="Shader type"}),
 
-    Record("Canvas", {
-        Field("image", Type("Image"), {nativetype="udata", map_read = "get_canvas_image"}),
-        Field("width", Integer(), {map_read = "get_canvas_width"}),
-        Field("height", Integer(), {map_read = "get_canvas_height"}),
-    }, {d="Canvas type. Can be used for offscreen drawing to create images."}),
-
-    Record("Font", nil, {d="Font type."}),
+    -- Record("Canvas", {
+    --     Field("image", Type("Image"), {nativetype="udata", map_read = "get_canvas_image"}),
+    --     Field("width", Integer(), {map_read = "get_canvas_width"}),
+    --     Field("height", Integer(), {map_read = "get_canvas_height"}),
+    -- }, {d="Canvas type. Can be used for offscreen drawing to create images."}),
 
     Record("Image", {
         Field("width", Integer(), {map_read = "get_image_width"}),
         Field("height", Integer(), {map_read = "get_image_height"}),
-    }, {d="Image type."}),
+        Field("is_canvas", Boolean(), {map_read = "is_image_canvas"}),
+    }, {d="Image type"}),
+
+    Record("Font", nil, {d="Font type."}),
 
     Record("Music", {
         Field("playing", Boolean(), {map_read = "is_music_playing"}),

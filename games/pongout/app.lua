@@ -192,7 +192,8 @@ function lyte.tick(delta_time, width, height, resized, fullscreen)
     end
     lyte.scale(Window.scale, Window.scale)
     lyte.translate(Window.width / Window.scale / 2 - CW / 2, (Window.height / Window.scale / 2 - CH / 2));
-    lyte.draw_image(Window.canvas.image, 0, 0)
+    lyte.draw_image(Window.canvas, 0, 0)
+    -- lyte.draw_image(Window.canvas.image, 0, 0)
     lyte.pop_matrix()
 
     -- Draw: Debug info

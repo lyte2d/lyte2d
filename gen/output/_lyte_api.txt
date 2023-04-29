@@ -115,15 +115,6 @@ get_image_width function get_image_width
 get_image_height function get_image_height
     arg[1] image :: Image
     ret[1] :: integer
-get_canvas_width function get_canvas_width
-    arg[1] canvas :: Canvas
-    ret[1] :: integer
-get_canvas_height function get_canvas_height
-    arg[1] canvas :: Canvas
-    ret[1] :: integer
-get_canvas_image function get_canvas_image
-    arg[1] canvas :: Canvas
-    ret[1] :: Image
 is_fullscreen function is_fullscreen
     ret[1] :: boolean
 is_gamepad_down function is_gamepad_down
@@ -167,6 +158,9 @@ is_sound_playing function is_sound_playing
     ret[1] :: boolean
 is_window_vsync function is_window_vsync
     ret[1] :: boolean
+is_image_canvas function is_image_canvas
+    arg[1] image :: Image
+    ret[1] :: boolean
 load_file function load_file
     arg[1] file_path :: string
     ret[1] :: string
@@ -186,7 +180,7 @@ load_sounddata function load_sounddata
 new_canvas function new_canvas
     arg[1] width :: integer
     arg[2] height :: integer
-    ret[1] :: Canvas
+    ret[1] :: Image
 new_shader function new_shader
     arg[1] shaderdef :: ShaderDef
     ret[1] :: Shader
@@ -238,13 +232,10 @@ scale_at function scale_at
 seek_music function seek_music
     arg[1] music :: Music
     arg[2] secs :: number
-send_shader_uniforms function send_shader_uniforms
-    arg[1] shader :: Shader
-    arg[2] uniforms :: ShaderUniforms
 set_blendmode function set_blendmode
     arg[1] blendmode :: BlendMode
 set_canvas function set_canvas
-    arg[1] canvas :: Canvas
+    arg[1] canvas_image :: Image
 set_color function set_color
     arg[1] r :: number
     arg[2] g :: number
@@ -320,13 +311,39 @@ stop_sound function stop_sound
 translate function translate
     arg[1] delta_x :: integer
     arg[2] delta_y :: integer
-ShaderUniforms alias ShaderUniforms ===  Dict<string, oneof 
-    option[1] :: <integer> 
-    option[2] :: <number> 
-    option[3] :: List<integer> 
-    option[4] :: List<number> 
-    option[5] :: <Image> 
-> 
+new_shaderbuilder function new_shaderbuilder
+    ret[1] :: ShaderBuilder
+shaderbuilder_uniform function shaderbuilder_uniform
+    arg[1] shaderbuilder :: ShaderBuilder
+    arg[2] uniform_name :: string
+    arg[3] uniform_type :: UniformType
+shaderbuilder_vertex function shaderbuilder_vertex
+    arg[1] shaderbuilder :: ShaderBuilder
+    arg[2] vertex_code :: string
+shaderbuilder_fragment function shaderbuilder_fragment
+    arg[1] shaderbuilder :: ShaderBuilder
+    arg[2] fragment_code :: string
+shaderbuilder_build function shaderbuilder_build
+    arg[1] shaderbuilder :: ShaderBuilder
+    ret[1] :: Shader
+send_shader_uniform function send_shader_uniform
+    arg[1] shader :: Shader
+    arg[2] uniform_name :: string
+    arg[3] uniform_value :: ShaderUniformValue
+ShaderUniformValue oneof ShaderUniformValue
+    option[1] :: <float> 
+    option[2] :: List<float> 
+    option[3] :: <Image> 
+ShaderBuilder record (ShaderBuilder)
+uniform:  method uniform
+    arg[1] uniform_name :: string
+    arg[2] uniform_type :: UniformType
+vertex:  method vertex
+    arg[1] vertex_code :: string
+fragment:  method fragment
+    arg[1] fragment_code :: string
+build:  method build
+    ret[1] :: Shader
 ShaderDef record (ShaderDef)
 frag:  <string> frag
 vert:  <string> vert
@@ -334,15 +351,13 @@ uniforms:  Dict<string, <UniformType>
 > uniforms
 Shader record (Shader)
 send:  method send
-    arg[1] uniforms :: ShaderUniforms
-Canvas record (Canvas)
-image:  <Image> image
-width:  <integer> width
-height:  <integer> height
-Font record (Font)
+    arg[1] uniform_name :: string
+    arg[2] uniform_value :: ShaderUniformValue
 Image record (Image)
 width:  <integer> width
 height:  <integer> height
+is_canvas:  <boolean> is_canvas
+Font record (Font)
 Music record (Music)
 playing:  <boolean> playing
 length:  <number> length

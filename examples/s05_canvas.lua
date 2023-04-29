@@ -4,6 +4,7 @@ local total_time = 0
 
 -- create a canvas
 local canvas_1 = lyte.new_canvas(220,220)
+print(lyte.is_image_canvas(canvas_1))
 
 -- helper function to randomly fill the canvas
 local function fill_canvas_random()
@@ -46,7 +47,7 @@ function lyte.tick(dt, width, height)
 
     -- draw the current image. note: when canvas is GC'd, image goes with it
     -- so make sure to keep a reference to canvas itself, even if you won't update it
-    lyte.draw_image(canvas_1.image, width/2 - canvas_1.width/2, height/2 - canvas_1.height/2)
+    lyte.draw_image(canvas_1, width/2 - canvas_1.width/2, height/2 - canvas_1.height/2)
 
     lyte.pop_matrix()
 

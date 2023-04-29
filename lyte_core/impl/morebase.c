@@ -1,10 +1,12 @@
 /* (c) mg */
 
 #include "morebase.h"
+#include "core.h"
 
 
 #define XLOG
 
+// #define SOKOL_LOG(s) printf(s)
 #define SOKOL_LOG(s) XLOG(s)    // sokol logs
 
 #define SGP_UNIFORM_CONTENT_SLOTS 1024
@@ -91,6 +93,7 @@ typedef struct ShaderInternal {
 
     uint32_t _uniform_data_count;
     uint32_t _uniform_images_count;
+    uint32_t pip_id;
 } ShaderInternal;
 
 // "global"  _input
@@ -143,7 +146,7 @@ static struct {
     float margin_right;
     float margin_top;
     float margin_bottom;
-    M_Canvas current_canvas;
+    M_Image current_canvas;
     float current_color[4];
     GLFWvidmode* mode;
     M_ShaderDef shaderdefs[M_MAX_SHADERDEFS];
@@ -519,6 +522,9 @@ M_Music M_newmusic_load(const char *path) {
     ASSERT_(data_size == read_size, "music loading: readbytes. read size doesn't match file size.");
     const char *format = audio_getfiletypewithdot(path);
     Music rm =  LoadMusicStreamFromMemory(format, data, data_size);
+    // memset(data, 0, data_size); // rayaudio does NOT copy
+    // free(data);
+
     rm.looping = true;
     musinfo.data = data;
     musinfo.data_size = data_size;
@@ -690,7 +696,7 @@ static int fons__renderResize(void* userPtr, int width, int height) {
 static void fons__renderUpdate(void* userPtr, int* rect, const unsigned char* data) {
     // note leaking right now!!
 
-    M_Canvas *c = (M_Canvas *)userPtr;
+    M_Image *c = (M_Image *)userPtr;
     sg_image_desc imdesc = (sg_image_desc) {
         .width = c->width,
         .height = c->height,
@@ -722,13 +728,13 @@ static void fons__renderUpdate(void* userPtr, int* rect, const unsigned char* da
     imdat.subimage[0][0].ptr = mydata,
     imdat.subimage[0][0].size = c->width*c->height*4,
     sg_update_image(img, &imdat);
-    c->id_image = img.id;
+    c->handle = img.id;
 }
 
 static void fons__renderDraw(void* userPtr, const float* verts, const float* tcoords, const unsigned int* colors, int nverts) {
-    M_Canvas *c = (M_Canvas *)userPtr;
-    M_Image img = M_canvas_get_image(*c);
-    sgp_set_image(0,(sg_image){.id=img.id});
+    M_Image *c = (M_Image *)userPtr;
+    M_Image img = *c; //M_canvas_get_image(*c);
+    sgp_set_image(0,(sg_image){.id=img.handle});
     sgp_set_blend_mode((sgp_blend_mode)_lib->blendmode);
     int W = _lib->width;
     int H = _lib->height;
@@ -770,7 +776,7 @@ static void fons__renderDelete(void* userPtr) {
 
 FONScontext *fons_create(int width, int height, uint8_t flags) {
 	FONSparams params;
-    M_Canvas *canvas = malloc(sizeof(M_Canvas));
+    M_Image *canvas = malloc(sizeof(M_Image));
     *canvas = M_newcanvas(width, height);
     // fntc = canvas;
 
@@ -1362,8 +1368,8 @@ void M_gfx_resetfiltermode(void) {
 
 
 
-M_Canvas M_newcanvas(int w, int h) {
-    M_Canvas canvas = {.width = w, .height = h};
+M_Image M_newcanvas(int w, int h) {
+    M_Image canvas = {.width = w, .height = h, .is_canvas = true};
 
     // create frame buffer image
     sg_image_desc fb_image_desc = {0};
@@ -1382,7 +1388,7 @@ M_Canvas M_newcanvas(int w, int h) {
         fprintf(stderr, "Failed to create frame buffer image\n");
         exit(-1);
     }
-    canvas.id_image = fb_image.id;
+    canvas.handle = fb_image.id;
 
     // create frame buffer depth stencil
     sg_image_desc fb_depth_image_desc = {0};
@@ -1412,23 +1418,33 @@ M_Canvas M_newcanvas(int w, int h) {
     return canvas;
 }
 
-void M_canvas_cleanup(M_Canvas canvas) {
-    sg_image fb_image, fb_depth_image;
-    sg_pass fb_pass;
-    fb_image = (sg_image){.id=canvas.id_image};
-    fb_depth_image = (sg_image){.id=canvas.id_depth_image};
-    fb_pass = (sg_pass){.id=canvas.id_pass};
+void M_canvas_cleanup(M_Image canvas) {
+    sg_image fb_image;
+    fb_image = (sg_image){.id=canvas.handle};
     sg_destroy_image(fb_image);
-    sg_destroy_image(fb_depth_image);
-    sg_destroy_pass(fb_pass);
+
+    if (canvas.is_canvas) {
+        sg_image fb_depth_image;
+        sg_pass fb_pass;
+        fb_depth_image = (sg_image){.id=canvas.id_depth_image};
+        fb_pass = (sg_pass){.id=canvas.id_pass};
+        sg_destroy_image(fb_depth_image);
+        sg_destroy_pass(fb_pass);
+    }
 }
 
-M_Image M_canvas_get_image(M_Canvas canvas) {
-    M_Image img = {.width = canvas.width, .height = canvas.height, .id = canvas.id_image};
-    return img;
-}
+// // TODO remove
+// M_CanvasImage M_canvas_get_image(M_CanvasImage canvas) {
+//     // M_Image img = {.width = canvas.width, .height = canvas.height, .handle = canvas.handle};
+//     // return img;
+//     return canvas;
+// }
 
-void M_canvas_set(M_Canvas canvas) {
+void M_canvas_set(M_Image canvas) {
+    if (!canvas.is_canvas) {
+        printf("Only images that are created as a canvas can be set.");
+        exit(0); // TODO error handling overall
+    }
     _lib->current_canvas = canvas;
     sgp_begin(canvas.width, canvas.height);
     sgp_set_blend_mode((sgp_blend_mode)_lib->blendmode);
@@ -1456,6 +1472,11 @@ void M_canvas_unset(void) {
     sgp_end();
     sg_end_pass();
 
+}
+
+
+bool M_image_is_canvas(M_Image image) {
+    return image.is_canvas;
 }
 
 // shader
@@ -1546,22 +1567,8 @@ static inline int _get_uniform_count(M_UniformType t) {
     return ret;
 }
 
-static uint32_t shader_add_shaderdef(M_ShaderDef *def) {
-    uint32_t id = 0;
-    for (size_t i=0; i<M_MAX_SHADERDEFS; i++) {
-        if (_lib->shaderdefs[i]._shader_id == 0) {
-            id = _lib->last_shaderid++;
-            memcpy(&_lib->shaderdefs[i], def, sizeof(M_ShaderDef));
-            _lib->shaderdefs[i]._shader_id = id;
-            _lib->shaderdefs[i]._impl = malloc(sizeof(ShaderInternal)); // free in cleanup_shader
-            _lib->last_shaderid = id;
-            break;
-        }
-    }
-    return id;
-}
 
-static M_ShaderDef *shader_find_shaderdef(uint32_t shader_id) {
+M_ShaderDef *M_shaderdef_find(uint32_t shader_id) {
     struct M_ShaderDef *def = NULL;
     for (size_t i=0; i<M_MAX_SHADERDEFS; i++) {
         if (_lib->shaderdefs[i]._shader_id == shader_id) {
@@ -1573,33 +1580,86 @@ static M_ShaderDef *shader_find_shaderdef(uint32_t shader_id) {
 }
 
 
+// static void shader_init_shaderdef(M_ShaderDef *def) {
+//     uint32_t id = def->_shader_id;
+//     // memcpy(&_lib->shaderdefs[id], def, sizeof(M_ShaderDef));
+//     _lib->shaderdefs[id]._shader_id = id;
+//     _lib->shaderdefs[id]._impl = malloc(sizeof(ShaderInternal)); // free in cleanup_shader
+//     return;
+// }
+
+
+
+M_ShaderDef *M_shaderdef_create() {
+    uint32_t id = 0;
+    for (size_t i=0; i<M_MAX_SHADERDEFS; i++) {
+        if (_lib->shaderdefs[i]._shader_id == 0) {
+            id = _lib->last_shaderid++;
+            // memcpy(&_lib->shaderdefs[i], def, sizeof(M_ShaderDef));
+            _lib->shaderdefs[i]._shader_id = id;
+            _lib->shaderdefs[i]._impl = malloc(sizeof(ShaderInternal)); // free in cleanup_shader
+            _lib->shaderdefs[i].uniforms = NULL;
+            _lib->shaderdefs[i].num_uniforms = 0;
+
+            // _lib->last_shaderid = id;
+            break;
+        }
+    }
+    M_ShaderDef *dest = M_shaderdef_find(id);
+    dest->uniforms = NULL;
+    dest->num_uniforms = 0;
+    // shader_init_shaderdef(dest);
+    return dest;
+}
+
+void M_shaderdef_uniform(M_ShaderDef *shaderdef, const char *name, M_UniformType type) {
+    int i = shaderdef->num_uniforms;
+    shaderdef->num_uniforms++;
+    shaderdef->uniforms = (void *)realloc(shaderdef->uniforms , shaderdef->num_uniforms * sizeof(struct M_UniformDef));
+    shaderdef->uniforms[i].name = name;
+    shaderdef->uniforms[i].type = type;
+
+}
+
+void M_shaderdef_vertex(M_ShaderDef *shaderdef, const char *code) {
+    // M_ShaderDef *dest = shader_find_shaderdef(shaderdef->_shader_id);
+    // dest->vert = code;
+    shaderdef->vert = code;
+}
+
+void M_shaderdef_fragment(M_ShaderDef *shaderdef, const char *code) {
+    // M_ShaderDef *dest = shader_find_shaderdef(shaderdef->_shader_id);
+    // dest->frag = code;
+    shaderdef->frag = code;
+}
 
 // static sg_pipeline _shader_pip;
 // static float _uniform_vals[SGP_TEXTURE_SLOTS] = {0};
 // size_t _total_uniforms_size = 0;
 
-M_Shader M_newshader(M_ShaderDef shaderdef) {
-    // TODO: id
-    uint32_t id = shader_add_shaderdef(&shaderdef);
-    if (id == 0) {
-        printf("Can't add more shaders, Max number reached: %d\n", M_MAX_SHADERDEFS);
-        exit(-1);
-    }
+M_Shader M_newshader(M_ShaderDef *shaderdef) {
+    // uint32_t id = shaderdef->_shader_id;
+    // if (id == 0) {
+    //     printf("Can't add more shaders, Max number reached: %d\n", M_MAX_SHADERDEFS);
+    //     exit(-1);
+    // }
+    // shader_init_shaderdef(shaderdef);
 
-    M_Shader shader = { .id = id };
 
-    const char *frag_code = shaderdef.frag;
-    const char *vert_code = shaderdef.vert;
-    struct M_UniformDef *uniforms = shaderdef.uniforms;
-    size_t num_uniforms = shaderdef.num_uniforms;
+    M_Shader shader = { .id = shaderdef->_shader_id };
+
+    const char *frag_code = shaderdef->frag;
+    const char *vert_code = shaderdef->vert;
+    struct M_UniformDef *uniforms = shaderdef->uniforms;
+    size_t num_uniforms = shaderdef->num_uniforms;
 
     const char *uniforms_text = _get_uniforms_text(uniforms, num_uniforms);
     const char *vert_code_full = _get_vert_code(vert_code, uniforms_text);
     const char *frag_code_full = _get_frag_code(frag_code, uniforms_text);
 
 
-    M_ShaderDef *_def = shader_find_shaderdef(id);
-    ShaderInternal *_idef = (ShaderInternal *) _def->_impl;
+    // M_ShaderDef *_def = shader_find_shaderdef(id);
+    ShaderInternal *_idef = (ShaderInternal *) shaderdef->_impl;
 
     _idef->_uniform_data_count = SGP_UNIFORM_CONTENT_SLOTS;
     _idef->_uniform_data = malloc(SGP_UNIFORM_CONTENT_SLOTS*sizeof(float));
@@ -1693,8 +1753,9 @@ M_Shader M_newshader(M_ShaderDef shaderdef) {
 
     // printf("make pipeline...(total uniforms size: %d\n", _total_uniforms_size);
     pip_desc.shader = shader_desc;
-    shader.pip_id = sgp_make_pipeline(&pip_desc).id;
-    sg_resource_state state = sg_query_pipeline_state((sg_pipeline){.id=shader.pip_id});
+    // shader.pip_id = sgp_make_pipeline(&pip_desc).id;
+    _idef->pip_id = sgp_make_pipeline(&pip_desc).id;
+    sg_resource_state state = sg_query_pipeline_state((sg_pipeline){.id=_idef->pip_id});
     if (state != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Error: failed to make custom pipeline: %d\n ", state);
         exit(-1);
@@ -1720,9 +1781,9 @@ M_Shader M_newshader(M_ShaderDef shaderdef) {
 
 void M_shader_cleanup(M_Shader shader) {
     printf("SHD: cleanup shader\n");
-    sg_destroy_pipeline((sg_pipeline){.id=shader.pip_id});
-    M_ShaderDef *def = shader_find_shaderdef(shader.id);
+    M_ShaderDef *def = M_shaderdef_find(shader.id);
     ShaderInternal *_idef = (ShaderInternal *) def->_impl;
+    sg_destroy_pipeline((sg_pipeline){.id=_idef->pip_id});
     free(_idef->_uniform_data);
     free(_idef->_uniform_images);
     free(_idef->_uniform_image_deletes);
@@ -1759,10 +1820,10 @@ void _shader_update_images(M_ShaderDef *def) {
 void M_shader_set(M_Shader shader) {
     (void)shader;
     // printf("SHD: set shader\n");
-    M_ShaderDef *def = shader_find_shaderdef(shader.id);
+    M_ShaderDef *def = M_shaderdef_find(shader.id);
     ShaderInternal *_idef = (ShaderInternal *) def->_impl;
 
-    sgp_set_pipeline((sg_pipeline){.id=shader.pip_id});
+    sgp_set_pipeline((sg_pipeline){.id=_idef->pip_id});
 
     // MAGIC current_color
     // TODO: correct amount of uniforms
@@ -1787,8 +1848,94 @@ void M_shader_unset(void) {
 }
 
 
-void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count) {
-    M_ShaderDef *def = shader_find_shaderdef(shader.id);
+// void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count) {
+//     M_ShaderDef *def = shader_find_shaderdef(shader.id);
+//     ShaderInternal *_idef = (ShaderInternal *)def->_impl;
+//     // float *_vals = _idef->_uniform_data;
+
+//     if (def == NULL) {
+//         printf("Shader definition not found: id %d\n", shader.id);
+//         exit(-1);
+//     }
+
+//     if (count > def->num_uniforms) {
+//         printf("Too many uniforms are sent: %zd. Expected %zd\n", count, def->num_uniforms);
+//         exit(1);
+//     }
+
+
+//     for (int i=0; i<count; i++) {
+//         M_ShaderUniform uf = uniforms[i];
+//         float *uf_data = (float *)uf.data;
+//         const char *uf_name = uf.name;
+//         int cnt_floats = uf.count;
+//         M_UniformType deftype = M_UNIFORM_INVALID;
+//         int def_cnt_floats = 0;
+//         int def_loc = 0;
+//         bool wipe_uniform = false;
+
+//         // find the uniform declaration (type, location, and number of elements)
+//         for (int j=0; j<def->num_uniforms; j++) {
+//             if (strcmp(def->uniforms[j].name, uf_name) == 0) {
+//                 deftype = def->uniforms[j].type;
+//                 def_cnt_floats = def->uniforms[j]._num_elems;
+//                 def_loc = def->uniforms[j]._loc;
+//                 break;
+//             }
+//         }
+
+//         if (deftype == M_UNIFORM_INVALID) {
+//             printf("Uniform definition not found for name: %s\n", uf_name);
+//             exit(-1);
+//         }
+
+//         if (def_cnt_floats != cnt_floats) {
+//             if (cnt_floats == 1 && uf_data[0] == 0.0f) {
+//                 wipe_uniform = true;
+//             } else {
+//                 printf("Expecting %d numbers, but got %d for uniform: %s\n", def_cnt_floats, cnt_floats, uf_name);
+//                 exit(-1);
+//             }
+//         }
+
+//         if (cnt_floats == 0) {
+//             // sampler2D TODO: set binding
+//             M_Image *img = uf.data;
+
+//             // sg_image _sgimg = (sg_image){.id=img->id};
+//             // sgp_set_image(def_loc, _sgimg);
+//             _idef->_uniform_image_deletes[def_loc] = false;
+//             _idef->_uniform_images[def_loc] = img->handle;
+
+//         } else {
+
+//             if (wipe_uniform) {
+//                 if (deftype == M_UNIFORM_SAMPLER2D) {
+//                     // sgp_reset_image(def_loc);
+//                     _idef->_uniform_image_deletes[def_loc] = true;
+
+//                 } else {
+//                     // memset(&_vals[def_loc+4], 0, def_cnt_floats*4);
+//                     memset(& _idef->_uniform_data[def_loc+4], 0, def_cnt_floats*4);
+//                 }
+//             } else {
+//                 // memcpy(&_vals[def_loc+4], uf_data, def_cnt_floats*4);
+//                 memcpy(& _idef->_uniform_data[def_loc+4], uf_data, def_cnt_floats*4);
+//             }
+//         }
+
+//     }
+//     // current_color
+//     memcpy(_idef->_uniform_data, _lib->current_color, 16);
+//     // sgp_set_uniform(_vals, _idef->_uniform_data_count * 4);
+//     sgp_set_uniform( _idef->_uniform_data, _idef->_uniform_data_count * 4);
+
+//     _shader_update_images(def);
+// }
+
+
+void M_shader_send(M_Shader shader, M_ShaderUniform uf) {
+    M_ShaderDef *def = M_shaderdef_find(shader.id);
     ShaderInternal *_idef = (ShaderInternal *)def->_impl;
     // float *_vals = _idef->_uniform_data;
 
@@ -1797,73 +1944,66 @@ void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count) {
         exit(-1);
     }
 
-    if (count > def->num_uniforms) {
-        printf("Too many uniforms are sent: %zd. Expected %zd\n", count, def->num_uniforms);
-        exit(1);
+
+    float *uf_data = (float *)uf.data;
+    const char *uf_name = uf.name;
+    int cnt_floats = uf.count;
+    M_UniformType deftype = M_UNIFORM_INVALID;
+    int def_cnt_floats = 0;
+    int def_loc = 0;
+    bool wipe_uniform = false;
+
+    // find the uniform declaration (type, location, and number of elements)
+    for (int j=0; j<def->num_uniforms; j++) {
+        if (strcmp(def->uniforms[j].name, uf_name) == 0) {
+            deftype = def->uniforms[j].type;
+            def_cnt_floats = def->uniforms[j]._num_elems;
+            def_loc = def->uniforms[j]._loc;
+            break;
+        }
     }
 
+    if (deftype == M_UNIFORM_INVALID) {
+        printf("Uniform definition not found for name: %s\n", uf_name);
+        exit(-1);
+    }
 
-    for (int i=0; i<count; i++) {
-        M_ShaderUniform uf = uniforms[i];
-        float *uf_data = (float *)uf.data;
-        const char *uf_name = uf.name;
-        int cnt_floats = uf.count;
-        M_UniformType deftype = M_UNIFORM_INVALID;
-        int def_cnt_floats = 0;
-        int def_loc = 0;
-        bool wipe_uniform = false;
-
-        // find the uniform declaration (type, location, and number of elements)
-        for (int j=0; j<def->num_uniforms; j++) {
-            if (strcmp(def->uniforms[j].name, uf_name) == 0) {
-                deftype = def->uniforms[j].type;
-                def_cnt_floats = def->uniforms[j]._num_elems;
-                def_loc = def->uniforms[j]._loc;
-                break;
-            }
-        }
-
-        if (deftype == M_UNIFORM_INVALID) {
-            printf("Uniform definition not found for name: %s\n", uf_name);
+    if (def_cnt_floats != cnt_floats) {
+        if (cnt_floats == 1 && uf_data[0] == 0.0f) {
+            wipe_uniform = true;
+        } else {
+            printf("Expecting %d numbers, but got %d for uniform: %s\n", def_cnt_floats, cnt_floats, uf_name);
             exit(-1);
         }
-
-        if (def_cnt_floats != cnt_floats) {
-            if (cnt_floats == 1 && uf_data[0] == 0.0f) {
-                wipe_uniform = true;
-            } else {
-                printf("Expecting %d numbers, but got %d for uniform: %s\n", def_cnt_floats, cnt_floats, uf_name);
-                exit(-1);
-            }
-        }
-
-        if (cnt_floats == 0) {
-            // sampler2D TODO: set binding
-            M_Image *img = uf.data;
-
-            // sg_image _sgimg = (sg_image){.id=img->id};
-            // sgp_set_image(def_loc, _sgimg);
-            _idef->_uniform_image_deletes[def_loc] = false;
-            _idef->_uniform_images[def_loc] = img->id;
-
-        } else {
-
-            if (wipe_uniform) {
-                if (deftype == M_UNIFORM_SAMPLER2D) {
-                    // sgp_reset_image(def_loc);
-                    _idef->_uniform_image_deletes[def_loc] = true;
-
-                } else {
-                    // memset(&_vals[def_loc+4], 0, def_cnt_floats*4);
-                    memset(& _idef->_uniform_data[def_loc+4], 0, def_cnt_floats*4);
-                }
-            } else {
-                // memcpy(&_vals[def_loc+4], uf_data, def_cnt_floats*4);
-                memcpy(& _idef->_uniform_data[def_loc+4], uf_data, def_cnt_floats*4);
-            }
-        }
-
     }
+
+    if (cnt_floats == 0) {
+        // sampler2D TODO: set binding
+        M_Image *img = uf.data;
+
+        // sg_image _sgimg = (sg_image){.id=img->id};
+        // sgp_set_image(def_loc, _sgimg);
+        _idef->_uniform_image_deletes[def_loc] = false;
+        _idef->_uniform_images[def_loc] = img->handle;
+
+    } else {
+
+        if (wipe_uniform) {
+            if (deftype == M_UNIFORM_SAMPLER2D) {
+                // sgp_reset_image(def_loc);
+                _idef->_uniform_image_deletes[def_loc] = true;
+
+            } else {
+                // memset(&_vals[def_loc+4], 0, def_cnt_floats*4);
+                memset(& _idef->_uniform_data[def_loc+4], 0, def_cnt_floats*4);
+            }
+        } else {
+            // memcpy(&_vals[def_loc+4], uf_data, def_cnt_floats*4);
+            memcpy(& _idef->_uniform_data[def_loc+4], uf_data, def_cnt_floats*4);
+        }
+    }
+
+
     // current_color
     memcpy(_idef->_uniform_data, _lib->current_color, 16);
     // sgp_set_uniform(_vals, _idef->_uniform_data_count * 4);
@@ -1953,6 +2093,44 @@ void M_gfx_drawtriangles_filled(M_Triangle *triangles, int cnt) {
     sgp_draw_filled_triangles((const sgp_triangle *)(void *)triangles, cnt);
 }
 
+// static buffer size for circle drawing triangles/lines
+#define _MAX_MANY_TRIS 1024
+
+void M_gfx_drawcircle(float x, float y, float r) {
+    static sgp_line lines[_MAX_MANY_TRIS];
+    int count = MIN(MAX(7, 2.0f * r / M_PI), _MAX_MANY_TRIS);
+    float delta_angle = 2.0*M_PI/(float)count;
+
+    for (int i=0; i<count; i++) {
+        lines[i].a.x = x + r/2.0f * sinf(i * delta_angle);
+        lines[i].a.y = y - r/2.0f * cosf(i * delta_angle);
+
+        lines[i].b.x = x + r/2.0f * sinf((i+1)* delta_angle);
+        lines[i].b.y = y - r/2.0f * cosf((i+1) * delta_angle);
+    }
+
+    sgp_draw_lines(lines, count);
+}
+
+void M_gfx_drawcircle_filled(float x, float y, float r) {
+    static sgp_triangle tris[_MAX_MANY_TRIS];
+    int count = MIN(MAX(7, 2.0f * r / M_PI), _MAX_MANY_TRIS);
+    float delta_angle = 2.0*M_PI/(float)count;
+
+    for (int i=0; i<count; i++) {
+        tris[i].a.x = x;
+        tris[i].a.y = y;
+
+        tris[i].b.x = x + r/2.0f * sinf(i * delta_angle);
+        tris[i].b.y = y - r/2.0f * cosf(i * delta_angle);
+
+        tris[i].c.x = x + r/2.0f * sinf((i+1)* delta_angle);
+        tris[i].c.y = y - r/2.0f * cosf((i+1) * delta_angle);
+    }
+
+    sgp_draw_filled_triangles(tris, count);
+}
+
 // void M_gfx_drawstriplines(M_Point *pts, int cnt) {
 //     sgp_draw_lines_strip((const sgp_point *)(void *)pts, cnt);
 // }
@@ -1994,23 +2172,24 @@ M_Image M_newimage_load(const char *path) {
 
 
     M_Image img = {
-        .id= _image.id,
+        .handle= _image.id,
         .width = width,
         .height = height,
+        .is_canvas = false,
     };
 
     return img;
 }
 
-void M_image_cleanup(M_Image image) {
-    image.height = 0;
-    image.width = 0;
-    sg_image img = (sg_image){.id=image.id};
-    sg_destroy_image(img);
-}
+// void M_image_cleanup(M_CanvasImage image) {
+//     // image.height = 0;
+//     // image.width = 0;
+//     sg_image img = (sg_image){.id=image.handle};
+//     sg_destroy_image(img);
+// }
 
 void M_image_draw(M_Image image, float x, float y) {
-    sg_image img = (sg_image){.id=image.id};
+    sg_image img = (sg_image){.id=image.handle};
     if (img.id != 0) {
         sgp_set_blend_mode((sgp_blend_mode)_lib->blendmode);
 
@@ -2022,7 +2201,7 @@ void M_image_draw(M_Image image, float x, float y) {
 }
 
 void M_image_draw_rect_line(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height) {
-    sg_image img = (sg_image){.id=image.id};
+    sg_image img = (sg_image){.id=image.handle};
     //sgp_set_blend_mode(_lib->blendmode);
     if (img.id != 0) {
         // printf("draw: %f %f %f %f %f %f\n", x, y, img_x, img_y, rect_width, rec_height);
@@ -2204,6 +2383,7 @@ static inline void tick(void) {
         // PERF_BEGIN();
         // PERF_BEGIN();
         audio_dowork();
+        lyte_audio_update_music_streams(); // new "dowork"
         // PERF_END("audio");
         // PERF_BEGIN();
         sfetch_dowork();
@@ -2324,6 +2504,10 @@ bool M_system_WASM() {
 }
 
 int M_app_init(M_Config *config) {
+
+    lyte_core_image_init();
+    lyte_core_audio_init();
+    lyte_core_font_init();
 
     _lib->vsync = config->vsync;
 

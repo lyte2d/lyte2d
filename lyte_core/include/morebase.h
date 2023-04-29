@@ -14,6 +14,13 @@
 #include "mb_gamepadbuttons.h"
 #include "mb_gamepadaxes.h"
 
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+#ifndef M_PI
+  #define M_PI  3.14159265358979323846264f  // from CRC
+#endif
+
+
 // order and numbering important. must match sokol_gp
 typedef enum M_FilterMode {
     M_FILTER_NEAREST = 1,
@@ -86,20 +93,21 @@ typedef struct M_Triangle {
     float x1, y1, x2, y2, x3, y3;
 } M_Triangle;
 
+// typedef struct M_Image {
+//     uint32_t handle;
+//     int width;
+//     int height;
+// } M_Image;
+
 typedef struct M_Image {
-    uint32_t id;
+    uint32_t handle;
     int width;
     int height;
-} M_Image;
-
-typedef struct M_Canvas {
-    uint32_t id_image;
+    bool is_canvas; // if true, values below should also be set
     uint32_t id_depth_image;
     uint32_t id_pass;
-    int width;
-    int height;
-    int _ref; //
-} M_Canvas;
+    // int _ref; //
+} M_Image;
 
 typedef struct M_ShaderDef {
     uint32_t _shader_id;
@@ -129,7 +137,7 @@ typedef struct M_ShaderUniform {
 typedef struct M_Shader {
     //const char *code;
     uint32_t id;
-    uint32_t pip_id;
+    // uint32_t pip_id;
 } M_Shader;
 
 typedef struct M_Font {
@@ -252,27 +260,35 @@ void M_gfx_setfiltermode(M_FilterMode filtermode);
 void M_gfx_resetfiltermode(void);
 
 // canvas
-M_Canvas M_newcanvas(int w, int h);
-void M_canvas_cleanup(M_Canvas canvas);
-M_Image M_canvas_get_image(M_Canvas canvas);
-void M_canvas_set(M_Canvas canvas);
+M_Image M_newcanvas(int w, int h);
+M_Image M_newimage_load(const char *path);
+
+void M_canvas_cleanup(M_Image canvas);
+// M_CanvasImage M_canvas_get_image(M_CanvasImage canvas);
+void M_canvas_set(M_Image canvas);
 void M_canvas_unset(void);
-// also rename these to match lua better
 
 // image
-M_Image M_newimage_load(const char *path);
-void M_image_cleanup(M_Image image);
+// void M_image_cleanup(M_Image image);
 void M_image_draw(M_Image image, float x, float y);
 void M_image_draw_rect_line(M_Image image, float x, float y, float img_x, float img_y, float rect_width, float rec_height);
+bool M_image_is_canvas(M_Image image);
 // multiple rects from single image to help with batching
 
 // shader
-M_Shader M_newshader(M_ShaderDef shaderdef);
+M_ShaderDef *M_shaderdef_create(void);
+M_ShaderDef *M_shaderdef_find(uint32_t shader_id);
+void M_shaderdef_uniform(M_ShaderDef *shaderdef, const char *name, M_UniformType type);
+void M_shaderdef_vertex(M_ShaderDef *shaderdef, const char *code);
+void M_shaderdef_fragment(M_ShaderDef *shaderdef, const char *code);
+
+M_Shader M_newshader(M_ShaderDef *shaderdef);
 // M_Shader M_newshader_load(const char *path);
 void M_shader_cleanup(M_Shader shader);
 void M_shader_set(M_Shader shader);
 void M_shader_unset(void);
-void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count);
+// void M_shader_send(M_Shader shader, M_ShaderUniform *uniforms, size_t count);
+void M_shader_send(M_Shader shader, M_ShaderUniform uniform);
 
 // font
 M_Font M_newfont_load(const char *path, float size);
@@ -293,6 +309,9 @@ void M_gfx_drawpoints(M_Point *points, int cnt);
 void M_gfx_drawlines(M_Line *lines, int cnt);
 void M_gfx_drawrects_filled(M_Rect *rects, int cnt);
 void M_gfx_drawtriangles_filled(M_Triangle *triangles, int cnt);
+
+void M_gfx_drawcircle(float x, float y, float r);
+void M_gfx_drawcircle_filled(float x, float y, float r);
 
 // void M_gfx_drawstriplines(M_Point *pts, int cnt);
 // void M_gfx_drawstriptriangles_filled(M_Point *pts, int cnt);
