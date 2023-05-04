@@ -6,7 +6,7 @@ RELDIR=$CURRDIR/out/rel
 BUILDDIR=$CURRDIR/out/docker
 
 echo
-echo "@@@ COPY SCRIPT"
+echo "@@@ BEGIN: COPY"
 echo "  datetime: " $(date)
 echo
 echo "  currentdir: " $CURRDIR
@@ -27,7 +27,7 @@ cp $BUILDDIR/linux/lyte $RELDIR/bin
 
 cp $BUILDDIR/win/lyte.exe $RELDIR/bin
 
-
-echo "@@@ DONE: COPY SCRIPT"
+echo
 echo "  datetime: " $(date)
+echo "@@@ DONE: COPY"
 echo

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "core.h"
+#include "lyte_core.h"
 #include "map.h"
 
 #include "physfs.h"
@@ -14,8 +14,8 @@
 #include "sokol_gp.h"
 #include "stb_image.h"
 
-#ifndef INIT_NUM_IMAGES
-#define INIT_NUM_IMAGES 10
+#ifndef INIT_NUM_IMAGEITEMS
+#define INIT_NUM_IMAGEITEMS 10
 #endif
 
 typedef struct ImageItem {
@@ -31,7 +31,7 @@ static mg_Map imageitems;
 static ImageItem *current_canvas = NULL;
 
 void lyte_core_image_init(void) {
-    mg_map_init(&imageitems, sizeof(ImageItem), INIT_NUM_IMAGES);
+    mg_map_init(&imageitems, sizeof(ImageItem), INIT_NUM_IMAGEITEMS);
 }
 
 void lyte_core_image_cleanup(void) {
@@ -64,8 +64,8 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     sg_image_desc image_desc = {0};
     image_desc.width = width;
     image_desc.height = height;
-    // image_desc.min_filter = (sg_filter)_lib->filtermode; // TODO: filtermode for images
-    // image_desc.mag_filter = (sg_filter)_lib->filtermode;
+    image_desc.min_filter = (sg_filter)lyte_state.filtermode;
+    image_desc.mag_filter = (sg_filter)lyte_state.filtermode;
     // image_desc.wrap_u = SG_WRAP_REPEAT;
     // image_desc.wrap_v = SG_WRAP_REPEAT;
     image_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
@@ -86,7 +86,7 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     return 0;
 }
 
-int lyte_new_canvas_image(int w, int h, lyte_Image *img) {
+int lyte_new_canvas(int w, int h, lyte_Image *img) {
     ImageItem canvas = {.width = w, .height = h, .is_canvas = true};
     // create frame buffer image
     sg_image_desc fb_image_desc = {0};
@@ -130,26 +130,48 @@ int lyte_new_canvas_image(int w, int h, lyte_Image *img) {
     return 0;
 }
 
-void lyte_cleanup_image(lyte_Image image) {
-    // Image *internal = mg_map_get(&images, image.handle);
+int lyte_cleanup_image(lyte_Image image) {
+    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    if (!imageitem) {
+        return 0;
+    }
+    if (imageitem->is_canvas) {
+        sg_destroy_image((sg_image){.id = imageitem->id_depth_image});
+        sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
+    }
+    sg_destroy_image((sg_image){.id = imageitem->handle});
+    mg_map_del(&imageitems, image.handle);
+    return 0;
 }
 
-int lyte_image_width(lyte_Image image) {
+int lyte_get_image_width(lyte_Image image, int *val) {
     ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
     if (!imageitem) {
         fprintf(stderr, "Image with handle %d not present\n", image.handle);
         return -1;
     }
-    return imageitem->width;
+    *val = imageitem->width;
+    return 0;
 }
 
-int lyte_image_height(lyte_Image image) {
+int lyte_get_image_height(lyte_Image image, int *val) {
     ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
     if (!imageitem) {
         fprintf(stderr, "Image with handle %d not present\n", image.handle);
         return -1;
     }
-    return imageitem->height;
+    *val = imageitem->height;
+    return 0;
+}
+
+int lyte_is_image_canvas(lyte_Image image, bool *val) {
+    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    if (!imageitem) {
+        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        return -1;
+    }
+    *val = imageitem->is_canvas;
+    return 0;
 }
 
 int lyte_draw_image(lyte_Image image, int x, int y) {

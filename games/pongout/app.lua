@@ -88,18 +88,18 @@ local function load_assets()
     Assets.font1 = lyte.load_font("/assets/fonts/m5x7.ttf", 14)
     Assets.music_elev = lyte.load_music("/assets/music/elev.mp3")
 
-    Assets.sd_brick_dt = lyte.load_sounddata("/assets/snd/sfx_pellet.ogg")
+    Assets.sd_brick_dt = lyte.load_sound("/assets/snd/sfx_pellet.ogg")
     print(Assets.sd_brick_dt.volume)
     Assets.sd_brick_dt.volume = 0.3
     print(Assets.sd_brick_dt.volume)
-    Assets.sd_paddle_dt = lyte.load_sounddata("/assets/snd/shoot.ogg")
+    Assets.sd_paddle_dt = lyte.load_sound("/assets/snd/shoot.ogg")
     Assets.sd_paddle_dt.volume = 0.3
-    Assets.sd_hurt_dt = lyte.load_sounddata("/assets/snd/sfx_hurt.wav")
+    Assets.sd_hurt_dt = lyte.load_sound("/assets/snd/sfx_hurt.wav")
     Assets.sd_hurt_dt.volume = 0.3
 
-    Assets.sc_brick = lyte.new_sound(Assets.sd_brick_dt)
-    Assets.sc_paddle = lyte.new_sound(Assets.sd_paddle_dt)
-    Assets.sc_hurt = lyte.new_sound(Assets.sd_hurt_dt)
+    Assets.sc_brick = lyte.clone_sound(Assets.sd_brick_dt)
+    Assets.sc_paddle = lyte.clone_sound(Assets.sd_paddle_dt)
+    Assets.sc_hurt = lyte.clone_sound(Assets.sd_hurt_dt)
 end
 
 local function debug_draw(DT)

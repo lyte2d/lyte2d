@@ -5,7 +5,7 @@ CURRDIR=$(pwd)
 BUILDDIR=$CURRDIR/out/docker
 
 echo
-echo "@@@ BUILD SCRIPT"
+echo "@@@ BEGIN: BUILD"
 echo "  datetime: " $(date)
 echo
 echo "  currentdir: " $CURRDIR
@@ -32,8 +32,8 @@ echo
 echo "---> BUILD: WIN (console)"
 cmake --build $BUILDDIR/win
 echo "---> DONE: WIN (console)"
+echo
 
-
-echo "@@@ DONE: BUILD SCRIPT"
 echo "  datetime: " $(date)
+echo "@@@ DONE: BUILD"
 echo

@@ -1,4 +1,4 @@
-name: Build Lyte2D, prep draft release
+name: Official Lyte2D build and release
 
 on:
   push:

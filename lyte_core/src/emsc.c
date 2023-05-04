@@ -1,6 +1,3 @@
-#ifndef EMSC_H_INCLUDED
-#define EMSC_H_INCLUDED
-
 #if defined(__EMSCRIPTEN__)
 
 /* common emscripten platform helper functions */
@@ -11,16 +8,13 @@
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 
+#include "emsc.h"
+
 static const char* _emsc_canvas_name = 0;
 static bool _emsc_is_webgl2 = false;
 static double _emsc_width = 0;
 static double _emsc_height = 0;
 
-enum {
-    EMSC_NONE = 0,
-    EMSC_TRY_WEBGL2 = (1<<0),
-    EMSC_ANTIALIAS = (1<<1)
-};
 
 /* track CSS element size changes and update the WebGL canvas size */
 static EM_BOOL _emsc_size_changed(int event_type, const EmscriptenUiEvent* ui_event, void* user_data) {
@@ -70,6 +64,4 @@ bool emsc_webgl_fallback() {
     return !_emsc_is_webgl2;
 }
 
-#endif /* __EMSCRIPTEN__ */
-
-#endif  /* EMSC_H_INCLUDED */
+#endif // __EMSCRIPTEN__

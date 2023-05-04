@@ -11,13 +11,12 @@
 // header file: do not edit directly
 // (use codegen to update this file)
 
-typedef struct lyte_ShaderBuilder { unsigned handle; } lyte_ShaderBuilder;
-typedef struct lyte_Shader { unsigned handle; } lyte_Shader;
 typedef struct lyte_Image { unsigned handle; } lyte_Image;
 typedef struct lyte_Font { unsigned handle; } lyte_Font;
 typedef struct lyte_Music { unsigned handle; } lyte_Music;
 typedef struct lyte_Sound { unsigned handle; } lyte_Sound;
-typedef struct lyte_SoundData { unsigned handle; } lyte_SoundData;
+typedef struct lyte_Shader { unsigned handle; } lyte_Shader;
+typedef struct lyte_ShaderBuilder { unsigned handle; } lyte_ShaderBuilder;
 typedef union lyte_ShaderUniformValue {
     float float_val;
     struct { float *values; size_t count; } float_list;

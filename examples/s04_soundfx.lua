@@ -1,18 +1,16 @@
 -- lyte sample
 
--- sound fx: data files
--- these contain the data, but can't be played on their own
-local sfx_hurt_data = lyte.load_sounddata("assets/sfx_hurt.wav")
-local sfx_shoot_data = lyte.load_sounddata("assets/sfx_shoot.ogg")
+local sfx_hurt = lyte.load_sound("assets/sfx_hurt.wav")
+local sfx_shoot = lyte.load_sound("assets/sfx_shoot.ogg")
 
 -- sound fx: playable instances
 -- 3 'hurt' instances
-local sfx_hurt_1 = lyte.new_sound(sfx_hurt_data)
-local sfx_hurt_2 = lyte.new_sound(sfx_hurt_data)
-local sfx_hurt_3 = lyte.new_sound(sfx_hurt_data)
+local sfx_hurt_1 = lyte.clone_sound(sfx_hurt)
+local sfx_hurt_2 = lyte.clone_sound(sfx_hurt)
+local sfx_hurt_3 = lyte.clone_sound(sfx_hurt)
 -- 2 'shoot' instances
-local sfx_shoot_1 = lyte.new_sound(sfx_shoot_data)
-local sfx_shoot_2 = lyte.new_sound(sfx_shoot_data)
+local sfx_shoot_1 = lyte.clone_sound(sfx_shoot)
+local sfx_shoot_2 = lyte.clone_sound(sfx_shoot)
 
 -- pans on both sides and middle
 sfx_hurt_1.pan = 1.0

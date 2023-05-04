@@ -40,6 +40,14 @@
             rets = {}
         }, {
             _kind = "function",
+            _name = "quit",
+            _tags = {
+                d = "Quit the application by closing the window."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
             _name = "cls",
             _tags = {
                 d = "Clear the screen or current canvas if one is used."
@@ -56,6 +64,108 @@
                 }, {
                     _name = "a",
                     value = "number"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_color",
+            _tags = {
+                d = "Set the foreground color to be used in the drawing operations."
+            },
+            args = { {
+                    _name = "r",
+                    value = "number"
+                }, {
+                    _name = "g",
+                    value = "number"
+                }, {
+                    _name = "b",
+                    value = "number"
+                }, {
+                    _name = "a",
+                    value = "number"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_color",
+            _tags = {
+                d = "Reset the color to its default value."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "draw_point",
+            _tags = {
+                d = "Draw a point."
+            },
+            args = { {
+                    _name = "x",
+                    value = "integer"
+                }, {
+                    _name = "y",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "draw_line",
+            _tags = {
+                d = "Draw a line"
+            },
+            args = { {
+                    _name = "x1",
+                    value = "integer"
+                }, {
+                    _name = "y1",
+                    value = "integer"
+                }, {
+                    _name = "x2",
+                    value = "integer"
+                }, {
+                    _name = "y2",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "draw_rect",
+            _tags = {
+                d = "Draw a filled rectangle."
+            },
+            args = { {
+                    _name = "dest_x",
+                    value = "integer"
+                }, {
+                    _name = "dest_y",
+                    value = "integer"
+                }, {
+                    _name = "rect_width",
+                    value = "integer"
+                }, {
+                    _name = "rect_height",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "draw_rect_line",
+            _tags = {
+                d = "Draw a rectangle border."
+            },
+            args = { {
+                    _name = "dest_x",
+                    value = "integer"
+                }, {
+                    _name = "dest_y",
+                    value = "integer"
+                }, {
+                    _name = "rect_width",
+                    value = "integer"
+                }, {
+                    _name = "rect_height",
+                    value = "integer"
                 } },
             rets = {}
         }, {
@@ -92,6 +202,24 @@
                     value = "integer"
                 } },
             rets = {}
+        }, {
+            _kind = "function",
+            _name = "load_image",
+            _tags = {
+                ctor = true,
+                d = "Load the image specified in the path."
+            },
+            args = { {
+                    _name = "image_path",
+                    value = "string"
+                } },
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Image"
+                } }
         }, {
             _kind = "function",
             _name = "draw_image",
@@ -146,412 +274,6 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "draw_line",
-            _tags = {
-                d = "Draw a line"
-            },
-            args = { {
-                    _name = "x1",
-                    value = "integer"
-                }, {
-                    _name = "y1",
-                    value = "integer"
-                }, {
-                    _name = "x2",
-                    value = "integer"
-                }, {
-                    _name = "y2",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "draw_point",
-            _tags = {
-                d = "Draw a point."
-            },
-            args = { {
-                    _name = "x",
-                    value = "integer"
-                }, {
-                    _name = "y",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "draw_rect",
-            _tags = {
-                d = "Draw a filled rectangle."
-            },
-            args = { {
-                    _name = "dest_x",
-                    value = "integer"
-                }, {
-                    _name = "dest_y",
-                    value = "integer"
-                }, {
-                    _name = "rect_width",
-                    value = "integer"
-                }, {
-                    _name = "rect_height",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "draw_rect_line",
-            _tags = {
-                d = "Draw a rectangle border."
-            },
-            args = { {
-                    _name = "dest_x",
-                    value = "integer"
-                }, {
-                    _name = "dest_y",
-                    value = "integer"
-                }, {
-                    _name = "rect_width",
-                    value = "integer"
-                }, {
-                    _name = "rect_height",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "draw_text",
-            _tags = {
-                d = "Draw a text line."
-            },
-            args = { {
-                    _name = "text",
-                    value = "string"
-                }, {
-                    _name = "dest_x",
-                    value = "integer"
-                }, {
-                    _name = "dest_y",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "get_gamepad_axis",
-            _tags = {
-                d = "Get the given axis of the gamepad at the given index."
-            },
-            args = { {
-                    _name = "index",
-                    value = "integer"
-                }, {
-                    _name = "gamepad_axis",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "GamepadAxis"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_gamepad_count",
-            _tags = {
-                d = "Get the number of gamepads."
-            },
-            args = {},
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_gamepad_name",
-            _tags = {
-                d = "Get the name of the gamepad at the given index."
-            },
-            args = { {
-                    _name = "index",
-                    value = "integer"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "string"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_mastervolume",
-            _tags = {
-                d = "Get the master volume."
-            },
-            args = {},
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_mouse_x",
-            _tags = {
-                d = "Get the mouse x position."
-            },
-            args = {},
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_mouse_y",
-            _tags = {
-                d = "Get the mouse y position."
-            },
-            args = {},
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_music_length",
-            _tags = {
-                d = "Get the length of the given music object in seconds."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_music_length_played",
-            _tags = {
-                d = "Get the already played length of the given music object in seconds."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_music_pan",
-            _tags = {
-                d = "Get the pan of the given music object."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_music_pitch",
-            _tags = {
-                d = "Get the pitch of the given music object."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_music_volume",
-            _tags = {
-                d = "Get the volume of the given music object."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_sound_pan",
-            _tags = {
-                d = "Get the pan of the given sound object."
-            },
-            args = { {
-                    _name = "sound",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_sound_pitch",
-            _tags = {
-                d = "Get the pitch of the given sound object."
-            },
-            args = { {
-                    _name = "sound",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_sound_volume",
-            _tags = {
-                d = "Get the volume of the given sound object."
-            },
-            args = { {
-                    _name = "sound",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_sounddata_pan",
-            _tags = {
-                d = "Get the pan of the given sounddata object."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_sounddata_pitch",
-            _tags = {
-                d = "Get the pitch of the given sounddata object."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_sounddata_volume",
-            _tags = {
-                d = "Get the volume of the given sounddata object."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "number"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_text_width",
-            _tags = {
-                d = "Get the width of the given text line."
-            },
-            args = { {
-                    _name = "text",
-                    value = "string"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_text_height",
-            _tags = {
-                d = "Get the height of the given text line."
-            },
-            args = { {
-                    _name = "text",
-                    value = "string"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_window_width",
-            _tags = {
-                d = "Get the width of the window."
-            },
-            args = {},
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
-            _name = "get_window_height",
-            _tags = {
-                d = "Get the height of the window."
-            },
-            args = {},
-            rets = { {
-                    _name = "val",
-                    value = "integer"
-                } }
-        }, {
-            _kind = "function",
             _name = "get_image_width",
             _tags = {
                 d = "Get the width of the image."
@@ -586,6 +308,218 @@
                 } }
         }, {
             _kind = "function",
+            _name = "new_canvas",
+            _tags = {
+                ctor = true,
+                d = "Create a canvas image with given width and height."
+            },
+            args = { {
+                    _name = "width",
+                    value = "integer"
+                }, {
+                    _name = "height",
+                    value = "integer"
+                } },
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Image"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_canvas",
+            _tags = {
+                d = "Set the effective canvas image. All draw operations will go to this canvas until it's reset."
+            },
+            args = { {
+                    _name = "canvas_image",
+                    _tags = {
+                        nativetype = "udata",
+                        save_to_registry = true
+                    },
+                    value = "Image"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_canvas",
+            _tags = {
+                d = "Reset the drawing target, back to screen."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "is_image_canvas",
+            _tags = {
+                d = "Check if the image was created as a canvas."
+            },
+            args = { {
+                    _name = "image",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Image"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
+        }, {
+            _kind = "function",
+            _name = "load_font",
+            _tags = {
+                ctor = true,
+                d = "Load the font specified in the path, and set the initial size."
+            },
+            args = { {
+                    _name = "font_path",
+                    value = "string"
+                }, {
+                    _name = "size",
+                    value = "number"
+                } },
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Font"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_font",
+            _tags = {
+                d = "Set the effective font to be used in the drawing operations."
+            },
+            args = { {
+                    _name = "font",
+                    _tags = {
+                        nativetype = "udata",
+                        save_to_registry = true
+                    },
+                    value = "Font"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_font",
+            _tags = {
+                c_api_skip = true,
+                d = "Reset the font to its default value."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "draw_text",
+            _tags = {
+                d = "Draw a text line."
+            },
+            args = { {
+                    _name = "text",
+                    value = "string"
+                }, {
+                    _name = "dest_x",
+                    value = "integer"
+                }, {
+                    _name = "dest_y",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "get_text_width",
+            _tags = {
+                d = "Get the width of the given text line."
+            },
+            args = { {
+                    _name = "text",
+                    value = "string"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "integer"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_text_height",
+            _tags = {
+                d = "Get the height of the given text line."
+            },
+            args = { {
+                    _name = "text",
+                    value = "string"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "integer"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_window_minsize",
+            _tags = {
+                d = "Set the window's minimum possible size."
+            },
+            args = { {
+                    _name = "width",
+                    value = "integer"
+                }, {
+                    _name = "height",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_window_size",
+            _tags = {
+                d = "Set the window's size."
+            },
+            args = { {
+                    _name = "width",
+                    value = "integer"
+                }, {
+                    _name = "height",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "get_window_width",
+            _tags = {
+                d = "Get the width of the window."
+            },
+            args = {},
+            rets = { {
+                    _name = "val",
+                    value = "integer"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_window_height",
+            _tags = {
+                d = "Get the height of the window."
+            },
+            args = {},
+            rets = { {
+                    _name = "val",
+                    value = "integer"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_fullscreen",
+            _tags = {
+                d = "Set the window to fullscreen, or windowed mode."
+            },
+            args = { {
+                    _name = "fullscreen",
+                    value = "boolean"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
             _name = "is_fullscreen",
             _tags = {
                 d = "Check if the window is set to fullscreen."
@@ -597,64 +531,88 @@
                 } }
         }, {
             _kind = "function",
-            _name = "is_gamepad_down",
+            _name = "set_window_title",
             _tags = {
-                d = "Check if the given button of the gamepad at the given index is down."
+                d = "Set the window's title."
             },
             args = { {
-                    _name = "index",
-                    value = "integer"
-                }, {
-                    _name = "gamepad_button",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "GamepadButton"
+                    _name = "title",
+                    value = "string"
                 } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_window_vsync",
+            _tags = {
+                d = "Set the window vsync flag to the given value."
+            },
+            args = { {
+                    _name = "vsync",
+                    value = "boolean"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "is_window_vsync",
+            _tags = {
+                d = "Check if the window vsync flag is set."
+            },
+            args = {},
             rets = { {
                     _name = "val",
                     value = "boolean"
                 } }
         }, {
             _kind = "function",
-            _name = "is_gamepad_pressed",
+            _name = "set_window_icon",
             _tags = {
-                d = "Check if the given button of the gamepad at the given index is pressed."
+                d = "Set the window icon."
             },
             args = { {
-                    _name = "index",
-                    value = "integer"
-                }, {
-                    _name = "gamepad_button",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "GamepadButton"
+                    _name = "icon_path",
+                    value = "string"
                 } },
-            rets = { {
-                    _name = "val",
-                    value = "boolean"
-                } }
+            rets = {}
         }, {
             _kind = "function",
-            _name = "is_gamepad_released",
+            _name = "set_window_margins",
             _tags = {
-                d = "Check if the given button of the gamepad at the given index is released."
+                d = "Set the window margins. Margins are ignored and no drawing can be made there.."
             },
             args = { {
-                    _name = "index",
+                    _name = "left",
                     value = "integer"
                 }, {
-                    _name = "gamepad_button",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "GamepadButton"
+                    _name = "right",
+                    value = "integer"
+                }, {
+                    _name = "top",
+                    value = "integer"
+                }, {
+                    _name = "bottom",
+                    value = "integer"
                 } },
-            rets = { {
-                    _name = "val",
-                    value = "boolean"
-                } }
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_window_paddings",
+            _tags = {
+                d = "Set the window paddings. Paddings are can be drawn on."
+            },
+            args = { {
+                    _name = "left",
+                    value = "integer"
+                }, {
+                    _name = "right",
+                    value = "integer"
+                }, {
+                    _name = "top",
+                    value = "integer"
+                }, {
+                    _name = "bottom",
+                    value = "integer"
+                } },
+            rets = {}
         }, {
             _kind = "function",
             _name = "is_key_down",
@@ -776,118 +734,152 @@
                 } }
         }, {
             _kind = "function",
-            _name = "is_music_playing",
+            _name = "get_mouse_x",
             _tags = {
-                d = "Check if the given music is playing."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "boolean"
-                } }
-        }, {
-            _kind = "function",
-            _name = "is_sound_playing",
-            _tags = {
-                d = "Check if the given sound is playing."
-            },
-            args = { {
-                    _name = "sound",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                } },
-            rets = { {
-                    _name = "val",
-                    value = "boolean"
-                } }
-        }, {
-            _kind = "function",
-            _name = "is_window_vsync",
-            _tags = {
-                d = "Check if the window vsync flag is set."
+                d = "Get the mouse x position."
             },
             args = {},
             rets = { {
                     _name = "val",
-                    value = "boolean"
+                    value = "integer"
                 } }
         }, {
             _kind = "function",
-            _name = "is_image_canvas",
+            _name = "get_mouse_y",
             _tags = {
-                d = "Check if the image was created as a canvas."
+                d = "Get the mouse y position."
+            },
+            args = {},
+            rets = { {
+                    _name = "val",
+                    value = "integer"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_gamepad_count",
+            _tags = {
+                d = "Get the number of gamepads."
+            },
+            args = {},
+            rets = { {
+                    _name = "val",
+                    value = "integer"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_gamepad_name",
+            _tags = {
+                d = "Get the name of the gamepad at the given index."
             },
             args = { {
-                    _name = "image",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Image"
+                    _name = "index",
+                    value = "integer"
                 } },
             rets = { {
                     _name = "val",
-                    value = "boolean"
-                } }
-        }, {
-            _kind = "function",
-            _name = "load_file",
-            _tags = {
-                d = "Load the file in the path."
-            },
-            args = { {
-                    _name = "file_path",
-                    value = "string"
-                } },
-            rets = { {
-                    _name = "val",
                     value = "string"
                 } }
         }, {
             _kind = "function",
-            _name = "load_font",
+            _name = "is_gamepad_down",
             _tags = {
-                ctor = true,
-                d = "Load the font specified in the path, and set the initial size."
+                d = "Check if the given button of the gamepad at the given index is down."
             },
             args = { {
-                    _name = "font_path",
-                    value = "string"
+                    _name = "index",
+                    value = "integer"
                 }, {
-                    _name = "size",
+                    _name = "gamepad_button",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "GamepadButton"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
+        }, {
+            _kind = "function",
+            _name = "is_gamepad_pressed",
+            _tags = {
+                d = "Check if the given button of the gamepad at the given index is pressed."
+            },
+            args = { {
+                    _name = "index",
+                    value = "integer"
+                }, {
+                    _name = "gamepad_button",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "GamepadButton"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
+        }, {
+            _kind = "function",
+            _name = "is_gamepad_released",
+            _tags = {
+                d = "Check if the given button of the gamepad at the given index is released."
+            },
+            args = { {
+                    _name = "index",
+                    value = "integer"
+                }, {
+                    _name = "gamepad_button",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "GamepadButton"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_gamepad_axis",
+            _tags = {
+                d = "Get the given axis of the gamepad at the given index."
+            },
+            args = { {
+                    _name = "index",
+                    value = "integer"
+                }, {
+                    _name = "gamepad_axis",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "GamepadAxis"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_mastervolume",
+            _tags = {
+                d = "Set the master volume."
+            },
+            args = { {
+                    _name = "mastervolume",
                     value = "number"
                 } },
-            rets = { {
-                    _name = "val",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Font"
-                } }
+            rets = {}
         }, {
             _kind = "function",
-            _name = "load_image",
+            _name = "get_mastervolume",
             _tags = {
-                ctor = true,
-                d = "Load the image specified in the path."
+                d = "Get the master volume."
             },
-            args = { {
-                    _name = "image_path",
-                    value = "string"
-                } },
+            args = {},
             rets = { {
                     _name = "val",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Image"
+                    value = "number"
                 } }
         }, {
             _kind = "function",
@@ -909,116 +901,6 @@
                 } }
         }, {
             _kind = "function",
-            _name = "load_sounddata",
-            _tags = {
-                ctor = true,
-                d = "Load the sounddata specified in the path."
-            },
-            args = { {
-                    _name = "sounddata_path",
-                    value = "string"
-                } },
-            rets = { {
-                    _name = "val",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                } }
-        }, {
-            _kind = "function",
-            _name = "new_canvas",
-            _tags = {
-                ctor = true,
-                d = "Create a canvas image with given width and height."
-            },
-            args = { {
-                    _name = "width",
-                    value = "integer"
-                }, {
-                    _name = "height",
-                    value = "integer"
-                } },
-            rets = { {
-                    _name = "val",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Image"
-                } }
-        }, {
-            _kind = "function",
-            _name = "new_shader",
-            _tags = {
-                c_api_skip = true,
-                ctor = true,
-                d = "Create a shader with given specification."
-            },
-            args = { {
-                    _name = "shaderdef",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "ShaderDef"
-                } },
-            rets = { {
-                    _name = "val",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Shader"
-                } }
-        }, {
-            _kind = "function",
-            _name = "new_sound",
-            _tags = {
-                ctor = true,
-                d = "Create a sound from given sounddata."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                } },
-            rets = { {
-                    _name = "val",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                } }
-        }, {
-            _kind = "function",
-            _name = "pause_music",
-            _tags = {
-                d = "Pause the music."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "pause_sound",
-            _tags = {
-                d = "Pause the sound."
-            },
-            args = { {
-                    _name = "sound",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
             _name = "play_music",
             _tags = {
                 d = "Play the music."
@@ -1033,97 +915,17 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "play_sound",
+            _name = "pause_music",
             _tags = {
-                d = "Play the sound."
+                d = "Pause the music."
             },
             args = { {
-                    _name = "sound",
+                    _name = "music",
                     _tags = {
                         nativetype = "udata"
                     },
-                    value = "Sound"
+                    value = "Music"
                 } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "pop_matrix",
-            _tags = {
-                d = "Pop the transform matrix."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "push_matrix",
-            _tags = {
-                d = "Push the transform matrix."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "quit",
-            _tags = {
-                d = "Quit the application by closing the window."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_blendmode",
-            _tags = {
-                d = "Reset the blendmode value to its default value."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_canvas",
-            _tags = {
-                d = "Reset the drawing target, back to screen."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_color",
-            _tags = {
-                d = "Reset the color to its default value."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_filtermode",
-            _tags = {
-                d = "Reset the filtermode value to its default value."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_font",
-            _tags = {
-                d = "Reset the font to its default value."
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_matrix",
-            _tags = {
-                d = "Reset the transformation matrix (load identity matrix.)"
-            },
-            args = {},
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "reset_shader",
-            _tags = {
-                d = "Reset the shader, back to framework defaults."
-            },
-            args = {},
             rets = {}
         }, {
             _kind = "function",
@@ -1141,108 +943,69 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "resume_sound",
+            _name = "stop_music",
             _tags = {
-                d = "Resume the sound."
+                d = "Stop the music."
             },
             args = { {
-                    _name = "sound",
+                    _name = "music",
                     _tags = {
                         nativetype = "udata"
                     },
-                    value = "Sound"
+                    value = "Music"
                 } },
             rets = {}
         }, {
             _kind = "function",
-            _name = "rotate",
+            _name = "is_music_playing",
             _tags = {
-                d = "Apply rotation (changes transform matrix.)"
+                d = "Check if the given music is playing."
             },
             args = { {
-                    _name = "angle",
-                    value = "number"
+                    _name = "music",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Music"
                 } },
-            rets = {}
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
         }, {
             _kind = "function",
-            _name = "rotate_at",
+            _name = "get_music_length",
             _tags = {
-                d = "Apply rotation at the given location (changes transform matrix.)"
+                d = "Get the length of the given music object in seconds."
             },
             args = { {
-                    _name = "angle",
-                    value = "number"
-                }, {
-                    _name = "x",
-                    value = "integer"
-                }, {
-                    _name = "y",
-                    value = "integer"
+                    _name = "music",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Music"
                 } },
-            rets = {}
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
         }, {
             _kind = "function",
-            _name = "save_file_append",
+            _name = "get_music_length_played",
             _tags = {
-                d = "Append the data to the file in the path. Append at the end if the file exists. Create if it doesn't exist."
+                d = "Get the already played length of the given music object in seconds."
             },
             args = { {
-                    _name = "file_path",
-                    value = "string"
-                }, {
-                    _name = "data",
-                    value = "string"
+                    _name = "music",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Music"
                 } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "save_file_write",
-            _tags = {
-                d = "Append the data to the file in the path. Override if the file exists. Create if it doesn't exist."
-            },
-            args = { {
-                    _name = "file_path",
-                    value = "string"
-                }, {
-                    _name = "data",
-                    value = "string"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "scale",
-            _tags = {
-                d = "Apply scaling (changes transform matrix.)"
-            },
-            args = { {
-                    _name = "scale_x",
+            rets = { {
+                    _name = "val",
                     value = "number"
-                }, {
-                    _name = "scale_y",
-                    value = "number"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "scale_at",
-            _tags = {
-                d = "Apply scaling at the given location (changes transform matrix.)"
-            },
-            args = { {
-                    _name = "scale_x",
-                    value = "integer"
-                }, {
-                    _name = "scale_y",
-                    value = "integer"
-                }, {
-                    _name = "x",
-                    value = "number"
-                }, {
-                    _name = "y",
-                    value = "number"
-                } },
-            rets = {}
+                } }
         }, {
             _kind = "function",
             _name = "seek_music",
@@ -1262,127 +1025,18 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "set_blendmode",
+            _name = "set_music_volume",
             _tags = {
-                d = "Set the effective blendmode."
+                d = "Set the volume of the given music object."
             },
             args = { {
-                    _name = "blendmode",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "BlendMode"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_canvas",
-            _tags = {
-                d = "Set the effective canvas image. All draw operations will go to this canvas until it's reset."
-            },
-            args = { {
-                    _name = "canvas_image",
+                    _name = "music",
                     _tags = {
                         nativetype = "udata"
                     },
-                    value = "Image"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_color",
-            _tags = {
-                d = "Set the foreground color to be used in the drawing operations."
-            },
-            args = { {
-                    _name = "r",
-                    value = "number"
+                    value = "Music"
                 }, {
-                    _name = "g",
-                    value = "number"
-                }, {
-                    _name = "b",
-                    value = "number"
-                }, {
-                    _name = "a",
-                    value = "number"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_default_blendmode",
-            _tags = {
-                d = "Set the default blendmode."
-            },
-            args = { {
-                    _name = "blendmode",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "BlendMode"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_default_filtermode",
-            _tags = {
-                d = "Set the default filtermode."
-            },
-            args = { {
-                    _name = "filtermode",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "FilterMode"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_filtermode",
-            _tags = {
-                d = "Set the effective filtermode."
-            },
-            args = { {
-                    _name = "filtermode",
-                    _tags = {
-                        nativetype = "enumstring"
-                    },
-                    value = "FilterMode"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_font",
-            _tags = {
-                d = "Set the effective font to be used in the drawing operations."
-            },
-            args = { {
-                    _name = "font",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Font"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_fullscreen",
-            _tags = {
-                d = "Set the window to fullscreen, or windowed mode."
-            },
-            args = { {
-                    _name = "fullscreen",
-                    value = "boolean"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_mastervolume",
-            _tags = {
-                d = "Set the master volume."
-            },
-            args = { {
-                    _name = "mastervolume",
+                    _name = "volume",
                     value = "number"
                 } },
             rets = {}
@@ -1422,9 +1076,9 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "set_music_volume",
+            _name = "get_music_volume",
             _tags = {
-                d = "Set the volume of the given music object."
+                d = "Get the volume of the given music object."
             },
             args = { {
                     _name = "music",
@@ -1432,23 +1086,172 @@
                         nativetype = "udata"
                     },
                     value = "Music"
-                }, {
-                    _name = "volume",
+                } },
+            rets = { {
+                    _name = "val",
                     value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_music_pan",
+            _tags = {
+                d = "Get the pan of the given music object."
+            },
+            args = { {
+                    _name = "music",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Music"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_music_pitch",
+            _tags = {
+                d = "Get the pitch of the given music object."
+            },
+            args = { {
+                    _name = "music",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Music"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "load_sound",
+            _tags = {
+                ctor = true,
+                d = "Load the sound specified in the path."
+            },
+            args = { {
+                    _name = "sound_path",
+                    value = "string"
+                } },
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } }
+        }, {
+            _kind = "function",
+            _name = "clone_sound",
+            _tags = {
+                ctor = true,
+                d = "Clone the sound specified in the path."
+            },
+            args = { {
+                    _name = "orig",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } },
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } }
+        }, {
+            _kind = "function",
+            _name = "play_sound",
+            _tags = {
+                d = "Play the sound."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
                 } },
             rets = {}
         }, {
             _kind = "function",
-            _name = "set_shader",
+            _name = "pause_sound",
             _tags = {
-                d = "Set the custom shader and use it for consequent calls."
+                d = "Pause the sound."
             },
             args = { {
-                    _name = "shader",
+                    _name = "sound",
                     _tags = {
                         nativetype = "udata"
                     },
-                    value = "Shader"
+                    value = "Sound"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "resume_sound",
+            _tags = {
+                d = "Resume the sound."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "stop_sound",
+            _tags = {
+                d = "Stop the sound."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "is_sound_playing",
+            _tags = {
+                d = "Check if the given sound is playing."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "boolean"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_sound_volume",
+            _tags = {
+                d = "Set the volume of the given sound object."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                }, {
+                    _name = "volume",
+                    value = "number"
                 } },
             rets = {}
         }, {
@@ -1487,195 +1290,9 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "set_sound_volume",
+            _name = "get_sound_volume",
             _tags = {
-                d = "Set the volume of the given sound object."
-            },
-            args = { {
-                    _name = "sound",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Sound"
-                }, {
-                    _name = "volume",
-                    value = "number"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_sounddata_pan",
-            _tags = {
-                d = "Set the pan of the given sounddata object."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                }, {
-                    _name = "pan",
-                    value = "number"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_sounddata_pitch",
-            _tags = {
-                d = "Set the pitch of the given sounddata object."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                }, {
-                    _name = "pitch",
-                    value = "number"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_sounddata_volume",
-            _tags = {
-                d = "Set the volume of the given sounddata object."
-            },
-            args = { {
-                    _name = "sounddata",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "SoundData"
-                }, {
-                    _name = "volume",
-                    _tags = {
-                        range = { 0, 1 }
-                    },
-                    value = "number"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_icon",
-            _tags = {
-                d = "Set the window icon."
-            },
-            args = { {
-                    _name = "icon_path",
-                    value = "string"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_margins",
-            _tags = {
-                d = "Set the window margins. Margins are ignored and no drawing can be made there.."
-            },
-            args = { {
-                    _name = "left",
-                    value = "integer"
-                }, {
-                    _name = "right",
-                    value = "integer"
-                }, {
-                    _name = "top",
-                    value = "integer"
-                }, {
-                    _name = "bottom",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_minsize",
-            _tags = {
-                d = "Set the window's minimum possible size."
-            },
-            args = { {
-                    _name = "width",
-                    value = "integer"
-                }, {
-                    _name = "height",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_paddings",
-            _tags = {
-                d = "Set the window paddings. Paddings are can be drawn on."
-            },
-            args = { {
-                    _name = "left",
-                    value = "integer"
-                }, {
-                    _name = "right",
-                    value = "integer"
-                }, {
-                    _name = "top",
-                    value = "integer"
-                }, {
-                    _name = "bottom",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_size",
-            _tags = {
-                d = "Set the window's size."
-            },
-            args = { {
-                    _name = "width",
-                    value = "integer"
-                }, {
-                    _name = "height",
-                    value = "integer"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_title",
-            _tags = {
-                d = "Set the window's title."
-            },
-            args = { {
-                    _name = "title",
-                    value = "string"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "set_window_vsync",
-            _tags = {
-                d = "Set the window vsync flag to the given value."
-            },
-            args = { {
-                    _name = "vsync",
-                    value = "boolean"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "stop_music",
-            _tags = {
-                d = "Stop the music."
-            },
-            args = { {
-                    _name = "music",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Music"
-                } },
-            rets = {}
-        }, {
-            _kind = "function",
-            _name = "stop_sound",
-            _tags = {
-                d = "Stop the sound."
+                d = "Get the volume of the given sound object."
             },
             args = { {
                     _name = "sound",
@@ -1684,6 +1301,109 @@
                     },
                     value = "Sound"
                 } },
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_sound_pan",
+            _tags = {
+                d = "Get the pan of the given sound object."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "get_sound_pitch",
+            _tags = {
+                d = "Get the pitch of the given sound object."
+            },
+            args = { {
+                    _name = "sound",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Sound"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "number"
+                } }
+        }, {
+            _kind = "function",
+            _name = "load_file",
+            _tags = {
+                d = "Load the file in the path."
+            },
+            args = { {
+                    _name = "file_path",
+                    value = "string"
+                } },
+            rets = { {
+                    _name = "val",
+                    value = "string"
+                } }
+        }, {
+            _kind = "function",
+            _name = "save_file_write",
+            _tags = {
+                d = "Append the data to the file in the path. Override if the file exists. Create if it doesn't exist."
+            },
+            args = { {
+                    _name = "file_path",
+                    value = "string"
+                }, {
+                    _name = "data",
+                    value = "string"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "save_file_append",
+            _tags = {
+                d = "Append the data to the file in the path. Append at the end if the file exists. Create if it doesn't exist."
+            },
+            args = { {
+                    _name = "file_path",
+                    value = "string"
+                }, {
+                    _name = "data",
+                    value = "string"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "push_matrix",
+            _tags = {
+                d = "Push the transform matrix."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "pop_matrix",
+            _tags = {
+                d = "Pop the transform matrix."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_matrix",
+            _tags = {
+                d = "Reset the transformation matrix (load identity matrix.)"
+            },
+            args = {},
             rets = {}
         }, {
             _kind = "function",
@@ -1697,6 +1417,207 @@
                 }, {
                     _name = "delta_y",
                     value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "rotate",
+            _tags = {
+                d = "Apply rotation (changes transform matrix.)"
+            },
+            args = { {
+                    _name = "angle",
+                    value = "number"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "rotate_at",
+            _tags = {
+                d = "Apply rotation at the given location (changes transform matrix.)"
+            },
+            args = { {
+                    _name = "angle",
+                    value = "number"
+                }, {
+                    _name = "x",
+                    value = "integer"
+                }, {
+                    _name = "y",
+                    value = "integer"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "scale",
+            _tags = {
+                d = "Apply scaling (changes transform matrix.)"
+            },
+            args = { {
+                    _name = "scale_x",
+                    value = "number"
+                }, {
+                    _name = "scale_y",
+                    value = "number"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "scale_at",
+            _tags = {
+                d = "Apply scaling at the given location (changes transform matrix.)"
+            },
+            args = { {
+                    _name = "scale_x",
+                    value = "integer"
+                }, {
+                    _name = "scale_y",
+                    value = "integer"
+                }, {
+                    _name = "x",
+                    value = "number"
+                }, {
+                    _name = "y",
+                    value = "number"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_default_blendmode",
+            _tags = {
+                d = "Set the default blendmode."
+            },
+            args = { {
+                    _name = "blendmode",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "BlendMode"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_blendmode",
+            _tags = {
+                d = "Set the effective blendmode."
+            },
+            args = { {
+                    _name = "blendmode",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "BlendMode"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_blendmode",
+            _tags = {
+                d = "Reset the blendmode value to its default value."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_default_filtermode",
+            _tags = {
+                d = "Set the default filtermode."
+            },
+            args = { {
+                    _name = "filtermode",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "FilterMode"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "set_filtermode",
+            _tags = {
+                d = "Set the effective filtermode."
+            },
+            args = { {
+                    _name = "filtermode",
+                    _tags = {
+                        nativetype = "enumstring"
+                    },
+                    value = "FilterMode"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_filtermode",
+            _tags = {
+                d = "Reset the filtermode value to its default value."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "new_shader",
+            _tags = {
+                c_api_skip = true,
+                ctor = true,
+                d = "Create a shader with given specification."
+            },
+            args = { {
+                    _name = "shaderdef",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "ShaderDef"
+                } },
+            rets = { {
+                    _name = "val",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Shader"
+                } }
+        }, {
+            _kind = "function",
+            _name = "set_shader",
+            _tags = {
+                d = "Set the custom shader and use it for consequent calls."
+            },
+            args = { {
+                    _name = "shader",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Shader"
+                } },
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "reset_shader",
+            _tags = {
+                d = "Reset the shader, back to framework defaults."
+            },
+            args = {},
+            rets = {}
+        }, {
+            _kind = "function",
+            _name = "send_shader_uniform",
+            _tags = {
+                d = "Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."
+            },
+            args = { {
+                    _name = "shader",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Shader"
+                }, {
+                    _name = "uniform_name",
+                    value = "string"
+                }, {
+                    _name = "uniform_value",
+                    _tags = {
+                        nativetype = "union"
+                    },
+                    value = "ShaderUniformValue"
                 } },
             rets = {}
         }, {
@@ -1791,159 +1712,6 @@
                         nativetype = "udata"
                     },
                     value = "Shader"
-                } }
-        }, {
-            _kind = "function",
-            _name = "send_shader_uniform",
-            _tags = {
-                d = "Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."
-            },
-            args = { {
-                    _name = "shader",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Shader"
-                }, {
-                    _name = "uniform_name",
-                    value = "string"
-                }, {
-                    _name = "uniform_value",
-                    _tags = {
-                        nativetype = "union"
-                    },
-                    value = "ShaderUniformValue"
-                } },
-            rets = {}
-        }, {
-            _kind = "oneof",
-            _name = "ShaderUniformValue",
-            options = { {
-                    _kind = "option",
-                    value = "float"
-                }, {
-                    _kind = "option",
-                    value = {
-                        _kind = "list",
-                        _tags = {
-                            max_count = 4
-                        },
-                        value = "float"
-                    }
-                }, {
-                    _kind = "option",
-                    _tags = {
-                        nativetype = "udata"
-                    },
-                    value = "Image"
-                } }
-        }, {
-            _kind = "record",
-            _name = "ShaderBuilder",
-            _tags = {
-                d = "ShaderBuilder type"
-            },
-            items = { {
-                    _kind = "method",
-                    _name = "uniform",
-                    _tags = {
-                        map_to = "shaderbuilder_uniform"
-                    },
-                    args = { {
-                            _name = "uniform_name",
-                            value = "string"
-                        }, {
-                            _name = "uniform_type",
-                            _tags = {
-                                nativetype = "enumstring"
-                            },
-                            value = "UniformType"
-                        } },
-                    rets = {}
-                }, {
-                    _kind = "method",
-                    _name = "vertex",
-                    _tags = {
-                        map_to = "shaderbuilder_vertex"
-                    },
-                    args = { {
-                            _name = "vertex_code",
-                            value = "string"
-                        } },
-                    rets = {}
-                }, {
-                    _kind = "method",
-                    _name = "fragment",
-                    _tags = {
-                        map_to = "shaderbuilder_fragment"
-                    },
-                    args = { {
-                            _name = "fragment_code",
-                            value = "string"
-                        } },
-                    rets = {}
-                }, {
-                    _kind = "method",
-                    _name = "build",
-                    _tags = {
-                        map_to = "shaderbuilder_build"
-                    },
-                    args = {},
-                    rets = { {
-                            _name = "shader",
-                            _tags = {
-                                nativetype = "udata"
-                            },
-                            value = "Shader"
-                        } }
-                } }
-        }, {
-            _kind = "record",
-            _name = "ShaderDef",
-            _tags = {
-                c_api_skip = true,
-                d = "Shader definition: uniforms declaration, vertex and fragment shader code."
-            },
-            items = { {
-                    _kind = "prop",
-                    _name = "frag",
-                    value = "string"
-                }, {
-                    _kind = "prop",
-                    _name = "vert",
-                    value = "string"
-                }, {
-                    _kind = "prop",
-                    _name = "uniforms",
-                    value = {
-                        _kind = "dict",
-                        dict_key = "string",
-                        dict_value = "UniformType"
-                    }
-                } }
-        }, {
-            _kind = "record",
-            _name = "Shader",
-            _tags = {
-                d = "Shader type"
-            },
-            items = { {
-                    _kind = "method",
-                    _name = "send",
-                    _tags = {
-                        map_to = "send_shader_uniform"
-                    },
-                    args = { {
-                            _name = "uniform_name",
-                            value = "string"
-                        }, {
-                            _name = "uniform_value",
-                            _tags = {
-                                nativetype = "union"
-                            },
-                            value = "ShaderUniformValue"
-                        } },
-                    rets = {}
                 } }
         }, {
             _kind = "record",
@@ -2107,6 +1875,26 @@
                     value = "number"
                 }, {
                     _kind = "method",
+                    _name = "clone",
+                    _tags = {
+                        map_to = "clone_sound"
+                    },
+                    args = { {
+                            _name = "orig",
+                            _tags = {
+                                nativetype = "udata"
+                            },
+                            value = "Sound"
+                        } },
+                    rets = { {
+                            _name = "val",
+                            _tags = {
+                                nativetype = "udata"
+                            },
+                            value = "Sound"
+                        } }
+                }, {
+                    _kind = "method",
                     _name = "pause",
                     _tags = {
                         map_to = "pause_sound"
@@ -2139,35 +1927,134 @@
                     rets = {}
                 } }
         }, {
+            _kind = "oneof",
+            _name = "ShaderUniformValue",
+            options = { {
+                    _kind = "option",
+                    value = "float"
+                }, {
+                    _kind = "option",
+                    value = {
+                        _kind = "list",
+                        _tags = {
+                            max_count = 4
+                        },
+                        value = "float"
+                    }
+                }, {
+                    _kind = "option",
+                    _tags = {
+                        nativetype = "udata"
+                    },
+                    value = "Image"
+                } }
+        }, {
             _kind = "record",
-            _name = "SoundData",
+            _name = "Shader",
             _tags = {
-                d = "SoundData type."
+                d = "Shader type"
+            },
+            items = { {
+                    _kind = "method",
+                    _name = "send",
+                    _tags = {
+                        map_to = "send_shader_uniform"
+                    },
+                    args = { {
+                            _name = "uniform_name",
+                            value = "string"
+                        }, {
+                            _name = "uniform_value",
+                            _tags = {
+                                nativetype = "union"
+                            },
+                            value = "ShaderUniformValue"
+                        } },
+                    rets = {}
+                } }
+        }, {
+            _kind = "record",
+            _name = "ShaderDef",
+            _tags = {
+                c_api_skip = true,
+                d = "Shader definition: uniforms declaration, vertex and fragment shader code."
             },
             items = { {
                     _kind = "prop",
-                    _name = "pan",
-                    _tags = {
-                        map_read = "get_sounddata_pan",
-                        map_write = "set_sounddata_pan"
-                    },
-                    value = "number"
+                    _name = "frag",
+                    value = "string"
                 }, {
                     _kind = "prop",
-                    _name = "pitch",
-                    _tags = {
-                        map_read = "get_sounddata_pitch",
-                        map_write = "set_sounddata_pitch"
-                    },
-                    value = "number"
+                    _name = "vert",
+                    value = "string"
                 }, {
                     _kind = "prop",
-                    _name = "volume",
+                    _name = "uniforms",
+                    value = {
+                        _kind = "dict",
+                        dict_key = "string",
+                        dict_value = "UniformType"
+                    }
+                } }
+        }, {
+            _kind = "record",
+            _name = "ShaderBuilder",
+            _tags = {
+                d = "ShaderBuilder type"
+            },
+            items = { {
+                    _kind = "method",
+                    _name = "uniform",
                     _tags = {
-                        map_read = "get_sounddata_volume",
-                        map_write = "set_sounddata_volume"
+                        map_to = "shaderbuilder_uniform"
                     },
-                    value = "number"
+                    args = { {
+                            _name = "uniform_name",
+                            value = "string"
+                        }, {
+                            _name = "uniform_type",
+                            _tags = {
+                                nativetype = "enumstring"
+                            },
+                            value = "UniformType"
+                        } },
+                    rets = {}
+                }, {
+                    _kind = "method",
+                    _name = "vertex",
+                    _tags = {
+                        map_to = "shaderbuilder_vertex"
+                    },
+                    args = { {
+                            _name = "vertex_code",
+                            value = "string"
+                        } },
+                    rets = {}
+                }, {
+                    _kind = "method",
+                    _name = "fragment",
+                    _tags = {
+                        map_to = "shaderbuilder_fragment"
+                    },
+                    args = { {
+                            _name = "fragment_code",
+                            value = "string"
+                        } },
+                    rets = {}
+                }, {
+                    _kind = "method",
+                    _name = "build",
+                    _tags = {
+                        map_to = "shaderbuilder_build"
+                    },
+                    args = {},
+                    rets = { {
+                            _name = "shader",
+                            _tags = {
+                                nativetype = "udata"
+                            },
+                            value = "Shader"
+                        } }
                 } }
         }, {
             _kind = "enum",

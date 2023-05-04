@@ -58,12 +58,21 @@ int main(void) {
     mg_map_add(&tests, 777, &A);
     printf("C: %zu\n", tests.count);
 
-    // test "iter"
+    // test iter
     for (int i=0; i<tests.count;i++) {
         uint32_t k = 0;
         TestX *t = mg_map_getindex(&tests, i, &k);
         printf("item %d has key %d val--%d--%f\n", i, k, t->x, t->z);
     }
+
+    // test (some) error cases
+    TestX *t1 = mg_map_get(NULL, 10);
+    if (t1 != NULL) { printf("err - get NULL\n"); } else { printf("pass - get NULL\n"); }
+    t1 = mg_map_get(&tests, 0);
+    if (t1 != NULL) { printf("err - get 0 key\n"); } else { printf("pass - get 0 key\n"); }
+    printf("test add NULL map (should be non zero): %d\n", mg_map_add(NULL, 10, &A));
+    printf("test add zero key (should be non zero): %d\n", mg_map_add(&tests, 0, &A));
+    printf("test add NULL object (should be non zero): %d\n", mg_map_add(&tests, 10, NULL));
 
     printf("bye\n");
 }

@@ -9,7 +9,6 @@ local _gtag_run = H.script [[
   gtag('js', new Date());
 
   gtag('config', 'G-ZCQ9FCCMV2');
-
 ]]
 
 local function Layout(title, ...)

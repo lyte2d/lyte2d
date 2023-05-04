@@ -8,7 +8,7 @@ local function Footer()
             MenuLinkExt("web", "https://morew4rd.com"),
             MenuLinkExt("twitter", "https://twitter.com/morew4rd"),
             MenuLinkExt("github", "https://github.com/morew4rd"),
-            MenuLinkExt("itcH.io", "https://morew4rd.itcH.io"),
+            MenuLinkExt("itch.io", "https://morew4rd.itcH.io"),
         }
     }
 end

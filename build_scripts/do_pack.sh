@@ -13,7 +13,7 @@ ZIPDIR=$RELDIR/zip
 ZIPCMD='zip -9 -u -r'
 
 echo
-echo "@@@ PACK SCRIPT"
+echo "@@@ BEGIN: PACK"
 echo "  datetime: " $(date)
 echo
 
@@ -50,6 +50,6 @@ cd ..
 rm -rf $TMPDIR
 
 echo
-echo "@@@ DONE: PACK SCRIPT"
 echo "  datetime: " $(date)
+echo "@@@ DONE: PACK"
 echo

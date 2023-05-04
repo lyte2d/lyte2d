@@ -14,6 +14,8 @@ local function fill_canvas_random()
         lyte.set_color(math.random(), math.random(), math.random(), math.random())
         lyte.draw_rect(math.random(1,220), math.random(1,220), math.random(5,100), math.random(5,100))
     end
+    lyte.set_color(1,1,0,1)
+    lyte.draw_text("HELLO HAHA", 10, 10)
     lyte.reset_canvas()
 end
 

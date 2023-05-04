@@ -1,7 +1,7 @@
 /* (c) mg */
 
 #include "morebase.h"
-#include "core.h"
+#include "lyte_core.h"
 
 
 #define XLOG
@@ -13,15 +13,16 @@
 #define SGP_TEXTURE_SLOTS 8
 // #define SGP_BATCH_OPTIMIZER_DEPTH 0
 // #define SOKOL_VALIDATE_NON_FATAL
-#define SOKOL_IMPL
+
+// #define SOKOL_IMPL // !!!!!!!moved to core_impls
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
 #include "emsc.h"
-#define SOKOL_GLES3
-#define GLFW_INCLUDE_ES3
-#else
-#define SOKOL_GLCORE33
+// #define SOKOL_GLES3
+// #define GLFW_INCLUDE_ES3
+// #else
+// #define SOKOL_GLCORE33
 #endif
 
 
@@ -40,7 +41,7 @@
 #include <string.h> // memset
 #include <stb_image.h>
 
-#define FONTSTASH_IMPLEMENTATION
+// #define FONTSTASH_IMPLEMENTATION ///  // !!!!!!!moved to core_impls
 #define FONS_USE_FREETYPE
 #if defined(_MSC_VER )
 #pragma warning(disable:4996)   // strncpy use in fontstash.h
@@ -50,7 +51,7 @@
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
-#include <fontstash.h>
+#include "fontstash.h"
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
@@ -216,7 +217,7 @@ static struct {
 static void audio_init() {
     InitAudioDevice();
     if (!IsAudioDeviceReady()) {
-        ASSERT(false);
+        // ASSERT(false);
     } else {
         M_app_setmastervolume(0.7);
 
@@ -250,7 +251,7 @@ static void audio_cleanup() {
 }
 
 static void audio_add_musicinfo(struct MusicInfo info) {
-    ASSERT_(_audio->next_musicinfo_index < _audio->num_musicinfo_items, "Too many music files!");
+    // ASSERT_(_audio->next_musicinfo_index < _audio->num_musicinfo_items, "Too many music files!");
     _audio->music_items[_audio->next_musicinfo_index++] = info;
 }
 
@@ -267,7 +268,7 @@ static struct MusicInfo *audio_find_musicinfo(uint32_t id) {
 }
 
 static void audio_add_sounddatainfo(struct SoundInfo info) {
-    ASSERT_(_audio->next_soundinfo_index < _audio->num_soundinfo_items, "Too many sound files!");
+    // ASSERT_(_audio->next_soundinfo_index < _audio->num_soundinfo_items, "Too many sound files!");
     _audio->sound_items[_audio->next_soundinfo_index++] = info;
 }
 
@@ -325,7 +326,7 @@ M_SoundData M_newsounddata_load(const char *path) {
     uint8_t *data = malloc(data_size);
     memset(data, 0, data_size);
     size_t read_size  = M_path_readbytes(path, data, data_size);
-    ASSERT_(data_size == read_size, "sound loading: readbytes. read size doesn't match file size.");
+    // ASSERT_(data_size == read_size, "sound loading: readbytes. read size doesn't match file size.");
     const char *format = audio_getfiletypewithdot(path);
     Wave wave =  LoadWaveFromMemory(format, data, data_size);
     sndinfo.data = data;
@@ -415,7 +416,7 @@ M_Sound M_newsound(M_SoundData sounddata) {
         SetSoundPitch(chinfo->sound, chinfo->pitch);
         chinfo->in_use = true;
     } else {
-        ASSERT(false);
+        // ASSERT(false);
     }
     M_Sound ch = (M_Sound){
         .data_id = info->id,
@@ -473,7 +474,7 @@ void M_sound_play(M_Sound sound) {
     if (chinfo->in_use) {
         PlaySound(chinfo->sound);
     } else {
-        ASSERT(false);
+        // ASSERT(false);
     }
 }
 
@@ -519,7 +520,7 @@ M_Music M_newmusic_load(const char *path) {
     size_t data_size = stat.filesize; // TODO same logic for image and font loading too. should be an api so that while using readbytes one can know what to send
     uint8_t *data = malloc(data_size);
     size_t read_size  = M_path_readbytes(path, data, data_size);
-    ASSERT_(data_size == read_size, "music loading: readbytes. read size doesn't match file size.");
+    // ASSERT_(data_size == read_size, "music loading: readbytes. read size doesn't match file size.");
     const char *format = audio_getfiletypewithdot(path);
     Music rm =  LoadMusicStreamFromMemory(format, data, data_size);
     // memset(data, 0, data_size); // rayaudio does NOT copy
@@ -582,7 +583,7 @@ void M_music_set_pitch(M_Music music,float pitch) {
 
 void M_music_play(M_Music music) {
     struct MusicInfo *info = audio_find_musicinfo(music.id);
-    ASSERT(info);
+    // ASSERT(info);
     info = info;
     PlayMusicStream(info->music);
 }
@@ -678,7 +679,7 @@ static struct FontInfo *font_find_fontinfo(uint32_t id) {
 }
 
 static void font_add_fontinfo(struct FontInfo info) {
-    ASSERT_(_fontdata->next_fontinfo_index < _fontdata->num_fontinfos,"Too many font files!");
+    // ASSERT_(_fontdata->next_fontinfo_index < _fontdata->num_fontinfos,"Too many font files!");
     _fontdata->font_items[_fontdata->next_fontinfo_index++] = info;
 }
 
@@ -815,8 +816,10 @@ M_Font M_newfont_load(const char *path, float fntsize) {
     size_t data_size = stat.filesize; // TODO same logic for image and font loading too. should be an api so that while using readbytes one can know what to send
     uint8_t *buf = malloc(data_size);
     int actual_size = M_path_readbytes(path, buf, data_size);
-    ASSERT_(data_size==actual_size, "font file load issue");
-    info.font = fonsAddFontMem(info.fons, "sans", (void*)buf, (int)actual_size,  true);
+    // ASSERT_(data_size==actual_size, "font file load issue");
+
+    // COMMENTED OUT TO COMPILE -- functionality now in core_font
+    // info.font = fonsAddFontMem(info.fons, "sans", (void*)buf, (int)actual_size,  true);
 
     font_add_fontinfo(info);
 
@@ -826,9 +829,10 @@ M_Font M_newfont_load(const char *path, float fntsize) {
 
 void M_font_cleanup(M_Font font) {
     struct FontInfo *inf = font_find_fontinfo(font.id);
-    if (inf->fons->atlas) {
-        fons_destroy(inf->fons);
-    }
+    // enable these lines in core_font!
+    // if (inf->fons->atlas) {
+    //     fons_destroy(inf->fons);
+    // }
     font.id = 0;
 }
 
@@ -970,7 +974,7 @@ static void _filesystem_add_zippath_async_callback(const sfetch_response_t* resp
         sfetch_range_t range = response->data;
 
         int idx = _filesystem_find_index_phys_path(response->path);
-        ASSERT_(idx>=0, "NOT FOUND.. internal issue?");
+        // ASSERT_(idx>=0, "NOT FOUND.. internal issue?");
 
         _fs->path_info[idx].buffer_size = response->data.size;
         // realloc?
@@ -2236,13 +2240,13 @@ static inline void _tick_input_next() {
         int count;
         const float* axes = glfwGetJoystickAxes(i, &count);
         // printf("Num gamepad axes: Count: %d", count);
-        ASSERT_(count <= M_NUM_GAMEPADAXISES, "Too many gamepad axes. Possibly internal error.");
+        // ASSERT_(count <= M_NUM_GAMEPADAXISES, "Too many gamepad axes. Possibly internal error.");
         for (int a=0; a<count; a++) {
             _input->gamepad_states_cur[i].axes[a] = axes[a];
         }
         const unsigned char* buttons = glfwGetJoystickButtons(i, &count);
         // printf("Num gamepad buttons: Count: %d", count);
-        ASSERT_(count <= M_NUM_GAMEPADBUTTONS*2, "Too many gamepad buttons. Possibly internal error");
+        // ASSERT_(count <= M_NUM_GAMEPADBUTTONS*2, "Too many gamepad buttons. Possibly internal error");
         for (int a=0; a<count; a++) {
             _input->gamepad_states_cur[i].buttons[a] = buttons[a];
         }
@@ -2383,7 +2387,7 @@ static inline void tick(void) {
         // PERF_BEGIN();
         // PERF_BEGIN();
         audio_dowork();
-        lyte_audio_update_music_streams(); // new "dowork"
+        lyte_core_audio_update_music_streams(); // new "dowork"
         // PERF_END("audio");
         // PERF_BEGIN();
         sfetch_dowork();
@@ -2415,7 +2419,7 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     } else if (action == GLFW_RELEASE) {
         _input->mousebuttons_cur[button] = false;
     } else {
-        ASSERT(false);
+        // ASSERT(false);
     }
 }
 
@@ -2454,7 +2458,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         } else if (action == GLFW_REPEAT) {
             _input->keys_rep[key] = true;
         } else {
-            ASSERT(false);
+            // ASSERT(false);
         }
     }
 }
@@ -2508,6 +2512,8 @@ int M_app_init(M_Config *config) {
     lyte_core_image_init();
     lyte_core_audio_init();
     lyte_core_font_init();
+
+    lyte_core_state_init(config->vsync, config->defaultblendmode, config->defaultfiltermode);
 
     _lib->vsync = config->vsync;
 
@@ -2599,7 +2605,8 @@ int M_app_init_graphics(M_Config *config) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
+    // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 #if defined(__EMSCRIPTEN__)
     _lib->window = glfwCreateWindow(emsc_width(), emsc_height(), config->title, NULL, NULL);
     emscripten_set_window_title(config->title);
@@ -2694,6 +2701,11 @@ void M_app_startloop(M_TickFunc tick_fn, void *app_data) {
 }
 
 void M_app_cleanup() {
+
+    lyte_core_image_cleanup();
+    lyte_core_audio_cleanup();
+    lyte_core_font_cleanup();
+
     // internal cleanups
     sfetch_shutdown();
     PHYSFS_deinit();

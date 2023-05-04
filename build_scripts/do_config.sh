@@ -6,10 +6,9 @@ SOURCEDIR=$CURRDIR
 BUILDDIR=$CURRDIR/out/docker
 
 echo
-echo "@@@ CONFIG SCRIPT"
+echo "@@@ BEGIN: CONFIG"
 echo "  datetime: " $(date)
 echo
-
 echo "  currentdir: " $CURRDIR
 echo "  sourcedir: " $SOURCEDIR
 echo "  builddir: " $BUILDDIR
@@ -31,9 +30,9 @@ echo "---> DONE: LINUX"
 echo "---> CONFIG: WIN (console)"
 cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=$SOURCEDIR/build_scripts/mingw.cmake -S $SOURCEDIR/lyte -B $BUILDDIR/win
 echo "---> DONE: WIN (console)"
-echo "@@@ CONFIG SCRIPT"
+echo
 
 echo
-echo "@@@ DONE: CONFIG SCRIPT"
 echo "  datetime: " $(date)
+echo "@@@ DONE: CONFIG"
 echo

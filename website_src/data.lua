@@ -1,3 +1,5 @@
+-- This script collects the information about Lyte2D samples
+
 local Data = {}
 
 Data.apitxt = "API description not found."
@@ -29,6 +31,5 @@ do
         end
     end
 end
-
 
 return Data

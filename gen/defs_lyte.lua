@@ -33,12 +33,49 @@ return Namespace("lyte", {
         Arg("window_resized", Boolean(), {optional=true, default=false}),
     }, nil, {d="Tick function. Should be created by the user.", c_api_skip=true}),
 
+    Function("quit", nil, nil, {d="Quit the application by closing the window."}),
+
     Function("cls", {
         Arg("r", Number()),
         Arg("g", Number()),
         Arg("b", Number()),
         Arg("a", Number()),
     }, nil, {d="Clear the screen or current canvas if one is used."}),
+
+    Function("set_color", {
+        Arg("r", Number()),
+        Arg("g", Number()),
+        Arg("b", Number()),
+        Arg("a", Number()),
+    }, nil, {d="Set the foreground color to be used in the drawing operations."}),
+
+    Function("reset_color", nil, nil, {d="Reset the color to its default value."}),
+
+    Function("draw_point", {
+        Arg("x", Integer()),
+        Arg("y", Integer()),
+    }, nil, {d="Draw a point."}),
+
+    Function("draw_line", {
+        Arg("x1", Integer()),
+        Arg("y1", Integer()),
+        Arg("x2", Integer()),
+        Arg("y2", Integer()),
+    }, nil, {d="Draw a line"}),
+
+    Function("draw_rect", {
+        Arg("dest_x", Integer()),
+        Arg("dest_y", Integer()),
+        Arg("rect_width", Integer()),
+        Arg("rect_height", Integer()),
+    }, nil, {d="Draw a filled rectangle."}),
+
+    Function("draw_rect_line", {
+        Arg("dest_x", Integer()),
+        Arg("dest_y", Integer()),
+        Arg("rect_width", Integer()),
+        Arg("rect_height", Integer()),
+    }, nil, {d="Draw a rectangle border."}),
 
     Function("draw_circle", {
         Arg("dest_x", Integer()),
@@ -51,6 +88,12 @@ return Namespace("lyte", {
         Arg("dest_y", Integer()),
         Arg("radius", Integer()),
     }, nil, {d="Draw a circle border."}),
+
+    Function("load_image", {
+        Arg("image_path", String()),
+    },{
+        Ret("val", Type("Image"), {nativetype="udata"}),
+    }, {d="Load the image specified in the path.", ctor=true}),
 
     Function("draw_image", {
         Arg("image", Type("Image"), {nativetype="udata"}),
@@ -68,132 +111,55 @@ return Namespace("lyte", {
         Arg("rect_height", Integer()),
     }, nil, {d="Draw a rectangular area from the image."}),
 
-    Function("draw_line", {
-        Arg("x1", Integer()),
-        Arg("y1", Integer()),
-        Arg("x2", Integer()),
-        Arg("y2", Integer()),
-    }, nil, {d="Draw a line"}),
+    Function("get_image_width", {
+        Arg("image", Type("Image"), {nativetype="udata"}),
+    }, {
+        Ret("val", Integer()),
+    }, {d="Get the width of the image."}),
 
-    Function("draw_point", {
-        Arg("x", Integer()),
-        Arg("y", Integer()),
-    }, nil, {d="Draw a point."}),
+    Function("get_image_height",  {
+        Arg("image", Type("Image"), {nativetype="udata"}),
+    }, {
+        Ret("val", Integer()),
+    }, {d="Get the height of the image."}),
 
-    Function("draw_rect", {
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("rect_width", Integer()),
-        Arg("rect_height", Integer()),
-    }, nil, {d="Draw a filled rectangle."}),
+    Function("new_canvas", {
+        Arg("width", Integer()),
+        Arg("height", Integer()),
+    },{
+        Ret("val", Type("Image"), {nativetype="udata"}),
+    }, {d="Create a canvas image with given width and height.", ctor=true}),
 
-    Function("draw_rect_line", {
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("rect_width", Integer()),
-        Arg("rect_height", Integer()),
-    }, nil, {d="Draw a rectangle border."}),
+    Function("set_canvas", {
+        Arg("canvas_image", Type("Image"), {nativetype="udata", save_to_registry=true}),
+    }, nil, {d="Set the effective canvas image. All draw operations will go to this canvas until it's reset."}),
+
+    Function("reset_canvas", nil, nil, {d="Reset the drawing target, back to screen."}),
+
+    Function("is_image_canvas",  {
+        Arg("image", Type("Image"), {nativetype="udata"}),
+    }, {
+        Ret("val", Boolean()),
+    }, {d="Check if the image was created as a canvas."}),
+
+    Function("load_font", {
+        Arg("font_path", String()),
+        Arg("size", Number()),
+    },{
+        Ret("val", Type("Font"), {nativetype="udata"}),
+    }, {d="Load the font specified in the path, and set the initial size.", ctor=true}),
+
+    Function("set_font", {
+        Arg("font", Type("Font"), {nativetype="udata", save_to_registry=true}),
+    }, nil, {d="Set the effective font to be used in the drawing operations."}),
+
+    Function("reset_font", nil, nil, {d="Reset the font to its default value.", c_api_skip=true}),
 
     Function("draw_text", {
         Arg("text", String()),
         Arg("dest_x", Integer()),
         Arg("dest_y", Integer()),
     }, nil, {d="Draw a text line."}),
-
-    Function("get_gamepad_axis", {
-        Arg("index", Integer()),
-        Arg("gamepad_axis", Type("GamepadAxis"), {nativetype="enumstring"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the given axis of the gamepad at the given index."}),
-
-    Function("get_gamepad_count", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the number of gamepads."}),
-
-    Function("get_gamepad_name", {
-        Arg("index", Integer()),
-    }, {
-        Ret("val", String()),
-    }, {d="Get the name of the gamepad at the given index."}),
-
-    Function("get_mastervolume", nil, {
-        Ret("val", Number()),
-    }, {d="Get the master volume."}),
-
-    Function("get_mouse_x", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the mouse x position."}),
-
-    Function("get_mouse_y", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the mouse y position."}),
-
-    Function("get_music_length", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the length of the given music object in seconds."}),
-
-    Function("get_music_length_played", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the already played length of the given music object in seconds."}),
-
-    Function("get_music_pan", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pan of the given music object."}),
-
-    Function("get_music_pitch", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pitch of the given music object."}),
-
-    Function("get_music_volume", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the volume of the given music object."}),
-
-    Function("get_sound_pan", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pan of the given sound object."}),
-
-    Function("get_sound_pitch", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pitch of the given sound object."}),
-
-    Function("get_sound_volume", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the volume of the given sound object."}),
-
-    Function("get_sounddata_pan", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pan of the given sounddata object."}),
-
-    Function("get_sounddata_pitch", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pitch of the given sounddata object."}),
-
-    Function("get_sounddata_volume", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the volume of the given sounddata object."}),
 
     Function("get_text_width", {
         Arg("text", String()),
@@ -207,6 +173,16 @@ return Namespace("lyte", {
         Ret("val", Integer()),
     }, {d="Get the height of the given text line."}),
 
+    Function("set_window_minsize", {
+        Arg("width", Integer()),
+        Arg("height", Integer()),
+    }, nil, {d="Set the window's minimum possible size."}),
+
+    Function("set_window_size", {
+        Arg("width", Integer()),
+        Arg("height", Integer()),
+    }, nil, {d="Set the window's size."}),
+
     Function("get_window_width", nil, {
         Ret("val", Integer()),
     }, {d="Get the width of the window."}),
@@ -215,61 +191,43 @@ return Namespace("lyte", {
         Ret("val", Integer()),
     }, {d="Get the height of the window."}),
 
-    Function("get_image_width", {
-        Arg("image", Type("Image"), {nativetype="udata"}),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the width of the image."}),
-
-    Function("get_image_height",  {
-        Arg("image", Type("Image"), {nativetype="udata"}),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the height of the image."}),
-
-    -- Function("get_canvas_width", {
-    --     Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    -- }, {
-    --     Ret("val", Integer()),
-    -- }, {d="Get the width of the canvase"}),
-
-    -- Function("get_canvas_height", {
-    --     Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    -- }, {
-    --     Ret("val", Integer()),
-    -- }, {d="Get the height of the canvas."}),
-
-    -- Function("get_canvas_image", {
-    --     Arg("canvas", Type("Canvas"), {nativetype="udata"}),
-    -- }, {
-    --     Ret("val", Type("Image")),
-    -- }, {d="Get the current attached image object of the canvas."}),
-
+    Function("set_fullscreen", {
+        Arg("fullscreen", Boolean()),
+    }, nil, {d="Set the window to fullscreen, or windowed mode."}),
 
     Function("is_fullscreen", nil, {
         Ret("val", Boolean()),
     }, {d="Check if the window is set to fullscreen."}),
 
-    Function("is_gamepad_down", {
-        Arg("index", Integer()),
-        Arg("gamepad_button", Type("GamepadButton"), {nativetype="enumstring"}),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given button of the gamepad at the given index is down."}),
+    Function("set_window_title", {
+        Arg("title", String()),
+    }, nil, {d="Set the window's title."}),
 
-    Function("is_gamepad_pressed", {
-        Arg("index", Integer()),
-        Arg("gamepad_button", Type("GamepadButton"), {nativetype="enumstring"}),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given button of the gamepad at the given index is pressed."}),
+    Function("set_window_vsync", {
+        Arg("vsync", Boolean()),
+    }, nil, {d="Set the window vsync flag to the given value."}),
 
-    Function("is_gamepad_released", {
-        Arg("index", Integer()),
-        Arg("gamepad_button", Type("GamepadButton"), {nativetype="enumstring"}),
-    }, {
+    Function("is_window_vsync", nil , {
         Ret("val", Boolean()),
-    }, {d="Check if the given button of the gamepad at the given index is released."}),
+    }, {d="Check if the window vsync flag is set."}),
+
+    Function("set_window_icon", {
+        Arg("icon_path", String()),
+    }, nil, {d="Set the window icon."}),
+
+    Function("set_window_margins", {
+        Arg("left", Integer()),
+        Arg("right", Integer()),
+        Arg("top", Integer()),
+        Arg("bottom", Integer()),
+    }, nil, {d="Set the window margins. Margins are ignored and no drawing can be made there.."}),
+
+    Function("set_window_paddings", {
+        Arg("left", Integer()),
+        Arg("right", Integer()),
+        Arg("top", Integer()),
+        Arg("bottom", Integer()),
+    }, nil, {d="Set the window paddings. Paddings are can be drawn on."}),
 
     Function("is_key_down", {
         Arg("key", Type("KeyboardKey"), {nativetype="enumstring"}),
@@ -313,11 +271,165 @@ return Namespace("lyte", {
         Ret("val", Boolean()),
     }, {d="Check if the given mouse button is released."}),
 
+    Function("get_mouse_x", nil, {
+        Ret("val", Integer()),
+    }, {d="Get the mouse x position."}),
+
+    Function("get_mouse_y", nil, {
+        Ret("val", Integer()),
+    }, {d="Get the mouse y position."}),
+
+    Function("get_gamepad_count", nil, {
+        Ret("val", Integer()),
+    }, {d="Get the number of gamepads."}),
+
+    Function("get_gamepad_name", {
+        Arg("index", Integer()),
+    }, {
+        Ret("val", String()),
+    }, {d="Get the name of the gamepad at the given index."}),
+
+    Function("is_gamepad_down", {
+        Arg("index", Integer()),
+        Arg("gamepad_button", Type("GamepadButton"), {nativetype="enumstring"}),
+    }, {
+        Ret("val", Boolean()),
+    }, {d="Check if the given button of the gamepad at the given index is down."}),
+
+    Function("is_gamepad_pressed", {
+        Arg("index", Integer()),
+        Arg("gamepad_button", Type("GamepadButton"), {nativetype="enumstring"}),
+    }, {
+        Ret("val", Boolean()),
+    }, {d="Check if the given button of the gamepad at the given index is pressed."}),
+
+    Function("is_gamepad_released", {
+        Arg("index", Integer()),
+        Arg("gamepad_button", Type("GamepadButton"), {nativetype="enumstring"}),
+    }, {
+        Ret("val", Boolean()),
+    }, {d="Check if the given button of the gamepad at the given index is released."}),
+
+    Function("get_gamepad_axis", {
+        Arg("index", Integer()),
+        Arg("gamepad_axis", Type("GamepadAxis"), {nativetype="enumstring"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the given axis of the gamepad at the given index."}),
+
+    Function("set_mastervolume", {
+        Arg("mastervolume", Number()),
+    }, nil, {d="Set the master volume."}),
+
+    Function("get_mastervolume", nil, {
+        Ret("val", Number()),
+    }, {d="Get the master volume."}),
+
+    Function("load_music", {
+        Arg("music_path", String()),
+    },{
+        Ret("val", Type("Music"), {nativetype="udata"}),
+    }, {d="Load the music specified in the path.", ctor=true}),
+
+    Function("play_music", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, nil, {d="Play the music."}),
+
+    Function("pause_music", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, nil, {d="Pause the music."}),
+
+    Function("resume_music", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, nil, {d="Resume the music."}),
+
+    Function("stop_music", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, nil, {d="Stop the music."}),
+
     Function("is_music_playing", {
         Arg("music", Type("Music"), {nativetype="udata"}),
     }, {
         Ret("val", Boolean()),
     }, {d="Check if the given music is playing."}),
+
+    Function("get_music_length", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the length of the given music object in seconds."}),
+
+    Function("get_music_length_played", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the already played length of the given music object in seconds."}),
+
+    Function("seek_music", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+        Arg("secs", Number()),
+    }, nil, {d="Move the music time played to the given value."}),
+
+    Function("set_music_volume", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+        Arg("volume", Number()),
+    }, nil, {d="Set the volume of the given music object."}),
+
+    Function("set_music_pan", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+        Arg("pan", Number()),
+    }, nil, {d="Set the pan of the given music object."}),
+
+    Function("set_music_pitch", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+        Arg("pitch", Number()),
+    }, nil, {d="Set the pitch of the given music object."}),
+
+    Function("get_music_volume", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the volume of the given music object."}),
+
+    Function("get_music_pan", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the pan of the given music object."}),
+
+    Function("get_music_pitch", {
+        Arg("music", Type("Music"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the pitch of the given music object."}),
+
+    Function("load_sound", {
+        Arg("sound_path", String()),
+    },{
+        Ret("val", Type("Sound"), {nativetype="udata"}),
+    }, {d="Load the sound specified in the path.", ctor=true}),
+
+    Function("clone_sound", {
+        Arg("orig", Type("Sound"), {nativetype="udata"}),
+    },{
+        Ret("val", Type("Sound"), {nativetype="udata"}),
+    }, {d="Clone the sound specified in the path.", ctor=true}),
+
+    Function("play_sound", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+    }, nil, {d="Play the sound."}),
+
+    Function("pause_sound", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+    }, nil, {d="Pause the sound."}),
+
+    Function("resume_sound", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+    }, nil, {d="Resume the sound."}),
+
+    Function("stop_sound", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+    }, nil, {d="Stop the sound."}),
 
     Function("is_sound_playing", {
         Arg("sound", Type("Sound"), {nativetype="udata"}),
@@ -325,15 +437,38 @@ return Namespace("lyte", {
         Ret("val", Boolean()),
     }, {d="Check if the given sound is playing."}),
 
-    Function("is_window_vsync", nil , {
-        Ret("val", Boolean()),
-    }, {d="Check if the window vsync flag is set."}),
+    Function("set_sound_volume", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+        Arg("volume", Number()),
+    }, nil, {d="Set the volume of the given sound object."}),
 
-    Function("is_image_canvas",  {
-        Arg("image", Type("Image"), {nativetype="udata"}),
+    Function("set_sound_pan", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+        Arg("pan", Number()),
+    }, nil, {d="Set the pan of the given sound object."}),
+
+    Function("set_sound_pitch", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+        Arg("pitch", Number()),
+    }, nil, {d="Set the pitch of the given sound object."}),
+
+    Function("get_sound_volume", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
     }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the image was created as a canvas."}),
+        Ret("val", Number()),
+    }, {d="Get the volume of the given sound object."}),
+
+    Function("get_sound_pan", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the pan of the given sound object."}),
+
+    Function("get_sound_pitch", {
+        Arg("sound", Type("Sound"), {nativetype="udata"}),
+    }, {
+        Ret("val", Number()),
+    }, {d="Get the pitch of the given sound object."}),
 
     Function("load_file", {
         Arg("file_path", String()),
@@ -341,93 +476,26 @@ return Namespace("lyte", {
         Ret("val", String()),
     },{ d="Load the file in the path."}),
 
-    Function("load_font", {
-        Arg("font_path", String()),
-        Arg("size", Number()),
-    },{
-        Ret("val", Type("Font"), {nativetype="udata"}),
-    }, {d="Load the font specified in the path, and set the initial size.", ctor=true}),
+    Function("save_file_write", {
+        Arg("file_path", String()),
+        Arg("data", String()),
+    }, nil, {d="Append the data to the file in the path. Override if the file exists. Create if it doesn't exist."}),
 
-    Function("load_image", {
-        Arg("image_path", String()),
-    },{
-        Ret("val", Type("Image"), {nativetype="udata"}),
-    }, {d="Load the image specified in the path.", ctor=true}),
-
-   Function("load_music", {
-        Arg("music_path", String()),
-    },{
-        Ret("val", Type("Music"), {nativetype="udata"}),
-    }, {d="Load the music specified in the path.", ctor=true}),
-
-   Function("load_sounddata", {
-        Arg("sounddata_path", String()),
-    },{
-        Ret("val", Type("SoundData"), {nativetype="udata"}),
-    }, {d="Load the sounddata specified in the path.", ctor=true}),
-
-    Function("new_canvas", {
-        Arg("width", Integer()),
-        Arg("height", Integer()),
-    },{
-        Ret("val", Type("Image"), {nativetype="udata"}),
-    }, {d="Create a canvas image with given width and height.", ctor=true}),
-
-    Function("new_shader", {
-        Arg("shaderdef", Type("ShaderDef"), {nativetype="udata"}),
-    },{
-        Ret("val", Type("Shader"), {nativetype="udata"}),
-    }, {d="Create a shader with given specification.", ctor=true, c_api_skip=true}),
-
-    Function("new_sound", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-    },{
-        Ret("val", Type("Sound"), {nativetype="udata"}),
-    }, {d="Create a sound from given sounddata.", ctor=true}),
-
-    Function("pause_music", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, nil, {d="Pause the music."}),
-
-    Function("pause_sound", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, nil, {d="Pause the sound."}),
-
-    Function("play_music", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, nil, {d="Play the music."}),
-
-    Function("play_sound", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, nil, {d="Play the sound."}),
-
-    Function("pop_matrix", nil, nil, {d="Pop the transform matrix."}),
+    Function("save_file_append", {
+        Arg("file_path", String()),
+        Arg("data", String()),
+    }, nil, {d="Append the data to the file in the path. Append at the end if the file exists. Create if it doesn't exist."}),
 
     Function("push_matrix", nil, nil, {d="Push the transform matrix."}),
 
-    Function("quit", nil, nil, {d="Quit the application by closing the window."}),
-
-    Function("reset_blendmode", nil, nil, {d="Reset the blendmode value to its default value."}),
-
-    Function("reset_canvas", nil, nil, {d="Reset the drawing target, back to screen."}),
-
-    Function("reset_color", nil, nil, {d="Reset the color to its default value."}),
-
-    Function("reset_filtermode", nil, nil, {d="Reset the filtermode value to its default value."}),
-
-    Function("reset_font", nil, nil, {d="Reset the font to its default value."}),
+    Function("pop_matrix", nil, nil, {d="Pop the transform matrix."}),
 
     Function("reset_matrix", nil, nil, {d="Reset the transformation matrix (load identity matrix.)"}),
 
-    Function("reset_shader", nil, nil, {d="Reset the shader, back to framework defaults."}),
-
-    Function("resume_music", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, nil, {d="Resume the music."}),
-
-    Function("resume_sound", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, nil, {d="Resume the sound."}),
+    Function("translate", {
+        Arg("delta_x", Integer()),
+        Arg("delta_y", Integer()),
+    }, nil, {d="Apply translation (changes transform matrix.)"}),
 
     Function("rotate", {
         Arg("angle", Number()),
@@ -438,16 +506,6 @@ return Namespace("lyte", {
         Arg("x", Integer()),
         Arg("y", Integer()),
     }, nil, {d="Apply rotation at the given location (changes transform matrix.)"}),
-
-    Function("save_file_append", {
-        Arg("file_path", String()),
-        Arg("data", String()),
-    }, nil, {d="Append the data to the file in the path. Append at the end if the file exists. Create if it doesn't exist."}),
-
-    Function("save_file_write", {
-        Arg("file_path", String()),
-        Arg("data", String()),
-    }, nil, {d="Append the data to the file in the path. Override if the file exists. Create if it doesn't exist."}),
 
     Function("scale", {
         Arg("scale_x", Number()),
@@ -461,29 +519,15 @@ return Namespace("lyte", {
         Arg("y", Number()),
     }, nil, {d="Apply scaling at the given location (changes transform matrix.)"}),
 
-    Function("seek_music", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-        Arg("secs", Number()),
-    }, nil, {d="Move the music time played to the given value."}),
+    Function("set_default_blendmode", {
+        Arg("blendmode", Type("BlendMode"), {nativetype="enumstring"}),
+    }, nil, {d="Set the default blendmode."}),
 
     Function("set_blendmode", {
         Arg("blendmode", Type("BlendMode"), {nativetype="enumstring"}),
     }, nil, {d="Set the effective blendmode."}),
 
-    Function("set_canvas", {
-        Arg("canvas_image", Type("Image"), {nativetype="udata"}),
-    }, nil, {d="Set the effective canvas image. All draw operations will go to this canvas until it's reset."}),
-
-    Function("set_color", {
-        Arg("r", Number()),
-        Arg("g", Number()),
-        Arg("b", Number()),
-        Arg("a", Number()),
-    }, nil, {d="Set the foreground color to be used in the drawing operations."}),
-
-    Function("set_default_blendmode", {
-        Arg("blendmode", Type("BlendMode"), {nativetype="enumstring"}),
-    }, nil, {d="Set the default blendmode."}),
+    Function("reset_blendmode", nil, nil, {d="Reset the blendmode value to its default value."}),
 
     Function("set_default_filtermode", {
         Arg("filtermode", Type("FilterMode"), {nativetype="enumstring"}),
@@ -493,115 +537,25 @@ return Namespace("lyte", {
         Arg("filtermode", Type("FilterMode"), {nativetype="enumstring"}),
     }, nil, {d="Set the effective filtermode."}),
 
-    Function("set_font", {
-        Arg("font", Type("Font"), {nativetype="udata"}),
-    }, nil, {d="Set the effective font to be used in the drawing operations."}),
+    Function("reset_filtermode", nil, nil, {d="Reset the filtermode value to its default value."}),
 
-    Function("set_fullscreen", {
-        Arg("fullscreen", Boolean()),
-    }, nil, {d="Set the window to fullscreen, or windowed mode."}),
-
-    Function("set_mastervolume", {
-        Arg("mastervolume", Number()),
-    }, nil, {d="Set the master volume."}),
-
-    Function("set_music_pan", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-        Arg("pan", Number()),
-    }, nil, {d="Set the pan of the given music object."}),
-
-    Function("set_music_pitch", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-        Arg("pitch", Number()),
-    }, nil, {d="Set the pitch of the given music object."}),
-
-    Function("set_music_volume", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-        Arg("volume", Number()),
-    }, nil, {d="Set the volume of the given music object."}),
+    Function("new_shader", {
+        Arg("shaderdef", Type("ShaderDef"), {nativetype="udata"}),
+    },{
+        Ret("val", Type("Shader"), {nativetype="udata"}),
+    }, {d="Create a shader with given specification.", ctor=true, c_api_skip=true}),
 
     Function("set_shader", {
         Arg("shader", Type("Shader"), {nativetype="udata"}),
     }, nil, {d="Set the custom shader and use it for consequent calls."}),
 
-    Function("set_sound_pan", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-        Arg("pan", Number()),
-    }, nil, {d="Set the pan of the given sound object."}),
+    Function("reset_shader", nil, nil, {d="Reset the shader, back to framework defaults."}),
 
-    Function("set_sound_pitch", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-        Arg("pitch", Number()),
-    }, nil, {d="Set the pitch of the given sound object."}),
-
-    Function("set_sound_volume", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-        Arg("volume", Number()),
-    }, nil, {d="Set the volume of the given sound object."}),
-
-    Function("set_sounddata_pan", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-        Arg("pan", Number()),
-    }, nil, {d="Set the pan of the given sounddata object."}),
-
-    Function("set_sounddata_pitch", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-        Arg("pitch", Number()),
-    }, nil, {d="Set the pitch of the given sounddata object."}),
-
-    Function("set_sounddata_volume", {
-        Arg("sounddata", Type("SoundData"), {nativetype="udata"}),
-        Arg("volume", Number(), {range={0,1}}),
-    }, nil, {d="Set the volume of the given sounddata object."}),
-
-    Function("set_window_icon", {
-        Arg("icon_path", String()),
-    }, nil, {d="Set the window icon."}),
-
-    Function("set_window_margins", {
-        Arg("left", Integer()),
-        Arg("right", Integer()),
-        Arg("top", Integer()),
-        Arg("bottom", Integer()),
-    }, nil, {d="Set the window margins. Margins are ignored and no drawing can be made there.."}),
-
-    Function("set_window_minsize", {
-        Arg("width", Integer()),
-        Arg("height", Integer()),
-    }, nil, {d="Set the window's minimum possible size."}),
-
-    Function("set_window_paddings", {
-        Arg("left", Integer()),
-        Arg("right", Integer()),
-        Arg("top", Integer()),
-        Arg("bottom", Integer()),
-    }, nil, {d="Set the window paddings. Paddings are can be drawn on."}),
-
-    Function("set_window_size", {
-        Arg("width", Integer()),
-        Arg("height", Integer()),
-    }, nil, {d="Set the window's size."}),
-
-    Function("set_window_title", {
-        Arg("title", String()),
-    }, nil, {d="Set the window's title."}),
-
-    Function("set_window_vsync", {
-        Arg("vsync", Boolean()),
-    }, nil, {d="Set the window vsync flag to the given value."}),
-
-    Function("stop_music", {
-        Arg("music", Type("Music"), {nativetype="udata"}),
-    }, nil, {d="Stop the music."}),
-
-    Function("stop_sound", {
-        Arg("sound", Type("Sound"), {nativetype="udata"}),
-    }, nil, {d="Stop the sound."}),
-
-    Function("translate", {
-        Arg("delta_x", Integer()),
-        Arg("delta_y", Integer()),
-    }, nil, {d="Apply translation (changes transform matrix.)"}),
+    Function("send_shader_uniform", {
+        Arg("shader", Type("Shader"), {nativetype="udata"}),
+        Arg("uniform_name", String()),
+        Arg("uniform_value", Type("ShaderUniformValue"), {nativetype="union"}),
+    }, nil, {d="Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."}),
 
     Function("new_shaderbuilder", nil, {
         Ret("val", Type("ShaderBuilder"), {nativetype="udata"}),
@@ -629,65 +583,6 @@ return Namespace("lyte", {
         Ret("shader", Type("Shader"), {nativetype="udata"})
     }, {d="Add fragment to the shaderbuilder", ctor="true"}),
 
-
-    -- Function("send_shader_uniforms", {
-    --     Arg("shader", Type("Shader"), {nativetype="udata"}),
-    --     Arg("uniforms", Type("ShaderUniforms"), {nativetype="udata"}),
-    -- }, nil, {d="Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."}),
-
-    Function("send_shader_uniform", {
-        Arg("shader", Type("Shader"), {nativetype="udata"}),
-        Arg("uniform_name", String()),
-        Arg("uniform_value", Type("ShaderUniformValue"), {nativetype="union"}),
-    }, nil, {d="Send the shader specified uniforms. Set value to '0' to delete the specified uniform. Unspecified uniforms are not changed."}),
-
-
-    OneOf("ShaderUniformValue", {
-        Option(Float()),
-        Option(List(Float(), {max_count=4})),
-        Option(Type("Image"), {nativetype="udata"}),
-    }),
-
-    -- Alias("ShaderUniforms", Dict(String(), Type("ShaderUniformValue") , {d="ShaderUniforms record. Table of names mapped to uniform values."})),
-
-    Record("ShaderBuilder", {
-        Method("uniform", {
-            Arg("uniform_name", String()),
-            Arg("uniform_type", Type("UniformType"), {nativetype="enumstring"}),
-        }, nil, {map_to="shaderbuilder_uniform"}),
-        Method("vertex", {
-            Arg("vertex_code", String()),
-        }, nil, {map_to="shaderbuilder_vertex"}),
-        Method("fragment", {
-            Arg("fragment_code", String()),
-        }, nil, {map_to="shaderbuilder_fragment"}),
-        Method("build", nil, {
-            Ret("shader", Type("Shader"), {nativetype="udata"})
-        }, {map_to="shaderbuilder_build"}),
-    }, {d="ShaderBuilder type"}),
-
-    Record("ShaderDef", {
-        Field("frag", String()),
-        Field("vert", String()),
-        Field("uniforms", Dict(String(), Type("UniformType"))),
-    }, {d="Shader definition: uniforms declaration, vertex and fragment shader code.", c_api_skip=true}),
-
-    Record("Shader", {
-        -- Method("send", {
-        --     Arg("uniforms", Type("ShaderUniforms"), {nativetype="udata"}),
-        -- }, nil),
-        Method("send", {
-            Arg("uniform_name", String()),
-            Arg("uniform_value", Type("ShaderUniformValue"), {nativetype="union"}),
-        }, nil, {map_to = "send_shader_uniform"}),
-    }, {d="Shader type"}),
-
-    -- Record("Canvas", {
-    --     Field("image", Type("Image"), {nativetype="udata", map_read = "get_canvas_image"}),
-    --     Field("width", Integer(), {map_read = "get_canvas_width"}),
-    --     Field("height", Integer(), {map_read = "get_canvas_height"}),
-    -- }, {d="Canvas type. Can be used for offscreen drawing to create images."}),
-
     Record("Image", {
         Field("width", Integer(), {map_read = "get_image_width"}),
         Field("height", Integer(), {map_read = "get_image_height"}),
@@ -714,17 +609,47 @@ return Namespace("lyte", {
         Field("pan", Number(), {map_read = "get_sound_pan", map_write = "set_sound_pan"}),
         Field("pitch", Number(), {map_read = "get_sound_pitch", map_write = "set_sound_pitch"}),
         Field("volume", Number(), {map_read = "get_sound_volume", map_write = "set_sound_volume"}),
+        Method("clone", {Arg("orig", Type("Sound"), {nativetype="udata"})}, {Ret("val", Type("Sound"), {nativetype="udata"})}, {map_to="clone_sound"}),
         Method("pause", nil, nil, {map_to="pause_sound"}),
         Method("play", nil, nil, {map_to="play_sound"}),
         Method("resume", nil, nil, {map_to="resume_sound"}),
         Method("stop", nil, nil, {map_to="stop_sound"}),
     }, {d="Sound type."}),
 
-    Record("SoundData", {
-        Field("pan", Number(), {map_read = "get_sounddata_pan", map_write = "set_sounddata_pan"}),
-        Field("pitch", Number(), {map_read = "get_sounddata_pitch", map_write = "set_sounddata_pitch"}),
-        Field("volume", Number(), {map_read = "get_sounddata_volume", map_write = "set_sounddata_volume"}),
-    }, {d="SoundData type."}),
+    OneOf("ShaderUniformValue", {
+        Option(Float()),
+        Option(List(Float(), {max_count=4})),
+        Option(Type("Image"), {nativetype="udata"}),
+    }),
+
+    Record("Shader", {
+        Method("send", {
+            Arg("uniform_name", String()),
+            Arg("uniform_value", Type("ShaderUniformValue"), {nativetype="union"}),
+        }, nil, {map_to = "send_shader_uniform"}),
+    }, {d="Shader type"}),
+
+    Record("ShaderDef", {
+        Field("frag", String()),
+        Field("vert", String()),
+        Field("uniforms", Dict(String(), Type("UniformType"))),
+    }, {d="Shader definition: uniforms declaration, vertex and fragment shader code.", c_api_skip=true}),
+
+    Record("ShaderBuilder", {
+        Method("uniform", {
+            Arg("uniform_name", String()),
+            Arg("uniform_type", Type("UniformType"), {nativetype="enumstring"}),
+        }, nil, {map_to="shaderbuilder_uniform"}),
+        Method("vertex", {
+            Arg("vertex_code", String()),
+        }, nil, {map_to="shaderbuilder_vertex"}),
+        Method("fragment", {
+            Arg("fragment_code", String()),
+        }, nil, {map_to="shaderbuilder_fragment"}),
+        Method("build", nil, {
+            Ret("shader", Type("Shader"), {nativetype="udata"})
+        }, {map_to="shaderbuilder_build"}),
+    }, {d="ShaderBuilder type"}),
 
     Enum("UniformType", {
         '_invalid', 'float', 'vec2', 'vec3', 'vec4', 'int', 'ivec2',
@@ -778,4 +703,3 @@ return Namespace("lyte", {
     }, {d="Acceptable keyboardkey values."}),
 
 })
-

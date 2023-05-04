@@ -96,8 +96,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
-    ./src/api.c                 # original handcoded implementation
-    # ./src/api_generated.c     # new generated implementation (work in progress)
+    # ./src/api.c                 # original handcoded implementation
+    ./src/api_generated.c     # new generated implementation (work in progress)
     ./src/cfg.c
     ./src/nbchar.c
     ./src/repl.c

@@ -4,11 +4,36 @@ tick function tick
     arg[2] window_width :: integer
     arg[3] window_height :: integer
     arg[4] window_resized :: boolean
+quit function quit
 cls function cls
     arg[1] r :: number
     arg[2] g :: number
     arg[3] b :: number
     arg[4] a :: number
+set_color function set_color
+    arg[1] r :: number
+    arg[2] g :: number
+    arg[3] b :: number
+    arg[4] a :: number
+reset_color function reset_color
+draw_point function draw_point
+    arg[1] x :: integer
+    arg[2] y :: integer
+draw_line function draw_line
+    arg[1] x1 :: integer
+    arg[2] y1 :: integer
+    arg[3] x2 :: integer
+    arg[4] y2 :: integer
+draw_rect function draw_rect
+    arg[1] dest_x :: integer
+    arg[2] dest_y :: integer
+    arg[3] rect_width :: integer
+    arg[4] rect_height :: integer
+draw_rect_line function draw_rect_line
+    arg[1] dest_x :: integer
+    arg[2] dest_y :: integer
+    arg[3] rect_width :: integer
+    arg[4] rect_height :: integer
 draw_circle function draw_circle
     arg[1] dest_x :: integer
     arg[2] dest_y :: integer
@@ -17,6 +42,9 @@ draw_circle_line function draw_circle_line
     arg[1] dest_x :: integer
     arg[2] dest_y :: integer
     arg[3] radius :: integer
+load_image function load_image
+    arg[1] image_path :: string
+    ret[1] :: Image
 draw_image function draw_image
     arg[1] image :: Image
     arg[2] dest_x :: integer
@@ -29,106 +57,71 @@ draw_image_rect function draw_image_rect
     arg[5] src_y :: integer
     arg[6] rect_width :: integer
     arg[7] rect_height :: integer
-draw_line function draw_line
-    arg[1] x1 :: integer
-    arg[2] y1 :: integer
-    arg[3] x2 :: integer
-    arg[4] y2 :: integer
-draw_point function draw_point
-    arg[1] x :: integer
-    arg[2] y :: integer
-draw_rect function draw_rect
-    arg[1] dest_x :: integer
-    arg[2] dest_y :: integer
-    arg[3] rect_width :: integer
-    arg[4] rect_height :: integer
-draw_rect_line function draw_rect_line
-    arg[1] dest_x :: integer
-    arg[2] dest_y :: integer
-    arg[3] rect_width :: integer
-    arg[4] rect_height :: integer
-draw_text function draw_text
-    arg[1] text :: string
-    arg[2] dest_x :: integer
-    arg[3] dest_y :: integer
-get_gamepad_axis function get_gamepad_axis
-    arg[1] index :: integer
-    arg[2] gamepad_axis :: GamepadAxis
-    ret[1] :: number
-get_gamepad_count function get_gamepad_count
-    ret[1] :: integer
-get_gamepad_name function get_gamepad_name
-    arg[1] index :: integer
-    ret[1] :: string
-get_mastervolume function get_mastervolume
-    ret[1] :: number
-get_mouse_x function get_mouse_x
-    ret[1] :: integer
-get_mouse_y function get_mouse_y
-    ret[1] :: integer
-get_music_length function get_music_length
-    arg[1] music :: Music
-    ret[1] :: number
-get_music_length_played function get_music_length_played
-    arg[1] music :: Music
-    ret[1] :: number
-get_music_pan function get_music_pan
-    arg[1] music :: Music
-    ret[1] :: number
-get_music_pitch function get_music_pitch
-    arg[1] music :: Music
-    ret[1] :: number
-get_music_volume function get_music_volume
-    arg[1] music :: Music
-    ret[1] :: number
-get_sound_pan function get_sound_pan
-    arg[1] sound :: Sound
-    ret[1] :: number
-get_sound_pitch function get_sound_pitch
-    arg[1] sound :: Sound
-    ret[1] :: number
-get_sound_volume function get_sound_volume
-    arg[1] sound :: Sound
-    ret[1] :: number
-get_sounddata_pan function get_sounddata_pan
-    arg[1] sounddata :: SoundData
-    ret[1] :: number
-get_sounddata_pitch function get_sounddata_pitch
-    arg[1] sounddata :: SoundData
-    ret[1] :: number
-get_sounddata_volume function get_sounddata_volume
-    arg[1] sounddata :: SoundData
-    ret[1] :: number
-get_text_width function get_text_width
-    arg[1] text :: string
-    ret[1] :: integer
-get_text_height function get_text_height
-    arg[1] text :: string
-    ret[1] :: integer
-get_window_width function get_window_width
-    ret[1] :: integer
-get_window_height function get_window_height
-    ret[1] :: integer
 get_image_width function get_image_width
     arg[1] image :: Image
     ret[1] :: integer
 get_image_height function get_image_height
     arg[1] image :: Image
     ret[1] :: integer
+new_canvas function new_canvas
+    arg[1] width :: integer
+    arg[2] height :: integer
+    ret[1] :: Image
+set_canvas function set_canvas
+    arg[1] canvas_image :: Image
+reset_canvas function reset_canvas
+is_image_canvas function is_image_canvas
+    arg[1] image :: Image
+    ret[1] :: boolean
+load_font function load_font
+    arg[1] font_path :: string
+    arg[2] size :: number
+    ret[1] :: Font
+set_font function set_font
+    arg[1] font :: Font
+reset_font function reset_font
+draw_text function draw_text
+    arg[1] text :: string
+    arg[2] dest_x :: integer
+    arg[3] dest_y :: integer
+get_text_width function get_text_width
+    arg[1] text :: string
+    ret[1] :: integer
+get_text_height function get_text_height
+    arg[1] text :: string
+    ret[1] :: integer
+set_window_minsize function set_window_minsize
+    arg[1] width :: integer
+    arg[2] height :: integer
+set_window_size function set_window_size
+    arg[1] width :: integer
+    arg[2] height :: integer
+get_window_width function get_window_width
+    ret[1] :: integer
+get_window_height function get_window_height
+    ret[1] :: integer
+set_fullscreen function set_fullscreen
+    arg[1] fullscreen :: boolean
 is_fullscreen function is_fullscreen
     ret[1] :: boolean
-is_gamepad_down function is_gamepad_down
-    arg[1] index :: integer
-    arg[2] gamepad_button :: GamepadButton
+set_window_title function set_window_title
+    arg[1] title :: string
+set_window_vsync function set_window_vsync
+    arg[1] vsync :: boolean
+is_window_vsync function is_window_vsync
     ret[1] :: boolean
-is_gamepad_pressed function is_gamepad_pressed
-    arg[1] index :: integer
-    arg[2] gamepad_button :: GamepadButton
-    ret[1] :: boolean
-is_gamepad_released function is_gamepad_released
-    arg[1] index :: integer
-    arg[2] gamepad_button :: GamepadButton
-    ret[1] :: boolean
+set_window_icon function set_window_icon
+    arg[1] icon_path :: string
+set_window_margins function set_window_margins
+    arg[1] left :: integer
+    arg[2] right :: integer
+    arg[3] top :: integer
+    arg[4] bottom :: integer
+set_window_paddings function set_window_paddings
+    arg[1] left :: integer
+    arg[2] right :: integer
+    arg[3] top :: integer
+    arg[4] bottom :: integer
 is_key_down function is_key_down
     arg[1] key :: KeyboardKey
     ret[1] :: boolean
@@ -150,77 +143,132 @@ is_mouse_pressed function is_mouse_pressed
 is_mouse_released function is_mouse_released
     arg[1] mouse_button :: MouseButton
     ret[1] :: boolean
-is_music_playing function is_music_playing
-    arg[1] music :: Music
-    ret[1] :: boolean
-is_sound_playing function is_sound_playing
-    arg[1] sound :: Sound
-    ret[1] :: boolean
-is_window_vsync function is_window_vsync
-    ret[1] :: boolean
-is_image_canvas function is_image_canvas
-    arg[1] image :: Image
-    ret[1] :: boolean
-load_file function load_file
-    arg[1] file_path :: string
+get_mouse_x function get_mouse_x
+    ret[1] :: integer
+get_mouse_y function get_mouse_y
+    ret[1] :: integer
+get_gamepad_count function get_gamepad_count
+    ret[1] :: integer
+get_gamepad_name function get_gamepad_name
+    arg[1] index :: integer
     ret[1] :: string
-load_font function load_font
-    arg[1] font_path :: string
-    arg[2] size :: number
-    ret[1] :: Font
-load_image function load_image
-    arg[1] image_path :: string
-    ret[1] :: Image
+is_gamepad_down function is_gamepad_down
+    arg[1] index :: integer
+    arg[2] gamepad_button :: GamepadButton
+    ret[1] :: boolean
+is_gamepad_pressed function is_gamepad_pressed
+    arg[1] index :: integer
+    arg[2] gamepad_button :: GamepadButton
+    ret[1] :: boolean
+is_gamepad_released function is_gamepad_released
+    arg[1] index :: integer
+    arg[2] gamepad_button :: GamepadButton
+    ret[1] :: boolean
+get_gamepad_axis function get_gamepad_axis
+    arg[1] index :: integer
+    arg[2] gamepad_axis :: GamepadAxis
+    ret[1] :: number
+set_mastervolume function set_mastervolume
+    arg[1] mastervolume :: number
+get_mastervolume function get_mastervolume
+    ret[1] :: number
 load_music function load_music
     arg[1] music_path :: string
     ret[1] :: Music
-load_sounddata function load_sounddata
-    arg[1] sounddata_path :: string
-    ret[1] :: SoundData
-new_canvas function new_canvas
-    arg[1] width :: integer
-    arg[2] height :: integer
-    ret[1] :: Image
-new_shader function new_shader
-    arg[1] shaderdef :: ShaderDef
-    ret[1] :: Shader
-new_sound function new_sound
-    arg[1] sounddata :: SoundData
-    ret[1] :: Sound
-pause_music function pause_music
-    arg[1] music :: Music
-pause_sound function pause_sound
-    arg[1] sound :: Sound
 play_music function play_music
     arg[1] music :: Music
-play_sound function play_sound
-    arg[1] sound :: Sound
-pop_matrix function pop_matrix
-push_matrix function push_matrix
-quit function quit
-reset_blendmode function reset_blendmode
-reset_canvas function reset_canvas
-reset_color function reset_color
-reset_filtermode function reset_filtermode
-reset_font function reset_font
-reset_matrix function reset_matrix
-reset_shader function reset_shader
+pause_music function pause_music
+    arg[1] music :: Music
 resume_music function resume_music
     arg[1] music :: Music
+stop_music function stop_music
+    arg[1] music :: Music
+is_music_playing function is_music_playing
+    arg[1] music :: Music
+    ret[1] :: boolean
+get_music_length function get_music_length
+    arg[1] music :: Music
+    ret[1] :: number
+get_music_length_played function get_music_length_played
+    arg[1] music :: Music
+    ret[1] :: number
+seek_music function seek_music
+    arg[1] music :: Music
+    arg[2] secs :: number
+set_music_volume function set_music_volume
+    arg[1] music :: Music
+    arg[2] volume :: number
+set_music_pan function set_music_pan
+    arg[1] music :: Music
+    arg[2] pan :: number
+set_music_pitch function set_music_pitch
+    arg[1] music :: Music
+    arg[2] pitch :: number
+get_music_volume function get_music_volume
+    arg[1] music :: Music
+    ret[1] :: number
+get_music_pan function get_music_pan
+    arg[1] music :: Music
+    ret[1] :: number
+get_music_pitch function get_music_pitch
+    arg[1] music :: Music
+    ret[1] :: number
+load_sound function load_sound
+    arg[1] sound_path :: string
+    ret[1] :: Sound
+clone_sound function clone_sound
+    arg[1] orig :: Sound
+    ret[1] :: Sound
+play_sound function play_sound
+    arg[1] sound :: Sound
+pause_sound function pause_sound
+    arg[1] sound :: Sound
 resume_sound function resume_sound
     arg[1] sound :: Sound
+stop_sound function stop_sound
+    arg[1] sound :: Sound
+is_sound_playing function is_sound_playing
+    arg[1] sound :: Sound
+    ret[1] :: boolean
+set_sound_volume function set_sound_volume
+    arg[1] sound :: Sound
+    arg[2] volume :: number
+set_sound_pan function set_sound_pan
+    arg[1] sound :: Sound
+    arg[2] pan :: number
+set_sound_pitch function set_sound_pitch
+    arg[1] sound :: Sound
+    arg[2] pitch :: number
+get_sound_volume function get_sound_volume
+    arg[1] sound :: Sound
+    ret[1] :: number
+get_sound_pan function get_sound_pan
+    arg[1] sound :: Sound
+    ret[1] :: number
+get_sound_pitch function get_sound_pitch
+    arg[1] sound :: Sound
+    ret[1] :: number
+load_file function load_file
+    arg[1] file_path :: string
+    ret[1] :: string
+save_file_write function save_file_write
+    arg[1] file_path :: string
+    arg[2] data :: string
+save_file_append function save_file_append
+    arg[1] file_path :: string
+    arg[2] data :: string
+push_matrix function push_matrix
+pop_matrix function pop_matrix
+reset_matrix function reset_matrix
+translate function translate
+    arg[1] delta_x :: integer
+    arg[2] delta_y :: integer
 rotate function rotate
     arg[1] angle :: number
 rotate_at function rotate_at
     arg[1] angle :: number
     arg[2] x :: integer
     arg[3] y :: integer
-save_file_append function save_file_append
-    arg[1] file_path :: string
-    arg[2] data :: string
-save_file_write function save_file_write
-    arg[1] file_path :: string
-    arg[2] data :: string
 scale function scale
     arg[1] scale_x :: number
     arg[2] scale_y :: number
@@ -229,88 +277,26 @@ scale_at function scale_at
     arg[2] scale_y :: integer
     arg[3] x :: number
     arg[4] y :: number
-seek_music function seek_music
-    arg[1] music :: Music
-    arg[2] secs :: number
-set_blendmode function set_blendmode
-    arg[1] blendmode :: BlendMode
-set_canvas function set_canvas
-    arg[1] canvas_image :: Image
-set_color function set_color
-    arg[1] r :: number
-    arg[2] g :: number
-    arg[3] b :: number
-    arg[4] a :: number
 set_default_blendmode function set_default_blendmode
     arg[1] blendmode :: BlendMode
+set_blendmode function set_blendmode
+    arg[1] blendmode :: BlendMode
+reset_blendmode function reset_blendmode
 set_default_filtermode function set_default_filtermode
     arg[1] filtermode :: FilterMode
 set_filtermode function set_filtermode
     arg[1] filtermode :: FilterMode
-set_font function set_font
-    arg[1] font :: Font
-set_fullscreen function set_fullscreen
-    arg[1] fullscreen :: boolean
-set_mastervolume function set_mastervolume
-    arg[1] mastervolume :: number
-set_music_pan function set_music_pan
-    arg[1] music :: Music
-    arg[2] pan :: number
-set_music_pitch function set_music_pitch
-    arg[1] music :: Music
-    arg[2] pitch :: number
-set_music_volume function set_music_volume
-    arg[1] music :: Music
-    arg[2] volume :: number
+reset_filtermode function reset_filtermode
+new_shader function new_shader
+    arg[1] shaderdef :: ShaderDef
+    ret[1] :: Shader
 set_shader function set_shader
     arg[1] shader :: Shader
-set_sound_pan function set_sound_pan
-    arg[1] sound :: Sound
-    arg[2] pan :: number
-set_sound_pitch function set_sound_pitch
-    arg[1] sound :: Sound
-    arg[2] pitch :: number
-set_sound_volume function set_sound_volume
-    arg[1] sound :: Sound
-    arg[2] volume :: number
-set_sounddata_pan function set_sounddata_pan
-    arg[1] sounddata :: SoundData
-    arg[2] pan :: number
-set_sounddata_pitch function set_sounddata_pitch
-    arg[1] sounddata :: SoundData
-    arg[2] pitch :: number
-set_sounddata_volume function set_sounddata_volume
-    arg[1] sounddata :: SoundData
-    arg[2] volume :: number
-set_window_icon function set_window_icon
-    arg[1] icon_path :: string
-set_window_margins function set_window_margins
-    arg[1] left :: integer
-    arg[2] right :: integer
-    arg[3] top :: integer
-    arg[4] bottom :: integer
-set_window_minsize function set_window_minsize
-    arg[1] width :: integer
-    arg[2] height :: integer
-set_window_paddings function set_window_paddings
-    arg[1] left :: integer
-    arg[2] right :: integer
-    arg[3] top :: integer
-    arg[4] bottom :: integer
-set_window_size function set_window_size
-    arg[1] width :: integer
-    arg[2] height :: integer
-set_window_title function set_window_title
-    arg[1] title :: string
-set_window_vsync function set_window_vsync
-    arg[1] vsync :: boolean
-stop_music function stop_music
-    arg[1] music :: Music
-stop_sound function stop_sound
-    arg[1] sound :: Sound
-translate function translate
-    arg[1] delta_x :: integer
-    arg[2] delta_y :: integer
+reset_shader function reset_shader
+send_shader_uniform function send_shader_uniform
+    arg[1] shader :: Shader
+    arg[2] uniform_name :: string
+    arg[3] uniform_value :: ShaderUniformValue
 new_shaderbuilder function new_shaderbuilder
     ret[1] :: ShaderBuilder
 shaderbuilder_uniform function shaderbuilder_uniform
@@ -326,33 +312,6 @@ shaderbuilder_fragment function shaderbuilder_fragment
 shaderbuilder_build function shaderbuilder_build
     arg[1] shaderbuilder :: ShaderBuilder
     ret[1] :: Shader
-send_shader_uniform function send_shader_uniform
-    arg[1] shader :: Shader
-    arg[2] uniform_name :: string
-    arg[3] uniform_value :: ShaderUniformValue
-ShaderUniformValue oneof ShaderUniformValue
-    option[1] :: <float> 
-    option[2] :: List<float> 
-    option[3] :: <Image> 
-ShaderBuilder record (ShaderBuilder)
-uniform:  method uniform
-    arg[1] uniform_name :: string
-    arg[2] uniform_type :: UniformType
-vertex:  method vertex
-    arg[1] vertex_code :: string
-fragment:  method fragment
-    arg[1] fragment_code :: string
-build:  method build
-    ret[1] :: Shader
-ShaderDef record (ShaderDef)
-frag:  <string> frag
-vert:  <string> vert
-uniforms:  Dict<string, <UniformType> 
-> uniforms
-Shader record (Shader)
-send:  method send
-    arg[1] uniform_name :: string
-    arg[2] uniform_value :: ShaderUniformValue
 Image record (Image)
 width:  <integer> width
 height:  <integer> height
@@ -375,14 +334,36 @@ Sound record (Sound)
 pan:  <number> pan
 pitch:  <number> pitch
 volume:  <number> volume
+clone:  method clone
+    arg[1] orig :: Sound
+    ret[1] :: Sound
 pause:  method pause
 play:  method play
 resume:  method resume
 stop:  method stop
-SoundData record (SoundData)
-pan:  <number> pan
-pitch:  <number> pitch
-volume:  <number> volume
+ShaderUniformValue oneof ShaderUniformValue
+    option[1] :: <float> 
+    option[2] :: List<float> 
+    option[3] :: <Image> 
+Shader record (Shader)
+send:  method send
+    arg[1] uniform_name :: string
+    arg[2] uniform_value :: ShaderUniformValue
+ShaderDef record (ShaderDef)
+frag:  <string> frag
+vert:  <string> vert
+uniforms:  Dict<string, <UniformType> 
+> uniforms
+ShaderBuilder record (ShaderBuilder)
+uniform:  method uniform
+    arg[1] uniform_name :: string
+    arg[2] uniform_type :: UniformType
+vertex:  method vertex
+    arg[1] vertex_code :: string
+fragment:  method fragment
+    arg[1] fragment_code :: string
+build:  method build
+    ret[1] :: Shader
 UniformType enum
     choice[1] :: _invalid
     choice[2] :: float

@@ -84,10 +84,14 @@ target_include_directories(${PROJECT_NAME}
 target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/src/map.c
     ./impl/morebase.c
-    ./src/core_state.c
+    ./src/emsc.c
+    ./src/core_impls.c
     ./src/core_audio.c
     ./src/core_font.c
     ./src/core_image.c
+    ./src/core_shapes.c
+    ./src/core_shader.c
+    ./src/core_state.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/stb_image/stb_image.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/raudio/src/raudio.c
 )

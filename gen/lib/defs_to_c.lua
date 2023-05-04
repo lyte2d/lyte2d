@@ -14,6 +14,7 @@ local CC = {
     top_structdefs = "",      -- structs (base def)
     top_uniondefs = "",      -- unions (base def)
     top_structlifetime = "",  -- local structure init/cleanup functions
+    top_structtostring = "",  -- local structure tostring function
     top_funcimpls = "",       -- function "implementations"
     top_enumstrs = "",        -- enum helpers, convert to and from string as well as string values
     open_funcs = "",          -- each api function to be made available to lua
@@ -121,6 +122,12 @@ end
 local function _ctype_is_udata(v)
     if v and v._tags and v._tags.nativetype then
         return v._tags.nativetype == "udata"
+    end
+    return false
+end
+local function _ctype_save_to_registry(v)
+    if v and v._tags and v._tags.nativetype then
+        return v._tags.save_to_registry
     end
     return false
 end
@@ -462,11 +469,22 @@ function CC.Record(items, depth, name, tags, traverse_fn)
     -- struct cleanups (this goes to top)
     -- Note: init functions are generated through constructor functions
 
-    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth) .. "static inline int _destroy_" .. prefix .. name .. "(" ..  prefix .. name .. " *" .. name:lower() .. ") {\n"
+    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth) .. "static inline int _impl_cleanup_" .. prefix .. name .. "(" ..  prefix .. name .. " *" .. name:lower() .. ") {\n"
     CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth + 1) .. "(void)" .. name:lower() .. ";\n"
-    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// implementation\n"
-    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "return 0;\n"
+    -- CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// implementation\n"
+    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "int _ret = 0;\n"
+    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// _ret = " .. prefix .. "cleanup_"  .. name:lower() .. "(*" ..  name:lower() .. ");\n"
+    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "return _ret;\n"
     CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth) .. "}\n"
+
+    CC.top_structtostring = CC.top_structtostring .. tab:rep(depth) .. "static inline const char *_impl_tostring_" .. prefix .. name .. "(" ..  prefix .. name .. " *" .. name:lower() .. ") {\n"
+    CC.top_structtostring = CC.top_structtostring .. tab:rep(depth + 1) .. "(void)" .. name:lower() .. ";\n"
+    -- CC.top_structtostring = CC.top_structtostring .. tab:rep(depth+1) .. "// implementation\n"
+    CC.top_structtostring = CC.top_structtostring .. tab:rep(depth+1) .. 'char *_ret = "[' .. CC.namespace .. "." .. name .. ']";\n'
+    CC.top_structtostring = CC.top_structtostring .. tab:rep(depth+1) .. "// _ret = " .. prefix .. name:lower() .. "_tostring(" ..  name:lower() .. ")\n"
+    CC.top_structtostring = CC.top_structtostring .. tab:rep(depth+1) .. "return (const char *)_ret;\n"
+    CC.top_structtostring = CC.top_structtostring .. tab:rep(depth) .. "}\n"
+
 
 
     -- rest goes into the body
@@ -530,15 +548,16 @@ function CC.Record(items, depth, name, tags, traverse_fn)
 
     -- DO: tostring
     CC.result = CC.result .. tab:rep(depth) .. "static int " .. name .. "_metatable_tostring(lua_State *L) {\n"
-    CC.result = CC.result .. tab:rep(depth+1) .. "// " .. prefix .. name .. ' *val = luaL_checkudata(L, 1, "' .. CC.namespace .. "." ..  name .. '");\n'
-    CC.result = CC.result .. tab:rep(depth+1) .. 'const char *str = "[' .. CC.namespace .. '.' ..  name .. ']";\n'
+    CC.result = CC.result .. tab:rep(depth+1) .. prefix .. name .. ' *'.. name:lower() .. ' = luaL_checkudata(L, 1, "' .. CC.namespace .. "." ..  name .. '");\n'
+    -- CC.result = CC.result .. tab:rep(depth+1) .. '// const char *str = "[' .. CC.namespace .. '.' ..  name .. ']";\n'
+    CC.result = CC.result .. tab:rep(depth+1) .. 'const char *str = _impl_tostring_' .. prefix .. name .. '(' .. name:lower() .. ');\n'
     CC.result = CC.result .. tab:rep(depth+1) .. "lua_pushstring(L, str);\n"
     CC.result = CC.result .. tab:rep(depth+1) .. "return 1;\n"
     CC.result = CC.result .. tab:rep(depth) .. "}\n"
     -- DO: gc
     CC.result = CC.result .. tab:rep(depth) .. "static int " .. name .. "_metatable_gc(lua_State *L) {\n"
-    CC.result = CC.result .. tab:rep(depth+1) .. prefix .. name .. ' *val = luaL_checkudata(L, 1, "' .. CC.namespace .. "." ..  name .. '");\n'
-    CC.result = CC.result .. tab:rep(depth+1) .. "_destroy_" .. prefix .. name .. "(val);\n"
+    CC.result = CC.result .. tab:rep(depth+1) .. prefix .. name .. ' *' .. name:lower() .. ' = luaL_checkudata(L, 1, "' .. CC.namespace .. "." ..  name .. '");\n'
+    CC.result = CC.result .. tab:rep(depth+1) .. "_impl_cleanup_" .. prefix .. name .. "(" .. name:lower() .. ");\n"
     CC.result = CC.result .. tab:rep(depth+1) .. "return 1;\n"
     CC.result = CC.result .. tab:rep(depth) .. "}\n"
     -- DO: registration
@@ -606,7 +625,7 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
 
     local c_fn_args = ""
     local c_call_args = ""
-
+    local c_lib_call_args = ""
     local voidargs = ""
 
     -- DEFINE FUNCTION
@@ -627,6 +646,7 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
         assert(v._name)
         assert(v.value)
         local arg_is_udata = _ctype_is_udata(v)
+        local save_to_registry = _ctype_save_to_registry(v)
         local arg_is_enumstring = _ctype_is_enumstring(v)
         local arg_is_union = _ctype_is_union(v)
         local c_type = _ctype_type(v)
@@ -669,6 +689,12 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
             CC.result = CC.result .. tab:rep(depth + 1) .. c_type .. "  " .. v._name .. " = enumstring_to_int(" .. c_type  .. "_strings, " .. var_name.. ")" .. ";\n";
         end
 
+        if save_to_registry then
+            CC.result = CC.result .. tab:rep(depth + 1) .. "// save this value to registry to prevent it from being GC'd\n"
+            CC.result = CC.result .. tab:rep(depth + 1) .. "lua_pushvalue(L, -1); // duplicate the object\n"
+            CC.result = CC.result .. tab:rep(depth + 1) .. 'lua_setfield(L, LUA_REGISTRYINDEX, "' .. CC.namespace .. "_" .. v._name .. '_SAVE");\n'
+        end
+
         -- cllect impl fn args
         local var_call_name = var_name_save
         if arg_is_udata then
@@ -677,12 +703,14 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
 
         c_fn_args = c_fn_args .. ", " .. c_type .. " " .. var_name_save
         c_call_args = c_call_args .. ", " .. var_call_name
-        voidargs = voidargs .. tab:rep(depth + 1) .. "(void)" .. var_name_save .. ";\n"
+        voidargs = voidargs  .. "(void)" .. var_name_save .. ";"
+        c_lib_call_args = c_lib_call_args .. ", " .. var_name_save
 
         if arg_is_union then
             c_fn_args = c_fn_args .. ", int which_" .. var_name_save
             c_call_args = c_call_args .. ", which_" .. var_name_save
-            voidargs = voidargs .. tab:rep(depth + 1) .. "(void)which_" .. var_name_save .. ";\n"
+            voidargs = voidargs .. "(void)which_" .. var_name_save .. ";"
+            c_lib_call_args = c_lib_call_args .. ", which_" .. var_name_save
         end
 
     end
@@ -717,7 +745,8 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
             -- callect impl fn args
             c_fn_args = c_fn_args .. ", " .. c_type .. " *" .. v._name
             c_call_args = c_call_args .. ", " .. var_name
-            voidargs = voidargs .. tab:rep(depth + 1) .. "(void)" .. v._name .. ";\n"
+            voidargs = voidargs .. "(void)" .. v._name .. ";"
+            c_lib_call_args = c_lib_call_args .. ", " .. v._name
         end
     end
 
@@ -754,6 +783,12 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
     local func_args = c_fn_args:sub(3) -- remove initial ", "
     if func_args == "" then func_args = "void" end
 
+    local call_args = c_call_args:sub(3) -- remove initial ", "
+    local call_lib_fn_name = CC.namespace .. "_" .. name
+    lib_call_args = c_lib_call_args:sub(3) -- remove initial ","
+
+    if voidargs ~= "" then voidargs = tab:rep(depth+1) .. voidargs .. "\n" end
+
     -- is this function a constructor?  Handle constructor
     if tags.ctor then
         local prefix = CC.namespace .. "_"
@@ -764,8 +799,10 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
         CC.top_structlifetime = CC.top_structlifetime .. func_args
         CC.top_structlifetime = CC.top_structlifetime ..  ") {\n"
         CC.top_structlifetime = CC.top_structlifetime .. voidargs
-        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// implementation\n"
-        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "return 0;\n"
+        -- CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// implementation\n"
+        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "int _ret = 0;\n"
+        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "//_ret = " .. call_lib_fn_name .. "(" ..  lib_call_args .. ");\n"
+        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "return _ret;\n"
         CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth) .. "}\n"
     else
         local prefix = "_impl_"
@@ -773,8 +810,10 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
         CC.top_funcimpls = CC.top_funcimpls .. func_args
         CC.top_funcimpls = CC.top_funcimpls ..  ") {\n"
         CC.top_funcimpls = CC.top_funcimpls .. voidargs
-        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "// implementation\n"
-        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "return 0;\n"
+        -- CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "// implementation\n"
+        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "int _ret = 0;\n"
+        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "//_ret = " .. call_lib_fn_name .. "(" ..  lib_call_args .. ");\n"
+        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "return _ret;\n"
         CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth) .. "}\n"
     end
 
@@ -907,6 +946,7 @@ f_gen_api:write(CC.public_open)
 f_impl:write(CC.top_line)
 f_impl:write(CC.top_defs_impl)
 f_impl:write(CC.top_structlifetime)
+f_impl:write(CC.top_structtostring)
 f_impl:write(CC.top_funcimpls)
 
 
