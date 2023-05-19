@@ -272,52 +272,43 @@ static inline int _impl_get_text_height(const char * text, int *val) {
 static inline int _impl_set_window_minsize(int width, int height) {
     (void)width;(void)height;
     int _ret = 0;
-    M_app_setwindowminsize(width, height);
-    //_ret = lyte_set_window_minsize(width, height);
+    _ret = lyte_set_window_minsize(width, height);
     return _ret;
 }
 static inline int _impl_set_window_size(int width, int height) {
     (void)width;(void)height;
     int _ret = 0;
-    M_app_setwindowsize(width, height);
-    //_ret = lyte_set_window_size(width, height);
+    _ret = lyte_set_window_size(width, height);
     return _ret;
 }
 static inline int _impl_get_window_width(int *val) {
     (void)val;
     int _ret = 0;
-    M_SizeI s = M_app_getwindowsize();
-    *val = s.w;
-    //_ret = lyte_get_window_width(val);
+    _ret = lyte_get_window_width(val);
     return _ret;
 }
 static inline int _impl_get_window_height(int *val) {
     (void)val;
     int _ret = 0;
-    M_SizeI s = M_app_getwindowsize();
-    *val = s.h;
-    //_ret = lyte_get_window_height(val);
+    _ret = lyte_get_window_height(val);
     return _ret;
 }
 static inline int _impl_set_fullscreen(bool fullscreen) {
     (void)fullscreen;
     int _ret = 0;
-    M_app_setfullscreen(fullscreen);
-    //_ret = lyte_set_fullscreen(fullscreen);
+    _ret = lyte_set_fullscreen(fullscreen);
     return _ret;
 }
 static inline int _impl_is_fullscreen(bool *val) {
     (void)val;
     int _ret = 0;
-    *val = M_app_getfullscreen();
-    //_ret = lyte_is_fullscreen(val);
+    _ret = lyte_is_fullscreen(val);
     return _ret;
 }
 static inline int _impl_set_window_title(const char * title) {
     (void)title;
     int _ret = 0;
-    M_app_settitle(title);
-    //_ret = lyte_set_window_title(title);
+    _ret = lyte_set_window_title(title);
     return _ret;
 }
 static inline int _impl_set_window_vsync(bool vsync) {
@@ -358,106 +349,91 @@ static inline int _impl_set_window_paddings(int left, int right, int top, int bo
 static inline int _impl_is_key_down(lyte_KeyboardKey key, bool *val) {
     (void)key;(void)val;
     int _ret = 0;
-    *val = M_input_keydown((M_KeyboardKey)key);
-    //_ret = lyte_is_key_down(key, val);
+    _ret = lyte_is_key_down(key, val);
     return _ret;
 }
 static inline int _impl_is_key_pressed(lyte_KeyboardKey key, bool *val) {
     (void)key;(void)val;
     int _ret = 0;
-    *val = M_input_keypressed((M_KeyboardKey)key);
-    //_ret = lyte_is_key_pressed(key, val);
+    _ret = lyte_is_key_pressed(key, val);
     return _ret;
 }
 static inline int _impl_is_key_released(lyte_KeyboardKey key, bool *val) {
     (void)key;(void)val;
     int _ret = 0;
-    *val = M_input_keyreleased((M_KeyboardKey)key);
-    //_ret = lyte_is_key_released(key, val);
+    _ret = lyte_is_key_released(key, val);
     return _ret;
 }
 static inline int _impl_is_key_repeat(lyte_KeyboardKey key, bool *val) {
     (void)key;(void)val;
     int _ret = 0;
-    *val = M_input_keyrepeat((M_KeyboardKey)key);
-    //_ret = lyte_is_key_repeat(key, val);
+    _ret = lyte_is_key_repeat(key, val);
     return _ret;
 }
 static inline int _impl_is_mouse_down(lyte_MouseButton mouse_button, bool *val) {
     (void)mouse_button;(void)val;
     int _ret = 0;
-    *val = M_input_mousedown((int)mouse_button);
-    //_ret = lyte_is_mouse_down(mouse_button, val);
+    _ret = lyte_is_mouse_down(mouse_button, val);
     return _ret;
 }
 static inline int _impl_is_mouse_pressed(lyte_MouseButton mouse_button, bool *val) {
     (void)mouse_button;(void)val;
     int _ret = 0;
-    *val = M_input_mousepressed((int)mouse_button);
-    //_ret = lyte_is_mouse_pressed(mouse_button, val);
+    _ret = lyte_is_mouse_pressed(mouse_button, val);
     return _ret;
 }
 static inline int _impl_is_mouse_released(lyte_MouseButton mouse_button, bool *val) {
     (void)mouse_button;(void)val;
     int _ret = 0;
-    *val = M_input_mousereleased((int)mouse_button);
-    //_ret = lyte_is_mouse_released(mouse_button, val);
+    _ret = lyte_is_mouse_released(mouse_button, val);
     return _ret;
 }
 static inline int _impl_get_mouse_x(int *val) {
     (void)val;
     int _ret = 0;
-    *val = M_input_mouse_x();
-    //_ret = lyte_get_mouse_x(val);
+    _ret = lyte_get_mouse_x(val);
     return _ret;
 }
 static inline int _impl_get_mouse_y(int *val) {
     (void)val;
     int _ret = 0;
-    *val = M_input_mouse_y();
-    //_ret = lyte_get_mouse_y(val);
+    _ret = lyte_get_mouse_y(val);
     return _ret;
 }
 static inline int _impl_get_gamepad_count(int *val) {
     (void)val;
     int _ret = 0;
-    *val = M_input_numgamepads();
-    //_ret = lyte_get_gamepad_count(val);
+    _ret = lyte_get_gamepad_count(val);
     return _ret;
 }
 static inline int _impl_get_gamepad_name(int index, const char * *val) {
     (void)index;(void)val;
     int _ret = 0;
-    *val = M_input_gamepadname((int)index);
-    //_ret = lyte_get_gamepad_name(index, val);
+    _ret = lyte_get_gamepad_name(index, val);
     return _ret;
 }
 static inline int _impl_is_gamepad_down(int index, lyte_GamepadButton gamepad_button, bool *val) {
     (void)index;(void)gamepad_button;(void)val;
     int _ret = 0;
-    *val = M_input_gamepaddown((int)index, (int)gamepad_button);
-    //_ret = lyte_is_gamepad_down(index, gamepad_button, val);
+    _ret = lyte_is_gamepad_down(index, gamepad_button, val);
     return _ret;
 }
 static inline int _impl_is_gamepad_pressed(int index, lyte_GamepadButton gamepad_button, bool *val) {
     (void)index;(void)gamepad_button;(void)val;
     int _ret = 0;
-    *val = M_input_gamepadpressed((int)index, (int)gamepad_button);
-    //_ret = lyte_is_gamepad_pressed(index, gamepad_button, val);
+    _ret = lyte_is_gamepad_pressed(index, gamepad_button, val);
     return _ret;
 }
 static inline int _impl_is_gamepad_released(int index, lyte_GamepadButton gamepad_button, bool *val) {
     (void)index;(void)gamepad_button;(void)val;
     int _ret = 0;
-    *val = M_input_gamepadreleased((int)index, (int)gamepad_button);
-    //_ret = lyte_is_gamepad_released(index, gamepad_button, val);
+    _ret = lyte_is_gamepad_released(index, gamepad_button, val);
     return _ret;
 }
 static inline int _impl_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val) {
     (void)index;(void)gamepad_axis;(void)val;
     int _ret = 0;
-    *val = M_input_gamepadaxis((int)index, (int)gamepad_axis);
-    //_ret = lyte_get_gamepad_axis(index, gamepad_axis, val);
+    _ret = lyte_get_gamepad_axis(index, gamepad_axis, val);
     return _ret;
 }
 static inline int _impl_set_mastervolume(double mastervolume) {
@@ -643,95 +619,81 @@ static inline int _impl_save_file_append(const char * file_path, const char * da
 }
 static inline int _impl_push_matrix(void) {
     int _ret = 0;
-    M_gfx_pushmatrix();
-    //_ret = lyte_push_matrix();
+    _ret = lyte_push_matrix();
     return _ret;
 }
 static inline int _impl_pop_matrix(void) {
     int _ret = 0;
-    M_gfx_popmatrix();
-    //_ret = lyte_pop_matrix();
+    _ret = lyte_pop_matrix();
     return _ret;
 }
 static inline int _impl_reset_matrix(void) {
     int _ret = 0;
-    M_gfx_identitymatrix();
-    //_ret = lyte_reset_matrix();
+    _ret = lyte_reset_matrix();
     return _ret;
 }
 static inline int _impl_translate(int delta_x, int delta_y) {
     (void)delta_x;(void)delta_y;
     int _ret = 0;
-    M_gfx_translate(delta_x, delta_y);
-    //_ret = lyte_translate(delta_x, delta_y);
+    _ret = lyte_translate(delta_x, delta_y);
     return _ret;
 }
 static inline int _impl_rotate(double angle) {
     (void)angle;
     int _ret = 0;
-    M_gfx_rotate(angle);
-    //_ret = lyte_rotate(angle);
+    _ret = lyte_rotate(angle);
     return _ret;
 }
 static inline int _impl_rotate_at(double angle, int x, int y) {
     (void)angle;(void)x;(void)y;
     int _ret = 0;
-    M_gfx_rotate_at(angle, x, y);
-    //_ret = lyte_rotate_at(angle, x, y);
+    _ret = lyte_rotate_at(angle, x, y);
     return _ret;
 }
 static inline int _impl_scale(double scale_x, double scale_y) {
     (void)scale_x;(void)scale_y;
     int _ret = 0;
-    M_gfx_scale(scale_x, scale_y);
-    //_ret = lyte_scale(scale_x, scale_y);
+    _ret = lyte_scale(scale_x, scale_y);
     return _ret;
 }
 static inline int _impl_scale_at(int scale_x, int scale_y, double x, double y) {
     (void)scale_x;(void)scale_y;(void)x;(void)y;
     int _ret = 0;
-    M_gfx_scale_at(scale_x, scale_y, x, y);
-    //_ret = lyte_scale_at(scale_x, scale_y, x, y);
+    _ret = lyte_scale_at(scale_x, scale_y, x, y);
     return _ret;
 }
 static inline int _impl_set_default_blendmode(lyte_BlendMode blendmode) {
     (void)blendmode;
     int _ret = 0;
-    M_gfx_setdefaultblendmode((M_BlendMode)blendmode);
-    //_ret = lyte_set_default_blendmode(blendmode);
+    _ret = lyte_set_default_blendmode(blendmode);
     return _ret;
 }
 static inline int _impl_set_blendmode(lyte_BlendMode blendmode) {
     (void)blendmode;
     int _ret = 0;
-    M_gfx_setblendmode((M_BlendMode)blendmode);
-    //_ret = lyte_set_blendmode(blendmode);
+    _ret = lyte_set_blendmode(blendmode);
     return _ret;
 }
 static inline int _impl_reset_blendmode(void) {
     int _ret = 0;
-    M_gfx_resetblendmode();
-    //_ret = lyte_reset_blendmode();
+    _ret = lyte_reset_blendmode();
     return _ret;
 }
 static inline int _impl_set_default_filtermode(lyte_FilterMode filtermode) {
     (void)filtermode;
     int _ret = 0;
-    M_gfx_setdefaultfiltermode((M_FilterMode)filtermode);
-    //_ret = lyte_set_default_filtermode(filtermode);
+    _ret = lyte_set_default_filtermode(filtermode);
     return _ret;
 }
 static inline int _impl_set_filtermode(lyte_FilterMode filtermode) {
     (void)filtermode;
     int _ret = 0;
-    M_gfx_setfiltermode((M_FilterMode)filtermode);
-    //_ret = lyte_set_filtermode(filtermode);
+    _ret = lyte_set_filtermode(filtermode);
     return _ret;
 }
 static inline int _impl_reset_filtermode(void) {
     int _ret = 0;
-    M_gfx_resetfiltermode();
-    //_ret = lyte_reset_filtermode();
+    _ret = lyte_reset_filtermode();
     return _ret;
 }
 static inline int _impl_set_shader(lyte_Shader shader) {

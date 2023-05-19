@@ -3,6 +3,12 @@
 
 #include "api_generated.h" // types and enums
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/emscripten.h>
+#include "lyte_emsc.h"
+#endif
+
+
 #ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #endif
@@ -17,30 +23,129 @@
 
 
 // -------------------------
-// core_state
+// core data types
 // -------------------------
+
+typedef struct lyte_Size {
+    int width, height;
+} lyte_Size;
+
+typedef struct lyte_Config {
+    bool vsync;
+    const char *window_title;
+    lyte_Size window_size;
+    lyte_Size window_min_size;
+    lyte_BlendMode blendmode;
+    lyte_FilterMode filtermode;
+} lyte_Config;
 
 typedef struct lyte_State {
     lyte_BlendMode default_blendmode;
-    lyte_BlendMode default_filtermode;
+    lyte_FilterMode default_filtermode;
 
+    const char *window_title;
+    lyte_Size window_size;
+    lyte_Size window_min_size;
+    bool fullscreen;
     bool vsync;
     lyte_BlendMode blendmode;
     lyte_FilterMode filtermode;
 
+    void *window; // GLFWwindow
+    void *monitor; // GLFWmonitor
+    void *mode; // GLFWVidMode
+
 } lyte_State;
+
+
+// -------------------------
+// core state
+// -------------------------
 
 extern lyte_State lyte_state;
 
-void lyte_core_state_init(bool vsync, lyte_BlendMode default_blendmode, lyte_FilterMode default_filtermode);
+int lyte_core_state_init(lyte_Config config);
+
+int lyte_set_default_blendmode(lyte_BlendMode blendmode);
+int lyte_set_blendmode(lyte_BlendMode blendmode);
+int lyte_reset_blendmode(void);
+int lyte_set_default_filtermode(lyte_FilterMode filtermode);
+int lyte_set_filtermode(lyte_FilterMode filtermode);
+int lyte_reset_filtermode(void);
+int lyte_push_matrix(void);
+int lyte_pop_matrix(void);
+int lyte_reset_matrix(void);
+int lyte_translate(int delta_x, int delta_y);
+int lyte_rotate(double angle);
+int lyte_rotate_at(double angle, int x, int y);
+int lyte_scale(double scale_x, double scale_y);
+int lyte_scale_at(int scale_x, int scale_y, double x, double y);
+
+
+// -------------------------
+// core_window
+// -------------------------
+
+int lyte_core_window_init(void);
+int lyte_core_window_cleanup(void);
+
+int lyte_set_window_minsize(int width, int height);
+int lyte_set_window_size(int width, int height);
+int lyte_get_window_width(int *val);
+int lyte_get_window_height(int *val);
+int lyte_set_fullscreen(bool fullscreen);
+int lyte_is_fullscreen(bool *val);
+int lyte_set_window_title(const char * title);
+
+
+// -------------------------
+// core_input
+// -------------------------
+
+int lyte_core_input_init(void);
+int lyte_core_input_cleanup(void);
+int lyte_core_input_update_state(void);
+
+int lyte_is_key_down(lyte_KeyboardKey key, bool *val);
+int lyte_is_key_pressed(lyte_KeyboardKey key, bool *val);
+int lyte_is_key_released(lyte_KeyboardKey key, bool *val);
+int lyte_is_key_repeat(lyte_KeyboardKey key, bool *val);
+int lyte_is_mouse_down(lyte_MouseButton mouse_button, bool *val);
+int lyte_is_mouse_pressed(lyte_MouseButton mouse_button, bool *val);
+int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val);
+int lyte_get_mouse_x(int *val);
+int lyte_get_mouse_y(int *val);
+int lyte_get_gamepad_count(int *val);
+int lyte_get_gamepad_name(int index, const char * *val);
+int lyte_is_gamepad_down(int index, lyte_GamepadButton gamepad_button, bool *val);
+int lyte_is_gamepad_pressed(int index, lyte_GamepadButton gamepad_button, bool *val);
+int lyte_is_gamepad_released(int index, lyte_GamepadButton gamepad_button, bool *val);
+int lyte_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val);
+
+
+// -------------------------
+// core_loop
+// -------------------------
+
+int lyte_core_start_loop(void);
+
+
+// -------------------------
+// core_filesystem
+// -------------------------
+
+int lyte_core_filesystem_init(void);
+int lyte_core_filesystem_cleanup(void);
+int lyte_core_filesystem_update_tasks(void);
+
+
 
 // -------------------------
 // core_image
 // -------------------------
 
-
-void lyte_core_image_init(void);
-void lyte_core_image_cleanup(void);
+int lyte_core_image_init(void);
+int lyte_core_image_cleanup(void);
 
 int lyte_load_image(const char *path, lyte_Image *img);
 int lyte_new_canvas(int w, int h, lyte_Image *img);
@@ -66,14 +171,15 @@ int lyte_draw_rect_line(int dest_x, int dest_y, int rect_width, int rect_height)
 int lyte_draw_circle(int dest_x, int dest_y, int radius);
 int lyte_draw_circle_line(int dest_x, int dest_y, int radius);
 
+
 // -------------------------
 // core_audio
 // -------------------------
 
 // lifetime
-void lyte_core_audio_init(void);
-void lyte_core_audio_cleanup(void);
-void lyte_core_audio_update_music_streams(void); // needs to run each frame
+int lyte_core_audio_init(void);
+int lyte_core_audio_cleanup(void);
+int lyte_core_audio_update_music_streams(void); // needs to run each frame
 
 // general
 int lyte_get_mastervolume(double *vol);
@@ -120,8 +226,8 @@ int lyte_set_sound_pitch(lyte_Sound snd, double pitch);
 // core_font
 // -------------------------
 
-void lyte_core_font_init(void);
-void lyte_core_font_cleanup(void);
+int lyte_core_font_init(void);
+int lyte_core_font_cleanup(void);
 
 int lyte_load_font(const char * font_path, double size, lyte_Font *val);
 int lyte_cleanup_font(lyte_Font font);
@@ -135,7 +241,6 @@ int lyte_get_text_height(const char * text, int *val);
 // -------------------------
 // core_shader
 // -------------------------
-
 
 // ShaderBuilder
 int lyte_new_shaderbuilder(lyte_ShaderBuilder *val);

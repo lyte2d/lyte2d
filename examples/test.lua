@@ -3,11 +3,13 @@
 local total_time = 0
 local image_1 = lyte.load_image("assets/hero.png")
 
+lyte.set_window_title "this is a test :)"
+lyte.set_window_icon "assets/hero.png"
 
 local sb = lyte.new_shaderbuilder()
 sb:uniform("screen_size", "vec2")
 sb:vertex [[
-    // draw rect sends x, y positions and w/h, 4 floats
+    // draw rect sends x, y positions and w/h, 4 floats
     in vec4 coords;
     out vec2 image_uv;
     void vert_main() {

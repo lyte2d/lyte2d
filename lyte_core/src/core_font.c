@@ -57,13 +57,15 @@ static uint32_t fontitem_last_handle = 1500;
 static mg_Map fontitems;
 static FontItem *current_font = NULL;
 
-void lyte_core_font_init(void) {
+int lyte_core_font_init(void) {
     mg_map_init(&fontitems, sizeof(FontItem), INIT_NUM_FONTITEMS);
+    return 0;
 }
 
-void lyte_core_font_cleanup(void) {
+int lyte_core_font_cleanup(void) {
     // TODO: decide: cleanup individual fonts vs leave it to the OS on exit?
     mg_map_cleanup(&fontitems);
+    return 0;
 }
 
 // fontstash callbacks

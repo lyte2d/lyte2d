@@ -1,5 +1,5 @@
-#ifndef EMSC_H_INCLUDED
-#define EMSC_H_INCLUDED
+#ifndef LYTE_EMSC_H_INCLUDED
+#define LYTE_EMSC_H_INCLUDED
 
 #if defined(__EMSCRIPTEN__)
 
@@ -21,12 +21,12 @@ enum {
 /* initialize WebGL context and canvas */
 void emsc_init(const char* canvas_name, int flags);
 
-int emsc_width();
+int emsc_width(void);
 
-int emsc_height();
+int emsc_height(void);
 
-bool emsc_webgl_fallback();
+bool emsc_webgl_fallback(void);
 
 #endif // __EMSCRIPTEN__
 
-#endif  // EMSC_H_INCLUDED
+#endif  // LYTE_EMSC_H_INCLUDED

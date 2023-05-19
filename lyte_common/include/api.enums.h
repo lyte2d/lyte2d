@@ -73,9 +73,15 @@ typedef enum lyte_GamepadButton {
     LYTE_GAMEPADBUTTON_DPAD_RIGHT = 15,// order: 12, str: 'dpad_right'
     LYTE_GAMEPADBUTTON_DPAD_DOWN = 13,// order: 13, str: 'dpad_down'
     LYTE_GAMEPADBUTTON_DPAD_LEFT = 14,// order: 14, str: 'dpad_left'
+
     // MG: value 6 corresponds to LEFT_TRIGGER as a button on WASM
     // MG: value 7 corresponds to RIGHT_TRIGGER as a button on WASM
-    LYTE_GAMEPADBUTTON_COUNT = 15,
+    LYTE_GAMEPADBUTTON_INTERNAL_LEFT_TRIGGER = 6, // only in emscripten. we will map to axis manually with 0.0 or 1.1 value
+    LYTE_GAMEPADBUTTON_INTERNAL_RIGHT_TRIGGER = 7, // only in emscripten. we will map to axis manually with 0.0 or 1.1 value
+
+    // LYTE_GAMEPADBUTTON_COUNT = 15,
+    LYTE_GAMEPADBUTTON_COUNT = 17,
+
     LYTE_GAMEPADBUTTON_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 #else
     // MG: values map to: GLFW (Empscripten/WASM)

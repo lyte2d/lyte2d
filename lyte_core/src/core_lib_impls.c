@@ -1,4 +1,6 @@
 //
+// "implementation" includes for the header libraries
+
 #define XLOG
 #define SOKOL_LOG(s) XLOG(s)
 
@@ -14,8 +16,6 @@
 #include "sokol_args.h"
 
 #if defined(__EMSCRIPTEN__)
-#include <emscripten/emscripten.h>
-#include "emsc.h"
 #define SOKOL_GLES3
 #define GLFW_INCLUDE_ES3
 #else

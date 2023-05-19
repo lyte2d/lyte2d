@@ -63,24 +63,26 @@ static mg_Map sounditems;
 
 static double mastervolume;
 
-void lyte_core_audio_init(void) {
+int lyte_core_audio_init(void) {
     mg_map_init(&musicitems, sizeof(MusicItem), INIT_NUM_MUSICITEMS);
     mg_map_init(&sounddataitems, sizeof(SoundDataItem), INIT_NUM_SOUNDDATAITEMS);
     mg_map_init(&sounditems, sizeof(SoundItem), INIT_NUM_SOUNDITEMS);
 
     // InitAudioDevice
+    return 0;
 }
 
-void lyte_core_audio_cleanup(void) {
+int lyte_core_audio_cleanup(void) {
     mg_map_cleanup(&musicitems);
     mg_map_cleanup(&sounddataitems);
     mg_map_cleanup(&sounditems);
 
-    // CloseAudioDevice
+   // CloseAudioDevice
+   return 0;
 }
 
 
-void lyte_core_audio_update_music_streams() {
+int lyte_core_audio_update_music_streams() {
     for (size_t i=0; i<musicitems.count; i++) {
         uint32_t key = 0;
         MusicItem *m = mg_map_getindex(&musicitems, i, &key);
@@ -94,6 +96,7 @@ void lyte_core_audio_update_music_streams() {
             }
         }
     }
+    return 0;
 }
 
 int lyte_get_mastervolume(double *vol) {

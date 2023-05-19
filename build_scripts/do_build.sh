@@ -14,14 +14,14 @@ echo
 
 
 
-echo "---> BUILD: WIN (GUI)"
-cmake --build $BUILDDIR/wingui
-echo "---> DONE: WIN (GUI)"
-echo
-
 echo "---> BUILD: WASM"
 cmake --build $BUILDDIR/wasm
 echo "---> DONE: WASM"
+echo
+
+echo "---> BUILD: WIN (GUI)"
+cmake --build $BUILDDIR/wingui
+echo "---> DONE: WIN (GUI)"
 echo
 
 echo "---> BUILD: LINUX"

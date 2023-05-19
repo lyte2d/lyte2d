@@ -30,12 +30,14 @@ typedef struct ImageItem {
 static mg_Map imageitems;
 static ImageItem *current_canvas = NULL;
 
-void lyte_core_image_init(void) {
+int lyte_core_image_init(void) {
     mg_map_init(&imageitems, sizeof(ImageItem), INIT_NUM_IMAGEITEMS);
+    return 0;
 }
 
-void lyte_core_image_cleanup(void) {
+int lyte_core_image_cleanup(void) {
     mg_map_cleanup(&imageitems);
+    return 0;
 }
 
 int lyte_load_image(const char *path, lyte_Image *img) {

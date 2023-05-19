@@ -8,7 +8,7 @@
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 
-#include "emsc.h"
+#include "lyte_emsc.h"
 
 static const char* _emsc_canvas_name = 0;
 static bool _emsc_is_webgl2 = false;

@@ -18,7 +18,7 @@
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
-#include "emsc.h"
+#include "lyte_emsc.h"
 // #define SOKOL_GLES3
 // #define GLFW_INCLUDE_ES3
 // #else
@@ -2338,23 +2338,27 @@ static inline void tick(void) {
             resized = true;
         }
 
-        // fullscreen check and update. at the end of the tick (hope this fixes tearing)
-        if (_lib->fullscreen != _lib->fullscreen_next) {
-            glfwSwapInterval(0);
-            _update_to_nextfullscreen();
-            if (_lib->vsync) {
-                glfwSwapInterval(1);
-            } else {
-                glfwSwapInterval(0);
-            }
-            // glfwSwapBuffers(_lib->window);
-        }
+        // MG: updated now
+        // // fullscreen check and update. at the end of the tick (hope this fixes tearing)
+        // if (_lib->fullscreen != _lib->fullscreen_next) {
+        //     // glfwSwapInterval(0);
+        //     _update_to_nextfullscreen();
+        //     // if (_lib->vsync) {
+        //     //     glfwSwapInterval(1);
+        //     // } else {
+        //     //     glfwSwapInterval(0);
+        //     // }
+        //     // glfwSwapBuffers(_lib->window);
+        // }
+
+
+
 
         sgp_begin(win_w, win_h);
 
         sgp_viewport(EMPTY_L, EMPTY_T, win_w-EMPTY_L-EMPTY_R, win_h-EMPTY_T-EMPTY_B);
         sgp_project(-RECT_DELT_L, fwidth+RECT_DELT_R, -RECT_DELT_T, fheight+RECT_DELT_B);
-        sgp_set_blend_mode((sgp_blend_mode)_lib->blendmode);
+        sgp_set_blend_mode((sgp_blend_mode)lyte_state.blendmode);
 
         // PERF_END("head");
 
@@ -2362,7 +2366,7 @@ static inline void tick(void) {
 
         PERF_BEGIN();
         M_gfx_pushmatrix();
-        _lib->tick_fn(_lib->app_data, delta_time, win_w, win_h, resized, _lib->fullscreen);
+        _lib->tick_fn(_lib->app_data, delta_time, win_w, win_h, resized, lyte_state.fullscreen);
         M_gfx_popmatrix();
         PERF_END("tick");
 
@@ -2387,13 +2391,22 @@ static inline void tick(void) {
         // PERF_BEGIN();
         // PERF_BEGIN();
         audio_dowork();
+
         lyte_core_audio_update_music_streams(); // new "dowork"
+
+        lyte_core_input_update_state();
+
         // PERF_END("audio");
         // PERF_BEGIN();
-        sfetch_dowork();
+        lyte_core_filesystem_update_tasks(); // sfetch_dowork covered here
+        // sfetch_dowork();
         // PERF_END("fetch");
         // PERF_BEGIN();
-        _tick_input_next();
+
+
+        // lyte_core_input_update_statet() takes over this:
+        // _tick_input_next();
+
         // PERF_END("input");
         // PERF_END("misc");
 
@@ -2509,11 +2522,22 @@ bool M_system_WASM() {
 
 int M_app_init(M_Config *config) {
 
+    lyte_core_state_init((lyte_Config){
+        .vsync = config->vsync,
+        .blendmode = config->defaultblendmode,
+        .filtermode = config->defaultfiltermode,
+        .window_title = config->title,
+        .window_size = (lyte_Size){ .width=config->width, .height=config->height },
+        .window_min_size = (lyte_Size){ .width=0, .height=0 },
+    });
+
+    lyte_core_filesystem_init();
     lyte_core_image_init();
     lyte_core_audio_init();
     lyte_core_font_init();
+    // lyte_core_window_init();
+    // lyte_core_input_innit();
 
-    lyte_core_state_init(config->vsync, config->defaultblendmode, config->defaultfiltermode);
 
     _lib->vsync = config->vsync;
 
@@ -2525,12 +2549,13 @@ int M_app_init(M_Config *config) {
 
 
     // init: physfs. this is to use zip files as folders!
-    int success = PHYSFS_init("");
-    if (!success) {
-        int errcode = PHYSFS_getLastErrorCode();
-        fprintf(stderr, "Failed to init PHYSFS: %d %d, %s\n", success, errcode, PHYSFS_getErrorByCode(errcode));
-        return 5555;
-    }
+    // handled in lyte_core_filesystem_init
+    // int success = PHYSFS_init("");
+    // if (!success) {
+    //     int errcode = PHYSFS_getLastErrorCode();
+    //     fprintf(stderr, "Failed to init PHYSFS: %d %d, %s\n", success, errcode, PHYSFS_getErrorByCode(errcode));
+    //     return 5555;
+    // }
 
 
     // init audio
@@ -2541,7 +2566,8 @@ int M_app_init(M_Config *config) {
 
 
     // init: sokol-fetch. this is to asynchronously retrieve files from filesystem (win/linux) or web (wasm)
-    sfetch_setup(&(sfetch_desc_t){0});
+    // handled in lyte_core_filesystem_init
+    // sfetch_setup(&(sfetch_desc_t){0});
 
     sargs_setup(&(sargs_desc){
         .argc = config->argc,
@@ -2585,106 +2611,127 @@ int M_app_init(M_Config *config) {
 
 int M_app_init_graphics(M_Config *config) {
 
+    lyte_core_window_init();
 
-#if defined(__EMSCRIPTEN__)
-    emsc_init("#canvas", EMSC_TRY_WEBGL2);
-    // emsc_init("#canvas", 0);
-#endif
+// #if defined(__EMSCRIPTEN__)
+//     emsc_init("#canvas", EMSC_TRY_WEBGL2);
+//     // emsc_init("#canvas", 0);
+// #endif
 
-    // init: glfw & opengl/gles
-    if (!glfwInit()) {
-        fprintf(stderr, "Failed to initialize glfw\n");
-        return 1111;
-    }
+//     // init: glfw & opengl/gles
+//     if (!glfwInit()) {
+//         fprintf(stderr, "Failed to initialize glfw\n");
+//         return 1111;
+//     }
 
-    // MSAA... to change this, window needs to be reopened...
-    // glfwWindowHint(GLFW_SAMPLES, 4);
+//     // MSAA... to change this, window needs to be reopened...
+//     // glfwWindowHint(GLFW_SAMPLES, 4);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
-    // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
-#if defined(__EMSCRIPTEN__)
-    _lib->window = glfwCreateWindow(emsc_width(), emsc_height(), config->title, NULL, NULL);
-    emscripten_set_window_title(config->title);
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+//     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//     // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
+//     glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
+//     // glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
+// #if defined(__EMSCRIPTEN__)
+//     _lib->window = glfwCreateWindow(emsc_width(), emsc_height(), config->title, NULL, NULL);
+//     emscripten_set_window_title(config->title);
 
-#else
-    _lib->window = glfwCreateWindow(config->width, config->height, config->title, NULL, NULL);
-#endif
+// #else
+//     _lib->window = glfwCreateWindow(config->width, config->height, config->title, NULL, NULL);
+// #endif
+
+    // // make the window current for opengl
+    // glfwMakeContextCurrent(_lib->window);
+
+    _lib->window = lyte_state.window;
+
     // assign a monitor to the window (primary by default)
     // todo: do we need an api to select a monitor in multi-mon settings?
-    _lib->monitor = glfwGetWindowMonitor(_lib->window);
-    if (!_lib->monitor) {
-        // this is expected
-        GLFWmonitor* primary = glfwGetPrimaryMonitor();
-        _lib->monitor = primary;
-    } else {
-        _lib->fullscreen = true;
-    }
 
-    // make the window current for opengl
-    glfwMakeContextCurrent(_lib->window);
+    // MG: removed for now
+    // _lib->monitor = glfwGetWindowMonitor(_lib->window);
+    // if (!_lib->monitor) {
+    //     // this is expected
+    //     GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    //     _lib->monitor = primary;
+    // } else {
+    //     // _lib->fullscreen = true;
+    // }
+
+    _lib->monitor = lyte_state.monitor;
+
     // get the mode (for fullscreen changes)
-    _lib->mode = (GLFWvidmode *)glfwGetVideoMode(_lib->monitor);
-    glfwSetWindowPos(
-        _lib->window,
-        _lib->mode->width/2 - config->width/2,
-        _lib->mode->height/2 - config->height/2);
+    // _lib->mode = (GLFWvidmode *)glfwGetVideoMode(_lib->monitor);
 
-    glfwGetWindowPos(_lib->window, &_lib->last_xpos, &_lib->last_ypos);
+
+    // removed for now
+
+    // glfwSetWindowPos(
+    //     _lib->window,
+    //     _lib->mode->width/2 - config->width/2,
+    //     _lib->mode->height/2 - config->height/2);
+
+    // glfwGetWindowPos(_lib->window, &_lib->last_xpos, &_lib->last_ypos);
+
+
 
     // we always start windowed so that we can setup a default location for the window. here we update the whatever the user config says
-    if (config->fullscreen) {
-        M_app_setfullscreen(true);
-    } else {
-        M_app_setfullscreen(false);
-    }
-    // todo: there's an issue with vsync in fullscreen mode. it doesn't seeem to be in effec there. investigate.
-    if (_lib->vsync) {
-        glfwSwapInterval(1);
-    } else {
-        glfwSwapInterval(0);
-    }
-    // hopefully all's good!
-    if (_lib->window == NULL) {
-        fprintf(stderr, "Failed to create glfw window\n");
-        return 2222;
-    }
+    // if (config->fullscreen) {
+    //     M_app_setfullscreen(true);
+    // } else {
+    //     M_app_setfullscreen(false);
+    // }
+    // // todo: there's an issue with vsync in fullscreen mode. it doesn't seeem to be in effec there. investigate.
+    // if (_lib->vsync) {
+    //     glfwSwapInterval(1);
+    // } else {
+    //     glfwSwapInterval(0);
+    // }
+    // // hopefully all's good!
+    // if (_lib->window == NULL) {
+    //     fprintf(stderr, "Failed to create glfw window\n");
+    //     return 2222;
+    // }
 
     // shader definitions
     _lib->last_shaderid = 100;
     memset(_lib->shaderdefs, 0, sizeof(M_ShaderDef)*M_MAX_SHADERDEFS);
 
-    // init: sokol
-    sg_desc sgdesc = {0};
-    sg_setup(&sgdesc);
-    if(!sg_isvalid()) {
-        fprintf(stderr, "Failed to create Sokol GFX context\n");
-        return 3333;
-    }
+    // // init: sokol
+    // sg_desc sgdesc = {0};
+    // sg_setup(&sgdesc);
+    // if(!sg_isvalid()) {
+    //     fprintf(stderr, "Failed to create Sokol GFX context\n");
+    //     return 3333;
+    // }
 
-    // init: sogol gp (2d abstractions for sokol)
-    // adjust the size of command buffers for your own use.
-    // TODO: make this configurable (M_MAX_VERTICES)
-    sgp_desc sgpdesc = {0};
-    sgpdesc.max_vertices = 250000;
-    sgp_setup(&sgpdesc);
-    if(!sgp_is_valid()) {
-        fprintf(stderr, "Failed to create Sokol GP context: %s\n", sgp_get_error_message(sgp_get_last_error()));
-        return 4444;
-    }
+    // // init: sogol gp (2d abstractions for sokol)
+    // // adjust the size of command buffers for your own use.
+    // // TODO: make this configurable (M_MAX_VERTICES)
+    // sgp_desc sgpdesc = {0};
+    // sgpdesc.max_vertices = 250000;
+    // sgp_setup(&sgpdesc);
+    // if(!sgp_is_valid()) {
+    //     fprintf(stderr, "Failed to create Sokol GP context: %s\n", sgp_get_error_message(sgp_get_last_error()));
+    //     return 4444;
+    // }
 
 
 
     // setup input callbacks for mouse cursor loc, mouse buttons, keyboard state, joystic (gamepad) connetions
     // other input state (such as gamepad buttons, axes, etc) is polled each tick.
-    glfwSetCursorPosCallback(_lib->window, cursor_position_callback);
-    glfwSetMouseButtonCallback(_lib->window, mouse_button_callback);
-    glfwSetKeyCallback(_lib->window, key_callback);
-    glfwSetJoystickCallback(joystick_callback);
+
+
+    lyte_core_input_init();
+    // takes over below:
+    // glfwSetCursorPosCallback(lyte_state.window, cursor_position_callback);
+    // glfwSetMouseButtonCallback(lyte_state.window, mouse_button_callback);
+    // glfwSetKeyCallback(lyte_state.window, key_callback);
+    // glfwSetJoystickCallback(joystick_callback);
+
+
     return 0;
 }
 
@@ -2701,17 +2748,19 @@ void M_app_startloop(M_TickFunc tick_fn, void *app_data) {
 }
 
 void M_app_cleanup() {
+    // internal cleanups
+    // handled in lyte_core_filesystem_cleanup
+    // sfetch_shutdown();
+    // PHYSFS_deinit();
+
+    font_cleanup();
+    audio_cleanup();
 
     lyte_core_image_cleanup();
     lyte_core_audio_cleanup();
     lyte_core_font_cleanup();
+    lyte_core_window_cleanup();
+    lyte_core_input_cleanup();
+    lyte_core_filesystem_cleanup();
 
-    // internal cleanups
-    sfetch_shutdown();
-    PHYSFS_deinit();
-    sgp_shutdown();
-    sg_shutdown();
-    font_cleanup();
-    audio_cleanup();
-    glfwTerminate();
 }
