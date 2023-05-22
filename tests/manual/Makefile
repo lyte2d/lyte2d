@@ -6,6 +6,9 @@ PONGOUT=../../games/pongout
 default:
 	echo "run samples, games etc"
 
+clean:
+	rm -rf ./tmp/**
+
 s01:
 	${LYTE} dir=${EXAMPLES} app=s01_hello
 
@@ -28,13 +31,16 @@ s07:
 	${LYTE} dir=${EXAMPLES} app=s07_basic_shader2
 
 s08:
-	${LYTE} dir=${EXAMPLES} app=s08_shader_spin_plus
+	${LYTE} dir=${EXAMPLES} app=s08_shader_spinning_plus
 
 s09:
 	${LYTE} dir=${EXAMPLES} app=s09_shader_canvas
 
 t1:
 	${LYTE} dir=${EXAMPLES} app=test
+
+file1:
+	${LYTE} app=textfile
 
 pongout:
 	${LYTE} dir=${PONGOUT}

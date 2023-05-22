@@ -7,7 +7,7 @@
 
 CURRDIR=$(pwd)
 
-VERSION=$(cat lyte/version.txt)
+VERSION=$(cat version.txt)
 
 ## Docker run helper. Notice no "-it" because this is to run in CI
 DO_RUN="docker run --rm --name=builder \

@@ -110,7 +110,7 @@ set_window_vsync function set_window_vsync
     arg[1] vsync :: boolean
 is_window_vsync function is_window_vsync
     ret[1] :: boolean
-set_window_icon function set_window_icon
+set_window_icon_file function set_window_icon_file
     arg[1] icon_path :: string
 set_window_margins function set_window_margins
     arg[1] left :: integer
@@ -248,13 +248,13 @@ get_sound_pan function get_sound_pan
 get_sound_pitch function get_sound_pitch
     arg[1] sound :: Sound
     ret[1] :: number
-load_file function load_file
+load_textfile function load_textfile
     arg[1] file_path :: string
     ret[1] :: string
-save_file_write function save_file_write
+save_textfile function save_textfile
     arg[1] file_path :: string
     arg[2] data :: string
-save_file_append function save_file_append
+save_textfile_append function save_textfile_append
     arg[1] file_path :: string
     arg[2] data :: string
 push_matrix function push_matrix

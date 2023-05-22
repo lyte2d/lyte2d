@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(morebase C)
+project(lyte_core C)
 message("===============> Project: ${PROJECT_NAME}")
 
 add_library(${PROJECT_NAME} STATIC)
@@ -56,7 +56,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 
 message("===> Adding FreeType")
-# set()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/freetype ${CMAKE_CURRENT_BINARY_DIR}/freetype)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   freetype
@@ -66,13 +65,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     ./include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../recycle/include # TEMP
   PRIVATE
-    ./impl
     ./src
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
     ${GLFW_SOURCE_DIR}/include
     ${GLFW_SOURCE_DIR}/dependencies
-    # ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/sokol_gp/thirdparty
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/sokol
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/sokol_gp
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/stb_image
@@ -83,9 +82,8 @@ target_include_directories(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/src/map.c
-    ./impl/morebase.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../recycle/morebase.c # TEMP
     ./src/core_lib_impls.c
-    ./src/core_emsc.c
     ./src/core_audio.c
     ./src/core_filesystem.c
     ./src/core_font.c
@@ -95,6 +93,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     ./src/core_shapes.c
     ./src/core_state.c
     ./src/core_window.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/src/lyte_emsc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/stb_image/stb_image.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/raudio/src/raudio.c
 )

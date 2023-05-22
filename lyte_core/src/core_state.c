@@ -24,9 +24,15 @@ int lyte_core_state_init(lyte_Config config) {
     lyte_state.monitor = NULL;
     lyte_state.mode = NULL;
 
+    lyte_state.do_quit = false;
+
     return 0;
 }
 
+int lyte_quit(void) {
+    lyte_state.do_quit = true;
+    return 0;
+}
 
 int lyte_set_default_blendmode(lyte_BlendMode blendmode) {
     lyte_state.default_blendmode = blendmode;
@@ -57,6 +63,13 @@ int lyte_set_filtermode(lyte_FilterMode filtermode) {
 
 int lyte_reset_filtermode(void) {
     lyte_state.filtermode = lyte_state.default_filtermode;
+    return 0;
+}
+
+int lyte_cls(double r, double g, double b, double a) {
+    sgp_set_color(r,g,b,a);
+    sgp_clear();
+    sgp_reset_color(); // TODO: should we keep a "current_color" and update?
     return 0;
 }
 

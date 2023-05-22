@@ -13,7 +13,7 @@
 
 #include "lyte.h"
 
-#include "_boot_zip.h"
+#include "_boot_zip.generated.c"
 
 #define LUA_BOOT_ZIP "bootzip"
 #define LUA_BOOT_FILENAME "lyte_boot"

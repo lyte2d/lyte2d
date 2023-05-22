@@ -144,27 +144,27 @@ static inline const char *_impl_tostring_lyte_ShaderBuilder(lyte_ShaderBuilder *
 }
 static inline int _impl_quit(void) {
     int _ret = 0;
-    M_app_quit();
-    //_ret = lyte_quit();
+    _ret = lyte_quit();
     return _ret;
 }
 static inline int _impl_cls(double r, double g, double b, double a) {
     (void)r;(void)g;(void)b;(void)a;
     int _ret = 0;
-    M_gfx_clear(r,g,b,a);
-    //_ret = lyte_cls(r, g, b, a);
+    _ret = lyte_cls(r, g, b, a);
     return _ret;
 }
 static inline int _impl_set_color(double r, double g, double b, double a) {
     (void)r;(void)g;(void)b;(void)a;
     int _ret = 0;
     M_gfx_setcolor(r,g,b,a);
+    // TODO: shader work before implementing these two
     //_ret = lyte_set_color(r, g, b, a);
     return _ret;
 }
 static inline int _impl_reset_color(void) {
     int _ret = 0;
     M_gfx_resetcolor();
+    // TODO: shader work before implementing these two
     //_ret = lyte_reset_color();
     return _ret;
 }
@@ -314,36 +314,31 @@ static inline int _impl_set_window_title(const char * title) {
 static inline int _impl_set_window_vsync(bool vsync) {
     (void)vsync;
     int _ret = 0;
-    M_app_setvsync(vsync);
-    //_ret = lyte_set_window_vsync(vsync);
+    _ret = lyte_set_window_vsync(vsync);
     return _ret;
 }
 static inline int _impl_is_window_vsync(bool *val) {
     (void)val;
     int _ret = 0;
-    *val = M_app_getvsync();
-    //_ret = lyte_is_window_vsync(val);
+    _ret = lyte_is_window_vsync(val);
     return _ret;
 }
-static inline int _impl_set_window_icon(const char * icon_path) {
+static inline int _impl_set_window_icon_file(const char * icon_path) {
     (void)icon_path;
     int _ret = 0;
-    M_app_seticon(icon_path);
-    //_ret = lyte_set_window_icon(icon_path);
+    _ret = lyte_set_window_icon_file(icon_path);
     return _ret;
 }
 static inline int _impl_set_window_margins(int left, int right, int top, int bottom) {
     (void)left;(void)right;(void)top;(void)bottom;
     int _ret = 0;
-    M_app_setmargins(left, right, top, bottom);
-    //_ret = lyte_set_window_margins(left, right, top, bottom);
+    _ret = lyte_set_window_margins(left, right, top, bottom);
     return _ret;
 }
 static inline int _impl_set_window_paddings(int left, int right, int top, int bottom) {
     (void)left;(void)right;(void)top;(void)bottom;
     int _ret = 0;
-    M_app_setpaddings(left, right, top, bottom);
-    //_ret = lyte_set_window_paddings(left, right, top, bottom);
+    _ret = lyte_set_window_paddings(left, right, top, bottom);
     return _ret;
 }
 static inline int _impl_is_key_down(lyte_KeyboardKey key, bool *val) {
@@ -598,23 +593,22 @@ static inline int _impl_get_sound_pitch(lyte_Sound sound, double *val) {
     _ret = lyte_get_sound_pitch(sound, val);
     return _ret;
 }
-static inline int _impl_load_file(const char * file_path, const char * *val) {
+static inline int _impl_load_textfile(const char * file_path, const char * *val) {
     (void)file_path;(void)val;
     int _ret = 0;
-    // *val = M_path_readbytes(path, )
-    //_ret = lyte_load_file(file_path, val);
+    _ret = lyte_load_textfile(file_path, val);
     return _ret;
 }
-static inline int _impl_save_file_write(const char * file_path, const char * data) {
+static inline int _impl_save_textfile(const char * file_path, const char * data) {
     (void)file_path;(void)data;
     int _ret = 0;
-    //_ret = lyte_save_file_write(file_path, data);
+    _ret = lyte_save_textfile(file_path, data);
     return _ret;
 }
-static inline int _impl_save_file_append(const char * file_path, const char * data) {
+static inline int _impl_save_textfile_append(const char * file_path, const char * data) {
     (void)file_path;(void)data;
     int _ret = 0;
-    //_ret = lyte_save_file_append(file_path, data);
+    _ret = lyte_save_textfile_append(file_path, data);
     return _ret;
 }
 static inline int _impl_push_matrix(void) {

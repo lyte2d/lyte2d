@@ -64,11 +64,18 @@ static mg_Map sounditems;
 static double mastervolume;
 
 int lyte_core_audio_init(void) {
+    InitAudioDevice();
+    if (!IsAudioDeviceReady()) {
+        fprintf(stderr, "Audio device init failed\n");
+        return -1;
+    }
+
     mg_map_init(&musicitems, sizeof(MusicItem), INIT_NUM_MUSICITEMS);
     mg_map_init(&sounddataitems, sizeof(SoundDataItem), INIT_NUM_SOUNDDATAITEMS);
     mg_map_init(&sounditems, sizeof(SoundItem), INIT_NUM_SOUNDITEMS);
 
-    // InitAudioDevice
+    mastervolume = 0.7;
+
     return 0;
 }
 
@@ -77,8 +84,9 @@ int lyte_core_audio_cleanup(void) {
     mg_map_cleanup(&sounddataitems);
     mg_map_cleanup(&sounditems);
 
-   // CloseAudioDevice
-   return 0;
+    CloseAudioDevice();
+
+    return 0;
 }
 
 

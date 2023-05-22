@@ -209,7 +209,7 @@ local function start()
     lyte.set_window_minsize(CW*3,CH*3)
     -- lyte.set_window_size(CW*3,CH*3)
     lyte.set_window_title("Pong Out!")
-    lyte.set_window_icon("/assets/images/icon.png")
+    lyte.set_window_icon_file("/assets/images/icon.png")
 
     Window.width = lyte.get_window_width()
     Window.height = lyte.get_window_height()

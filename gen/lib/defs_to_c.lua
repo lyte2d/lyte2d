@@ -473,7 +473,7 @@ function CC.Record(items, depth, name, tags, traverse_fn)
     CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth + 1) .. "(void)" .. name:lower() .. ";\n"
     -- CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// implementation\n"
     CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "int _ret = 0;\n"
-    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// _ret = " .. prefix .. "cleanup_"  .. name:lower() .. "(*" ..  name:lower() .. ");\n"
+    CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "_ret = " .. prefix .. "cleanup_"  .. name:lower() .. "(*" ..  name:lower() .. ");\n"
     CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "return _ret;\n"
     CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth) .. "}\n"
 
@@ -801,7 +801,7 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
         CC.top_structlifetime = CC.top_structlifetime .. voidargs
         -- CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "// implementation\n"
         CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "int _ret = 0;\n"
-        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "//_ret = " .. call_lib_fn_name .. "(" ..  lib_call_args .. ");\n"
+        CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "_ret = " .. call_lib_fn_name .. "(" ..  lib_call_args .. ");\n"
         CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth+1) .. "return _ret;\n"
         CC.top_structlifetime = CC.top_structlifetime .. tab:rep(depth) .. "}\n"
     else
@@ -812,7 +812,7 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
         CC.top_funcimpls = CC.top_funcimpls .. voidargs
         -- CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "// implementation\n"
         CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "int _ret = 0;\n"
-        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "//_ret = " .. call_lib_fn_name .. "(" ..  lib_call_args .. ");\n"
+        CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "_ret = " .. call_lib_fn_name .. "(" ..  lib_call_args .. ");\n"
         CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth+1) .. "return _ret;\n"
         CC.top_funcimpls = CC.top_funcimpls .. tab:rep(depth) .. "}\n"
     end

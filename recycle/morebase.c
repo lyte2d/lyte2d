@@ -2294,7 +2294,7 @@ static inline void tick(void) {
 
 #if defined(__EMSCRIPTEN__)
     // Note this is for emscripten case. Non-emscripten quit is handled in M_app_startloop()
-    if(_lib->quit) {
+    if(lyte_state.do_quit) {
         emscripten_cancel_main_loop();
     }
 #endif
@@ -2310,15 +2310,15 @@ static inline void tick(void) {
 
         int win_w, win_h;
 
-        float RECT_DELT_L = _lib->padding_left;
-        float RECT_DELT_R = _lib->padding_right;
-        float RECT_DELT_T = _lib->padding_top;
-        float RECT_DELT_B = _lib->padding_bottom;
+        float RECT_DELT_L = lyte_state.window_paddings.left;
+        float RECT_DELT_R = lyte_state.window_paddings.right;
+        float RECT_DELT_T = lyte_state.window_paddings.top;
+        float RECT_DELT_B = lyte_state.window_paddings.bottom;
 
-        float EMPTY_L = _lib->margin_left;
-        float EMPTY_R = _lib->margin_right;
-        float EMPTY_T = _lib->margin_top;
-        float EMPTY_B = _lib->margin_bottom;
+        float EMPTY_L = lyte_state.window_margins.left;
+        float EMPTY_R = lyte_state.window_margins.right;
+        float EMPTY_T = lyte_state.window_margins.top;
+        float EMPTY_B = lyte_state.window_margins.bottom;
 
 #if defined(__EMSCRIPTEN__)
         // _lib->width = emsc_width();
@@ -2326,7 +2326,7 @@ static inline void tick(void) {
         win_w = emsc_width();
         win_h = emsc_height();
 #else
-        glfwGetFramebufferSize(_lib->window, &win_w, &win_h);
+        glfwGetFramebufferSize(lyte_state.window, &win_w, &win_h);
 #endif
 
         int fwidth = win_w - RECT_DELT_L - RECT_DELT_R;
@@ -2539,13 +2539,19 @@ int M_app_init(M_Config *config) {
     // lyte_core_input_innit();
 
 
-    _lib->vsync = config->vsync;
+    // shader init (WIP)
+    _lib->last_shaderid = 100;
+    memset(_lib->shaderdefs, 0, sizeof(M_ShaderDef)*M_MAX_SHADERDEFS);
 
-    _lib->defaultblendmode = config->defaultblendmode;
-    _lib->blendmode = _lib->defaultblendmode;
 
-    _lib->defaultfiltermode = config->defaultfiltermode;
-    _lib->filtermode = _lib->filtermode;
+
+    // _lib->vsync = config->vsync;
+
+    // _lib->defaultblendmode = config->defaultblendmode;
+    // _lib->blendmode = _lib->defaultblendmode;
+
+    // _lib->defaultfiltermode = config->defaultfiltermode;
+    // _lib->filtermode = _lib->filtermode;
 
 
     // init: physfs. this is to use zip files as folders!
@@ -2559,23 +2565,22 @@ int M_app_init(M_Config *config) {
 
 
     // init audio
-    audio_init();
+    // audio_init();
 
     // init font system
-    font_init();
+    // font_init();
 
 
     // init: sokol-fetch. this is to asynchronously retrieve files from filesystem (win/linux) or web (wasm)
     // handled in lyte_core_filesystem_init
     // sfetch_setup(&(sfetch_desc_t){0});
 
+    // TODO: move to state?
     sargs_setup(&(sargs_desc){
         .argc = config->argc,
         .argv = config->argv
     });
-
-
-
+    // TODO: ditto
 #ifndef __EMSCRIPTEN__
     bool first_arg_update = false;
     char first_arg_new[1000] = {0};
@@ -2606,6 +2611,7 @@ int M_app_init(M_Config *config) {
     }
 #endif
     return 0;
+    // ---- TODO end-move to state-end ---
 }
 
 
@@ -2696,8 +2702,7 @@ int M_app_init_graphics(M_Config *config) {
     // }
 
     // shader definitions
-    _lib->last_shaderid = 100;
-    memset(_lib->shaderdefs, 0, sizeof(M_ShaderDef)*M_MAX_SHADERDEFS);
+
 
     // // init: sokol
     // sg_desc sgdesc = {0};
@@ -2742,7 +2747,7 @@ void M_app_startloop(M_TickFunc tick_fn, void *app_data) {
     #ifdef EMSCRIPTEN
     emscripten_set_main_loop(tick, 0, 1);
     #else
-    while(!(glfwWindowShouldClose(_lib->window) || _lib->quit)) { tick(); }
+    while(!(glfwWindowShouldClose(lyte_state.window) || lyte_state.do_quit)) { tick(); }
     #endif
     // LOOP ENDS HERE------------------------------------------------
 }
@@ -2753,8 +2758,8 @@ void M_app_cleanup() {
     // sfetch_shutdown();
     // PHYSFS_deinit();
 
-    font_cleanup();
-    audio_cleanup();
+    // font_cleanup();
+    // audio_cleanup();
 
     lyte_core_image_cleanup();
     lyte_core_audio_cleanup();

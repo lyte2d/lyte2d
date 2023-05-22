@@ -4,7 +4,7 @@ local total_time = 0
 local image_1 = lyte.load_image("assets/hero.png")
 
 lyte.set_window_title "this is a test :)"
-lyte.set_window_icon "assets/hero.png"
+lyte.set_window_icon_file "assets/hero.png"
 
 local sb = lyte.new_shaderbuilder()
 sb:uniform("screen_size", "vec2")

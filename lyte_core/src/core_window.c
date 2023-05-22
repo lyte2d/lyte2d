@@ -13,6 +13,9 @@
 #include "sokol_gfx.h"
 #include "sokol_gp.h"
 
+#include "physfs.h" // icon
+#include "stb_image.h" // icon
+
 
 
 int lyte_core_window_init(void) {
@@ -181,3 +184,67 @@ int lyte_set_window_title(const char * title) {
     return 0;
 }
 
+int lyte_set_window_icon_file(const char * path) {
+    PHYSFS_File *file = PHYSFS_openRead(path);
+    if (file == NULL) {
+        int errcode = PHYSFS_getLastErrorCode();
+        const char *errstr = PHYSFS_getErrorByCode(errcode);
+        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        return errcode;
+    }
+    size_t len = PHYSFS_fileLength(file);
+    uint8_t *buf = malloc(len);
+    size_t read_len = PHYSFS_readBytes(file, buf, len);
+    if (len != read_len) {
+        fprintf(stderr, "File not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
+        return 1;
+    }
+    int width;
+    int height;
+    int channels;
+    uint8_t *data = stbi_load_from_memory(buf, read_len, &width, &height, &channels, 4);
+    if (!data) {
+        fprintf(stderr, "Image file failed to load: %s\n", path);
+        return 2;
+    }
+
+    GLFWimage images[1];
+    images[0].pixels = stbi_load_from_memory(buf, read_len, &images[0].width, &images[0].height, 0, 4);
+    glfwSetWindowIcon(lyte_state.window, 1, images);
+
+    stbi_image_free(data);
+    free(buf);
+    PHYSFS_close(file);
+    return 0;
+}
+
+int lyte_set_window_vsync(bool vsync) {
+    lyte_state.vsync = vsync;
+    if (lyte_state.vsync) {
+        glfwSwapInterval(1);
+    } else {
+        glfwSwapInterval(0);
+    }
+    return 0;
+}
+
+int lyte_is_window_vsync(bool *val) {
+    *val = lyte_state.vsync;
+    return 0;
+}
+
+int lyte_set_window_margins(int left, int right, int top, int bottom) {
+    lyte_state.window_margins.left = left;
+    lyte_state.window_margins.right = right;
+    lyte_state.window_margins.top = top;
+    lyte_state.window_margins.bottom = bottom;
+    return 0;
+}
+
+int lyte_set_window_paddings(int left, int right, int top, int bottom) {
+    lyte_state.window_paddings.left = left;
+    lyte_state.window_paddings.right = right;
+    lyte_state.window_paddings.top = top;
+    lyte_state.window_paddings.bottom = bottom;
+    return 0;
+}

@@ -564,7 +564,7 @@
                 } }
         }, {
             _kind = "function",
-            _name = "set_window_icon",
+            _name = "set_window_icon_file",
             _tags = {
                 d = "Set the window icon."
             },
@@ -1341,7 +1341,7 @@
                 } }
         }, {
             _kind = "function",
-            _name = "load_file",
+            _name = "load_textfile",
             _tags = {
                 d = "Load the file in the path."
             },
@@ -1355,9 +1355,9 @@
                 } }
         }, {
             _kind = "function",
-            _name = "save_file_write",
+            _name = "save_textfile",
             _tags = {
-                d = "Append the data to the file in the path. Override if the file exists. Create if it doesn't exist."
+                d = "Append the text to the file in the path. Override if the file exists. Create if it doesn't exist."
             },
             args = { {
                     _name = "file_path",
@@ -1369,9 +1369,9 @@
             rets = {}
         }, {
             _kind = "function",
-            _name = "save_file_append",
+            _name = "save_textfile_append",
             _tags = {
-                d = "Append the data to the file in the path. Append at the end if the file exists. Create if it doesn't exist."
+                d = "Append the text to the file in the path. Append at the end if the file exists. Create if it doesn't exist."
             },
             args = { {
                     _name = "file_path",

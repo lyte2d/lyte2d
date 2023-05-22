@@ -30,6 +30,10 @@ typedef struct lyte_Size {
     int width, height;
 } lyte_Size;
 
+typedef struct lyte_QuadSize {
+    int left, right, top, bottom;
+} lyte_QuadSize;
+
 typedef struct lyte_Config {
     bool vsync;
     const char *window_title;
@@ -50,10 +54,15 @@ typedef struct lyte_State {
     bool vsync;
     lyte_BlendMode blendmode;
     lyte_FilterMode filtermode;
+    lyte_QuadSize window_margins;
+    lyte_QuadSize window_paddings;
+
 
     void *window; // GLFWwindow
     void *monitor; // GLFWmonitor
     void *mode; // GLFWVidMode
+
+    bool do_quit; // set to true to quit the app
 
 } lyte_State;
 
@@ -66,12 +75,14 @@ extern lyte_State lyte_state;
 
 int lyte_core_state_init(lyte_Config config);
 
+int lyte_quit(void);
 int lyte_set_default_blendmode(lyte_BlendMode blendmode);
 int lyte_set_blendmode(lyte_BlendMode blendmode);
 int lyte_reset_blendmode(void);
 int lyte_set_default_filtermode(lyte_FilterMode filtermode);
 int lyte_set_filtermode(lyte_FilterMode filtermode);
 int lyte_reset_filtermode(void);
+int lyte_cls(double r, double g, double b, double a);
 int lyte_push_matrix(void);
 int lyte_pop_matrix(void);
 int lyte_reset_matrix(void);
@@ -96,6 +107,11 @@ int lyte_get_window_height(int *val);
 int lyte_set_fullscreen(bool fullscreen);
 int lyte_is_fullscreen(bool *val);
 int lyte_set_window_title(const char * title);
+int lyte_set_window_icon_file(const char * icon_path);
+int lyte_set_window_vsync(bool vsync);
+int lyte_is_window_vsync(bool *val);
+int lyte_set_window_margins(int left, int right, int top, int bottom);
+int lyte_set_window_paddings(int left, int right, int top, int bottom);
 
 
 // -------------------------
@@ -138,6 +154,9 @@ int lyte_core_filesystem_init(void);
 int lyte_core_filesystem_cleanup(void);
 int lyte_core_filesystem_update_tasks(void);
 
+int lyte_load_textfile(const char * file_path, const char * *val);
+int lyte_save_textfile(const char * file_path, const char * data);
+int lyte_save_textfile_append(const char * file_path, const char * data);
 
 
 // -------------------------

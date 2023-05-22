@@ -194,12 +194,12 @@ int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val) {
 }
 
 int lyte_get_mouse_x(int *val) {
-    *val = inputstate.mouse_x; // - _lib->margin_left - _lib->padding_left;
+    *val = inputstate.mouse_x - lyte_state.window_margins.left - lyte_state.window_paddings.left;
     return 0;
 }
 
 int lyte_get_mouse_y(int *val) {
-    *val = inputstate.mouse_y; // - _lib->margin_top - _lib->padding_top;
+    *val = inputstate.mouse_y - lyte_state.window_margins.top - lyte_state.window_paddings.top;
     return 0;
 }
 

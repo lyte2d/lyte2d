@@ -34,7 +34,7 @@ declare namespace lyte {
     function set_window_title(title: string): void
     function set_window_vsync(vsync: boolean): void
     function is_window_vsync(): boolean
-    function set_window_icon(icon_path: string): void
+    function set_window_icon_file(icon_path: string): void
     function set_window_margins(left: number, right: number, top: number, bottom: number): void
     function set_window_paddings(left: number, right: number, top: number, bottom: number): void
     function is_key_down(key: KeyboardKey): boolean
@@ -82,9 +82,9 @@ declare namespace lyte {
     function get_sound_volume(sound: Sound): number
     function get_sound_pan(sound: Sound): number
     function get_sound_pitch(sound: Sound): number
-    function load_file(file_path: string): string
-    function save_file_write(file_path: string, data: string): void
-    function save_file_append(file_path: string, data: string): void
+    function load_textfile(file_path: string): string
+    function save_textfile(file_path: string, data: string): void
+    function save_textfile_append(file_path: string, data: string): void
     function push_matrix(): void
     function pop_matrix(): void
     function reset_matrix(): void

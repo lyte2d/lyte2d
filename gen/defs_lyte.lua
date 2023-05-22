@@ -211,7 +211,7 @@ return Namespace("lyte", {
         Ret("val", Boolean()),
     }, {d="Check if the window vsync flag is set."}),
 
-    Function("set_window_icon", {
+    Function("set_window_icon_file", {
         Arg("icon_path", String()),
     }, nil, {d="Set the window icon."}),
 
@@ -470,21 +470,21 @@ return Namespace("lyte", {
         Ret("val", Number()),
     }, {d="Get the pitch of the given sound object."}),
 
-    Function("load_file", {
+    Function("load_textfile", {
         Arg("file_path", String()),
     },{
         Ret("val", String()),
     },{ d="Load the file in the path."}),
 
-    Function("save_file_write", {
+    Function("save_textfile", {
         Arg("file_path", String()),
         Arg("data", String()),
-    }, nil, {d="Append the data to the file in the path. Override if the file exists. Create if it doesn't exist."}),
+    }, nil, {d="Append the text to the file in the path. Override if the file exists. Create if it doesn't exist."}),
 
-    Function("save_file_append", {
+    Function("save_textfile_append", {
         Arg("file_path", String()),
         Arg("data", String()),
-    }, nil, {d="Append the data to the file in the path. Append at the end if the file exists. Create if it doesn't exist."}),
+    }, nil, {d="Append the text to the file in the path. Append at the end if the file exists. Create if it doesn't exist."}),
 
     Function("push_matrix", nil, nil, {d="Push the transform matrix."}),
 

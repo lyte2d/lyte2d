@@ -1,4 +1,4 @@
-VERSION=${shell cat lyte/version.txt}
+VERSION=${shell cat version.txt}
 
 default:
 	cat Makefile
@@ -9,10 +9,10 @@ default:
 
 ## Code generators (local development use)
 
-codegen-bootzip-header:
+codegen-bootzip:
 	rm -f out/boot.zip
-	cd lyte/boot && zip -9 -u -r ../../out/boot.zip . -x *.tl && cd ../..
-	cd out && xxd -i boot.zip ../lyte/src/_boot_zip.h && cd ../..
+	cd lyte_boot && zip -9 -u -r ../out/boot.zip . -x *.tl && cd ..
+	cd out && xxd -i boot.zip ../lyte/src/_boot_zip.generated.c && cd ../..
 	rm -f out/boot.zip
 
 

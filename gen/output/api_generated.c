@@ -751,15 +751,15 @@ static int api_is_window_vsync(lua_State *L) {
     return 1;
 }
 // [ string  --  ]
-static int api_set_window_icon(lua_State *L) {
+static int api_set_window_icon_file(lua_State *L) {
     (void)L;
     // arguments
     const char * icon_path = luaL_checkstring(L, 1);
 
     // implementation
-    int err = _impl_set_window_icon(icon_path);
+    int err = _impl_set_window_icon_file(icon_path);
     if (err != 0) {
-        printf("Warning:  api_set_window_icon");
+        printf("Warning:  api_set_window_icon_file");
     }
     return 0;
 }
@@ -1485,7 +1485,7 @@ static int api_get_sound_pitch(lua_State *L) {
     return 1;
 }
 // [ string  -- string  ]
-static int api_load_file(lua_State *L) {
+static int api_load_textfile(lua_State *L) {
     (void)L;
     // arguments
     const char * file_path = luaL_checkstring(L, 1);
@@ -1493,38 +1493,38 @@ static int api_load_file(lua_State *L) {
     const char * val = {0};
 
     // implementation
-    int err = _impl_load_file(file_path, &val);
+    int err = _impl_load_textfile(file_path, &val);
     if (err != 0) {
-        printf("Warning:  api_load_file");
+        printf("Warning:  api_load_textfile");
     }
     lua_pushstring(L, val);
     return 1;
 }
 // [ string string  --  ]
-static int api_save_file_write(lua_State *L) {
+static int api_save_textfile(lua_State *L) {
     (void)L;
     // arguments
     const char * file_path = luaL_checkstring(L, 1);
     const char * data = luaL_checkstring(L, 2);
 
     // implementation
-    int err = _impl_save_file_write(file_path, data);
+    int err = _impl_save_textfile(file_path, data);
     if (err != 0) {
-        printf("Warning:  api_save_file_write");
+        printf("Warning:  api_save_textfile");
     }
     return 0;
 }
 // [ string string  --  ]
-static int api_save_file_append(lua_State *L) {
+static int api_save_textfile_append(lua_State *L) {
     (void)L;
     // arguments
     const char * file_path = luaL_checkstring(L, 1);
     const char * data = luaL_checkstring(L, 2);
 
     // implementation
-    int err = _impl_save_file_append(file_path, data);
+    int err = _impl_save_textfile_append(file_path, data);
     if (err != 0) {
-        printf("Warning:  api_save_file_append");
+        printf("Warning:  api_save_textfile_append");
     }
     return 0;
 }
@@ -2265,7 +2265,7 @@ static const struct luaL_Reg lyte_api_functions[] = {
     {"set_window_title", api_set_window_title},
     {"set_window_vsync", api_set_window_vsync},
     {"is_window_vsync", api_is_window_vsync},
-    {"set_window_icon", api_set_window_icon},
+    {"set_window_icon_file", api_set_window_icon_file},
     {"set_window_margins", api_set_window_margins},
     {"set_window_paddings", api_set_window_paddings},
     {"is_key_down", api_is_key_down},
@@ -2313,9 +2313,9 @@ static const struct luaL_Reg lyte_api_functions[] = {
     {"get_sound_volume", api_get_sound_volume},
     {"get_sound_pan", api_get_sound_pan},
     {"get_sound_pitch", api_get_sound_pitch},
-    {"load_file", api_load_file},
-    {"save_file_write", api_save_file_write},
-    {"save_file_append", api_save_file_append},
+    {"load_textfile", api_load_textfile},
+    {"save_textfile", api_save_textfile},
+    {"save_textfile_append", api_save_textfile_append},
     {"push_matrix", api_push_matrix},
     {"pop_matrix", api_pop_matrix},
     {"reset_matrix", api_reset_matrix},
