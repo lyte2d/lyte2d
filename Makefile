@@ -12,9 +12,11 @@ default:
 codegen-bootzip:
 	rm -f out/boot.zip
 	cd lyte_boot && zip -9 -u -r ../out/boot.zip . -x *.tl && cd ..
-	cd out && xxd -i boot.zip ../lyte/src/_boot_zip.generated.c && cd ../..
+	cd out && xxd -i boot.zip ../lyte_boot/include/_boot_zip_generated.c && cd ../..
 	rm -f out/boot.zip
 
+codegen-apidefs:
+	make -C lyte_api/defs all
 
 ## Local / Dev builds
 
@@ -62,6 +64,11 @@ docker-image-build:
 	docker build -t more/builder:0.1 -f ./build_scripts/Dockerfile .
 	docker tag more/builder:0.1 more/builder:latest
 
+official-build:
+	./build_scripts/official_build.sh
+
+## Personal use/concenience (MG)
+
 DOCKER_RUN_INTERACTIVE=docker run -it --rm --name=builder \
     	--mount type=bind,source=${PWD},target=/src \
 		--workdir /src \
@@ -71,46 +78,6 @@ DOCKER_RUN_INTERACTIVE=docker run -it --rm --name=builder \
 docker-bash:
 	${DOCKER_RUN_INTERACTIVE} bash
 
-
-
-# ######################################################################################
-
-# # Docker based official build
-
-
-# DOCKER_RUN_CI=docker run --rm --name=builder \
-#     	--mount type=bind,source=${PWD},target=/src \
-# 		--workdir /src \
-#     	-t more/builder:latest
-
-# DO_RUN=${DOCKER_RUN_CI}
-
-
-# # Build all binaries and pack all zips
-# do-official-build: do-config do-build do-copy do-pack
-# 	echo "do-official-build: finished running."
-
-# do-config:
-# 	${DO_RUN} bash build_scripts/do_config.sh
-
-# do-build:
-# 	${DO_RUN} bash ./build_scripts/do_build.sh
-# 	ls -al ./out/docker
-
-# do-copy:
-# 	rm -rf ./out/rel/bin
-# 	${DO_RUN} bash ./build_scripts/do_copy.sh
-# 	ls -al ./out/rel/bin
-
-
-# do-pack:
-# 	rm -rf ./out/rel/zip
-# 	${DO_RUN} bash ./build_scripts/do_pack.sh ${VERSION}
-# 	ls -al ./out/rel/zip
-
-# ######################################################################################
-
-## Personal use/concenience (MG)
 
 clean-docker:
 	rm -rf /src/out/rel
@@ -152,7 +119,7 @@ host-website:
 
 
 ## codegen things
-gen: codegen-bootzip-header
+gen: codegen-bootzip codegen-apidefs
 
 ## currently used build target
 ## should be one of the local-config-* or local-build-* (the star part)

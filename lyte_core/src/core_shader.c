@@ -12,118 +12,468 @@
 #include "sokol_gp.h"
 
 
-//*********************************************
-// *************** TEMPORARY ***************
-#include "morebase.h"
-// *************** TEMPORARY ***************
-//*********************************************
+#ifndef INIT_NUM_SHADERBUILDERITEMS
+#define INIT_NUM_SHADERBUILDERITEMS 10
+#endif
+
+#ifndef INIT_NUM_SHADERITEMS
+#define INIT_NUM_SHADERITEMS 10
+#endif
+
+typedef struct ShaderUniformDefinition {
+    const char *name;
+    lyte_UniformType type;
+    int float_count;
+    int location;
+} ShaderUniformDefinition;
+
+typedef struct ShaderBuilderItem {
+    uint32_t handle;
+    ShaderUniformDefinition *uniform_definitions;
+    size_t num_uniform_definitions;
+
+    const char *vert_code;
+    const char *frag_code;
+
+} ShaderBuilderItem;
+
+typedef struct ShaderItem {
+    uint32_t handle;
+    uint32_t sbi_handle;
+
+    // definitions, including location of the uniforms
+    ShaderUniformDefinition *uniform_definitions;
+    size_t num_uniform_definitions;
+
+    // actual float numbers
+    float *uniform_floats;
+    size_t num_uniform_floats;
+
+    // actual images
+    lyte_Image *images;
+    size_t num_images;
+
+    uint32_t pip_id;
+} ShaderItem;
+
+static mg_Map shaderbuilderitems;
+static uint32_t shaderbuilderitem_last_handle = 1500;
+
+static mg_Map shaderitems;
+static uint32_t shaderitem_last_handle = 1500;
+
+
+int lyte_core_shader_init(void) {
+    mg_map_init(&shaderbuilderitems, sizeof(ShaderBuilderItem), INIT_NUM_SHADERBUILDERITEMS);
+    mg_map_init(&shaderitems, sizeof(ShaderItem), INIT_NUM_SHADERITEMS);
+    return 0;
+}
+
+int lyte_core_shader_cleanup(void) {
+    mg_map_cleanup(&shaderbuilderitems);
+    mg_map_cleanup(&shaderitems);
+    return 0;
+}
 
 // ShaderBuilder
 
 int lyte_new_shaderbuilder(lyte_ShaderBuilder *val) {
-    M_ShaderDef *shaderdef =  M_shaderdef_create();
-    val->handle = shaderdef->_shader_id;
+    ShaderBuilderItem sbi = {0};
+    sbi.handle = shaderitem_last_handle++;
+    sbi.uniform_definitions = NULL;
+    sbi.num_uniform_definitions = 0;
+    sbi.vert_code = NULL;
+    sbi.frag_code = NULL;
+    mg_map_set(&shaderbuilderitems, sbi.handle, &sbi);
+    val->handle = sbi.handle;
+
     return 0;
 }
 
 int lyte_cleanup_shaderbuilder(lyte_ShaderBuilder shaderbuilder) {
+    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    if (sbi) {
+        mg_map_del(&shaderbuilderitems, sbi->handle);
+    }
 
     return 0;
 }
 
+static inline int get_uniform_count(lyte_UniformType t) {
+    int ret = 0;
+    switch (t) {
+            case LYTE_UNIFORMTYPE_FLOAT:
+            case LYTE_UNIFORMTYPE_INT:
+            { ret = 1; } break;
+            case LYTE_UNIFORMTYPE_VEC2:
+            case LYTE_UNIFORMTYPE_IVEC2:
+            { ret = 2; } break;
+            case LYTE_UNIFORMTYPE_VEC3:
+            case LYTE_UNIFORMTYPE_IVEC3:
+            { ret = 3; } break;
+            case LYTE_UNIFORMTYPE_VEC4:
+            case LYTE_UNIFORMTYPE_IVEC4:
+            { ret = 4; } break;
+            case LYTE_UNIFORMTYPE_MAT4:
+            { ret = 16; } break;
+            case LYTE_UNIFORMTYPE_SAMPLER2D:
+            { ret = 0; } break;
+    }
+    return ret;
+}
+
+
 int lyte_shaderbuilder_uniform(lyte_ShaderBuilder shaderbuilder, const char * uniform_name, lyte_UniformType uniform_type) {
-    M_ShaderDef *sd = M_shaderdef_find(shaderbuilder.handle);
-    if (!sd) {
-        printf("shaderdef not found\n");
+    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    if (!sbi) {
+        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
         return 1;
     }
-    M_shaderdef_uniform(sd, uniform_name, (M_UniformType)uniform_type);
+    int idx = sbi->num_uniform_definitions;
+    int cnt = get_uniform_count(uniform_type);
+    sbi->num_uniform_definitions++;
+    sbi->uniform_definitions = (void *)realloc(sbi->uniform_definitions, sbi->num_uniform_definitions * sizeof(ShaderBuilderItem));
+    sbi->uniform_definitions[idx].name = uniform_name;
+    sbi->uniform_definitions[idx].type = uniform_type;
+    sbi->uniform_definitions[idx].float_count = cnt;
+    sbi->uniform_definitions[idx].location = 0;
+
     return 0;
 }
 
 int lyte_shaderbuilder_vertex(lyte_ShaderBuilder shaderbuilder, const char * vertex_code) {
-    M_ShaderDef *sd = M_shaderdef_find(shaderbuilder.handle);
-    if (!sd) {
-        printf("shaderdef not found\n");
+    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    if (!sbi) {
+        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
         return 1;
     }
-    M_shaderdef_vertex(sd, vertex_code);
+    sbi->vert_code = vertex_code;
+
     return 0;
 }
 
 int lyte_shaderbuilder_fragment(lyte_ShaderBuilder shaderbuilder, const char * fragment_code) {
-    M_ShaderDef *sd = M_shaderdef_find(shaderbuilder.handle);
-    if (!sd) {
-        printf("shaderdef not found\n");
+    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    if (!sbi) {
+        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
         return 1;
     }
-    M_shaderdef_fragment(sd, fragment_code);
+    sbi->frag_code = fragment_code;
+
     return 0;
 }
 
 
 // Shader
 
- int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shader) {
-    M_ShaderDef *sd = M_shaderdef_find(shaderbuilder.handle);
-    if (!sd) {
-        printf("shaderdef not found\n");
+#if !defined(__EMSCRIPTEN__)
+static const char *shader_header = "\n\n#version 330\n// ---\n\n";
+// static const char *shader_header = "#version 330 core\n// ---\n";
+#else
+static const char *shader_header = "#version 300 es\nprecision highp float;\n// ---\n";
+// static const char *shader_header = "#version 300 es\nprecision mediump float;\n// ---\n";
+// static const char *shader_header = "\n\n#version 300 es\n// ---\n\n";
+#endif
+
+
+static const char *vert_footer = "\n// ---\nvoid main() { vert_main(); }\n";
+static const char *frag_footer = "\n// ---\nvoid main() { frag_main(); }\n";
+static const char *frag_header_1 = "uniform sampler2D current_image;\n";
+static const char *frag_header_2 = "uniform vec4 current_color;\n";
+static const char *frag_sep = "// ---\n\n";
+
+
+static inline char *get_full_uniforms_code(ShaderBuilderItem *sbi) {
+    size_t num_uniforms = sbi->num_uniform_definitions;
+    char *ret = malloc(256*(num_uniforms+1)); // TODO: free at lyte_shaderbuilder_build
+    sprintf(ret, "// uniform declarations...\n");
+    for (int i=0; i<num_uniforms;i++) {
+        const char *type = NULL;
+        lyte_UniformType utype = sbi->uniform_definitions[i].type;
+        switch (utype) {
+            case LYTE_UNIFORMTYPE_FLOAT: {type = "float";} break;
+            case LYTE_UNIFORMTYPE_VEC2: {type = "vec2";} break;
+            case LYTE_UNIFORMTYPE_VEC3: {type = "vec3";} break;
+            case LYTE_UNIFORMTYPE_VEC4: {type = "vec4";} break;
+            case LYTE_UNIFORMTYPE_INT: {type = "int";} break;
+            case LYTE_UNIFORMTYPE_IVEC2: {type = "ivec3";} break;
+            case LYTE_UNIFORMTYPE_IVEC3: {type = "ivec3";} break;
+            case LYTE_UNIFORMTYPE_IVEC4: {type = "ivec4";} break;
+            case LYTE_UNIFORMTYPE_MAT4: {type = "mat4";} break;
+            case LYTE_UNIFORMTYPE_SAMPLER2D: {type = "sampler2D";} break;
+            default: {
+                printf("Unknown uniform type: %d", utype);
+                exit(1);
+            } break;
+        }
+        const char *name = sbi->uniform_definitions[i].name;
+        sprintf(ret+strlen(ret), "uniform %s %s;\n", type, name);
+    }
+    return ret;
+}
+
+static inline char *get_full_vertex_code(ShaderBuilderItem *sbi, const char *uniforms_text) {
+    char *str = (char *)sbi->vert_code;
+    size_t orig_len = strlen(str);
+    size_t new_len = orig_len + 1000;
+    char *ret = malloc(new_len); // TODO: free at lyte_shaderbuilder_build
+    memset(ret, 0, new_len);
+    sprintf(ret, "%s%s%s%s%s%s", shader_header, uniforms_text, frag_sep, str, frag_sep, vert_footer);
+    return ret;
+}
+
+static inline char *get_full_fragment_code(ShaderBuilderItem *sbi, const char *uniforms_text) {
+    char *str = (char *)sbi->frag_code;
+    size_t orig_len = strlen(str);
+    size_t new_len = orig_len + 1000;
+    char *ret =malloc(new_len); // TODO: free at lyte_shaderbuilder_build
+    memset(ret, 0, new_len);
+    sprintf(ret, "%s%s%s%s%s%s%s%s", shader_header, frag_header_1, frag_header_2, frag_sep, uniforms_text, frag_sep, str, frag_footer);
+    return ret;
+}
+
+
+int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shader) {
+    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    if (!sbi) {
+        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
         return 1;
     }
-    M_Shader s = M_newshader(sd);
-    shader->handle = s.id;
+
+    const char *uniforms_code = get_full_uniforms_code(sbi);
+    if (!uniforms_code) {
+        fprintf(stderr, "Uniforms code was not generated.");
+        return 2;
+    }
+    const char *full_code_vertex = get_full_vertex_code(sbi, uniforms_code);
+    if (!full_code_vertex) {
+        fprintf(stderr, "Vertex code was not generated.");
+        return 3;
+    }
+    const char *full_code_fragment = get_full_fragment_code(sbi, uniforms_code);
+    if (!full_code_vertex) {
+        fprintf(stderr, "Fragment code was not generated.");
+        return 4;
+    }
+
+    ShaderItem shd = {0};
+    shd.handle = shaderitem_last_handle++;
+    // shd.handle = s.id; // TODO; remove this and uncomment above
+
+    shd.uniform_floats = malloc(SGP_UNIFORM_CONTENT_SLOTS*sizeof(float)); // TODO: free in lyte_cleanup_shader
+    memset(shd.uniform_floats, 0, SGP_UNIFORM_CONTENT_SLOTS*sizeof(float));
+    shd.images = malloc(SGP_TEXTURE_SLOTS*sizeof(lyte_Image)); // TODO: free in lyte_cleanup_shader
+    memset(shd.images, 0, SGP_TEXTURE_SLOTS*sizeof(lyte_Image));
+
+    shd.num_uniform_definitions = sbi->num_uniform_definitions;
+    shd.uniform_definitions = malloc(shd.num_uniform_definitions * sizeof(ShaderBuilderItem));
+    memcpy(shd.uniform_definitions, sbi->uniform_definitions, shd.num_uniform_definitions * sizeof(ShaderBuilderItem)); // TODO: free in lyte_cleanup_shader
+
+    // sg shader description
+
+    // init
+    sg_shader_desc shader_desc = {0};
+    shader_desc.label = "lyteshaderprogram";
+    shd.num_uniform_floats = 0;
+    shd.num_images = 0;
+
+    // shader code
+    shader_desc.vs.source = full_code_vertex;
+    shader_desc.fs.source = full_code_fragment;
+    shader_desc.vs.entry = "main";
+    shader_desc.fs.entry = "main";
+    // "MAGIC" uniforms: vec4 current_color and sampler2D current_image
+    shader_desc.fs.uniform_blocks->uniforms[0].name = "current_color";
+    shader_desc.fs.uniform_blocks->uniforms[0].type = (sg_uniform_type)LYTE_UNIFORMTYPE_VEC4;
+    shader_desc.fs.uniform_blocks->uniforms[0].array_count = 1;
+    shader_desc.vs.uniform_blocks->uniforms[0].name = "current_color";
+    shader_desc.vs.uniform_blocks->uniforms[0].type = (sg_uniform_type)LYTE_UNIFORMTYPE_VEC4;
+    shader_desc.vs.uniform_blocks->uniforms[0].array_count = 1;
+
+    shd.num_uniform_floats += 4; // r,g,b,a for current_color
+
+    // if user calls draw_image, this is the corresponding MAGIC image name
+    shader_desc.fs.images[0].name="current_image";
+    shader_desc.fs.images[0].image_type=SG_IMAGETYPE_2D;
+    shader_desc.fs.images[0].sampler_type=SG_SAMPLERTYPE_FLOAT;
+
+    shd.num_images += 1; // current_image
+
+    size_t num_uniforms = sbi->num_uniform_definitions;
+
+    int flt_idx = 1;
+    int img_idx = 1;
+
+    for (int i=0; i<num_uniforms; i++) {
+        ShaderUniformDefinition *sud = &shd.uniform_definitions[i];
+        if (sud->type == LYTE_UNIFORMTYPE_SAMPLER2D) {
+            // image
+            shader_desc.fs.images[img_idx].name = sud->name;
+            shader_desc.fs.images[img_idx].image_type=SG_IMAGETYPE_2D;
+            shader_desc.fs.images[img_idx].sampler_type=SG_SAMPLERTYPE_FLOAT;
+            sud->location = img_idx;
+            img_idx++;
+            shd.num_images += 1;
+        } else {
+            shader_desc.fs.uniform_blocks[0].uniforms[flt_idx].name = sud->name;
+            shader_desc.fs.uniform_blocks[0].uniforms[flt_idx].type = (sg_uniform_type)sud->type;
+            shader_desc.fs.uniform_blocks[0].uniforms[flt_idx].array_count = 1;
+            shader_desc.vs.uniform_blocks[0].uniforms[flt_idx].name = sud->name;
+            shader_desc.vs.uniform_blocks[0].uniforms[flt_idx].type = (sg_uniform_type)sud->type;
+            shader_desc.vs.uniform_blocks[0].uniforms[flt_idx].array_count = 1;
+            flt_idx++;
+            sud->location = shd.num_uniform_floats;
+            shd.num_uniform_floats += sud->float_count;
+        }
+    }
+
+    shader_desc.fs.uniform_blocks[0].size = shd.num_uniform_floats * 4;
+
+    // sgp pipeline
+    sgp_pipeline_desc pip_desc = {0};
+    pip_desc.blend_mode = (sgp_blend_mode)lyte_state.blendmode;
+    pip_desc.shader = shader_desc;
+    //pip_desc.primitive_type = SG_PRIMITIVETYPE_ ; // TODO: do we need to set this?
+    sg_pipeline pip = sgp_make_pipeline(&pip_desc);
+    sg_resource_state state = sg_query_pipeline_state(pip);
+    if (state != SG_RESOURCESTATE_VALID) {
+        fprintf(stderr, "Failed to make custom pipeline: %d\n ", state);
+        return 5;
+    }
+
+    // associate sgp pipeline with the shaderitem
+    shd.pip_id = pip.id;
+
+    // add to the map
+    mg_map_add(&shaderitems, shd.handle, &shd);
+    shader->handle = shd.handle;
+
+    // these are allocated in get_full_* functions (in this file, static inline)
+    free((void *)uniforms_code);
+    free((void *)full_code_vertex);
+    free((void *)full_code_fragment);
+
     return 0;
 }
 
- int lyte_cleanup_shader(lyte_Shader shader) {
+int lyte_cleanup_shader(lyte_Shader shader) {
+    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    if (shd) {
+        free(shd->uniform_definitions);
+        free(shd->uniform_floats);
+        free(shd->images);
+        sg_destroy_pipeline((sg_pipeline){.id=shd->pip_id});
+    }
+    return 0;
+}
+
+
+int lyte_set_shader(lyte_Shader shader) {
+    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    if (!shd) {
+        fprintf(stderr, "Unknown shader: %d", shader.handle);
+        return 1;
+    }
+    sgp_set_pipeline((sg_pipeline){.id=shd->pip_id});
+    memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+    sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
+    lyte_set_blendmode(lyte_state.blendmode);
+    lyte_state.shader = shd;
+
+    return 0;
+}
+
+int lyte_reset_shader(void) {
+    lyte_state.shader = NULL;
+    sgp_reset_pipeline();
 
     return 0;
 }
 
 
- int lyte_set_shader(lyte_Shader shader) {
-    M_Shader s;
-    s.id = shader.handle;
-    M_shader_set(s);
+int lyte_core_shader_set_color() {
+    if (lyte_state.shader) {
+        ShaderItem *shd = lyte_state.shader;
+        memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+        sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
+    }
     return 0;
 }
 
- int lyte_reset_shader(void) {
-    M_shader_unset();
-    return 0;
-}
-
- int lyte_send_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value) {
-    M_Shader s;
-    s.id = shader.handle;
-    M_ShaderUniform uf = {0};
-    uf.name = uniform_name;
-
-    // printf("WHICH: %d\n", which_uniform_value);
-
+int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value) {
+    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    if (!shd) {
+        fprintf(stderr, "Unknown shader: %d", shader.handle);
+        return 1;
+    }
+    ShaderUniformDefinition *sud = NULL;
+    for (int i=0; i<shd->num_uniform_definitions; i++) {
+        if (shd->uniform_definitions[i].name == uniform_name) {
+            sud = &shd->uniform_definitions[i];
+            break;
+        }
+    }
+    if (!sud) {
+        fprintf(stderr, "Unknown shader uniform: %s\n", uniform_name);
+        return 2;
+    }
     switch (which_uniform_value) {
-        case 0: {
-            uf.count = 1;
-            uf.data = &uniform_value.float_val;
-            printf("%f\n", uniform_value.float_val);
+        case 0: { // float/int
+            shd->uniform_floats[sud->location] = uniform_value.float_val;
+            memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+            sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
-        case 1: {
-            uf.count = uniform_value.float_list.count;
-            uf.data = uniform_value.float_list.values;
+        case 1: { // vecX/ivecX. X = 2 or 3 or 4
+            if (uniform_value.float_list.count > sud->float_count) {
+                fprintf(stderr, "warning: too many uniform values sent\n");
+            } else  if (uniform_value.float_list.count > sud->float_count) {
+                fprintf(stderr, "warning: not enough uniform values sent\n");
+            }
+            int count = MAX(MIN(uniform_value.float_list.count, sud->float_count),4);
+            for (int i=0; i<count; i++) {
+                shd->uniform_floats[sud->location+i] = uniform_value.float_list.values[i];
+            }
+            memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+            sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
-        case 2: {
-            uf.count = 0;
-            uf.data = &(uniform_value.image_val);
+        case 2: { // sampler2D
+            shd->images[sud->location] = uniform_value.image_val;
+            sg_image sgimg = (sg_image){.id=uniform_value.image_val.handle};
+            sgp_set_image(sud->location, sgimg);
          }
          break;
         default: {
-            printf("UNKNOWN SHADER UNIFORM VALUE\n");
+            fprintf(stderr, "Unknown shader uniform value, shouldn't happen.\n");
+            return -1;
         }
         break;
     }
 
-    M_shader_send(s, uf);
+    return 0;
+}
+
+int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name) {
+    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    if (!shd) {
+        fprintf(stderr, "Unknown shader: %d", shader.handle);
+        return 1;
+    }
+    ShaderUniformDefinition *sud = NULL;
+    for (int i=0; i<shd->num_uniform_definitions; i++) {
+        if (shd->uniform_definitions[i].name == uniform_name) {
+            sud = &shd->uniform_definitions[i];
+            break;
+        }
+    }
+    if (!sud) {
+        fprintf(stderr, "Unknown shader uniform: %s\n", uniform_name);
+        return 2;
+    }
+
+    // TODO
+
+
     return 0;
 }

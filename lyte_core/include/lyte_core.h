@@ -1,12 +1,15 @@
 #ifndef LYTE_CORE_H_INCLUDED
 #define LYTE_CORE_H_INCLUDED
 
-#include "api_generated.h" // types and enums
+#include "lyte_api.h" // types and enums
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
 #include "lyte_emsc.h"
 #endif
+
+#define SGP_UNIFORM_CONTENT_SLOTS 1024
+#define SGP_TEXTURE_SLOTS 8
 
 
 #ifndef MIN
@@ -22,6 +25,7 @@
 #endif
 
 
+
 // -------------------------
 // core data types
 // -------------------------
@@ -34,7 +38,15 @@ typedef struct lyte_QuadSize {
     int left, right, top, bottom;
 } lyte_QuadSize;
 
+typedef struct lyte_Args {
+    int argc;
+    char **argv;
+} lyte_Args;
+
+typedef void (*lyte_TickFunction)(void *app_data, float delta_time, int width, int height, bool resized, bool fullscreen);
+
 typedef struct lyte_Config {
+    lyte_Args args;
     bool vsync;
     const char *window_title;
     lyte_Size window_size;
@@ -44,6 +56,8 @@ typedef struct lyte_Config {
 } lyte_Config;
 
 typedef struct lyte_State {
+    lyte_Args args;
+
     lyte_BlendMode default_blendmode;
     lyte_FilterMode default_filtermode;
 
@@ -57,12 +71,18 @@ typedef struct lyte_State {
     lyte_QuadSize window_margins;
     lyte_QuadSize window_paddings;
 
+    float current_color[4];
 
     void *window; // GLFWwindow
     void *monitor; // GLFWmonitor
     void *mode; // GLFWVidMode
 
+    void *shader; // ShaderItem (internal)
+
     bool do_quit; // set to true to quit the app
+
+    lyte_TickFunction tick_fn;
+    void *app_data;
 
 } lyte_State;
 
@@ -75,7 +95,13 @@ extern lyte_State lyte_state;
 
 int lyte_core_state_init(lyte_Config config);
 
+bool lyte_core_state_has_arg(const char *name);
+const char *lyte_core_state_get_arg(const char *name);
+bool lyte_core_state_get_arg_bool(const char *name);
+
 int lyte_quit(void);
+int lyte_set_color(double r, double g, double b, double a);
+int lyte_reset_color(void);
 int lyte_set_default_blendmode(lyte_BlendMode blendmode);
 int lyte_set_blendmode(lyte_BlendMode blendmode);
 int lyte_reset_blendmode(void);
@@ -143,7 +169,7 @@ int lyte_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val)
 // core_loop
 // -------------------------
 
-int lyte_core_start_loop(void);
+int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data);
 
 
 // -------------------------
@@ -153,6 +179,14 @@ int lyte_core_start_loop(void);
 int lyte_core_filesystem_init(void);
 int lyte_core_filesystem_cleanup(void);
 int lyte_core_filesystem_update_tasks(void);
+
+bool lyte_core_filesystem_check_fetch_file_in_progress(uint32_t handle);
+bool lyte_core_filesystem_check_fetch_file_failed(uint32_t handle);
+bool lyte_core_filesystem_check_fetch_file_succeeded(uint32_t handle);
+uint32_t lyte_core_filesystem_fetch_file_async(const char *name, const char *path, size_t est_max_size, const char *mount_path);
+int lyte_core_filesystem_set_writeable_path(const char* path);
+int lyte_core_filesystem_add_readable_path(const char* path, const char *mount_path);
+int lyte_core_filesystem_add_path_memory(const char *path, void *buf, size_t size, const char *mount_path);
 
 int lyte_load_textfile(const char * file_path, const char * *val);
 int lyte_save_textfile(const char * file_path, const char * data);
@@ -195,7 +229,6 @@ int lyte_draw_circle_line(int dest_x, int dest_y, int radius);
 // core_audio
 // -------------------------
 
-// lifetime
 int lyte_core_audio_init(void);
 int lyte_core_audio_cleanup(void);
 int lyte_core_audio_update_music_streams(void); // needs to run each frame
@@ -240,7 +273,6 @@ int lyte_set_sound_volume(lyte_Sound snd, double volume);
 int lyte_set_sound_pan(lyte_Sound snd, double pan);
 int lyte_set_sound_pitch(lyte_Sound snd, double pitch);
 
-
 // -------------------------
 // core_font
 // -------------------------
@@ -261,6 +293,10 @@ int lyte_get_text_height(const char * text, int *val);
 // core_shader
 // -------------------------
 
+int lyte_core_shader_init(void);
+int lyte_core_shader_cleanup(void);
+int lyte_core_shader_set_color(void);
+
 // ShaderBuilder
 int lyte_new_shaderbuilder(lyte_ShaderBuilder *val);
 int lyte_cleanup_shaderbuilder(lyte_ShaderBuilder shaderbuilder);
@@ -270,13 +306,13 @@ int lyte_shaderbuilder_vertex(lyte_ShaderBuilder shaderbuilder, const char * ver
 int lyte_shaderbuilder_fragment(lyte_ShaderBuilder shaderbuilder, const char * fragment_code);
 
 // Shader
- int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shader);
- int lyte_cleanup_shader(lyte_Shader shader);
+int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shader);
+int lyte_cleanup_shader(lyte_Shader shader);
 
- int lyte_set_shader(lyte_Shader shader);
- int lyte_reset_shader(void);
- int lyte_send_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value);
-
+int lyte_set_shader(lyte_Shader shader);
+int lyte_reset_shader(void);
+int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value);
+int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name);
 
 
 #endif  // LYTE_CORE_H_INCLUDED

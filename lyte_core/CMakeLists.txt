@@ -66,9 +66,9 @@ target_include_directories(${PROJECT_NAME}
   PUBLIC
     ./include
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../recycle/include # TEMP
   PRIVATE
     ./src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
     ${GLFW_SOURCE_DIR}/include
     ${GLFW_SOURCE_DIR}/dependencies
@@ -82,13 +82,13 @@ target_include_directories(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/src/map.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../recycle/morebase.c # TEMP
     ./src/core_lib_impls.c
     ./src/core_audio.c
     ./src/core_filesystem.c
     ./src/core_font.c
     ./src/core_input.c
     ./src/core_image.c
+    ./src/core_loop.c
     ./src/core_shader.c
     ./src/core_shapes.c
     ./src/core_state.c

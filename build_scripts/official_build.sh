@@ -5,6 +5,8 @@
 ## This script requires the Docker image 'more/builder:latest' to be available.
 ## 'Dockerfile' to build this image is available next to this script.
 
+## Use "manual_docker.sh" script to test build manually if needed
+
 CURRDIR=$(pwd)
 
 VERSION=$(cat version.txt)

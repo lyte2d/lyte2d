@@ -148,24 +148,65 @@ int lyte_get_window_height(int *val) {
     return 0;
 }
 
+static int get_current_monitor( GLFWmonitor** monitor, GLFWwindow* window) {
+    int winpos[2] = {0};
+    glfwGetWindowPos(window, &winpos[0], &winpos[1]);
+
+    int monitors_size = 0;
+    GLFWmonitor** monitors = glfwGetMonitors(&monitors_size);
+
+    for (int i = 0; i < monitors_size; ++i) {
+        int monitorpos[2] = {0};
+        glfwGetMonitorPos(monitors[i], &monitorpos[0], &monitorpos[1]);
+        const GLFWvidmode* vidmode = glfwGetVideoMode(monitors[i]);
+        if (   winpos[0] >= monitorpos[0]
+            && winpos[0] < (monitorpos[0] + vidmode->width)
+            && winpos[1] >= monitorpos[1]
+            && winpos[1] < (monitorpos[1] + vidmode->height)) {
+            *monitor = monitors[i];
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 int lyte_set_fullscreen(bool fullscreen) {
-    static int win_x = 0;
-    static int win_y = 0;
+#if defined(__EMSCRIPTEN__)
     if (fullscreen != lyte_state.fullscreen) {
         if (fullscreen) {
-            GLFWvidmode * mode = lyte_state.mode;
-            glfwGetWindowPos(lyte_state.window, &win_x, &win_y);
-            glfwSetWindowMonitor(lyte_state.window, lyte_state.monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            emscripten_request_fullscreen("#canvas", false);
+            lyte_state.fullscreen = fullscreen = true;
         } else {
-            glfwSetWindowMonitor(lyte_state.window, NULL, win_x, win_y, lyte_state.window_size.width, lyte_state.window_size.height, GLFW_DONT_CARE);
-            GLFWmonitor *monitor = glfwGetWindowMonitor(lyte_state.window);
-            if (monitor) {
+            emscripten_exit_fullscreen();
+            lyte_state.fullscreen = fullscreen = false;
+        }
+    }
+#else
+    static int win_x = 0;
+    static int win_y = 0;
+    static int win_save_w = 0;
+    static int win_save_h = 0;
+    if (fullscreen != lyte_state.fullscreen) {
+            GLFWmonitor *monitor = NULL;
+            int err = get_current_monitor(&monitor, lyte_state.window);
+            if (!err) {
                 lyte_state.monitor = monitor;
                 lyte_state.mode = (void *)glfwGetVideoMode(lyte_state.monitor);
             }
+        if (fullscreen) {
+            GLFWvidmode * mode = lyte_state.mode;
+            glfwGetWindowPos(lyte_state.window, &win_x, &win_y);
+            win_save_w = lyte_state.window_size.width;
+            win_save_h = lyte_state.window_size.height;
+            glfwGetWindowSize(lyte_state.window,&lyte_state.window_size.width, &lyte_state.window_size.height);
+            glfwSetWindowMonitor(lyte_state.window, lyte_state.monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+        } else {
+            glfwSetWindowMonitor(lyte_state.window, NULL, win_x, win_y, win_save_w, win_save_h, GLFW_DONT_CARE);
         }
         lyte_state.fullscreen = fullscreen;
     }
+#endif
     return 0;
 }
 

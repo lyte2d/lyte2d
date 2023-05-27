@@ -65,9 +65,9 @@ function lyte.tick(dt, width, height)
     -- UPDATE
     total_time = total_time + dt
 
-    -- shader_1:send({ screen_size = {width, height} })
-    shader_1:send("screen_size", {width, height})
-    -- lyte.send_shader_uniform(shader_1,  "screen_size", {width, height})
+    -- shader_1:set({ screen_size = {width, height} })
+    shader_1:set("screen_size", {width, height})
+    -- lyte.set_shader_uniform(shader_1,  "screen_size", {width, height})
     -- DRAW
     lyte.cls(0, 0, 0, 1)
     lyte.reset_color()

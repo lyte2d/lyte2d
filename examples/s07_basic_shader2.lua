@@ -54,11 +54,11 @@ function lyte.tick(dt, width, height)
     -- UPDATE
     total_time = total_time + dt
 
-    shader_1:send("transparent_mode", 0)
-    shader_1:send("screen_size", {width, height})
+    shader_1:set("transparent_mode", 0)
+    shader_1:set("screen_size", {width, height})
 
     if lyte.is_key_down("space") or lyte.is_mouse_down("mb1") then
-        shader_1:send("transparent_mode", 1 )
+        shader_1:set("transparent_mode", 1 )
     end
 
     -- DRAW
@@ -68,19 +68,19 @@ function lyte.tick(dt, width, height)
     lyte.set_color(1,1,1,0.4)
     lyte.set_shader(shader_1)
 
-    shader_1:send("my_img", img_1)
+    shader_1:set("my_img", img_1)
 
     lyte.draw_rect(10, 10, width-20, 40)
 
-    shader_1:send("my_img", img_2)
+    shader_1:set("my_img", img_2)
 
     draw_some_rects(10, 60)
 
-    shader_1:send("my_img", img_3 )
+    shader_1:set("my_img", img_3 )
 
     draw_some_rects(30, 90)
 
-    shader_1:send("my_img", img_1 )
+    shader_1:set("my_img", img_1 )
 
     draw_some_rects(60, 120)
 

@@ -10,7 +10,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#define LYTE_MAX_JOYSTICS 16
+#define LYTE_MAX_JOYSTICKS 16
 #define LYTE_MAX_KEYBOARD_KEYS (LYTE_KEYBOARDKEY_MENU+1)
 #define LYTE_MAX_MOUSEBUTTONS LYTE_MOUSEBUTTON_COUNT
 
@@ -24,14 +24,14 @@ typedef struct lyte_InputState {
 
 
     // these two are handled by joystick connet/disconnect events
-    uint8_t joystick_connected[LYTE_MAX_JOYSTICS];
+    uint8_t joystick_connected[LYTE_MAX_JOYSTICKS];
     struct {
         int joystick_id;
         bool is_gamepad;
         const char *name;
-    } gamepad_info[LYTE_MAX_JOYSTICS];
-    GLFWgamepadstate gamepad_states_prev[LYTE_MAX_JOYSTICS];
-    GLFWgamepadstate gamepad_states_cur[LYTE_MAX_JOYSTICS];
+    } gamepad_info[LYTE_MAX_JOYSTICKS];
+    GLFWgamepadstate gamepad_states_prev[LYTE_MAX_JOYSTICKS];
+    GLFWgamepadstate gamepad_states_cur[LYTE_MAX_JOYSTICKS];
 
 } lyte_InputState;
 
@@ -117,8 +117,8 @@ int lyte_core_input_update_state(void) {
     // mouse buttons
     memcpy(inputstate.mousebuttons_prev, inputstate.mousebuttons_cur, LYTE_MAX_MOUSEBUTTONS);
     // gamepad/joystick states
-    memcpy(inputstate.gamepad_states_prev, inputstate.gamepad_states_cur, sizeof(GLFWgamepadstate) * LYTE_MAX_JOYSTICS);
-    for (int i=0; i<LYTE_MAX_JOYSTICS; i++) {
+    memcpy(inputstate.gamepad_states_prev, inputstate.gamepad_states_cur, sizeof(GLFWgamepadstate) * LYTE_MAX_JOYSTICKS);
+    for (int i=0; i<LYTE_MAX_JOYSTICKS; i++) {
 #if !defined(__EMSCRIPTEN__)
         if (glfwGetGamepadState(i, &inputstate.gamepad_states_cur[i])) { /* TODO: we could count num  gamepads here for convenience */
         }
@@ -205,7 +205,7 @@ int lyte_get_mouse_y(int *val) {
 
 int lyte_get_gamepad_count(int *val) {
     int cnt = 0;
-    for (int i=0; i<LYTE_MAX_JOYSTICS; i++) {
+    for (int i=0; i<LYTE_MAX_JOYSTICKS; i++) {
         if (inputstate.gamepad_info[i].is_gamepad) {
             cnt++;
         }

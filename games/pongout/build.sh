@@ -11,7 +11,8 @@ cd ../..
 rm -rf $OUTDIR/bin
 mkdir -p $OUTDIR/bin
 
-cat $LYTEBINDIR/lyte_gui.exe $OUTDIR/pongout_src.zip > $OUTDIR/bin/pongout_win.exe
+cat $LYTEBINDIR/lyte_gui.exe $OUTDIR/pongout_src.zip > $OUTDIR/bin/pongout_win_gui.exe
+cat $LYTEBINDIR/lyte.exe $OUTDIR/pongout_src.zip > $OUTDIR/bin/pongout_win.exe
 cat $LYTEBINDIR/lyte $OUTDIR/pongout_src.zip > $OUTDIR/bin/pongout_linux
 
 rm -rf $OUTDIR/web

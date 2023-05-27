@@ -89,9 +89,9 @@ local function load_assets()
     Assets.music_elev = lyte.load_music("/assets/music/elev.mp3")
 
     Assets.sd_brick_dt = lyte.load_sound("/assets/snd/sfx_pellet.ogg")
-    print(Assets.sd_brick_dt.volume)
+    -- print(Assets.sd_brick_dt.volume)
     Assets.sd_brick_dt.volume = 0.3
-    print(Assets.sd_brick_dt.volume)
+    -- print(Assets.sd_brick_dt.volume)
     Assets.sd_paddle_dt = lyte.load_sound("/assets/snd/shoot.ogg")
     Assets.sd_paddle_dt.volume = 0.3
     Assets.sd_hurt_dt = lyte.load_sound("/assets/snd/sfx_hurt.wav")
@@ -139,8 +139,10 @@ function lyte.tick(delta_time, width, height, resized, fullscreen)
     end
 
     -- System keys
+
     -- F4: quit
     if lyte.is_key_pressed("f4") or lyte.is_gamepad_pressed(0, "back") then lyte.quit() end
+
     -- Alt-F11: pixel perfect vs regular scaling
     if (lyte.is_key_down('left_alt') or lyte.is_key_down('right_alt')) and lyte.is_key_pressed("f11") then
         Window.PIXEL_PERFFECT = not Window.PIXEL_PERFFECT
@@ -157,6 +159,7 @@ function lyte.tick(delta_time, width, height, resized, fullscreen)
     end
 
     if lyte.is_key_pressed("f8") then lyte.set_window_vsync(false) end
+
     if lyte.is_key_pressed("f9") then lyte.set_window_vsync(true) end
 
     -- App update

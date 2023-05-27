@@ -92,15 +92,18 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ./src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_boot/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/include
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
-    # ./src/api.c                 # original handcoded implementation
-    ./src/api_generated.c     # new generated implementation (work in progress)
-    ./src/cfg.c
-    ./src/nbchar.c
-    ./src/repl.c
-    ./src/lyte.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/src/api_generated.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/cfg.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/nbchar.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/repl.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/lyte.c
+    ./src/main.c
 )
 

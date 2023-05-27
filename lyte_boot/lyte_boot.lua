@@ -5,9 +5,9 @@ lyte = lyte or {}
 table.unpack = table.unpack or unpack
 unpack = unpack or table.unpack
 
-lyte.set_window_icon_file("bootassets/icon.png")
+lyte.set_window_icon_file("lyte_boot_assets/icon.png")
 
-local default_font = lyte.load_font("/bootassets/monogram-extended.ttf", 24)
+local default_font = lyte.load_font("/lyte_boot_assets/monogram-extended.ttf", 24)
 
 function lyte.reset_font()
     lyte.set_font(default_font)
