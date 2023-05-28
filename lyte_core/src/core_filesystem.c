@@ -176,7 +176,7 @@ int lyte_core_filesystem_set_writeable_path(const char* path) {
     return 0;
 }
 
-int lyte_core_filesystem_add_readable_path(const char* path, const char *mount_path) {
+int lyte_core_filesystem_add_path_local(const char* path, const char *mount_path) {
 // #if defined(__EMSCRIPTEN__)
 //     path=".";
 // #endif
@@ -189,8 +189,8 @@ int lyte_core_filesystem_add_readable_path(const char* path, const char *mount_p
     return 0;
 }
 
-int lyte_core_filesystem_add_path_memory(const char *path, void *buf, size_t size, const char *mount_path) {
-    int success = PHYSFS_mountMemory(buf, size, NULL, path, mount_path, 1);
+int lyte_core_filesystem_add_path_memory(const char *name, void *buf, size_t size, const char *mount_path) {
+    int success = PHYSFS_mountMemory(buf, size, NULL, name, mount_path, 1);
     if (!success) {
         int errcode = PHYSFS_getLastErrorCode();
         fprintf(stderr, "Failed to mount memory zip: PHYSFS: %d %d, %s\n", success, errcode, PHYSFS_getErrorByCode(errcode));
@@ -218,7 +218,7 @@ int lyte_load_textfile(const char * path, const char * *val) {
     buf[len] = 0; // ensure '\0' at the end of the string
     *(char **)val = (char *)buf;
 
-    // TODO: small leak!
+    // TODO: fix: small leak on each file load
     // free(buf);   // TODO: test if this is a problem, or if we need to do this in another frame
     PHYSFS_close(file);
     return 0;

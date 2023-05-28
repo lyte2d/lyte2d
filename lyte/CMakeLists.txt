@@ -99,11 +99,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
+    ./src/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/src/api_generated.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/cfg.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/nbchar.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/repl.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/lyte.c
-    ./src/main.c
 )
 

@@ -19,7 +19,22 @@ local menu_items = {
 
 local active_item = 1
 
+local fps_list = {}
 local FPS = 0
+local function count_fps(dt)
+  local fps = (1 / dt)
+  table.insert(fps_list, fps)
+  if (#fps_list > 5) then
+    table.remove(fps_list, fps, 1)
+  else
+  end
+  FPS = 0
+  for i = 1, #fps_list do
+    FPS = (FPS + fps_list[i])
+  end
+  FPS = (FPS / #fps_list)
+  return nil
+end
 
 
 function M.init()
@@ -31,7 +46,9 @@ function M.init()
 end
 
 function M.update(dt)
-    FPS = 1/dt
+    -- FPS = 1/dt
+    count_fps(dt)
+
     local _goin_done = tweens.goin:update(dt)
     if tweens.demo_starter then
     end

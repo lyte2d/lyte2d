@@ -1,17 +1,20 @@
 ## Changelog
 
-### Lyte1D alpha v0.5
-- Added missing APIs
-  -
+### Lyte1D alpha v0.6 (...)
+
+### Lyte1D alpha v0.5 (2023.05.27)
+- Added missing APIs/
+- API changes
 - Bugfixes
 - lyte command-line arguments
   - lyte (non WASM) now accepts a first argument without a name. It's assigned to "dir="
-  -
 - Internal/Fundamentals
-  - Build simplified. Docker support added for local build
-  - Docker based build support added for "official" binaries
-  - Github actions based builds. All binaries will be coming from Github machines from now on.
-
+  - Builds:
+    - Build simplified. Docker support added for local build
+    - Docker based build support added for "official" binaries
+    - Github actions based builds. All binaries will be coming from Github machines from now on.
+  - API codegen:
+    - Lua API code is generated so it's easier and less erorr-prone to add APIs
 
 ### Lyte1D alpha v0.4 (2023.02.25)
 - Error messages now contain the filename

@@ -136,3 +136,6 @@ dev: bld
 	rm \lua\l.exe
 	cp out/lyte.exe \lua/lyte.exe
 	ln -s \lua/lyte.exe \lua/l.exe
+
+po:
+	make dev && cp out\lyte.exe out\rel\bin\ && make pongout && out\pongout\bin\pongout_win.exe

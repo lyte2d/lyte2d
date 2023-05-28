@@ -18,7 +18,7 @@
 
 // EDITED WITH IMPLEMENTATION CALLS
 
-#include "lyte.h"
+#include "lyte_api.h"
 #include "lyte_core.h"
 
 

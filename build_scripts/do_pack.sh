@@ -30,7 +30,7 @@ mkdir -p $ZIPDIR
 mkdir -p $TMPDIR
 
 cp -r $DOCDIR/licenses.txt $TMPDIR/
-cp -r $DOCDIR/readme.txt $TMPDIR/
+cp -r $DOCDIR/lyte_readme.txt $TMPDIR/
 cp -r $BINDIR/* $TMPDIR/
 
 cd $TMPDIR
@@ -40,11 +40,11 @@ pwd
 ls -al
 echo "------"
 
-$ZIPCMD $ZIPDIR/lyte2d.windows-gui.x64.v$VERSION.zip  licenses.txt readme.txt   lyte_gui.exe
-$ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             licenses.txt readme.txt   lyte.html lyte.js lyte.wasm
-$ZIPCMD $ZIPDIR/lyte2d.linux.x64.v$VERSION.zip        licenses.txt readme.txt   lyte
-$ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      licenses.txt readme.txt   lyte.exe
-$ZIPCMD $ZIPDIR/lyte2d.EVERYTHING.x64.v$VERSION.zip   licenses.txt readme.txt   lyte* lyte*.*
+$ZIPCMD $ZIPDIR/lyte2d.windows-gui.x64.v$VERSION.zip  licenses.txt lyte_readme.txt   lyte_gui.exe
+$ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             licenses.txt lyte_readme.txt   lyte.html lyte.js lyte.wasm
+$ZIPCMD $ZIPDIR/lyte2d.linux.x64.v$VERSION.zip        licenses.txt lyte_readme.txt   lyte
+$ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      licenses.txt lyte_readme.txt   lyte.exe
+$ZIPCMD $ZIPDIR/lyte2d.EVERYTHING.x64.v$VERSION.zip   licenses.txt lyte_readme.txt   lyte* lyte*.*
 
 cd ..
 rm -rf $TMPDIR

@@ -12,7 +12,8 @@ declare namespace lyte {
     function draw_circle_line(dest_x: number, dest_y: number, radius: number): void
     function load_image(image_path: string): Image
     function draw_image(image: Image, dest_x: number, dest_y: number): void
-    function draw_image_rect(image: Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number): void
+    function draw_image_rect(image: Image, dest_x: number, dest_y: number,
+        src_x: number, src_y: number, rect_width: number, rect_height: number): void
     function get_image_width(image: Image): number
     function get_image_height(image: Image): number
     function new_canvas(width: number, height: number): Image
@@ -102,7 +103,8 @@ declare namespace lyte {
     function new_shader(shaderdef: ShaderDef): Shader
     function set_shader(shader: Shader): void
     function reset_shader(): void
-    function send_shader_uniform(shader: Shader, uniform_name: string, uniform_value: ShaderUniformValue): void
+    function set_shader_uniform(shader: Shader, uniform_name: string, uniform_value: ShaderUniformValue): void
+    function reset_shader_uniform(shader: Shader, uniform_name: string): void
     function new_shaderbuilder(): ShaderBuilder
     function shaderbuilder_uniform(shaderbuilder: ShaderBuilder, uniform_name: string, uniform_type: UniformType): void
     function shaderbuilder_vertex(shaderbuilder: ShaderBuilder, vertex_code: string): void
@@ -140,7 +142,8 @@ declare namespace lyte {
     }
     type ShaderUniformValue = number | number[] | Image
     interface Shader {
-        send: (uniform_name: string, uniform_value: ShaderUniformValue) => void;
+        set: (uniform_name: string, uniform_value: ShaderUniformValue) => void;
+        reset: (uniform_name: string) => void;
     }
     interface ShaderDef {
         frag: string;
@@ -153,12 +156,30 @@ declare namespace lyte {
         fragment: (fragment_code: string) => void;
         build: () => Shader;
     }
-    type UniformType = '_invalid'  | 'float'  | 'vec2'  | 'vec3'  | 'vec4'  | 'int'  | 'ivec2'  | 'ivec3'  | 'ivec4'  | 'mat4'  | 'sampler2D' 
-    type BlendMode = 'none'  | 'blend'  | 'add'  | 'mod'  | 'mul' 
-    type FilterMode = '_invalid'  | 'nearest'  | 'linear' 
-    type GamepadAxis = 'left_x'  | 'left_y'  | 'right_x'  | 'right_y'  | 'left_trigger'  | 'right_trigger' 
-    type GamepadButton = 'pad_a'  | 'pad_b'  | 'pad_x'  | 'pad_y'  | 'left_bumper'  | 'right_bumper'  | 'back'  | 'start'  | 'guide'  | 'left_thumb'  | 'right_thumb'  | 'dpad_up'  | 'dpad_right'  | 'dpad_down'  | 'dpad_left' 
-    type MouseButton = 'mb1'  | 'mb2'  | 'mb3'  | 'mb4'  | 'mb5'  | 'mb6'  | 'mb7'  | 'mb8' 
-    type KeyboardKey = 'space'  | '\''  | ','  | '-'  | '.'  | '/'  | '0'  | '1'  | '2'  | '3'  | '4'  | '5'  | '6'  | '7'  | '8'  | '9'  | ';'  | '='  | 'a'  | 'b'  | 'c'  | 'd'  | 'e'  | 'f'  | 'g'  | 'h'  | 'i'  | 'j'  | 'k'  | 'l'  | 'm'  | 'n'  | 'o'  | 'p'  | 'q'  | 'r'  | 's'  | 't'  | 'u'  | 'v'  | 'w'  | 'x'  | 'y'  | 'z'  | '['  | '\\'  | ']'  | '`'  | 'world_1'  | 'world_2'  | 'escape'  | 'enter'  | 'tab'  | 'backspace'  | 'insert'  | 'delete'  | 'right'  | 'left'  | 'down'  | 'up'  | 'page_up'  | 'page_down'  | 'home'  | 'end'  | 'caps_lock'  | 'scroll_lock'  | 'num_lock'  | 'print_screen'  | 'pause'  | 'f1'  | 'f2'  | 'f3'  | 'f4'  | 'f5'  | 'f6'  | 'f7'  | 'f8'  | 'f9'  | 'f10'  | 'f11'  | 'f12'  | 'f13'  | 'f14'  | 'f15'  | 'f16'  | 'f17'  | 'f18'  | 'f19'  | 'f20'  | 'f21'  | 'f22'  | 'f23'  | 'f24'  | 'f25'  | 'kp_0'  | 'kp_1'  | 'kp_2'  | 'kp_3'  | 'kp_4'  | 'kp_5'  | 'kp_6'  | 'kp_7'  | 'kp_8'  | 'kp_9'  | 'kp_decimal'  | 'kp_divide'  | 'kp_multiply'  | 'kp_subtract'  | 'kp_add'  | 'kp_enter'  | 'kp_equal'  | 'left_shift'  | 'left_control'  | 'left_alt'  | 'left_super'  | 'right_shift'  | 'right_control'  | 'right_alt'  | 'right_super'  | 'menu' 
+    type UniformType =
+        '_invalid'  | 'float'  | 'vec2'  | 'vec3'  | 'vec4'  | 'int'  | 'ivec2'  | 'ivec3'  | 'ivec4'  | 'mat4'  | 'sampler2D'
+    type BlendMode =
+        'none'  | 'blend'  | 'add'  | 'mod'  | 'mul'
+    type FilterMode =
+        '_invalid'  | 'nearest'  | 'linear'
+    type GamepadAxis =
+        'left_x'  | 'left_y'  | 'right_x'  | 'right_y'  | 'left_trigger'  | 'right_trigger'
+    type GamepadButton =
+        'pad_a'  | 'pad_b'  | 'pad_x'  | 'pad_y'  | 'left_bumper'  | 'right_bumper'  | 'back'  | 'start'  | 'guide'  |
+        'left_thumb'  | 'right_thumb'  | 'dpad_up'  | 'dpad_right'  | 'dpad_down'  | 'dpad_left'
+    type MouseButton =
+        'mb1'  | 'mb2'  | 'mb3'  | 'mb4'  | 'mb5'  | 'mb6'  | 'mb7'  | 'mb8'
+    type KeyboardKey =
+        'space'  | '\''  | ','  | '-'  | '.'  | '/'  | '0'  | '1'  | '2'  | '3'  | '4'  | '5'  | '6'  | '7'  | '8'  | '9'  |
+        ';'  | '='  | 'a'  | 'b'  | 'c'  | 'd'  | 'e'  | 'f'  | 'g'  | 'h'  | 'i'  | 'j'  | 'k'  | 'l'  | 'm'  | 'n'  | 'o'  |
+        'p'  | 'q'  | 'r'  | 's'  | 't'  | 'u'  | 'v'  | 'w'  | 'x'  | 'y'  | 'z'  | '['  | '\\'  | ']'  | '`'  |
+        'world_1'  | 'world_2'  | 'escape'  | 'enter'  | 'tab'  | 'backspace'  | 'insert'  | 'delete'  | 'right'  | 'left'  |
+        'down'  | 'up'  | 'page_up'  | 'page_down'  | 'home'  | 'end'  | 'caps_lock'  | 'scroll_lock'  | 'num_lock'  |
+        'print_screen'  | 'pause'  | 'f1'  | 'f2'  | 'f3'  | 'f4'  | 'f5'  | 'f6'  | 'f7'  | 'f8'  | 'f9'  | 'f10'  |
+        'f11'  | 'f12'  | 'f13'  | 'f14'  | 'f15'  | 'f16'  | 'f17'  | 'f18'  | 'f19'  | 'f20'  | 'f21'  | 'f22'  |
+        'f23'  | 'f24'  | 'f25'  | 'kp_0'  | 'kp_1'  | 'kp_2'  | 'kp_3'  | 'kp_4'  | 'kp_5'  | 'kp_6'  | 'kp_7'  | 'kp_8'  |
+        'kp_9'  | 'kp_decimal'  | 'kp_divide'  | 'kp_multiply'  | 'kp_subtract'  | 'kp_add'  | 'kp_enter'  | 'kp_equal'  |
+        'left_shift'  | 'left_control'  | 'left_alt'  | 'left_super'  | 'right_shift'  | 'right_control'  | 'right_alt'  |
+        'right_super'  | 'menu'
 }
 

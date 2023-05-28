@@ -96,10 +96,14 @@ static inline void _tick_function(void) {
     glfwPollEvents();
 }
 
-
-int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data) {
+int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data) {
     lyte_state.tick_fn = tick_fn;
     lyte_state.app_data = app_data;
+    return 0;
+}
+
+int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data) {
+    lyte_core_set_loop(tick_fn, app_data);
 
     // LOOP BEGINS HERE---------------------------------------------
 #ifdef EMSCRIPTEN

@@ -1,5 +1,7 @@
 // (c) mg
-#include "lyte.h"
+
+#include "lyte_repl.h"
+
 #include <stdio.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -13,8 +15,7 @@
 
 #include <isocline.h>
 
-
-LYTE_LANG repl_lang = LUA;
+// TODO: this file is prototype level code. Needs design and clean up
 
 // completion function defined below
 static void _completer(ic_completion_env_t* cenv, const char* prefix );
@@ -31,8 +32,8 @@ void repl_prompt(void) {
 }
 
 
-void repl_setup(LYTE_LANG _lang) {
-    repl_lang = _lang;
+void repl_setup(void) {
+    // repl_lang = _lang;
 
     setlocale(LC_ALL,"C.UTF-8");  // we use utf-8 in this example
 
@@ -40,15 +41,17 @@ void repl_setup(LYTE_LANG _lang) {
     ic_style_def("kbd","gray underline");     // you can define your own styles
     ic_style_def("ic-prompt","ansi-maroon");  // or re-define system styles
 
-    ic_printf( "[b]Lyte2D[/b] alpha v0.2 REPL in %s.\n"
+    ic_printf( "[b]Lyte2D[/b] %s (alpha) REPL in %s.\n"
                 "- Type 'lyte.quit()' to quit. (or use [kbd]ctrl-c[/]).\n"
                 "- Press [kbd]F1[/] for help on editing commands.\n"
                 "- Use [kbd]shift-tab[/] for multiline input. (or [kbd]ctrl-enter[/], or [kbd]ctrl-j[/])\n"
                 "- Use [kbd]ctrl-r[/] to search the history.\n\n"
-                "REPL is a work in progress. Proper completions not implemented yet\n\n", repl_lang == FENNEL ? "fennel" : "lua");
+                "REPL is a work in progress. Proper completions not implemented yet\n\n", "v0.x", "Lua");
 
     // enable history; use a NULL filename to not persist history to disk
-    ic_set_history("history.txt", -1 /* default entries (= 200) */);
+    // ic_set_history("history.txt", -1 /* default entries (= 200) */);
+    ic_set_history(NULL, -1 /* default entries (= 200) */);
+
 
     // enable completion with a default completion function
     ic_set_default_completer(&_completer, NULL);
@@ -64,6 +67,7 @@ void repl_setup(LYTE_LANG _lang) {
 
     // inline hinting is enabled by default
     // ic_enable_hint(false);
+    // repl_prompt();
 }
 
 
@@ -116,13 +120,13 @@ bool repl_check(lua_State *L) {
 #endif
         // input = ic_readline_ex("", NULL, NULL, NULL, NULL);
         luaL_buffinit(L, &b);
-        if (repl_lang == FENNEL) {
-            // luaL_addstring(&b, "return unpack({fennel.eval([===[");
-            luaL_addstring(&b, "return tool_eval_fennel([===[");
-            luaL_addstring(&b, input);
-            // luaL_addstring(&b, "]===], {correlate=true, filename='(repl)', allowedGlobals=false})})");
-            luaL_addstring(&b, "]===])");
-        } else if (repl_lang == LUA) {
+        // if (repl_lang == FENNEL) {
+        //     // luaL_addstring(&b, "return unpack({fennel.eval([===[");
+        //     luaL_addstring(&b, "return tool_eval_fennel([===[");
+        //     luaL_addstring(&b, input);
+        //     // luaL_addstring(&b, "]===], {correlate=true, filename='(repl)', allowedGlobals=false})})");
+        //     luaL_addstring(&b, "]===])");
+        // } else if (repl_lang == LUA) {
             //printf("===DBG===\n%s %c %d\n===DBG===\n", input, input[0], input);
             if (input[0] == '=') {
                 luaL_addstring(&b, "return ");
@@ -130,10 +134,10 @@ bool repl_check(lua_State *L) {
             } else {
                 luaL_addstring(&b, input);
             }
-        } else {
-            printf("Unexpected error: repl language");
-            lua_error(L);
-        }
+        // } else {
+        //     printf("Unexpected error: repl language");
+        //     lua_error(L);
+        // }
         luaL_pushresult(&b);
         // todo: do we need to convert \n chars to \\n? for "send to" stuff? or is it a tooling responsibility?
         //luaL_addstring(&b, "\r");
@@ -152,20 +156,20 @@ bool repl_check(lua_State *L) {
         } else {
             int rescount = lua_gettop(L);
             for (int i=1;i<=rescount;i++) {
-                if (repl_lang == FENNEL) {
-                    lua_getglobal(L, "tostring_fennel");
-                } else {
+                // if (repl_lang == FENNEL) {
+                //     lua_getglobal(L, "tostring_fennel");
+                // } else {
                     lua_getglobal(L, "tostring");
-                }
+                // }
                 lua_pushvalue(L, i);
                 lua_pcall(L, 1, 1, 0);
                 const char *res = luaL_checkstring(L, -1);
                 printf("%s\t", res);
             }
             lua_settop(L, 0);
-            if (rescount == 0 && repl_lang == FENNEL && strlen(input) > 0) {
-                printf("nil\n");
-            }
+            // if (rescount == 0 && repl_lang == FENNEL && strlen(input) > 0) {
+            //     printf("nil\n");
+            // }
             if (rescount > 0) { printf("\n"); }
         }
         free(input);

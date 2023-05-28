@@ -25,6 +25,7 @@ int lyte_core_state_init(lyte_Config config) {
     lyte_state.blendmode = config.blendmode;
     lyte_state.filtermode = config.filtermode;
 
+    lyte_state.exe_name = config.exe_name;
     lyte_state.window_title = config.window_title;
     lyte_state.window_size = config.window_size;
     lyte_state.window_min_size = config.window_min_size;
@@ -149,9 +150,14 @@ int lyte_reset_filtermode(void) {
 }
 
 int lyte_cls(double r, double g, double b, double a) {
+    float c[4];
+    c[0] = lyte_state.current_color[0];
+    c[1] = lyte_state.current_color[1];
+    c[2] = lyte_state.current_color[2];
+    c[3] = lyte_state.current_color[3];
     lyte_set_color(r,g,b,a);
     sgp_clear();
-    lyte_reset_color(); // TODO: should we keep a "current_color" and update?
+    lyte_set_color(c[0], c[1], c[2], c[3]);
     return 0;
 }
 

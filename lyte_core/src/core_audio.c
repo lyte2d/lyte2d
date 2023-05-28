@@ -1,4 +1,4 @@
-//
+// TODO: "internalize"
 
 #include <stdio.h>
 #include <assert.h>

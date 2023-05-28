@@ -192,6 +192,7 @@ function lyte.tick(delta_time, width, height, resized, fullscreen)
         lyte.cls(0.15, 0.15, 0.15, 1)
     else
         lyte.cls(0, 0, 0, 1)
+        lyte.reset_color();
     end
     lyte.scale(Window.scale, Window.scale)
     lyte.translate(Window.width / Window.scale / 2 - CW / 2, (Window.height / Window.scale / 2 - CH / 2));

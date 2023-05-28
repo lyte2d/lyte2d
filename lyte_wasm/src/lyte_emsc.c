@@ -1,3 +1,5 @@
+//
+
 #if defined(__EMSCRIPTEN__)
 
 /* common emscripten platform helper functions */

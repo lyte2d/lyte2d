@@ -1,7 +1,8 @@
 #ifndef LYTE_CORE_H_INCLUDED
 #define LYTE_CORE_H_INCLUDED
 
-#include "lyte_api.h" // types and enums
+
+#include "api_generated.h" // types and enums
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>
@@ -48,6 +49,7 @@ typedef void (*lyte_TickFunction)(void *app_data, float delta_time, int width, i
 typedef struct lyte_Config {
     lyte_Args args;
     bool vsync;
+    const char *exe_name;
     const char *window_title;
     lyte_Size window_size;
     lyte_Size window_min_size;
@@ -61,6 +63,7 @@ typedef struct lyte_State {
     lyte_BlendMode default_blendmode;
     lyte_FilterMode default_filtermode;
 
+    const char *exe_name;
     const char *window_title;
     lyte_Size window_size;
     lyte_Size window_min_size;
@@ -170,6 +173,7 @@ int lyte_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val)
 // -------------------------
 
 int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data);
+int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data);
 
 
 // -------------------------
@@ -185,8 +189,8 @@ bool lyte_core_filesystem_check_fetch_file_failed(uint32_t handle);
 bool lyte_core_filesystem_check_fetch_file_succeeded(uint32_t handle);
 uint32_t lyte_core_filesystem_fetch_file_async(const char *name, const char *path, size_t est_max_size, const char *mount_path);
 int lyte_core_filesystem_set_writeable_path(const char* path);
-int lyte_core_filesystem_add_readable_path(const char* path, const char *mount_path);
-int lyte_core_filesystem_add_path_memory(const char *path, void *buf, size_t size, const char *mount_path);
+int lyte_core_filesystem_add_path_local(const char* path, const char *mount_path);
+int lyte_core_filesystem_add_path_memory(const char *name, void *buf, size_t size, const char *mount_path);
 
 int lyte_load_textfile(const char * file_path, const char * *val);
 int lyte_save_textfile(const char * file_path, const char * data);
