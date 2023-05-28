@@ -1,13 +1,12 @@
-Lyte2D is licensed under MIT license. Please see below, or 'LICENSE.md' file in the root folder for details.
+-----------------------------------------------------------------------------------
 
-Lyte2D depends on a number of libraries with various licenses. They're specified below.
+Lyte2D is licensed under MIT license.
+Lyte2D depends on a number of libraries with various licenses.
 
-For full list of dependencies, please see 'dependencies' folder in the root folder of Lyte2D source code.
 
-
---------------------------------------------------------------------------------------------------------
---- Lyte2D (MIT)
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+--- Lyte2D (MIT): https://github.com/morew4rd/lyte2d
+-----------------------------------------------------------------------------------
 
 Copyright (c) 2022-2023 morew4rd
 
@@ -31,9 +30,10 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
---------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
 --- fontstash (ZLIB): https://github.com/memononen/fontstash
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 Copyright (c) 2013 Mikko Mononen memon@inside.org
 
@@ -54,9 +54,10 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
 
---------------------------------------------------------------------------------------------------------
---- freetype (BSD/-like)
---------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
+--- freetype (BSD/like): https://www.freetype.org
+-----------------------------------------------------------------------------------
 
                     The FreeType Project LICENSE
                     ----------------------------
@@ -227,9 +228,9 @@ Legal Terms
 
 
 
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 --- glfw (ZLIB): https://www.glfw.org
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 Copyright (c) 2002-2006 Marcus Geelnard
 
@@ -256,9 +257,9 @@ freely, subject to the following restrictions:
 
 
 
---------------------------------------------------------------------------------------------------------
---- isocline (MIT)
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+--- isocline (MIT): https://github.com/daanx/isocline
+-----------------------------------------------------------------------------------
 
 MIT License
 
@@ -283,21 +284,74 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
---------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
 --- Lua, PUC (MIT): https://lua.org
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 Copyright © 1994–2023 Lua.org, PUC-Rio.
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
---------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
+--- ODE (BSD): https://www.ode.org/
+-----------------------------------------------------------------------------------
+
+Open Dynamics Engine
+Copyright (c) 2001-2007, Russell L. Smith.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+Neither the names of ODE's copyright owner nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+-----------------------------------------------------------------------------------
 --- PHYSFS (ZLIB): https://github.com/icculus/physfs
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 Copyright (c) 2001-2022 Ryan C. Gordon <icculus@icculus.org> and others.
 
@@ -317,35 +371,42 @@ freely, subject to the following restrictions:
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 
---------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------
 --- raudio (ZLIB): https://github.com/raysan5/raudio
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 zlib License
 
 Copyright (c) 2014-2022 Ramon Santamaria (@raysan5)
 
-This software is provided "as-is", without any express or implied warranty. In no event
-will the authors be held liable for any damages arising from the use of this software.
+This software is provided 'as-is', without any express or implied warranty.
+In no event will the authors be held liable for any damages arising from the
+use of this software.
 
-Permission is granted to anyone to use this software for any purpose, including commercial
-applications, and to alter it and redistribute it freely, subject to the following restrictions:
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
 
-  1. The origin of this software must not be misrepresented; you must not claim that you
-  wrote the original software. If you use this software in a product, an acknowledgment
-  in the product documentation would be appreciated but is not required.
+    1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software. If you use this software in a
+    product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
 
-  2. Altered source versions must be plainly marked as such, and must not be misrepresented
-  as being the original software.
+    2. Altered source versions must be plainly marked as such, and must not
+    be misrepresented as being the original software.
 
-  3. This notice may not be removed or altered from any source distribution.
+    3. This notice may not be removed or altered from any source
+    distribution.
 
 
 
---------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
 --- sokol libraries (ZLIB): https://github.com/floooh/sokol
 ---   (includes: sokol_gfx, sokol_args, sokol_fetch, ...)
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 zlib/libpng license
 
@@ -371,9 +432,10 @@ freely, subject to the following restrictions:
     distribution.
 
 
---------------------------------------------------------------------------------------------------------
+
+-----------------------------------------------------------------------------------
 --- sokol_gp (MIT): https://github.com/edubart/sokol_gp
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 Copyright (c) 2020-2022 Eduardo Bart (https://github.com/edubart/sokol_gp)
 
@@ -392,18 +454,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
---------------------------------------------------------------------------------------------------------
----
---------------------------------------------------------------------------------------------------------
 
 
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 --- stb_headers (public domain): https://github.com/nothings/stb
 ---    (includes: stb_truetype.h, stb_image.h)
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------------------------------
----
---------------------------------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------------------------------
+
+
+-----------------------------------------------------------------------------------
