@@ -13,6 +13,7 @@
 #include "lyte_repl.h"
 #include "lyte_api.h"
 #include "lyte_core.h"
+#include "lyte_physics.h"
 
 #include "_boot_zip_generated.c"
 
@@ -402,6 +403,7 @@ static int init(void) {
     err = lyte_core_shader_init();
     err = lyte_core_window_init();
     err = lyte_core_input_init();
+    err = lyte_physics_init();
 
     lua_State *L = luaL_newstate();
     lua_atpanic(L, _lua_panic_fn);
@@ -436,7 +438,7 @@ static int init(void) {
     lyte_core_filesystem_add_path_local(localpath, "/");
     lyte_core_filesystem_add_path_memory("BOOT_ZIP", boot_zip, boot_zip_len, "/");
     _download_zip_handle = lyte_core_filesystem_fetch_file_async("APP_ZIP", archivepath, LYTE_APP_ZIP_MAX_SIZE, "/");
-    _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", lyte_state.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
+    _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", lytecore_state.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
 
     _registerloader(L, _lyte_loader, 2);
 
@@ -462,6 +464,7 @@ static int cleanup(void) {
     err = lyte_core_window_cleanup();
     err = lyte_core_input_cleanup();
     err = lyte_core_filesystem_cleanup();
+    err = lyte_physics_cleanup();
 
     return err;
 }

@@ -66,8 +66,8 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     sg_image_desc image_desc = {0};
     image_desc.width = width;
     image_desc.height = height;
-    image_desc.min_filter = (sg_filter)lyte_state.filtermode;
-    image_desc.mag_filter = (sg_filter)lyte_state.filtermode;
+    image_desc.min_filter = (sg_filter)lytecore_state.filtermode;
+    image_desc.mag_filter = (sg_filter)lytecore_state.filtermode;
     // image_desc.wrap_u = SG_WRAP_REPEAT;
     // image_desc.wrap_v = SG_WRAP_REPEAT;
     image_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;

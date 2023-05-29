@@ -27,6 +27,12 @@ static int enumstring_to_int(EnumStrInt *vals, const char *str) {
     return vals->value;
 }
 // ---
+EnumStrInt lyte_PhysicsEngineState_strings[] = {
+    {"off", LYTE_PHYSICSENGINESTATE_OFF},
+    {"2D", LYTE_PHYSICSENGINESTATE_2D},
+    {"3D", LYTE_PHYSICSENGINESTATE_3D},
+    {NULL, -1},
+};
 EnumStrInt lyte_UniformType_strings[] = {
     {"_invalid", LYTE_UNIFORMTYPE__INVALID},
     {"float", LYTE_UNIFORMTYPE_FLOAT},
@@ -1842,6 +1848,21 @@ static int api_shaderbuilder_build(lua_State *L) {
     lua_setmetatable(L, -2);
     return 1;
 }
+// [ PhysicsEngineState  --  ]
+static int api_set_physics_engine(lua_State *L) {
+    (void)L;
+    // arguments
+    const char * state_str = luaL_checkstring(L, 1);
+    lyte_PhysicsEngineState  state = enumstring_to_int(lyte_PhysicsEngineState_strings, state_str);
+
+    // implementation
+    int err = _impl_set_physics_engine(state);
+    if (err != 0) {
+        printf("Warning:  api_set_physics_engine");
+    }
+    return 0;
+}
+
 // record Image
 enum Image_keys_index {
     IDX_Image_width,
@@ -2356,6 +2377,7 @@ static const struct luaL_Reg lyte_api_functions[] = {
     {"shaderbuilder_vertex", api_shaderbuilder_vertex},
     {"shaderbuilder_fragment", api_shaderbuilder_fragment},
     {"shaderbuilder_build", api_shaderbuilder_build},
+    {"set_physics_engine", api_set_physics_engine},
     {NULL, NULL}, // sentinel
 };
 static int luaopen_lyte_api_functions(lua_State *L) {

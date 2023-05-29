@@ -97,9 +97,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 
 int lyte_core_input_init(void) {
-    glfwSetCursorPosCallback(lyte_state.window, cursor_position_callback);
-    glfwSetMouseButtonCallback(lyte_state.window, mouse_button_callback);
-    glfwSetKeyCallback(lyte_state.window, key_callback);
+    glfwSetCursorPosCallback(lytecore_state.window, cursor_position_callback);
+    glfwSetMouseButtonCallback(lytecore_state.window, mouse_button_callback);
+    glfwSetKeyCallback(lytecore_state.window, key_callback);
     glfwSetJoystickCallback(joystick_callback);
 
     return 0;
@@ -194,12 +194,12 @@ int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val) {
 }
 
 int lyte_get_mouse_x(int *val) {
-    *val = inputstate.mouse_x - lyte_state.window_margins.left - lyte_state.window_paddings.left;
+    *val = inputstate.mouse_x - lytecore_state.window_margins.left - lytecore_state.window_paddings.left;
     return 0;
 }
 
 int lyte_get_mouse_y(int *val) {
-    *val = inputstate.mouse_y - lyte_state.window_margins.top - lyte_state.window_paddings.top;
+    *val = inputstate.mouse_y - lytecore_state.window_margins.top - lytecore_state.window_paddings.top;
     return 0;
 }
 

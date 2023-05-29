@@ -592,6 +592,16 @@ return Namespace("lyte", {
         Ret("shader", Type("Shader"), {nativetype="udata"})
     }, {d="Add fragment to the shaderbuilder", ctor="true"}),
 
+    -- BEGIN: PHYSICS ------------------------------
+
+    Function("set_physics_engine", {
+        Arg("state", Type("PhysicsEngineState"), {nativetype="enumstring"}),
+    }, nil, {d="Initialize the physics engine. Either '2D' or '3D': Start the updates to the physics simulation. 'off': Stop the physics simulation."});
+
+    Enum("PhysicsEngineState", {"off", "2D", "3D"}, {d="Physics engine state. '3D', '2D' to disable 'Z', 'off' to shutdownssssstatesi."}),
+
+    -- END:   PHYSICS ------------------------------
+
     Record("Image", {
         Field("width", Integer(), {map_read = "get_image_width"}),
         Field("height", Integer(), {map_read = "get_image_height"}),

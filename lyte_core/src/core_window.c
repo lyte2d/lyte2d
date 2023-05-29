@@ -38,31 +38,31 @@ int lyte_core_window_init(void) {
     glfwWindowHint(GLFW_DOUBLEBUFFER, 1);
 
 #if defined(__EMSCRIPTEN__)
-    lyte_state.window = glfwCreateWindow(emsc_width(), emsc_height(), lyte_state.window_title, NULL, NULL);
-    emscripten_set_window_title(lyte_state.window_title);
+    lytecore_state.window = glfwCreateWindow(emsc_width(), emsc_height(), lytecore_state.window_title, NULL, NULL);
+    emscripten_set_window_title(lytecore_state.window_title);
 #else
-    lyte_state.window = glfwCreateWindow(lyte_state.window_size.width, lyte_state.window_size.height, lyte_state.window_title, NULL, NULL);
+    lytecore_state.window = glfwCreateWindow(lytecore_state.window_size.width, lytecore_state.window_size.height, lytecore_state.window_title, NULL, NULL);
 #endif
 
-    if (lyte_state.window == NULL) {
+    if (lytecore_state.window == NULL) {
         fprintf(stderr, "Failed to create glfw window\n");
         return -2;
     }
 
     // make the window current for opengl
-    glfwMakeContextCurrent(lyte_state.window);
+    glfwMakeContextCurrent(lytecore_state.window);
 
-    lyte_state.monitor = glfwGetWindowMonitor(lyte_state.window);
-    if (!lyte_state.monitor) {
+    lytecore_state.monitor = glfwGetWindowMonitor(lytecore_state.window);
+    if (!lytecore_state.monitor) {
         // this is expected
         GLFWmonitor* primary = glfwGetPrimaryMonitor();
-        lyte_state.monitor = primary;
+        lytecore_state.monitor = primary;
 
         const GLFWvidmode *mode = glfwGetVideoMode(primary);
-        lyte_state.mode = (void *)mode;
+        lytecore_state.mode = (void *)mode;
     }
 
-    if (lyte_state.vsync) {
+    if (lytecore_state.vsync) {
         glfwSwapInterval(1);
     } else {
         glfwSwapInterval(0);
@@ -95,9 +95,9 @@ int lyte_core_window_cleanup(void) {
 }
 
 int lyte_set_window_minsize(int width, int height) {
-    glfwSetWindowSizeLimits(lyte_state.window, width, height, GLFW_DONT_CARE, GLFW_DONT_CARE);
-    lyte_state.window_min_size.width = width;
-    lyte_state.window_min_size.height = height;
+    glfwSetWindowSizeLimits(lytecore_state.window, width, height, GLFW_DONT_CARE, GLFW_DONT_CARE);
+    lytecore_state.window_min_size.width = width;
+    lytecore_state.window_min_size.height = height;
     // _lib->mode = (GLFWvidmode *)glfwGetVideoMode(_lib->monitor);
     // glfwSetWindowPos(
     //     _lib->window,
@@ -107,9 +107,9 @@ int lyte_set_window_minsize(int width, int height) {
 }
 
 int lyte_set_window_size(int width, int height) {
-    glfwSetWindowSize(lyte_state.window, width, height);
-    lyte_state.window_size.width = width;
-    lyte_state.window_size.height = height;
+    glfwSetWindowSize(lytecore_state.window, width, height);
+    lytecore_state.window_size.width = width;
+    lytecore_state.window_size.height = height;
     // _lib->mode = (GLFWvidmode *)glfwGetVideoMode(_lib->monitor);
     // glfwSetWindowPos(
     //     _lib->window,
@@ -125,11 +125,11 @@ int lyte_get_window_width(int *val) {
         w = emsc_width();
         h = emsc_height();
 #else
-    glfwGetWindowSize(lyte_state.window, &w, &h);
+    glfwGetWindowSize(lytecore_state.window, &w, &h);
 #endif
     *val = w;
-    lyte_state.window_size.width = w;
-    lyte_state.window_size.height = h;
+    lytecore_state.window_size.width = w;
+    lytecore_state.window_size.height = h;
     return 0;
 }
 
@@ -140,11 +140,11 @@ int lyte_get_window_height(int *val) {
         w = emsc_width();
         h = emsc_height();
 #else
-    glfwGetWindowSize(lyte_state.window, &w, &h);
+    glfwGetWindowSize(lytecore_state.window, &w, &h);
 #endif
     *val = h;
-    lyte_state.window_size.width = w;
-    lyte_state.window_size.height = h;
+    lytecore_state.window_size.width = w;
+    lytecore_state.window_size.height = h;
     return 0;
 }
 
@@ -173,13 +173,13 @@ static int get_current_monitor( GLFWmonitor** monitor, GLFWwindow* window) {
 
 int lyte_set_fullscreen(bool fullscreen) {
 #if defined(__EMSCRIPTEN__)
-    if (fullscreen != lyte_state.fullscreen) {
+    if (fullscreen != lytecore_state.fullscreen) {
         if (fullscreen) {
             emscripten_request_fullscreen("#canvas", false);
-            lyte_state.fullscreen = fullscreen = true;
+            lytecore_state.fullscreen = fullscreen = true;
         } else {
             emscripten_exit_fullscreen();
-            lyte_state.fullscreen = fullscreen = false;
+            lytecore_state.fullscreen = fullscreen = false;
         }
     }
 #else
@@ -187,31 +187,31 @@ int lyte_set_fullscreen(bool fullscreen) {
     static int win_y = 0;
     static int win_save_w = 0;
     static int win_save_h = 0;
-    if (fullscreen != lyte_state.fullscreen) {
+    if (fullscreen != lytecore_state.fullscreen) {
             GLFWmonitor *monitor = NULL;
-            int err = get_current_monitor(&monitor, lyte_state.window);
+            int err = get_current_monitor(&monitor, lytecore_state.window);
             if (!err) {
-                lyte_state.monitor = monitor;
-                lyte_state.mode = (void *)glfwGetVideoMode(lyte_state.monitor);
+                lytecore_state.monitor = monitor;
+                lytecore_state.mode = (void *)glfwGetVideoMode(lytecore_state.monitor);
             }
         if (fullscreen) {
-            GLFWvidmode * mode = lyte_state.mode;
-            glfwGetWindowPos(lyte_state.window, &win_x, &win_y);
-            win_save_w = lyte_state.window_size.width;
-            win_save_h = lyte_state.window_size.height;
-            glfwGetWindowSize(lyte_state.window,&lyte_state.window_size.width, &lyte_state.window_size.height);
-            glfwSetWindowMonitor(lyte_state.window, lyte_state.monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            GLFWvidmode * mode = lytecore_state.mode;
+            glfwGetWindowPos(lytecore_state.window, &win_x, &win_y);
+            win_save_w = lytecore_state.window_size.width;
+            win_save_h = lytecore_state.window_size.height;
+            glfwGetWindowSize(lytecore_state.window,&lytecore_state.window_size.width, &lytecore_state.window_size.height);
+            glfwSetWindowMonitor(lytecore_state.window, lytecore_state.monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
         } else {
-            glfwSetWindowMonitor(lyte_state.window, NULL, win_x, win_y, win_save_w, win_save_h, GLFW_DONT_CARE);
+            glfwSetWindowMonitor(lytecore_state.window, NULL, win_x, win_y, win_save_w, win_save_h, GLFW_DONT_CARE);
         }
-        lyte_state.fullscreen = fullscreen;
+        lytecore_state.fullscreen = fullscreen;
     }
 #endif
     return 0;
 }
 
 int lyte_is_fullscreen(bool *val) {
-    *val = lyte_state.fullscreen;
+    *val = lytecore_state.fullscreen;
     return 0;
 }
 
@@ -219,9 +219,9 @@ int lyte_set_window_title(const char * title) {
 #if defined(__EMSCRIPTEN__)
     emscripten_set_window_title(title);
 #else
-    glfwSetWindowTitle(lyte_state.window, title);
+    glfwSetWindowTitle(lytecore_state.window, title);
 #endif
-    lyte_state.window_title = title;
+    lytecore_state.window_title = title;
     return 0;
 }
 
@@ -251,7 +251,7 @@ int lyte_set_window_icon_file(const char * path) {
 
     GLFWimage images[1];
     images[0].pixels = stbi_load_from_memory(buf, read_len, &images[0].width, &images[0].height, 0, 4);
-    glfwSetWindowIcon(lyte_state.window, 1, images);
+    glfwSetWindowIcon(lytecore_state.window, 1, images);
 
     stbi_image_free(data);
     free(buf);
@@ -260,8 +260,8 @@ int lyte_set_window_icon_file(const char * path) {
 }
 
 int lyte_set_window_vsync(bool vsync) {
-    lyte_state.vsync = vsync;
-    if (lyte_state.vsync) {
+    lytecore_state.vsync = vsync;
+    if (lytecore_state.vsync) {
         glfwSwapInterval(1);
     } else {
         glfwSwapInterval(0);
@@ -270,22 +270,22 @@ int lyte_set_window_vsync(bool vsync) {
 }
 
 int lyte_is_window_vsync(bool *val) {
-    *val = lyte_state.vsync;
+    *val = lytecore_state.vsync;
     return 0;
 }
 
 int lyte_set_window_margins(int left, int right, int top, int bottom) {
-    lyte_state.window_margins.left = left;
-    lyte_state.window_margins.right = right;
-    lyte_state.window_margins.top = top;
-    lyte_state.window_margins.bottom = bottom;
+    lytecore_state.window_margins.left = left;
+    lytecore_state.window_margins.right = right;
+    lytecore_state.window_margins.top = top;
+    lytecore_state.window_margins.bottom = bottom;
     return 0;
 }
 
 int lyte_set_window_paddings(int left, int right, int top, int bottom) {
-    lyte_state.window_paddings.left = left;
-    lyte_state.window_paddings.right = right;
-    lyte_state.window_paddings.top = top;
-    lyte_state.window_paddings.bottom = bottom;
+    lytecore_state.window_paddings.left = left;
+    lytecore_state.window_paddings.right = right;
+    lytecore_state.window_paddings.top = top;
+    lytecore_state.window_paddings.bottom = bottom;
     return 0;
 }

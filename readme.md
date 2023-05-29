@@ -18,7 +18,7 @@ Lyte2D website: https://simple-bits.com/lyte
 
 ### License
 
-This project is licensed under the terms of the MIT license. See [/docs/LICENSE.md](/docs/LICENSE.md) file for details.
+This project is licensed under the terms of the MIT license. See [/LICENSE.md](/LICENSE.md) file for details.
 
 Lyte2D depends on other software which have various licenses:
 

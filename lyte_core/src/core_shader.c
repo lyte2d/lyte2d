@@ -331,7 +331,7 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 
     // sgp pipeline
     sgp_pipeline_desc pip_desc = {0};
-    pip_desc.blend_mode = (sgp_blend_mode)lyte_state.blendmode;
+    pip_desc.blend_mode = (sgp_blend_mode)lytecore_state.blendmode;
     pip_desc.shader = shader_desc;
     //pip_desc.primitive_type = SG_PRIMITIVETYPE_ ; // TODO: do we need to set this?
     sg_pipeline pip = sgp_make_pipeline(&pip_desc);
@@ -375,16 +375,16 @@ int lyte_set_shader(lyte_Shader shader) {
         return 1;
     }
     sgp_set_pipeline((sg_pipeline){.id=shd->pip_id});
-    memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+    memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
     sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
-    lyte_set_blendmode(lyte_state.blendmode);
-    lyte_state.shader = shd;
+    lyte_set_blendmode(lytecore_state.blendmode);
+    lytecore_state.shader = shd;
 
     return 0;
 }
 
 int lyte_reset_shader(void) {
-    lyte_state.shader = NULL;
+    lytecore_state.shader = NULL;
     sgp_reset_pipeline();
 
     return 0;
@@ -392,9 +392,9 @@ int lyte_reset_shader(void) {
 
 
 int lyte_core_shader_set_color() {
-    if (lyte_state.shader) {
-        ShaderItem *shd = lyte_state.shader;
-        memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+    if (lytecore_state.shader) {
+        ShaderItem *shd = lytecore_state.shader;
+        memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
         sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
     }
     return 0;
@@ -420,7 +420,7 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
     switch (which_uniform_value) {
         case 0: { // float/int
             shd->uniform_floats[sud->location] = uniform_value.float_val;
-            memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+            memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
             sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
@@ -434,7 +434,7 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
             for (int i=0; i<count; i++) {
                 shd->uniform_floats[sud->location+i] = uniform_value.float_list.values[i];
             }
-            memcpy(shd->uniform_floats, lyte_state.current_color, 16);
+            memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
             sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;

@@ -1,3 +1,5 @@
+//
+
 #ifndef LYTE_CORE_H_INCLUDED
 #define LYTE_CORE_H_INCLUDED
 
@@ -57,7 +59,7 @@ typedef struct lyte_Config {
     lyte_FilterMode filtermode;
 } lyte_Config;
 
-typedef struct lyte_State {
+typedef struct lyte_CoreState {
     lyte_Args args;
 
     lyte_BlendMode default_blendmode;
@@ -87,14 +89,14 @@ typedef struct lyte_State {
     lyte_TickFunction tick_fn;
     void *app_data;
 
-} lyte_State;
+} lyte_CoreState;
 
 
 // -------------------------
 // core state
 // -------------------------
 
-extern lyte_State lyte_state;
+extern lyte_CoreState lytecore_state;
 
 int lyte_core_state_init(lyte_Config config);
 

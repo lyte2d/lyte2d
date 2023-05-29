@@ -80,8 +80,8 @@ static int _fons_render_create(void *user_ptr, int width, int height) {
         .height = height,
         // .pixel_format = SG_PIXELFORMAT_R8,
         .pixel_format = SG_PIXELFORMAT_RGBA8,
-        .min_filter = (sg_filter)lyte_state.filtermode,
-        .mag_filter = (sg_filter)lyte_state.filtermode,
+        .min_filter = (sg_filter)lytecore_state.filtermode,
+        .mag_filter = (sg_filter)lytecore_state.filtermode,
         .type = SG_IMAGETYPE_2D,
         .usage = SG_USAGE_DYNAMIC,
     };
@@ -151,7 +151,7 @@ static void _fons_render_draw(void *user_ptr, const float *verts, const float *t
     sg_image img = (sg_image){ .id=fontitem->imageid };
 
     sgp_set_image(0,img);
-    sgp_set_blend_mode((sgp_blend_mode)lyte_state.blendmode);
+    sgp_set_blend_mode((sgp_blend_mode)lytecore_state.blendmode);
     // sgp_set_blend_mode(SGP_BLENDMODE_BLEND);
 
     for (int i=0; i<nverts-2; i += 3) {

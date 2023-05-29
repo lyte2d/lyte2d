@@ -40,7 +40,7 @@ local function Page()
             H.p [[ Hello world in Lyte2D: ]],
             Code ({id="example-1", style="background-color:inherit"}, simple1),
             H.script [[ Prism.highlightElement(document.getElementById("example-1")); ]],
-            H. p "Lyte2D is small (Windows and Linux binaries are each about 1MB zipped) and supports HTML5 by compiling into WASM.",
+            H. p "Lyte2D is small (Windows and Linux binaries are each less than 2 MB zipped) and supports HTML5 by compiling into WASM.",
             H.p {style="color: brown;", [[
                 Lyte2D is currently "alpha" software.
                 Unless you know what you're doing, you probably shouldn't use it in "production."
@@ -50,7 +50,7 @@ local function Page()
             H.p "Lyte2D works on Windows, Linux (including SteamDeck) and HTML5.",
             H.b "Downloads",
             H.ul {
-                H.li {"Binaries", MenuLinkExt("https://morew4rd.itch.io/lyte2d","https://morew4rd.itch.io/lyte2d")},
+                H.li {"Binaries", MenuLinkExt("https://github.com/morew4rd/lyte2d/releases","https://github.com/morew4rd/lyte2d/releases")},
                 H.li {"Source snapshot", MenuLinkExt("https://github.com/morew4rd/lyte2d", "https://github.com/morew4rd/lyte2d")},
             },
             H.p "Once you download the binary zip, just put lyte.exe somewhere in your path (or in a local directory where you'll write your game.)",
