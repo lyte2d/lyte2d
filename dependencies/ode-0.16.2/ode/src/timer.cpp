@@ -96,7 +96,9 @@ double dTimerTicksPerSecond()
 // instructions have executed and data has been written back before the cpu
 // time stamp counter is read. the CPUID instruction is used to serialize.
 
-#if defined(PENTIUM) && !defined(WIN32)
+// MG: added !emscripten
+// #if defined(PENTIUM) && !defined(WIN32)
+#if defined(PENTIUM) && !defined(WIN32) && !defined(__EMSCRIPTEN__)
 
 // we need to know the clock rate so that the timing function can report
 // accurate times. this number only needs to be set accurately if we're
@@ -108,7 +110,7 @@ double dTimerTicksPerSecond()
 
 static inline void getClockCount (unsigned long cc[2])
 {
-#ifndef X86_64_SYSTEM	
+#ifndef X86_64_SYSTEM
     asm volatile (
         "rdtsc\n"
         "movl %%eax,(%%esi)\n"
@@ -120,7 +122,7 @@ static inline void getClockCount (unsigned long cc[2])
         "movl %%eax,(%%rsi)\n"
         "movl %%edx,4(%%rsi)\n"
         : : "S" (cc) : "%eax","%edx","cc","memory");
-#endif  
+#endif
 }
 
 
@@ -153,7 +155,7 @@ static inline double loadClockCount (unsigned long a[2])
 #else
     asm volatile ("fildll %1; fstpl %0" : "=m" (ret) : "m" (a[0]) :
     "cc","memory");
-#endif  
+#endif
     return ret;
 }
 
@@ -241,6 +243,60 @@ double dTimerTicksPerSecond()
 }
 
 #endif
+
+//****************************************************************************
+// MG: added emscripten case
+// TODO: consider using emscripten_get_now() https://emscripten.org/docs/api_reference/emscripten.h.html
+#if defined(__EMSCRIPTEN__)
+
+#include <sys/time.h>
+#include <unistd.h>
+
+
+static inline void getClockCount (unsigned long cc[2])
+{
+    struct timeval tv;
+    gettimeofday (&tv,0);
+    cc[0] = tv.tv_usec;
+    cc[1] = tv.tv_sec;
+}
+
+static inline void serialize()
+{
+}
+
+
+static inline double loadClockCount (unsigned long a[2])
+{
+    return a[1]*1.0e6 + a[0];
+}
+
+
+double dTimerResolution()
+{
+    unsigned long cc1[2],cc2[2];
+    getClockCount (cc1);
+    do {
+        getClockCount (cc2);
+    }
+    while (cc1[0]==cc2[0] && cc1[1]==cc2[1]);
+    do {
+        getClockCount (cc1);
+    }
+    while (cc1[0]==cc2[0] && cc1[1]==cc2[1]);
+    double t1 = loadClockCount (cc1);
+    double t2 = loadClockCount (cc2);
+    return (t1-t2) / dTimerTicksPerSecond();
+}
+
+
+double dTimerTicksPerSecond()
+{
+    return 1000000;
+}
+
+#endif
+
 
 //****************************************************************************
 // stop watches

@@ -12,17 +12,22 @@ set(VERSION_MINOR 16)
 set(VERSION_PATCH 2)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
-option(BUILD_SHARED_LIBS "Build shared libraries." ON)
+# MG -- DEFAULTS CHANGED
+option(BUILD_SHARED_LIBS "Build shared libraries." OFF)
 option(ODE_16BIT_INDICES "Use 16-bit indices for trimeshes (default is 32-bit)." OFF)
-option(ODE_NO_BUILTIN_THREADING_IMPL "Disable built-in multithreaded threading implementation." OFF)
-option(ODE_NO_THREADING_INTF "Disable threading interface support (external implementations cannot be assigned." OFF)
+# option(ODE_NO_BUILTIN_THREADING_IMPL "Disable built-in multithreaded threading implementation." OFF)
+option(ODE_NO_BUILTIN_THREADING_IMPL "Disable built-in multithreaded threading implementation." ON)
+# option(ODE_NO_THREADING_INTF "Disable threading interface support (external implementations cannot be assigned." OFF)
+option(ODE_NO_THREADING_INTF "Disable threading interface support (external implementations cannot be assigned." ON)
 option(ODE_OLD_TRIMESH "Use old OPCODE trimesh-trimesh collider." OFF)
-option(ODE_WITH_DEMOS "Builds the demo applications and DrawStuff library." ON)
+# option(ODE_WITH_DEMOS "Builds the demo applications and DrawStuff library." ON)
+option(ODE_WITH_DEMOS "Builds the demo applications and DrawStuff library." OFF)
 option(ODE_WITH_GIMPACT "Use GIMPACT for trimesh collisions (experimental)." OFF)
 option(ODE_WITH_LIBCCD "Use libccd for handling some collision tests absent in ODE." OFF)
 option(ODE_WITH_OPCODE "Use old OPCODE trimesh-trimesh collider." ON)
 option(ODE_WITH_OU "Use TLS for global caches (allows threaded collision checks for separated spaces)." OFF)
-option(ODE_WITH_TESTS "Builds the unit test application." ON)
+# option(ODE_WITH_TESTS "Builds the unit test application." ON)
+option(ODE_WITH_TESTS "Builds the unit test application." OFF)
 
 cmake_dependent_option(ODE_WITH_LIBCCD_BOX_CYL "Use libccd for box-cylinder." ON "ODE_WITH_LIBCCD" OFF)
 cmake_dependent_option(ODE_WITH_LIBCCD_CAP_CYL "Use libccd for capsule-cylinder." ON "ODE_WITH_LIBCCD" OFF)
@@ -887,7 +892,8 @@ install(
 )
 
 configure_file(cmake/cmake_uninstall.cmake.in cmake_uninstall.cmake @ONLY)
-add_custom_target(uninstall ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
+# add_custom_target(uninstall ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)   ## fixing build break. rename uninstall target (in use elsewhere)
+add_custom_target(uninstall_ode ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "ODE is a free, industrial quality library for simulating articulated rigid body dynamics - for example ground vehicles, legged creatures, and moving objects in VR environments. It is fast, flexible, robust and platform independent, with advanced joints, contact with friction, and built-in collision detection.")
 

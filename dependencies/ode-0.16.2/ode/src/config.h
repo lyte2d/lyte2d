@@ -59,6 +59,7 @@
 #define X86_64_SYSTEM 1
 
 /* Try to identify the platform */
+// MG: added __EMSCRIPTEN__
 #if defined(_XENON)
 #define ODE_PLATFORM_XBOX360
 #elif defined(SN_TARGET_PSP_HW)
@@ -67,7 +68,7 @@
 #define ODE_PLATFORM_PS3
 #elif defined(_MSC_VER) || defined(__CYGWIN32__) || defined(__MINGW32__)
 #define ODE_PLATFORM_WINDOWS
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__EMSCRIPTEN__)
 #define ODE_PLATFORM_LINUX
 #elif defined(__APPLE__) && defined(__MACH__)
 #define ODE_PLATFORM_OSX
