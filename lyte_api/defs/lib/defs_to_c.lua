@@ -466,7 +466,8 @@ function CC.Record(items, depth, name, tags, traverse_fn)
 
 
     -- struct definition (this goes to top)
-    CC.top_structdefs = CC.top_structdefs .. tab:rep(depth) .. "typedef struct " .. prefix .. name .. " { unsigned handle; } " ..  prefix .. name  .. ";\n"
+    -- CC.top_structdefs = CC.top_structdefs .. tab:rep(depth) .. "typedef struct " .. prefix .. name .. " { unsigned handle; } " ..  prefix .. name  .. ";\n"
+    CC.top_structdefs = CC.top_structdefs .. tab:rep(depth) .. "typedef struct " .. prefix .. name .. " { void *ptr; } " ..  prefix .. name  .. ";\n"
 
     -- struct cleanups (this goes to top)
     -- Note: init functions are generated through constructor functions

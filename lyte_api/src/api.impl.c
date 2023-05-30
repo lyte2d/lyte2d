@@ -730,6 +730,6 @@ static inline int _impl_shaderbuilder_fragment(lyte_ShaderBuilder shaderbuilder,
 static inline int _impl_set_physics_engine(lyte_PhysicsEngineState state) {
     (void)state;
     int _ret = 0;
-    // _ret = lyte_set_physics_engine(state);
+    _ret = lyte_set_physics_engine(state);
     return _ret;
 }

@@ -19,7 +19,7 @@
 #endif
 
 typedef struct ImageItem {
-    uint32_t handle;
+    uint32_t handle; // **MAGIC_1** NOTE: needs to stay the first element in the struct. (pointer magic in core_shader.c)
     int width;
     int height;
     bool is_canvas; // if true, values below should also be set
@@ -82,7 +82,8 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     imageitem.height = height;
     imageitem.is_canvas = false;
     mg_map_set(&imageitems, imageitem.handle, &imageitem);
-    img->handle = imageitem.handle;
+    ImageItem *ii = mg_map_get(&imageitems, imageitem.handle);
+    img->ptr = ii;
     free(buf);
     PHYSFS_close(file);
     return 0;
@@ -128,12 +129,13 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
     }
     canvas.id_pass = fb_pass.id;
     mg_map_set(&imageitems, canvas.handle, &canvas);
-    img->handle = canvas.handle;
+    ImageItem *ii = mg_map_get(&imageitems, canvas.handle);
+    img->ptr = ii;
     return 0;
 }
 
 int lyte_cleanup_image(lyte_Image image) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
         return 0;
     }
@@ -142,14 +144,14 @@ int lyte_cleanup_image(lyte_Image image) {
         sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
     }
     sg_destroy_image((sg_image){.id = imageitem->handle});
-    mg_map_del(&imageitems, image.handle);
+    mg_map_del(&imageitems, imageitem->handle);
     return 0;
 }
 
 int lyte_get_image_width(lyte_Image image, int *val) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
-        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        fprintf(stderr, "Image not found\n");
         return -1;
     }
     *val = imageitem->width;
@@ -157,9 +159,9 @@ int lyte_get_image_width(lyte_Image image, int *val) {
 }
 
 int lyte_get_image_height(lyte_Image image, int *val) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
-        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        fprintf(stderr, "Image not found\n");
         return -1;
     }
     *val = imageitem->height;
@@ -167,9 +169,9 @@ int lyte_get_image_height(lyte_Image image, int *val) {
 }
 
 int lyte_is_image_canvas(lyte_Image image, bool *val) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
-        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        fprintf(stderr, "Image not found\n");
         return -1;
     }
     *val = imageitem->is_canvas;
@@ -177,12 +179,12 @@ int lyte_is_image_canvas(lyte_Image image, bool *val) {
 }
 
 int lyte_draw_image(lyte_Image image, int x, int y) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
-        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        fprintf(stderr, "Image not found\n");
         return -1;
     }
-    sg_image sgimage = (sg_image){ .id = image.handle };
+    sg_image sgimage = (sg_image){ .id = imageitem->handle };
     // TODO: blendmode?
     sgp_set_image(0, sgimage);
     sgp_draw_textured_rect(x, y, imageitem->width, imageitem->height);
@@ -191,12 +193,12 @@ int lyte_draw_image(lyte_Image image, int x, int y) {
 }
 
 int lyte_draw_image_rect(lyte_Image image, int x, int y, int src_x, int src_y, int w, int h) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
-        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        fprintf(stderr, "Image not found\n");
         return -1;
     }
-    sg_image sgimage = (sg_image){ .id = image.handle };
+    sg_image sgimage = (sg_image){ .id = imageitem->handle };
     // TODO: blendmode?
     sgp_set_image(0, sgimage);
     sgp_draw_textured_rect_ex(0, (sgp_rect){x, y, w, h}, (sgp_rect){src_x, src_y, w, h});
@@ -205,17 +207,16 @@ int lyte_draw_image_rect(lyte_Image image, int x, int y, int src_x, int src_y, i
 }
 
 int lyte_set_canvas(lyte_Image image) {
-    ImageItem *imageitem = mg_map_get(&imageitems, image.handle);
+    ImageItem *imageitem = image.ptr;
     if (!imageitem) {
-        fprintf(stderr, "Image with handle %d not present\n", image.handle);
+        fprintf(stderr, "Image not found\n");
         return -1;
     }
     if (!imageitem->is_canvas) {
-        fprintf(stderr, "Image with handle %d is not a canvas\n", image.handle);
+        fprintf(stderr, "Image is not a canvas\n");
         return 1;
     }
     sgp_begin(imageitem->width, imageitem->height);
-    // sgp_set_blend_mode((sgp_blend_mode)_lib->blendmode); // TODO: blendmode
     sgp_scale(1.0, -1.0);
     sgp_translate(0, -imageitem->height);
     sgp_push_transform();

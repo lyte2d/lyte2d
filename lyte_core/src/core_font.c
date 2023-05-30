@@ -222,32 +222,32 @@ int lyte_load_font(const char * path, double size, lyte_Font *val) {
         .renderUpdate = _fons_render_update,
         .renderDraw = _fons_render_draw,
     };
-    //printf("LOAD_FONT: CANVAS handle imageid: %d -- fontitem handle: %d...\n", saved_fontitem->imageid, ((lyte_Image*)params.userPtr)->handle);
     saved_fontitem->fonsctx = fonsCreateInternal(&params);
     saved_fontitem->font = fonsAddFontMem(saved_fontitem->fonsctx, path, buf, read_len, false);
 
-    val->handle = saved_fontitem->handle;
+    val->ptr = saved_fontitem;
 
     PHYSFS_close(file);
     return 0;
 }
 
 int lyte_cleanup_font(lyte_Font font) {
-    FontItem *fontitem = mg_map_get(&fontitems, font.handle);
-    // printf("CLEANUP_FONT: %p\n", fontitem);
+    FontItem *fontitem = font.ptr;
+
     if (fontitem == NULL) {
         return 0;
     }
     free(fontitem->fontdata);
     fonsDeleteInternal(fontitem->fonsctx);
-    mg_map_del(&fontitems, font.handle);
+    mg_map_del(&fontitems, fontitem->handle);
     return 0;
 }
 
 int lyte_set_font(lyte_Font font) {
-    FontItem *fontitem = mg_map_get(&fontitems, font.handle);
+    FontItem *fontitem = font.ptr;
+
     if (fontitem == NULL) {
-        fprintf(stderr, "Font with handle %d not present\n",font.handle);
+        fprintf(stderr, "Font with not found\n");
         return -1;
     }
     current_font = fontitem;
@@ -273,11 +273,6 @@ int lyte_draw_text(const char * text, int dest_x, int dest_y) {
     fonsVertMetrics(ctx, NULL, NULL, &fontheight);
     fonsSetBlur(ctx, 0);
     double last_x = fonsDrawText(ctx, dest_x, dest_y+fontheight, text,  NULL);
-
-    // printf("--> (%d,%d) -- (%f,%f,%f) -- %s \n", dest_x, dest_y, last_x,fontheight, fontsize, text );
-    // if needed, text width & height:
-    // double text_width = last_x - dest_x;
-    // double text_height = fontheight;
 
     return 0;
 }

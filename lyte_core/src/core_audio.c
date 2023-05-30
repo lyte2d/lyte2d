@@ -144,27 +144,28 @@ int lyte_load_music(const char *path, lyte_Music *mus) {
     musicitem.music = LoadMusicStreamFromMemory(file_extension, musicitem.data, musicitem.data_size);
     musicitem.music.looping = true;
     mg_map_set(&musicitems, musicitem.handle, &musicitem);
-    mus->handle = musicitem.handle;
+    MusicItem *mi = mg_map_get(&musicitems, musicitem.handle);
+    mus->ptr = mi;
     PHYSFS_close(file);
     return 0;
 }
 
 int lyte_cleanup_music(lyte_Music mus) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (musicitem == NULL) {
         return 0;
     }
     StopMusicStream(musicitem->music);
     UnloadMusicStream(musicitem->music);
     free(musicitem->data);
-    mg_map_del(&musicitems, mus.handle);
+    mg_map_del(&musicitems, musicitem->handle);
     return 0;
 }
 
 int lyte_play_music(lyte_Music mus) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     PlayMusicStream(musicitem->music);
@@ -172,9 +173,9 @@ int lyte_play_music(lyte_Music mus) {
 }
 
 int lyte_pause_music(lyte_Music mus) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     PauseMusicStream(musicitem->music);
@@ -182,9 +183,9 @@ int lyte_pause_music(lyte_Music mus) {
 }
 
 int lyte_resume_music(lyte_Music mus) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     ResumeMusicStream(musicitem->music);
@@ -192,9 +193,9 @@ int lyte_resume_music(lyte_Music mus) {
 }
 
 int lyte_stop_music(lyte_Music mus) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     StopMusicStream(musicitem->music);
@@ -202,9 +203,9 @@ int lyte_stop_music(lyte_Music mus) {
 }
 
 int lyte_is_music_playing(lyte_Music mus, bool *val) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     *val = IsMusicStreamPlaying(musicitem->music);
@@ -212,9 +213,9 @@ int lyte_is_music_playing(lyte_Music mus, bool *val) {
 }
 
 int lyte_get_music_volume(lyte_Music mus, double *val) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     *val = musicitem->volume;
@@ -222,9 +223,9 @@ int lyte_get_music_volume(lyte_Music mus, double *val) {
 }
 
 int lyte_get_music_pan(lyte_Music mus, double *val) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     *val = musicitem->pan;
@@ -232,9 +233,9 @@ int lyte_get_music_pan(lyte_Music mus, double *val) {
 }
 
 int lyte_get_music_pitch(lyte_Music mus, double *val) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     *val = musicitem->pitch;
@@ -242,9 +243,9 @@ int lyte_get_music_pitch(lyte_Music mus, double *val) {
 }
 
 int lyte_get_music_length(lyte_Music mus, double *secs) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     *secs = GetMusicTimeLength(musicitem->music);
@@ -252,9 +253,9 @@ int lyte_get_music_length(lyte_Music mus, double *secs) {
 }
 
 int lyte_get_music_length_played(lyte_Music mus, double *secs) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     *secs = GetMusicTimePlayed(musicitem->music);
@@ -262,9 +263,9 @@ int lyte_get_music_length_played(lyte_Music mus, double *secs) {
 }
 
 int lyte_set_music_volume(lyte_Music mus, double vol) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     musicitem->volume = vol;
@@ -273,9 +274,9 @@ int lyte_set_music_volume(lyte_Music mus, double vol) {
 }
 
 int lyte_set_music_pan(lyte_Music mus, double pan) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     musicitem->pan = pan;
@@ -284,9 +285,9 @@ int lyte_set_music_pan(lyte_Music mus, double pan) {
 }
 
 int lyte_set_music_pitch(lyte_Music mus, double pitch) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     musicitem->pitch= pitch;
@@ -295,9 +296,9 @@ int lyte_set_music_pitch(lyte_Music mus, double pitch) {
 }
 
 int lyte_seek_music(lyte_Music mus, double secs) {
-    MusicItem *musicitem = mg_map_get(&musicitems, mus.handle);
+    MusicItem *musicitem = mus.ptr;
     if (!musicitem) {
-        fprintf(stderr, "Music with handle %d not present\n", mus.handle);
+        fprintf(stderr, "Music not found\n");
         return -1;
     }
     SeekMusicStream(musicitem->music, secs);
@@ -327,27 +328,28 @@ int lyte_load_sound(const char * path, lyte_Sound *val) {
     sdi.wave = LoadWaveFromMemory(file_extension, sdi.data, sdi.data_size);
     mg_map_set(&sounddataitems, sdi.handle, &sdi);
 
-    SoundItem si = {0};
-    si.handle = sounditem_last_handle++;
-    si.sounddata_handle = sdi.handle;
-    si.volume = 1.0;
-    si.pan = 0.5;
-    si.pitch = 1.0;
-    si.sound = LoadSoundFromWave(sdi.wave);
+    SoundItem sounditem = {0};
+    sounditem.handle = sounditem_last_handle++;
+    sounditem.sounddata_handle = sdi.handle;
+    sounditem.volume = 1.0;
+    sounditem.pan = 0.5;
+    sounditem.pitch = 1.0;
+    sounditem.sound = LoadSoundFromWave(sdi.wave);
 
     sdi.ref_count = 1;
-    SetSoundVolume(si.sound, si.volume);
-    SetSoundPan(si.sound, si.pan);
-    SetSoundPitch(si.sound, si.pitch);
-    mg_map_set(&sounditems, si.handle, &si);
+    SetSoundVolume(sounditem.sound, sounditem.volume);
+    SetSoundPan(sounditem.sound, sounditem.pan);
+    SetSoundPitch(sounditem.sound, sounditem.pitch);
+    mg_map_set(&sounditems, sounditem.handle, &sounditem);
+    SoundItem *si = mg_map_get(&sounditems, sounditem.handle);
 
-    val->handle = si.handle;
+    val->ptr = si;
     PHYSFS_close(file);
     return 0;
 }
 
 int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
-    SoundItem *si = mg_map_get(&sounditems, orig.handle);
+    SoundItem *si = orig.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -357,26 +359,26 @@ int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
         fprintf(stderr, "Sound data not found\n");
         return -2;
     }
-    SoundItem nsi = {0};
-    nsi.handle = sounditem_last_handle++;
-    nsi.sounddata_handle = si->sounddata_handle;
-    nsi.volume = si->volume;
-    nsi.pan = si->pan;
-    nsi.pitch = si->pitch;
-    nsi.sound = LoadSoundFromWave(sdi->wave);
+    SoundItem newsounditem = {0};
+    newsounditem.handle = sounditem_last_handle++;
+    newsounditem.sounddata_handle = si->sounddata_handle;
+    newsounditem.volume = si->volume;
+    newsounditem.pan = si->pan;
+    newsounditem.pitch = si->pitch;
+    newsounditem.sound = LoadSoundFromWave(sdi->wave);
 
     sdi->ref_count++;
-    SetSoundVolume(nsi.sound, nsi.volume);
-    SetSoundPan(nsi.sound, nsi.pan);
-    SetSoundPitch(nsi.sound, nsi.pitch);
-    mg_map_set(&sounditems, nsi.handle, &nsi);
-
-    val->handle = nsi.handle;
+    SetSoundVolume(newsounditem.sound, newsounditem.volume);
+    SetSoundPan(newsounditem.sound, newsounditem.pan);
+    SetSoundPitch(newsounditem.sound, newsounditem.pitch);
+    mg_map_set(&sounditems, newsounditem.handle, &newsounditem);
+    SoundItem *nsi = mg_map_get(&sounditems, newsounditem.handle);
+    val->ptr = nsi;
     return 0;
 }
 
 int lyte_cleanup_sound(lyte_Sound sound) {
-    SoundItem *si = mg_map_get(&sounditems, sound.handle);
+    SoundItem *si = sound.ptr;
     if (si == NULL) {
         return 0;
     }
@@ -386,7 +388,7 @@ int lyte_cleanup_sound(lyte_Sound sound) {
         return -2;
     }
     UnloadSound(si->sound);
-    mg_map_del(&sounditems, sound.handle);
+    mg_map_del(&sounditems, si->handle);
     sdi->ref_count--;
     if (sdi->ref_count == 0) {
         UnloadWave(sdi->wave);
@@ -397,7 +399,7 @@ int lyte_cleanup_sound(lyte_Sound sound) {
 }
 
 int lyte_play_sound(lyte_Sound snd) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -407,7 +409,7 @@ int lyte_play_sound(lyte_Sound snd) {
 }
 
 int lyte_pause_sound(lyte_Sound snd) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -417,7 +419,7 @@ int lyte_pause_sound(lyte_Sound snd) {
 }
 
 int lyte_resume_sound(lyte_Sound snd) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -427,7 +429,7 @@ int lyte_resume_sound(lyte_Sound snd) {
 }
 
 int lyte_stop_sound(lyte_Sound snd) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -437,7 +439,7 @@ int lyte_stop_sound(lyte_Sound snd) {
 }
 
 int lyte_is_sound_playing(lyte_Sound snd, bool *val) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -447,7 +449,7 @@ int lyte_is_sound_playing(lyte_Sound snd, bool *val) {
 }
 
 int lyte_get_sound_volume(lyte_Sound snd, double *val) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -457,7 +459,7 @@ int lyte_get_sound_volume(lyte_Sound snd, double *val) {
 }
 
 int lyte_get_sound_pan(lyte_Sound snd, double *val) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -467,7 +469,7 @@ int lyte_get_sound_pan(lyte_Sound snd, double *val) {
 }
 
 int lyte_get_sound_pitch(lyte_Sound snd, double *val) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -477,7 +479,7 @@ int lyte_get_sound_pitch(lyte_Sound snd, double *val) {
 }
 
 int lyte_set_sound_volume(lyte_Sound snd, double volume) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -488,7 +490,7 @@ int lyte_set_sound_volume(lyte_Sound snd, double volume) {
 }
 
 int lyte_set_sound_pan(lyte_Sound snd, double pan) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -499,7 +501,7 @@ int lyte_set_sound_pan(lyte_Sound snd, double pan) {
 }
 
 int lyte_set_sound_pitch(lyte_Sound snd, double pitch) {
-    SoundItem *si = mg_map_get(&sounditems, snd.handle);
+    SoundItem *si = snd.ptr;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;

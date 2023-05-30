@@ -78,20 +78,21 @@ int lyte_core_shader_cleanup(void) {
 // ShaderBuilder
 
 int lyte_new_shaderbuilder(lyte_ShaderBuilder *val) {
-    ShaderBuilderItem sbi = {0};
-    sbi.handle = shaderitem_last_handle++;
-    sbi.uniform_definitions = NULL;
-    sbi.num_uniform_definitions = 0;
-    sbi.vert_code = NULL;
-    sbi.frag_code = NULL;
-    mg_map_set(&shaderbuilderitems, sbi.handle, &sbi);
-    val->handle = sbi.handle;
+    ShaderBuilderItem shaderbuilderitem = {0};
+    shaderbuilderitem.handle = shaderitem_last_handle++;
+    shaderbuilderitem.uniform_definitions = NULL;
+    shaderbuilderitem.num_uniform_definitions = 0;
+    shaderbuilderitem.vert_code = NULL;
+    shaderbuilderitem.frag_code = NULL;
+    mg_map_set(&shaderbuilderitems, shaderbuilderitem.handle, &shaderbuilderitem);
+    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilderitem.handle);
+    val->ptr = sbi;
 
     return 0;
 }
 
 int lyte_cleanup_shaderbuilder(lyte_ShaderBuilder shaderbuilder) {
-    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    ShaderBuilderItem *sbi = shaderbuilder.ptr;
     if (sbi) {
         mg_map_del(&shaderbuilderitems, sbi->handle);
     }
@@ -124,9 +125,9 @@ static inline int get_uniform_count(lyte_UniformType t) {
 
 
 int lyte_shaderbuilder_uniform(lyte_ShaderBuilder shaderbuilder, const char * uniform_name, lyte_UniformType uniform_type) {
-    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    ShaderBuilderItem *sbi = shaderbuilder.ptr;
     if (!sbi) {
-        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
+        fprintf(stderr, "ShaderBuilder not found.");
         return 1;
     }
     int idx = sbi->num_uniform_definitions;
@@ -142,9 +143,9 @@ int lyte_shaderbuilder_uniform(lyte_ShaderBuilder shaderbuilder, const char * un
 }
 
 int lyte_shaderbuilder_vertex(lyte_ShaderBuilder shaderbuilder, const char * vertex_code) {
-    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    ShaderBuilderItem *sbi = shaderbuilder.ptr;
     if (!sbi) {
-        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
+        fprintf(stderr, "ShaderBuilder not found.");
         return 1;
     }
     sbi->vert_code = vertex_code;
@@ -153,9 +154,9 @@ int lyte_shaderbuilder_vertex(lyte_ShaderBuilder shaderbuilder, const char * ver
 }
 
 int lyte_shaderbuilder_fragment(lyte_ShaderBuilder shaderbuilder, const char * fragment_code) {
-    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    ShaderBuilderItem *sbi = shaderbuilder.ptr;
     if (!sbi) {
-        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
+        fprintf(stderr, "ShaderBuilder not found.");
         return 1;
     }
     sbi->frag_code = fragment_code;
@@ -234,9 +235,9 @@ static inline char *get_full_fragment_code(ShaderBuilderItem *sbi, const char *u
 
 
 int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shader) {
-    ShaderBuilderItem *sbi = mg_map_get(&shaderbuilderitems, shaderbuilder.handle);
+    ShaderBuilderItem *sbi = shaderbuilder.ptr;
     if (!sbi) {
-        fprintf(stderr, "Unknown shaderbuilder: %d", shaderbuilder.handle);
+        fprintf(stderr, "ShaderBuilder not found.");
         return 1;
     }
 
@@ -258,7 +259,6 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 
     ShaderItem shd = {0};
     shd.handle = shaderitem_last_handle++;
-    // shd.handle = s.id; // TODO; remove this and uncomment above
 
     shd.uniform_floats = malloc(SGP_UNIFORM_CONTENT_SLOTS*sizeof(float)); // TODO: free in lyte_cleanup_shader
     memset(shd.uniform_floats, 0, SGP_UNIFORM_CONTENT_SLOTS*sizeof(float));
@@ -346,7 +346,8 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 
     // add to the map
     mg_map_add(&shaderitems, shd.handle, &shd);
-    shader->handle = shd.handle;
+    ShaderItem *si = mg_map_get(&shaderitems, shd.handle);
+    shader->ptr = si;
 
     // these are allocated in get_full_* functions (in this file, static inline)
     free((void *)uniforms_code);
@@ -357,7 +358,7 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 }
 
 int lyte_cleanup_shader(lyte_Shader shader) {
-    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    ShaderItem *shd =shader.ptr;
     if (shd) {
         free(shd->uniform_definitions);
         free(shd->uniform_floats);
@@ -369,9 +370,9 @@ int lyte_cleanup_shader(lyte_Shader shader) {
 
 
 int lyte_set_shader(lyte_Shader shader) {
-    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    ShaderItem *shd =shader.ptr;
     if (!shd) {
-        fprintf(stderr, "Unknown shader: %d", shader.handle);
+        fprintf(stderr, "Shader not found.");
         return 1;
     }
     sgp_set_pipeline((sg_pipeline){.id=shd->pip_id});
@@ -401,9 +402,9 @@ int lyte_core_shader_set_color() {
 }
 
 int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value) {
-    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    ShaderItem *shd =shader.ptr;
     if (!shd) {
-        fprintf(stderr, "Unknown shader: %d", shader.handle);
+        fprintf(stderr, "Shader not found.");
         return 1;
     }
     ShaderUniformDefinition *sud = NULL;
@@ -440,7 +441,8 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
         break;
         case 2: { // sampler2D
             shd->images[sud->location] = uniform_value.image_val;
-            sg_image sgimg = (sg_image){.id=uniform_value.image_val.handle};
+            uint32_t img_id = *(uint32_t *)uniform_value.image_val.ptr; // **MAGIC_1** NOTE: uint32_t handle is the first item in ImageItem struct in core_image.c file this depens on that magic
+            sg_image sgimg = (sg_image){.id = img_id};
             sgp_set_image(sud->location, sgimg);
          }
          break;
@@ -455,9 +457,9 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
 }
 
 int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name) {
-    ShaderItem *shd = mg_map_get(&shaderitems, shader.handle);
+    ShaderItem *shd =shader.ptr;
     if (!shd) {
-        fprintf(stderr, "Unknown shader: %d", shader.handle);
+        fprintf(stderr, "Shader not found.");
         return 1;
     }
     ShaderUniformDefinition *sud = NULL;
@@ -472,8 +474,7 @@ int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name) {
         return 2;
     }
 
-    // TODO
-
+    // TODO: Do we need resetting?
 
     return 0;
 }
