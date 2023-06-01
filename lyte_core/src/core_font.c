@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "lyte_core.h"
-#include "map.h"
 
 #include "physfs.h"
 
@@ -40,9 +39,7 @@ int fonsAddFontMem(FONScontext* stash, const char* name, unsigned char* data, in
 #endif
 
 typedef struct FontItem {
-    uint32_t handle;
     FONScontext *fonsctx;
-    // lyte_Image fontcanvas;
     void *fontdata;
     uint8_t *buffer;
     uint32_t imageid;
@@ -53,18 +50,13 @@ typedef struct FontItem {
     double fontsize;
 } FontItem;
 
-static uint32_t fontitem_last_handle = 1500;
-static mg_Map fontitems;
 static FontItem *current_font = NULL;
 
 int lyte_core_font_init(void) {
-    mg_map_init(&fontitems, sizeof(FontItem), INIT_NUM_FONTITEMS);
     return 0;
 }
 
 int lyte_core_font_cleanup(void) {
-    // TODO: decide: cleanup individual fonts vs leave it to the OS on exit?
-    mg_map_cleanup(&fontitems);
     return 0;
 }
 
@@ -198,34 +190,31 @@ int lyte_load_font(const char * path, double size, lyte_Font *val) {
         fprintf(stderr, "File not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
         return 1;
     }
-    FontItem _fontitem = {0};
-    _fontitem.handle = fontitem_last_handle++;
-    // save it in the map, because we'll need to use a reliable pointer as userptr in FONSparams
-    mg_map_set(&fontitems, _fontitem.handle, &_fontitem);
-    FontItem *saved_fontitem = mg_map_get(&fontitems, _fontitem.handle);
 
-    saved_fontitem->atlas_dim = FONT_ATLAS_SIZE;
-    saved_fontitem->fontsize = size;
-    saved_fontitem->imageid = 0;
-    saved_fontitem->width = 0;
-    saved_fontitem->height = 0;
-    saved_fontitem->fontdata = buf;
+    FontItem *fi = malloc(sizeof(FontItem));
+
+    fi->atlas_dim = FONT_ATLAS_SIZE;
+    fi->fontsize = size;
+    fi->imageid = 0;
+    fi->width = 0;
+    fi->height = 0;
+    fi->fontdata = buf;
 
     FONSparams params = {
         .flags = FONS_ZERO_TOPLEFT,
-        .width = saved_fontitem->atlas_dim,
-        .height = saved_fontitem->atlas_dim,
-        .userPtr = saved_fontitem,
+        .width = fi->atlas_dim,
+        .height = fi->atlas_dim,
+        .userPtr = fi,
         .renderCreate = _fons_render_create,
         .renderDelete = _fons_render_delete,
         .renderResize = _fons_render_resize,
         .renderUpdate = _fons_render_update,
         .renderDraw = _fons_render_draw,
     };
-    saved_fontitem->fonsctx = fonsCreateInternal(&params);
-    saved_fontitem->font = fonsAddFontMem(saved_fontitem->fonsctx, path, buf, read_len, false);
+    fi->fonsctx = fonsCreateInternal(&params);
+    fi->font = fonsAddFontMem(fi->fonsctx, path, buf, read_len, false);
 
-    val->ptr = saved_fontitem;
+    val->ptr = fi;
 
     PHYSFS_close(file);
     return 0;
@@ -239,7 +228,7 @@ int lyte_cleanup_font(lyte_Font font) {
     }
     free(fontitem->fontdata);
     fonsDeleteInternal(fontitem->fonsctx);
-    mg_map_del(&fontitems, fontitem->handle);
+    free(fontitem);
     return 0;
 }
 

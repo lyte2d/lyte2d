@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "lyte_core.h"
-#include "map.h"
 
 #include "physfs.h"
 
@@ -27,16 +26,13 @@ typedef struct ImageItem {
     uint32_t id_pass;
 } ImageItem;
 
-static mg_Map imageitems;
 static ImageItem *current_canvas = NULL;
 
 int lyte_core_image_init(void) {
-    mg_map_init(&imageitems, sizeof(ImageItem), INIT_NUM_IMAGEITEMS);
     return 0;
 }
 
 int lyte_core_image_cleanup(void) {
-    mg_map_cleanup(&imageitems);
     return 0;
 }
 
@@ -76,13 +72,13 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     image_desc.data.subimage[0][0].size = (size_t)(width * height * 4);
     sg_image sgimage = sg_make_image(&image_desc);
     stbi_image_free(data);
-    ImageItem imageitem = {0};
-    imageitem.handle = sgimage.id;
-    imageitem.width = width;
-    imageitem.height = height;
-    imageitem.is_canvas = false;
-    mg_map_set(&imageitems, imageitem.handle, &imageitem);
-    ImageItem *ii = mg_map_get(&imageitems, imageitem.handle);
+
+    ImageItem *ii = malloc(sizeof(ImageItem));
+    ii->handle = sgimage.id;
+    ii->width = width;
+    ii->height = height;
+    ii->is_canvas = false;
+
     img->ptr = ii;
     free(buf);
     PHYSFS_close(file);
@@ -90,7 +86,11 @@ int lyte_load_image(const char *path, lyte_Image *img) {
 }
 
 int lyte_new_canvas(int w, int h, lyte_Image *img) {
-    ImageItem canvas = {.width = w, .height = h, .is_canvas = true};
+    ImageItem *c = malloc(sizeof(ImageItem));
+    c->width = w;
+    c->height = h;
+    c->is_canvas = true;
+
     // create frame buffer image
     sg_image_desc fb_image_desc = {0};
     fb_image_desc.render_target = true;
@@ -105,7 +105,7 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
         fprintf(stderr, "Failed to create frame buffer image\n");
         return 1;
     }
-    canvas.handle = fb_image.id;
+    c->handle = fb_image.id;
     // create frame buffer depth stencil
     sg_image_desc fb_depth_image_desc = {0};
     fb_depth_image_desc.render_target = true;
@@ -117,7 +117,7 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
         fprintf(stderr, "Failed to create frame buffer depth image\n");
         return 2;
     }
-    canvas.id_depth_image = fb_depth_image.id;
+    c->id_depth_image = fb_depth_image.id;
     // create frame buffer pass
     sg_pass_desc pass_desc = {0};
     pass_desc.color_attachments[0].image = fb_image;
@@ -127,10 +127,8 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
         fprintf(stderr, "Failed to create frame buffer pass\n");
         return 3;
     }
-    canvas.id_pass = fb_pass.id;
-    mg_map_set(&imageitems, canvas.handle, &canvas);
-    ImageItem *ii = mg_map_get(&imageitems, canvas.handle);
-    img->ptr = ii;
+    c->id_pass = fb_pass.id;
+    img->ptr = c;
     return 0;
 }
 
@@ -144,7 +142,7 @@ int lyte_cleanup_image(lyte_Image image) {
         sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
     }
     sg_destroy_image((sg_image){.id = imageitem->handle});
-    mg_map_del(&imageitems, imageitem->handle);
+    free(imageitem);
     return 0;
 }
 

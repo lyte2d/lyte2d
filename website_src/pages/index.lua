@@ -95,7 +95,7 @@ local function Page()
             },
             H.b "Want to run some code in another location?",
             H.ul{
-                H.li "If you want to use another directory as the base, you can do <code>lyte dir=../my_games/testgame</code>. If you use backslashes (you don't need to), you'll need to use escape with another backslash.",
+                H.li "If you want to use another directory as the base, you can do <code>lyte dir=../my_games/testgame</code> ",
                 H.li "If you want to use another file as your 'main' file, you can do <code>lyte app=myapp</code>, assuming you have 'myapp.lua' in the current directory. You should NOT specify the extension",
                 H.li "<code>dir=...</code> and <code>app=...</code> arguments can be combined to run a file in an arbitrary directory",
             },

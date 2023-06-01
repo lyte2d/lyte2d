@@ -65,6 +65,11 @@ int lyte_core_state_init(lyte_Config config) {
             } else {
 
                 sprintf(first_arg_new, "dir=%s", lytecore_state.args.argv[1]);
+                for(int i=0; i<strlen(first_arg_new);i++) {
+                    if (first_arg_new[i] == '\\') {
+                        first_arg_new[i] = '/';
+                    }
+                }
                 lytecore_state.args.argv[1] = first_arg_new;
             }
         }

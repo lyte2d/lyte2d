@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "lyte_core.h"
-#include "map.h"
 
 #include "physfs.h"
 
@@ -26,7 +25,6 @@
 
 
 typedef struct MusicItem {
-    uint32_t handle;
     Music music;
     double volume;
     double pan;
@@ -44,22 +42,15 @@ typedef struct SoundDataItem {
 } SoundDataItem;
 
 typedef struct SoundItem {
-    uint32_t handle;
-    uint32_t sounddata_handle;
+    SoundDataItem *sdi;
     Sound sound;
     double volume;
     double pan;
     double pitch;
 } SoundItem;
 
-static uint32_t musicitem_last_handle = 1500;
-static mg_Map musicitems;
+static MusicItem *current_music = NULL;
 
-static uint32_t sounddataitem_last_handle = 1500;
-static mg_Map sounddataitems;
-
-static uint32_t sounditem_last_handle = 1500;
-static mg_Map sounditems;
 
 static double mastervolume;
 
@@ -70,9 +61,6 @@ int lyte_core_audio_init(void) {
         return -1;
     }
 
-    mg_map_init(&musicitems, sizeof(MusicItem), INIT_NUM_MUSICITEMS);
-    mg_map_init(&sounddataitems, sizeof(SoundDataItem), INIT_NUM_SOUNDDATAITEMS);
-    mg_map_init(&sounditems, sizeof(SoundItem), INIT_NUM_SOUNDITEMS);
 
     mastervolume = 0.7;
 
@@ -80,9 +68,6 @@ int lyte_core_audio_init(void) {
 }
 
 int lyte_core_audio_cleanup(void) {
-    mg_map_cleanup(&musicitems);
-    mg_map_cleanup(&sounddataitems);
-    mg_map_cleanup(&sounditems);
 
     CloseAudioDevice();
 
@@ -91,17 +76,13 @@ int lyte_core_audio_cleanup(void) {
 
 
 int lyte_core_audio_update_music_streams() {
-    for (size_t i=0; i<musicitems.count; i++) {
-        uint32_t key = 0;
-        MusicItem *m = mg_map_getindex(&musicitems, i, &key);
-        if (key != 0) {
-            Music music = m->music;
-            if (IsMusicStreamPlaying(music)) {
-                UpdateMusicStream(music);
-                UpdateMusicStream(music);
-                UpdateMusicStream(music);
-                UpdateMusicStream(music);
-            }
+    if (current_music) {
+        Music music = current_music->music;
+        if (IsMusicStreamPlaying(music)) {
+            UpdateMusicStream(music);
+            UpdateMusicStream(music);
+            UpdateMusicStream(music);
+            UpdateMusicStream(music);
         }
     }
     return 0;
@@ -134,17 +115,16 @@ int lyte_load_music(const char *path, lyte_Music *mus) {
         return 1;
     }
     const char *file_extension = &path[strlen(path)-4]; // detect file format (like "mp3\0")
-    MusicItem musicitem = {0};
-    musicitem.handle = musicitem_last_handle++;
-    musicitem.data = buf; // don't free! raudio does not copy the data. free at cleanup_music.
-    musicitem.data_size = read_len;
-    musicitem.volume = 1.0;
-    musicitem.pan = 0.5;
-    musicitem.pitch = 1.0;
-    musicitem.music = LoadMusicStreamFromMemory(file_extension, musicitem.data, musicitem.data_size);
-    musicitem.music.looping = true;
-    mg_map_set(&musicitems, musicitem.handle, &musicitem);
-    MusicItem *mi = mg_map_get(&musicitems, musicitem.handle);
+    MusicItem *mi = malloc(sizeof(MusicItem));
+    mi->data = buf; // don't free! raudio does not copy the data. free at cleanup_music.
+    mi->data_size = read_len;
+    mi->volume = 1.0;
+    mi->pan = 0.5;
+    mi->pitch = 1.0;
+    mi->music = LoadMusicStreamFromMemory(file_extension, mi->data, mi->data_size);
+    mi->music.looping = true;
+
+
     mus->ptr = mi;
     PHYSFS_close(file);
     return 0;
@@ -158,7 +138,7 @@ int lyte_cleanup_music(lyte_Music mus) {
     StopMusicStream(musicitem->music);
     UnloadMusicStream(musicitem->music);
     free(musicitem->data);
-    mg_map_del(&musicitems, musicitem->handle);
+    free(musicitem);
     return 0;
 }
 
@@ -168,7 +148,11 @@ int lyte_play_music(lyte_Music mus) {
         fprintf(stderr, "Music not found\n");
         return -1;
     }
-    PlayMusicStream(musicitem->music);
+    if (current_music) {
+        StopMusicStream(current_music->music);
+    }
+    current_music = musicitem;
+    PlayMusicStream(current_music->music);
     return 0;
 }
 
@@ -198,7 +182,8 @@ int lyte_stop_music(lyte_Music mus) {
         fprintf(stderr, "Music not found\n");
         return -1;
     }
-    StopMusicStream(musicitem->music);
+    StopMusicStream(current_music->music);
+    current_music = NULL;
     return 0;
 }
 
@@ -321,27 +306,21 @@ int lyte_load_sound(const char * path, lyte_Sound *val) {
         return 1;
     }
     const char *file_extension = &path[strlen(path)-4]; // detect file format (like "mp3\0")
-    SoundDataItem sdi = {0};
-    sdi.handle = sounddataitem_last_handle++;
-    sdi.data_size = read_len;
-    sdi.data = buf;
-    sdi.wave = LoadWaveFromMemory(file_extension, sdi.data, sdi.data_size);
-    mg_map_set(&sounddataitems, sdi.handle, &sdi);
+    SoundDataItem *sdi = malloc(sizeof(SoundDataItem));
+    sdi->data_size = read_len;
+    sdi->data = buf;
+    sdi->wave = LoadWaveFromMemory(file_extension, sdi->data, sdi->data_size);
 
-    SoundItem sounditem = {0};
-    sounditem.handle = sounditem_last_handle++;
-    sounditem.sounddata_handle = sdi.handle;
-    sounditem.volume = 1.0;
-    sounditem.pan = 0.5;
-    sounditem.pitch = 1.0;
-    sounditem.sound = LoadSoundFromWave(sdi.wave);
-
-    sdi.ref_count = 1;
-    SetSoundVolume(sounditem.sound, sounditem.volume);
-    SetSoundPan(sounditem.sound, sounditem.pan);
-    SetSoundPitch(sounditem.sound, sounditem.pitch);
-    mg_map_set(&sounditems, sounditem.handle, &sounditem);
-    SoundItem *si = mg_map_get(&sounditems, sounditem.handle);
+    SoundItem *si = malloc(sizeof(SoundItem));
+    si->volume = 1.0;
+    si->pan = 0.5;
+    si->pitch = 1.0;
+    si->sound = LoadSoundFromWave(sdi->wave);
+    si->sdi = sdi;
+    sdi->ref_count = 1;
+    SetSoundVolume(si->sound, si->volume);
+    SetSoundPan(si->sound, si->pan);
+    SetSoundPitch(si->sound, si->pitch);
 
     val->ptr = si;
     PHYSFS_close(file);
@@ -354,25 +333,21 @@ int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
         fprintf(stderr, "Sound not found\n");
         return -1;
     }
-    SoundDataItem *sdi = mg_map_get(&sounddataitems, si->sounddata_handle);
+    SoundDataItem *sdi = si->sdi;
     if (sdi == NULL) {
         fprintf(stderr, "Sound data not found\n");
         return -2;
     }
-    SoundItem newsounditem = {0};
-    newsounditem.handle = sounditem_last_handle++;
-    newsounditem.sounddata_handle = si->sounddata_handle;
-    newsounditem.volume = si->volume;
-    newsounditem.pan = si->pan;
-    newsounditem.pitch = si->pitch;
-    newsounditem.sound = LoadSoundFromWave(sdi->wave);
-
+    SoundItem *nsi = malloc(sizeof(SoundItem));
+    nsi->volume = si->volume;
+    nsi->pan = si->pan;
+    nsi->pitch = si->pitch;
+    nsi->sound = LoadSoundFromWave(sdi->wave);
+    nsi->sdi = sdi;
     sdi->ref_count++;
-    SetSoundVolume(newsounditem.sound, newsounditem.volume);
-    SetSoundPan(newsounditem.sound, newsounditem.pan);
-    SetSoundPitch(newsounditem.sound, newsounditem.pitch);
-    mg_map_set(&sounditems, newsounditem.handle, &newsounditem);
-    SoundItem *nsi = mg_map_get(&sounditems, newsounditem.handle);
+    SetSoundVolume(nsi->sound, nsi->volume);
+    SetSoundPan(nsi->sound, nsi->pan);
+    SetSoundPitch(nsi->sound, nsi->pitch);
     val->ptr = nsi;
     return 0;
 }
@@ -382,19 +357,19 @@ int lyte_cleanup_sound(lyte_Sound sound) {
     if (si == NULL) {
         return 0;
     }
-    SoundDataItem *sdi = mg_map_get(&sounditems, si->sounddata_handle);
+    SoundDataItem *sdi = si->sdi;
     if (sdi == NULL) {
         fprintf(stderr, "Sound data not found\n");
         return -2;
     }
     UnloadSound(si->sound);
-    mg_map_del(&sounditems, si->handle);
     sdi->ref_count--;
     if (sdi->ref_count == 0) {
         UnloadWave(sdi->wave);
-        mg_map_del(&sounddataitems, sdi->handle);
         free(sdi->data);
+        free(sdi);
     }
+    free(si);
     return 0;
 }
 

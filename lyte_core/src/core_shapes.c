@@ -7,7 +7,6 @@
 #include <math.h> // for sinf() and cosf()
 
 #include "lyte_core.h"
-#include "map.h"
 
 #include "sokol_gfx.h"
 #include "sokol_gp.h"
