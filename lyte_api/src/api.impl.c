@@ -20,6 +20,7 @@
 
 #include "lyte_api.h"
 #include "lyte_core.h"
+#include "lyte_physics.h"
 
 
 static inline int _impl_ctor_load_image(const char * image_path, lyte_Image *val) {
