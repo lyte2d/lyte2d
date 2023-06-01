@@ -54,11 +54,11 @@ int lyte_draw_circle(int dest_x, int dest_y, int radius) {
         tris[i].a.x = x;
         tris[i].a.y = y;
 
-        tris[i].b.x = x + r/2.0f * sinf(i * delta_angle);
-        tris[i].b.y = y - r/2.0f * cosf(i * delta_angle);
+        tris[i].b.x = x + r * sinf(i * delta_angle);
+        tris[i].b.y = y - r * cosf(i * delta_angle);
 
-        tris[i].c.x = x + r/2.0f * sinf((i+1)* delta_angle);
-        tris[i].c.y = y - r/2.0f * cosf((i+1) * delta_angle);
+        tris[i].c.x = x + r * sinf((i+1)* delta_angle);
+        tris[i].c.y = y - r * cosf((i+1) * delta_angle);
     }
     sgp_draw_filled_triangles(tris, count);
     return 0;
@@ -74,11 +74,11 @@ int lyte_draw_circle_line(int dest_x, int dest_y, int radius) {
     float delta_angle = 2.0*(float)M_PI/(float)count;
 
     for (int i=0; i<count; i++) {
-        lines[i].a.x = x + r/2.0f * sinf(i * delta_angle);
-        lines[i].a.y = y - r/2.0f * cosf(i * delta_angle);
+        lines[i].a.x = x + r * sinf(i * delta_angle);
+        lines[i].a.y = y - r * cosf(i * delta_angle);
 
-        lines[i].b.x = x + r/2.0f * sinf((i+1)* delta_angle);
-        lines[i].b.y = y - r/2.0f * cosf((i+1) * delta_angle);
+        lines[i].b.x = x + r * sinf((i+1)* delta_angle);
+        lines[i].b.y = y - r * cosf((i+1) * delta_angle);
     }
     sgp_draw_lines(lines, count);
     return 0;
