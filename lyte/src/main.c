@@ -248,12 +248,12 @@ static int _try_load(lua_State *L) {
     return 0;
 }
 
-static int _lyte_loader(lua_State *L) {
-    CHK_STACK(1);
-    lua_pushcclosure(L, _try_load, 1);
-    CHK_STACK(1);
-    return 1;
-}
+// static int _lyte_loader(lua_State *L) {
+//     CHK_STACK(1);
+//     lua_pushcclosure(L, _try_load, 1);
+//     CHK_STACK(1);
+//     return 1;
+// }
 
 static inline int _load_lua_file(lua_State *L, const char *path, bool error_if_missing) {
     (void)error_if_missing;
@@ -271,11 +271,23 @@ static void _check_fetch_file_status(lua_State *L) {
     if (_need_to_load_archives && archive_done && binary_done) {
 
         _need_to_load_archives = false;
+
+        lua_pushstring(L, _app_modulename);
+        lua_setglobal(L, "LYTE_APP_MODULENAME");
+
         _load_lua_file(L, "lyte_boot", true);
-        _load_lua_file(L, _app_modulename, !_has_repl);
-        if (lua_gettop(L) != 0) {
-            lua_error(L);
-        }
+        // app module is set in global LYTE_APP_MODULENAME variable
+        // and loaded at the end of boot
+
+
+        // _load_lua_file(L, _app_modulename, !_has_repl);
+        // lua_getglobal(L, "require");
+        // lua_pushstring(L, _app_modulename);
+        // docall(L, 1, 0);
+
+        // if (lua_gettop(L) != 0) {
+        //     lua_error(L);
+        // }
 
     }
 }
@@ -376,21 +388,21 @@ static void tick_fn_loading(void *data, float dt, int width, int height, bool re
     }
 }
 
-static void _registerloader(lua_State* L, lua_CFunction loader, int index) {
-    lua_getglobal(L, "table");
-    lua_getfield(L, -1, "insert");
-    lua_getglobal(L, "package");
-    lua_getfield(L, -1, "loaders");
-    lua_remove(L, -2);
-    if (lua_istable(L, -1)) {
-        lua_pushinteger(L, index);
-        lua_pushcfunction(L, loader);
-        lua_call(L, 3, 0);
-    } else {
-        lua_pop(L, 2);
-    }
-    lua_pop(L, 1);
-}
+// static void _registerloader(lua_State* L, lua_CFunction loader, int index) {
+//     lua_getglobal(L, "table");
+//     lua_getfield(L, -1, "insert");
+//     lua_getglobal(L, "package");
+//     lua_getfield(L, -1, "loaders");
+//     lua_remove(L, -2);
+//     if (lua_istable(L, -1)) {
+//         lua_pushinteger(L, index);
+//         lua_pushcfunction(L, loader);
+//         lua_call(L, 3, 0);
+//     } else {
+//         lua_pop(L, 2);
+//     }
+//     lua_pop(L, 1);
+// }
 
 
 static int init(void) {
@@ -440,14 +452,20 @@ static int init(void) {
     _download_zip_handle = lyte_core_filesystem_fetch_file_async("APP_ZIP", archivepath, LYTE_APP_ZIP_MAX_SIZE, "/");
     _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", lytecore_state.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
 
-    _registerloader(L, _lyte_loader, 2);
+    // removing this for bootzip experimentation
+    // _registerloader(L, _lyte_loader, 2);
 
     lua_gc(L, LUA_GCCOLLECT, 0);
 
 #ifndef __EMSCRIPTEN__
     if (lyte_core_state_has_arg("repl")) {
         _has_repl = true;
-        repl_setup();
+        if (_has_repl) {
+            lua_pushstring(L, lyte_core_state_get_arg("repl"));
+            lua_setglobal(L, "LYTE_REPL_REQUESTED");
+
+            repl_setup();
+        }
     }
 #endif
 

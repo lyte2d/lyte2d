@@ -592,16 +592,6 @@ return Namespace("lyte", {
         Ret("shader", Type("Shader"), {nativetype="udata"})
     }, {d="Add fragment to the shaderbuilder", ctor="true"}),
 
-    -- BEGIN: PHYSICS ------------------------------
-
-    Function("set_physics_engine", {
-        Arg("state", Type("PhysicsEngineState"), {nativetype="enumstring"}),
-    }, nil, {d="Initialize the physics engine. Either '2D' or '3D': Start the updates to the physics simulation. 'off': Stop the physics simulation."});
-
-    Enum("PhysicsEngineState", {"off", "2D", "3D"}, {d="Physics engine state. '3D', '2D' to disable 'Z', 'off' to shutdownssssstatesi."}),
-
-    -- END:   PHYSICS ------------------------------
-
     Record("Image", {
         Field("width", Integer(), {map_read = "get_image_width"}),
         Field("height", Integer(), {map_read = "get_image_height"}),
@@ -723,5 +713,70 @@ return Namespace("lyte", {
         'kp_add', 'kp_enter', 'kp_equal', 'left_shift', 'left_control', 'left_alt',
         'left_super', 'right_shift', 'right_control', 'right_alt', 'right_super', 'menu',
     }, {d="Acceptable keyboardkey values."}),
+
+
+
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- BEGIN: PHYSICS ------------------------------
+
+    Function("set_physics_engine", {
+        Arg("state", Type("PhysicsState"), {nativetype="enumstring"}),
+    }, nil, {d="Set the physics engine state."});
+
+    Function("reset_physics_engine", nil, nil, {d="Reset the physics engine state."});
+
+    Function("set_physics_config", {
+        Arg("name", Type("PhysicsConfig")),
+        Arg("value", Number()),
+    }, nil, {d="Set the given physics engine/world config."});
+
+    Function("reset_physics_config", {
+        Arg("name", Type("PhysicsConfig")),
+    }, nil, {d="Reset the given physics engine/world config."});
+
+    Function("get_physics_config", {
+        Arg("name", Type("PhysicsConfig")),
+    }, {
+        Ret("val", Number()),
+    }, {d="Gets the given physics engine/world config."});
+
+
+    Record("Body", {
+        Field("x", Number(), {map_read="get_body_x", map_write="set_body_x"}),
+        Field("y", Number(), {map_read="get_body_y", map_write="set_body_y"}),
+        Field("angle_z", Number(), {map_read="get_body_angle_z", map_write="set_body_angle_z"}),
+        -- "z_rotation_enabled", Bool(), {map_read="is_body_z_rotation_enabled", map_write="set_body_z_rotation_enabled"
+        --   methods:
+        -- set_body_location
+        -- set_body_linearvelocity
+        -- set_body_angularvelocity
+        --
+    }, {d="Physics body."}),
+
+    Record("Joint", {
+        -- Field(),
+    }, {d="Physics joint."}),
+
+
+    Record("Geom", {
+        -- Field(),
+    }, {d="Physics geom."}),
+
+
+    Enum("GeomType", {"circle", "rectangle"}, {d="Physics Geom types"}),
+
+    Enum("JointType", {"mmm", "hinge"}, {d="Physics Joint types"}),
+
+    Enum("PhysicsConfig", {"num_dimensions", "gravity_x", "gravity_y", "gravity_z", }),
+
+    Enum("PhysicsState", {"off", "on", "paused"}, {d="Physics engine state.", dd={["off"]="Physics engine off", ["on"]="Physics engine on", ["paused"]="Physics engine paused"}}), -- dd: testing enum docs
+
+
+    -- END:   PHYSICS ------------------------------
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
+    ------------------------------------------------------------------------------------------------------------------------------------------------------
 
 })

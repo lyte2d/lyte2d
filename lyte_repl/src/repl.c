@@ -128,12 +128,18 @@ bool repl_check(lua_State *L) {
         //     luaL_addstring(&b, "]===])");
         // } else if (repl_lang == LUA) {
             //printf("===DBG===\n%s %c %d\n===DBG===\n", input, input[0], input);
-            if (input[0] == '=') {
-                luaL_addstring(&b, "return ");
-                luaL_addstring(&b, &input[1] );
-            } else {
-                luaL_addstring(&b, input);
-            }
+
+          luaL_addstring(&b, "return LYTE_REPL_EVAL([===[");
+          luaL_addstring(&b, input );
+          luaL_addstring(&b, "]===])");
+
+            // if (input[0] == '=') {
+            //     luaL_addstring(&b, "return ");
+            //     luaL_addstring(&b, &input[1] );
+            // } else {
+            //     luaL_addstring(&b, input);
+            // }
+
         // } else {
         //     printf("Unexpected error: repl language");
         //     lua_error(L);
@@ -142,6 +148,7 @@ bool repl_check(lua_State *L) {
         // todo: do we need to convert \n chars to \\n? for "send to" stuff? or is it a tooling responsibility?
         //luaL_addstring(&b, "\r");
         formatted_inp = (char *)luaL_checkstring(L, -1);
+
         lua_pop(L, 1);
         //int err = luaL_dostring(L,input);
         int err = 0;
@@ -159,7 +166,7 @@ bool repl_check(lua_State *L) {
                 // if (repl_lang == FENNEL) {
                 //     lua_getglobal(L, "tostring_fennel");
                 // } else {
-                    lua_getglobal(L, "tostring");
+                    lua_getglobal(L, "LYTE_REPL_TOSTRING");
                 // }
                 lua_pushvalue(L, i);
                 lua_pcall(L, 1, 1, 0);

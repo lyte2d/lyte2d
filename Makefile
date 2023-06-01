@@ -11,8 +11,9 @@ default:
 
 codegen-bootzip:
 	rm -f out/boot.zip
-	cd lyte_boot && zip -9 -u -r ../out/boot.zip . -x *.tl && cd ..
+	cd lyte_boot/boot && zip -9 -u -r ../../out/boot.zip . -x *.tl && cd ../..
 	cd out && xxd -i boot.zip ../lyte_boot/include/_boot_zip_generated.c && cd ../..
+	mv out/boot.zip out/boot_old.zip
 	rm -f out/boot.zip
 
 codegen-apidefs:
