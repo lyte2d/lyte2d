@@ -716,60 +716,90 @@ return Namespace("lyte", {
 
 
 
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    -- BEGIN: PHYSICS ------------------------------
+    -- ------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- ------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- ------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- -- BEGIN: PHYSICS ------------------------------
 
     Function("set_physics_engine", {
         Arg("state", Type("PhysicsState"), {nativetype="enumstring"}),
     }, nil, {d="Set the physics engine state."});
 
-    Function("reset_physics_engine", nil, nil, {d="Reset the physics engine state."});
+    -- Function("reset_physics_engine", nil, nil, {d="Reset the physics engine state."});
 
-    Function("set_physics_config", {
-        Arg("name", Type("PhysicsConfig")),
-        Arg("value", Number()),
-    }, nil, {d="Set the given physics engine/world config."});
+    -- Function("set_physics_config", {
+    --     Arg("name", Type("PhysicsConfig"), {nativetype="udata"}),
+    --     Arg("value", Number()),
+    -- }, nil, {d="Set the given physics engine/world config."});
 
-    Function("reset_physics_config", {
-        Arg("name", Type("PhysicsConfig")),
-    }, nil, {d="Reset the given physics engine/world config."});
+    -- Function("reset_physics_config", {
+    --     Arg("name", Type("PhysicsConfig"), {nativetype="udata"}),
+    -- }, nil, {d="Reset the given physics engine/world config."});
 
-    Function("get_physics_config", {
-        Arg("name", Type("PhysicsConfig")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Gets the given physics engine/world config."});
+    -- Function("get_physics_config", {
+    --     Arg("name", Type("PhysicsConfig"), {nativetype="udata"}),
+    -- }, {
+    --     Ret("val", Number()),
+    -- }, {d="Gets the given physics engine/world config."});
 
-
-    Record("Body", {
-        Field("x", Number(), {map_read="get_body_x", map_write="set_body_x"}),
-        Field("y", Number(), {map_read="get_body_y", map_write="set_body_y"}),
-        Field("angle_z", Number(), {map_read="get_body_angle_z", map_write="set_body_angle_z"}),
-        -- "z_rotation_enabled", Bool(), {map_read="is_body_z_rotation_enabled", map_write="set_body_z_rotation_enabled"
-        --   methods:
-        -- set_body_location
-        -- set_body_linearvelocity
-        -- set_body_angularvelocity
-        --
-    }, {d="Physics body."}),
-
-    Record("Joint", {
-        -- Field(),
-    }, {d="Physics joint."}),
+    -- Function("add_body_geom", {
+    --     Arg("body", Type("Body"), {nativetype="udata"}),
+    --     Arg("geom", Type("Geom"), {nativetype="union"}),
+    --     Arg("mmmm", List(Float(), {max_count=4})),
+    -- }, {
+    -- }, {d=""}),
 
 
-    Record("Geom", {
-        -- Field(),
-    }, {d="Physics geom."}),
+    -- -- Function("get_body_geom", {
+    -- --     Arg("body", Type("Body"), {nativetype="udata"}),
+    -- --     Arg("key", String()),
+    -- -- }, {
+    -- --     Ret("val", Type("Geom"), {nativetype="union"}),
+    -- -- }, {d=""}),
+
+    -- Record("Body", {
+    --     Field("x", Number(), {map_read="get_body_x", map_write="set_body_x"}),
+    --     Field("y", Number(), {map_read="get_body_y", map_write="set_body_y"}),
+    --     Field("angle", Number(), {map_read="get_body_angle", map_write="set_body_angle"}),
+    --     Field("vel_x", Number(), {map_read="get_body_vel_x", map_write="set_body_vel_x"}),
+    --     Field("vel_y", Number(), {map_read="get_body_vel_y", map_write="set_body_vel_y"}),
+    --     Field("angular_vel_x", Number(), {map_read="get_body_angular_vel_x", map_write="set_body_angular_vel_x"}),
+    --     Field("angular_vel_y", Number(), {map_read="get_body_angular_vel_y", map_write="set_body_angular_vel_y"}),
+    --     Field("rotation_enabled", Boolean(), {map_read="is_body_rotation_enabled", map_write="set_body_rotation_enabled"}),
+    --     Field("mass", Number(), {map_read="get_body_mass", map_write="set_body_mass"}),
+
+    --     --   methods:
+    --     -- set_body_location
+    --     -- set_body_linearvelocity
+    --     -- set_body_angularvelocity
+    --     --
+    -- }, {d="Physics body."}),
+
+    -- -- Record("Joint", {
+    -- --     -- Field(),
+    -- -- }, {d="Physics joint."}),
 
 
-    Enum("GeomType", {"circle", "rectangle"}, {d="Physics Geom types"}),
+    -- Record("CircleGeom", {
+    --     Field("radius", Number(), {map_read="get_circle_geom_radius", map_write="set_circle_geom_radius"}),
+    -- }, {d="Circle geom type."}),
 
-    Enum("JointType", {"mmm", "hinge"}, {d="Physics Joint types"}),
+    -- Record("RectGeom", {
+    --     Field("width", Number(), {map_read="get_rect_geom_width", map_write="set_rect_geom_width"}),
+    --     Field("height", Number(), {map_read="get_rect_geom_height", map_write="set_rect_geom_height"}),
+    -- }, {d="Rectangle geom type."}),
 
-    Enum("PhysicsConfig", {"num_dimensions", "gravity_x", "gravity_y", "gravity_z", }),
+    -- OneOf("Geom", {
+    --     Option(Type("CircleGeom"), {nativetype="udata"}),
+    --     Option(Type("RectGeom"), {nativetype="udata"}),
+    -- }, {d="Physics collision geometry object."}),
+
+
+    -- Enum("GeomType", {"circle", "rect"}, {d="Physics Geom types"}),
+
+    -- -- Enum("JointType", {"mmm", "hinge"}, {d="Physics Joint types"}),
+
+    -- Enum("PhysicsConfig", {"num_dimensions", "gravity_x", "gravity_y", "gravity_z", "ERP", "CFM", }), -- there's a lot more
 
     Enum("PhysicsState", {"off", "on", "paused"}, {d="Physics engine state.", dd={["off"]="Physics engine off", ["on"]="Physics engine on", ["paused"]="Physics engine paused"}}), -- dd: testing enum docs
 

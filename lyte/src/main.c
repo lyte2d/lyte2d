@@ -28,8 +28,9 @@
 #define LYTE_APP_ZIP_MAX_SIZE (120*1024*1024)
 #define LYTE_APP_EXE_MAX_SIZE (120*1024*1024)
 
-#define LYTE_INIT_WIDTH 400
-#define LYTE_INIT_HEIGHT 260
+// TODO: remove (from C config as well)
+#define LYTE_INIT_WIDTH 400 // not used
+#define LYTE_INIT_HEIGHT 260 // not used
 
 static bool _need_to_load_archives = false;
 static bool _has_repl = false; // enable with repl=true
@@ -272,15 +273,13 @@ static void _check_fetch_file_status(lua_State *L) {
 
         _need_to_load_archives = false;
 
-        lua_pushstring(L, _app_modulename);
-        lua_setglobal(L, "LYTE_APP_MODULENAME");
 
-        _load_lua_file(L, "lyte_boot", true);
+        // _load_lua_file(L, "lyte_boot", true);
+
         // app module is set in global LYTE_APP_MODULENAME variable
         // and loaded at the end of boot
 
-
-        // _load_lua_file(L, _app_modulename, !_has_repl);
+        _load_lua_file(L, _app_modulename, !_has_repl);
         // lua_getglobal(L, "require");
         // lua_pushstring(L, _app_modulename);
         // docall(L, 1, 0);
@@ -334,6 +333,8 @@ static void tick_fn_active_norepl(void *data, float dt, int width, int height, b
     }
 }
 
+
+
 static void tick_fn_active_repl(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
     static bool _skip_tick = false;
     lua_State *L = data;
@@ -350,31 +351,64 @@ static void tick_fn_active_repl(void *data, float dt, int width, int height, boo
 
 }
 
+static void tick_fn_active_tick_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
+    lua_State *L = data;
+    int status = 0;
+
+    lua_getglobal(L, "lyte");
+    lua_pushstring(L, "tick_loading");
+    lua_gettable(L, -2);
+    lua_remove(L, -2);
+
+    lua_pushnumber(L,dt);
+    lua_pushinteger(L,width);
+    lua_pushinteger(L,height);
+    lua_pushboolean(L,resized);
+    lua_pushboolean(L,fullscreen);
+
+    status = docall(L, 5, 0);
+
+    if (status &&  lua_gettop(L) > 0) {
+        // TODO: check if this triggers
+        lua_getglobal(L, "print");
+        lua_insert(L, 1);
+        if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
+            l_message("program_name", lua_pushfstring(L,
+                                "error calling " LUA_QL("print") " (%s)",
+                                lua_tostring(L, -1)));
+        // quit on error for now
+        exit(1);
+    }
+}
+
 static void tick_fn_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
-    (void)resized; (void)fullscreen;
-    static float _angle = 0.0f;
-    static float _loading_time = 0.0f;
-    static int ww = 190;
-    static int hh = 30;
+    // (void)resized; (void)fullscreen;
+    // static float _angle = 0.0f;
+    // static float _loading_time = 0.0f;
+    // int ww = width/4.0;
+    // int hh = height/8.0;
 
     lua_State *L = data;
 
     CHK_STACK(0);
     if(_need_to_load_archives) {
-        _loading_time += dt;
+        // _loading_time += dt;
 
-        if (_loading_time > 0.5) {
-            _angle += dt * 1;
-        }
+        // if (_loading_time > 0.5) {
+        //     _angle += dt * 1;
+        // }
 
-        // loading screen
-        lyte_push_matrix();
-        lyte_translate(width/2, height/2);
-        lyte_rotate(_angle);
-        lyte_cls(0.0,0.0,0.0,1.0);
-        lyte_set_color(1.0,0.4,0.2,0.7);
-        lyte_draw_rect(-ww/2, -hh/2, ww, hh);
-        lyte_pop_matrix();
+        // // loading screen
+        // lyte_push_matrix();
+        // lyte_translate(width/2, height/2);
+        // lyte_rotate(_angle);
+        // lyte_cls(0.0,0.0,0.0,1.0);
+        // lyte_set_color(1.0, 1.0, 1.0, 0.7);
+        // lyte_draw_rect(-ww/2, -hh/2, ww, hh);
+        // lyte_pop_matrix();
+
+
+        tick_fn_active_tick_loading(data, dt, width, height, resized, fullscreen);
 
         _check_fetch_file_status(L);
 
@@ -413,8 +447,6 @@ static int init(void) {
     err = lyte_core_audio_init();
     err = lyte_core_font_init();
     err = lyte_core_shader_init();
-    err = lyte_core_window_init();
-    err = lyte_core_input_init();
     err = lyte_physics_init();
 
     lua_State *L = luaL_newstate();
@@ -469,6 +501,9 @@ static int init(void) {
     }
 #endif
 
+    // LOAD BOOT
+    _load_lua_file(L, "lyte_boot", true);
+
     return err;
 }
 
@@ -479,8 +514,6 @@ static int cleanup(void) {
     err = lyte_core_audio_cleanup();
     err = lyte_core_font_cleanup();
     err = lyte_core_shader_cleanup();
-    err = lyte_core_window_cleanup();
-    err = lyte_core_input_cleanup();
     err = lyte_core_filesystem_cleanup();
     err = lyte_physics_cleanup();
 
@@ -505,7 +538,11 @@ int main(int argc, char *argv[]) {
 
     err = init();
 
+    // err = lyte_core_window_init();
+
     err = lyte_core_start_loop((lyte_TickFunction)tick_fn_loading, _global_L);
+
+    err = lyte_core_window_cleanup();
 
     err = cleanup();
 

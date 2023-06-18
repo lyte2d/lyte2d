@@ -11,6 +11,18 @@ function lyte.tick()
 end
 ]]
 
+local cfg1 = [[
+return {
+    window_width = 800,
+    window_height = 500,
+    window_title = "my game",
+    fulscreen = false,
+    window_vsync = true,
+    default_filtermode = "nearest", -- linear
+    default_blendmode = "blend",
+  }
+]]
+
 local _examples = H.ul { id="examplesdropdown", class="dropdown-menu",
     H.li {
         H.a {class="menulink", target="none", onclick="on_examplelink_click(event, 'empty')", href="about:blank",
@@ -114,6 +126,13 @@ local function Page()
                 H.li "Lyte2D support LOVE2D style app fusing. Basically you merge the exe and the zip files into a single binary that will contain everything needed to run your code.",
                 H.li "On linux you can do <code>cat lyte.exe app.zip > mygame.exe</code>. Then just distribute 'mygame.exe' however you'd like.",
                 H.li "Similar on Windows. (...to be documented, in the meantime see LOVE2D docs.)",
+            },
+            H.b "Configuring your app.",
+            H.ul {
+                H.li "If you'd like to configure your window size, fullscreen, etc. before the app loads, you can create a 'config.lua' file next to your 'app.lua'. Here's an example config.lua file: ",
+                Code ({id="cfg-1", style="background-color:inherit"}, cfg1),
+                H.script [[ Prism.highlightElement(document.getElementById("cfg-1")); ]],
+                H.li "Note: you need to keep this file next to the zip or exe file if you fuse your app",
             },
             H.b "HTML5 -- browser games!",
             H.ul {

@@ -8,19 +8,19 @@
 
 
 
-typedef struct lyte_PhysicsState {
-    lyte_PhysicsEngineState enginestate;
+typedef struct lyte_PhysicsData {
+    lyte_PhysicsState enginestate;
     void *world;
 
-} lyte_PhysicsState;
+} lyte_PhysicsData;
 
-extern lyte_PhysicsState lytephysics_state;
+extern lyte_PhysicsData lytephysics_data;
 
 
 int lyte_physics_init(void);
 int lyte_physics_cleanup(void);
 
 
-int lyte_set_physics_engine(lyte_PhysicsEngineState state);
+int lyte_set_physics_engine(lyte_PhysicsState state);
 
 #endif  // LYTE_PHYSICS_H_INCLUDED

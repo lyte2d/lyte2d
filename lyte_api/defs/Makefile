@@ -10,6 +10,6 @@ do-ts:
 do-lua:
 	lua lib/defs_to_inspectoutput.lua > output/_lyte_api.lua
 
-all: do-ts do-lua do-c do-txt
+all: do-lua  do-txt do-ts do-c
 
 .PHONY: all do-ts do-lua do-c do-txt

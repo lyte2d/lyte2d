@@ -6,13 +6,6 @@
 
 // lyte enums (do not add new values or change the names. changing values per implementation/platform is OK.)
 
-typedef enum lyte_PhysicsEngineState {
-    LYTE_PHYSICSENGINESTATE_OFF,// order: 0, str: 'off'
-    LYTE_PHYSICSENGINESTATE_2D,// order: 1, str: '2D'
-    LYTE_PHYSICSENGINESTATE_3D,// order: 2, str: '3D'
-    LYTE_PHYSICSENGINESTATE_COUNT = 3,
-    LYTE_PHYSICSENGINESTATE_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
-} lyte_PhysicsEngineState;
 typedef enum lyte_UniformType {
     LYTE_UNIFORMTYPE__INVALID,// order: 0, str: '_invalid'
     LYTE_UNIFORMTYPE_FLOAT,// order: 1, str: 'float'
@@ -209,5 +202,12 @@ typedef enum lyte_KeyboardKey {
     LYTE_KEYBOARDKEY_COUNT = 120,
     LYTE_KEYBOARDKEY_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 } lyte_KeyboardKey;
+typedef enum lyte_PhysicsState {
+    LYTE_PHYSICSSTATE_OFF,// order: 0, str: 'off'
+    LYTE_PHYSICSSTATE_ON,// order: 1, str: 'on'
+    LYTE_PHYSICSSTATE_PAUSED,// order: 2, str: 'paused'
+    LYTE_PHYSICSSTATE_COUNT = 3,
+    LYTE_PHYSICSSTATE_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
+} lyte_PhysicsState;
 
 #endif  // API_ENUMS_H_INCLUDED

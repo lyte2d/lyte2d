@@ -47,6 +47,8 @@ function LOVE.set_fns(draw, update)
         update(dt)
     end
     love.draw = draw
+
+    jit.off()
 end
 
 function LYTE.set_fns(draw, update)

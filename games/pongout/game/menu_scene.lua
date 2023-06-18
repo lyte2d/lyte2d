@@ -24,7 +24,7 @@ local FPS = 0
 local function count_fps(dt)
   local fps = (1 / dt)
   table.insert(fps_list, fps)
-  if (#fps_list > 5) then
+  if (#fps_list > 100) then
     table.remove(fps_list, 1)
   else
   end

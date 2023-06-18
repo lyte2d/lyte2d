@@ -59,7 +59,9 @@ local-build-gcc-debug:
 
 
 ## Build the official build image locally
-## Can be used for either testing lyte2d changes
+## 0. Have WSL/mingw + dev tools installed along with Docker
+## 1. make docker-image-build  --> create the docker
+## 2. make official-build  --> creates an "official build" in the out/rel folder
 
 docker-image-build:
 	docker build -t more/builder:0.1 -f ./build_scripts/Dockerfile .
@@ -68,7 +70,7 @@ docker-image-build:
 official-build:
 	./build_scripts/official_build.sh
 
-## Personal use/concenience (MG)
+## Personal use/convenience (MG)
 
 DOCKER_RUN_INTERACTIVE=docker run -it --rm --name=builder \
     	--mount type=bind,source=${PWD},target=/src \
@@ -139,4 +141,7 @@ dev: bld
 	ln -s \lua/lyte.exe \lua/l.exe
 
 po:
-	make dev && cp out\lyte.exe out\rel\bin\ && make pongout && out\pongout\bin\pongout_win.exe
+	make dev && cp out\\lyte.exe out\\rel\\bin\\ && make pongout && out\\pongout\\bin\\pongout_win.exe
+
+dn:
+	make -C defs_new

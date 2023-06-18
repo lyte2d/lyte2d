@@ -544,4 +544,10 @@ KeyboardKey enum
     choice[118] :: right_alt
     choice[119] :: right_super
     choice[120] :: menu
+set_physics_engine function set_physics_engine
+    arg[1] state :: PhysicsState
+PhysicsState enum
+    choice[1] :: off
+    choice[2] :: on
+    choice[3] :: paused
 

@@ -16,7 +16,7 @@
 #include "physfs.h" // icon
 #include "stb_image.h" // icon
 
-
+static bool _window_inited = false;
 
 int lyte_core_window_init(void) {
 #if defined(__EMSCRIPTEN__)
@@ -83,11 +83,17 @@ int lyte_core_window_init(void) {
         return -4;
     }
 
+    // NOTE: Input code and window are tighyly integrated. We need to initialize this here
+    lyte_core_input_init();
 
+    _window_inited = true;
     return 0;
 }
 
 int lyte_core_window_cleanup(void) {
+    // NOTE: Input code and window are tighyly integrated. We need to initialize this here
+    lyte_core_input_cleanup();
+
     sgp_shutdown();
     sg_shutdown();
     glfwTerminate();
@@ -95,37 +101,44 @@ int lyte_core_window_cleanup(void) {
 }
 
 int lyte_set_window_minsize(int width, int height) {
-    glfwSetWindowSizeLimits(lytecore_state.window, width, height, GLFW_DONT_CARE, GLFW_DONT_CARE);
     lytecore_state.window_min_size.width = width;
     lytecore_state.window_min_size.height = height;
-    // _lib->mode = (GLFWvidmode *)glfwGetVideoMode(_lib->monitor);
-    // glfwSetWindowPos(
-    //     _lib->window,
-    //     _lib->mode->width/2 - w/2,
-    //     _lib->mode->height/2 - h/2);
+    lytecore_state.window_size.width = MAX(lytecore_state.window_size.width, width);
+    lytecore_state.window_size.height = MAX(lytecore_state.window_size.height, height);
+        if (!_window_inited) {
+        int err = lyte_core_window_init();
+        if (err != 0) {
+            return err;
+        }
+    }
+    glfwSetWindowSizeLimits(lytecore_state.window, width, height, GLFW_DONT_CARE, GLFW_DONT_CARE);
     return 0;
 }
 
 int lyte_set_window_size(int width, int height) {
-    glfwSetWindowSize(lytecore_state.window, width, height);
-    lytecore_state.window_size.width = width;
-    lytecore_state.window_size.height = height;
-    // _lib->mode = (GLFWvidmode *)glfwGetVideoMode(_lib->monitor);
-    // glfwSetWindowPos(
-    //     _lib->window,
-    //     _lib->mode->width/2 - w/2,
-    //     _lib->mode->height/2 - h/2);
+    lytecore_state.window_size.width = MAX(lytecore_state.window_min_size.width, width);
+    lytecore_state.window_size.height = MAX(lytecore_state.window_min_size.height, height);
+    if (!_window_inited) {
+        int err = lyte_core_window_init();
+        if (err != 0) {
+            return err;
+        }
+    } else {
+        glfwSetWindowSize(lytecore_state.window, width, height);
+    }
     return 0;
 }
 
 int lyte_get_window_width(int *val) {
-    int w;
-    int h;
+    int w = 0;
+    int h = 0;
 #if defined(__EMSCRIPTEN__)
         w = emsc_width();
         h = emsc_height();
 #else
-    glfwGetWindowSize(lytecore_state.window, &w, &h);
+    if (lytecore_state.window) {
+        glfwGetWindowSize(lytecore_state.window, &w, &h);
+    }
 #endif
     *val = w;
     lytecore_state.window_size.width = w;
@@ -134,13 +147,15 @@ int lyte_get_window_width(int *val) {
 }
 
 int lyte_get_window_height(int *val) {
-    int w;
-    int h;
+    int w = 0;
+    int h = 0;
 #if defined(__EMSCRIPTEN__)
         w = emsc_width();
         h = emsc_height();
 #else
-    glfwGetWindowSize(lytecore_state.window, &w, &h);
+    if (lytecore_state.window) {
+        glfwGetWindowSize(lytecore_state.window, &w, &h);
+    }
 #endif
     *val = h;
     lytecore_state.window_size.width = w;

@@ -20,6 +20,9 @@ function LYTE.color(r,g,b,a) lyte.set_color(r,g,b,a) end
 function LOVE.circle(x,y,r) love.graphics.circle("fill", x, y, r)  end
 function LYTE.circle(x,y,r) lyte.draw_circle(x, y, r) end
 
+function LOVE.rect(x,y,w,h) love.graphics.rectangle("fill", x, y, w, h)  end
+function LYTE.rect(x,y,w,h) lyte.draw_rect(x, y, w, h) end
+
 function LOVE.loadfont(path, sz) local fnt = love.graphics.newFont(path, sz); fnt:setFilter("nearest", "nearest"); return fnt end
 function LYTE.loadfont(path, sz) return lyte.load_font(path, sz) end
 

@@ -4,7 +4,7 @@
 
 #include <conio.h>
 #include <stdio.h>
-int nbchar() {
+int nbchar(void) {
     if(_kbhit()) {
         return 1;
     }
@@ -30,7 +30,7 @@ int _t = 0;
 #include <stropts.h>
 #include <fcntl.h>
 
-void nbchar_enable_raw_mode()
+void nbchar_enable_raw_mode(void)
 {
     struct termios term;
     tcgetattr(0, &term);
@@ -38,7 +38,7 @@ void nbchar_enable_raw_mode()
     tcsetattr(0, TCSANOW, &term);
 }
 
-void nbchar_disable_raw_mode()
+void nbchar_disable_raw_mode(void)
 {
     struct termios term;
     tcgetattr(0, &term);
@@ -46,14 +46,14 @@ void nbchar_disable_raw_mode()
     tcsetattr(0, TCSANOW, &term);
 }
 
-static bool kbhit()
+static bool kbhit(void)
 {
     int byteswaiting;
     ioctl(0, FIONREAD, &byteswaiting);
     return byteswaiting > 0;
 }
 
-int nbchar() {
+int nbchar(void) {
    nbchar_enable_raw_mode();
     int ret = 0;
     int hit = kbhit();
