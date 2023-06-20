@@ -268,7 +268,7 @@ static int api_quit(lua_State *L) {
     // implementation
     int err = _impl_quit();
     if (err != 0) {
-        printf("Warning:  api_quit");
+        // (TODO: handle errors.) printf("Warning:  api_quit");
     }
     return 0;
 }
@@ -284,7 +284,7 @@ static int api_cls(lua_State *L) {
     // implementation
     int err = _impl_cls(r, g, b, a);
     if (err != 0) {
-        printf("Warning:  api_cls");
+        // (TODO: handle errors.) printf("Warning:  api_cls");
     }
     return 0;
 }
@@ -300,7 +300,7 @@ static int api_set_color(lua_State *L) {
     // implementation
     int err = _impl_set_color(r, g, b, a);
     if (err != 0) {
-        printf("Warning:  api_set_color");
+        // (TODO: handle errors.) printf("Warning:  api_set_color");
     }
     return 0;
 }
@@ -311,7 +311,7 @@ static int api_reset_color(lua_State *L) {
     // implementation
     int err = _impl_reset_color();
     if (err != 0) {
-        printf("Warning:  api_reset_color");
+        // (TODO: handle errors.) printf("Warning:  api_reset_color");
     }
     return 0;
 }
@@ -325,7 +325,7 @@ static int api_draw_point(lua_State *L) {
     // implementation
     int err = _impl_draw_point(x, y);
     if (err != 0) {
-        printf("Warning:  api_draw_point");
+        // (TODO: handle errors.) printf("Warning:  api_draw_point");
     }
     return 0;
 }
@@ -341,7 +341,7 @@ static int api_draw_line(lua_State *L) {
     // implementation
     int err = _impl_draw_line(x1, y1, x2, y2);
     if (err != 0) {
-        printf("Warning:  api_draw_line");
+        // (TODO: handle errors.) printf("Warning:  api_draw_line");
     }
     return 0;
 }
@@ -357,7 +357,7 @@ static int api_draw_rect(lua_State *L) {
     // implementation
     int err = _impl_draw_rect(dest_x, dest_y, rect_width, rect_height);
     if (err != 0) {
-        printf("Warning:  api_draw_rect");
+        // (TODO: handle errors.) printf("Warning:  api_draw_rect");
     }
     return 0;
 }
@@ -373,7 +373,7 @@ static int api_draw_rect_line(lua_State *L) {
     // implementation
     int err = _impl_draw_rect_line(dest_x, dest_y, rect_width, rect_height);
     if (err != 0) {
-        printf("Warning:  api_draw_rect_line");
+        // (TODO: handle errors.) printf("Warning:  api_draw_rect_line");
     }
     return 0;
 }
@@ -388,7 +388,7 @@ static int api_draw_circle(lua_State *L) {
     // implementation
     int err = _impl_draw_circle(dest_x, dest_y, radius);
     if (err != 0) {
-        printf("Warning:  api_draw_circle");
+        // (TODO: handle errors.) printf("Warning:  api_draw_circle");
     }
     return 0;
 }
@@ -403,7 +403,7 @@ static int api_draw_circle_line(lua_State *L) {
     // implementation
     int err = _impl_draw_circle_line(dest_x, dest_y, radius);
     if (err != 0) {
-        printf("Warning:  api_draw_circle_line");
+        // (TODO: handle errors.) printf("Warning:  api_draw_circle_line");
     }
     return 0;
 }
@@ -417,7 +417,7 @@ static int api_load_image(lua_State *L) {
     // implementation
     int err = _impl_ctor_load_image(image_path, val);
     if (err != 0) {
-        printf("Warning:  api_load_image");
+        // (TODO: handle errors.) printf("Warning:  api_load_image");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Image");
@@ -435,7 +435,7 @@ static int api_draw_image(lua_State *L) {
     // implementation
     int err = _impl_draw_image(*image, dest_x, dest_y);
     if (err != 0) {
-        printf("Warning:  api_draw_image");
+        // (TODO: handle errors.) printf("Warning:  api_draw_image");
     }
     return 0;
 }
@@ -454,7 +454,7 @@ static int api_draw_image_rect(lua_State *L) {
     // implementation
     int err = _impl_draw_image_rect(*image, dest_x, dest_y, src_x, src_y, rect_width, rect_height);
     if (err != 0) {
-        printf("Warning:  api_draw_image_rect");
+        // (TODO: handle errors.) printf("Warning:  api_draw_image_rect");
     }
     return 0;
 }
@@ -469,7 +469,7 @@ static int api_get_image_width(lua_State *L) {
     // implementation
     int err = _impl_get_image_width(*image, &val);
     if (err != 0) {
-        printf("Warning:  api_get_image_width");
+        // (TODO: handle errors.) printf("Warning:  api_get_image_width");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -485,7 +485,7 @@ static int api_get_image_height(lua_State *L) {
     // implementation
     int err = _impl_get_image_height(*image, &val);
     if (err != 0) {
-        printf("Warning:  api_get_image_height");
+        // (TODO: handle errors.) printf("Warning:  api_get_image_height");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -501,7 +501,7 @@ static int api_new_canvas(lua_State *L) {
     // implementation
     int err = _impl_ctor_new_canvas(width, height, val);
     if (err != 0) {
-        printf("Warning:  api_new_canvas");
+        // (TODO: handle errors.) printf("Warning:  api_new_canvas");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Image");
@@ -520,7 +520,7 @@ static int api_set_canvas(lua_State *L) {
     // implementation
     int err = _impl_set_canvas(*canvas_image);
     if (err != 0) {
-        printf("Warning:  api_set_canvas");
+        // (TODO: handle errors.) printf("Warning:  api_set_canvas");
     }
     return 0;
 }
@@ -531,7 +531,7 @@ static int api_reset_canvas(lua_State *L) {
     // implementation
     int err = _impl_reset_canvas();
     if (err != 0) {
-        printf("Warning:  api_reset_canvas");
+        // (TODO: handle errors.) printf("Warning:  api_reset_canvas");
     }
     return 0;
 }
@@ -546,7 +546,7 @@ static int api_is_image_canvas(lua_State *L) {
     // implementation
     int err = _impl_is_image_canvas(*image, &val);
     if (err != 0) {
-        printf("Warning:  api_is_image_canvas");
+        // (TODO: handle errors.) printf("Warning:  api_is_image_canvas");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -562,7 +562,7 @@ static int api_load_font(lua_State *L) {
     // implementation
     int err = _impl_ctor_load_font(font_path, size, val);
     if (err != 0) {
-        printf("Warning:  api_load_font");
+        // (TODO: handle errors.) printf("Warning:  api_load_font");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Font");
@@ -581,7 +581,7 @@ static int api_set_font(lua_State *L) {
     // implementation
     int err = _impl_set_font(*font);
     if (err != 0) {
-        printf("Warning:  api_set_font");
+        // (TODO: handle errors.) printf("Warning:  api_set_font");
     }
     return 0;
 }
@@ -597,7 +597,7 @@ static int api_draw_text(lua_State *L) {
     // implementation
     int err = _impl_draw_text(text, dest_x, dest_y);
     if (err != 0) {
-        printf("Warning:  api_draw_text");
+        // (TODO: handle errors.) printf("Warning:  api_draw_text");
     }
     return 0;
 }
@@ -612,7 +612,7 @@ static int api_get_text_width(lua_State *L) {
     // implementation
     int err = _impl_get_text_width(text, &val);
     if (err != 0) {
-        printf("Warning:  api_get_text_width");
+        // (TODO: handle errors.) printf("Warning:  api_get_text_width");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -628,7 +628,7 @@ static int api_get_text_height(lua_State *L) {
     // implementation
     int err = _impl_get_text_height(text, &val);
     if (err != 0) {
-        printf("Warning:  api_get_text_height");
+        // (TODO: handle errors.) printf("Warning:  api_get_text_height");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -643,7 +643,7 @@ static int api_set_window_minsize(lua_State *L) {
     // implementation
     int err = _impl_set_window_minsize(width, height);
     if (err != 0) {
-        printf("Warning:  api_set_window_minsize");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_minsize");
     }
     return 0;
 }
@@ -657,7 +657,7 @@ static int api_set_window_size(lua_State *L) {
     // implementation
     int err = _impl_set_window_size(width, height);
     if (err != 0) {
-        printf("Warning:  api_set_window_size");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_size");
     }
     return 0;
 }
@@ -670,7 +670,7 @@ static int api_get_window_width(lua_State *L) {
     // implementation
     int err = _impl_get_window_width(&val);
     if (err != 0) {
-        printf("Warning:  api_get_window_width");
+        // (TODO: handle errors.) printf("Warning:  api_get_window_width");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -684,7 +684,7 @@ static int api_get_window_height(lua_State *L) {
     // implementation
     int err = _impl_get_window_height(&val);
     if (err != 0) {
-        printf("Warning:  api_get_window_height");
+        // (TODO: handle errors.) printf("Warning:  api_get_window_height");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -698,7 +698,7 @@ static int api_set_fullscreen(lua_State *L) {
     // implementation
     int err = _impl_set_fullscreen(fullscreen);
     if (err != 0) {
-        printf("Warning:  api_set_fullscreen");
+        // (TODO: handle errors.) printf("Warning:  api_set_fullscreen");
     }
     return 0;
 }
@@ -711,7 +711,7 @@ static int api_is_fullscreen(lua_State *L) {
     // implementation
     int err = _impl_is_fullscreen(&val);
     if (err != 0) {
-        printf("Warning:  api_is_fullscreen");
+        // (TODO: handle errors.) printf("Warning:  api_is_fullscreen");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -725,7 +725,7 @@ static int api_set_window_title(lua_State *L) {
     // implementation
     int err = _impl_set_window_title(title);
     if (err != 0) {
-        printf("Warning:  api_set_window_title");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_title");
     }
     return 0;
 }
@@ -738,7 +738,7 @@ static int api_set_window_vsync(lua_State *L) {
     // implementation
     int err = _impl_set_window_vsync(vsync);
     if (err != 0) {
-        printf("Warning:  api_set_window_vsync");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_vsync");
     }
     return 0;
 }
@@ -751,7 +751,7 @@ static int api_is_window_vsync(lua_State *L) {
     // implementation
     int err = _impl_is_window_vsync(&val);
     if (err != 0) {
-        printf("Warning:  api_is_window_vsync");
+        // (TODO: handle errors.) printf("Warning:  api_is_window_vsync");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -765,7 +765,7 @@ static int api_set_window_icon_file(lua_State *L) {
     // implementation
     int err = _impl_set_window_icon_file(icon_path);
     if (err != 0) {
-        printf("Warning:  api_set_window_icon_file");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_icon_file");
     }
     return 0;
 }
@@ -781,7 +781,7 @@ static int api_set_window_margins(lua_State *L) {
     // implementation
     int err = _impl_set_window_margins(left, right, top, bottom);
     if (err != 0) {
-        printf("Warning:  api_set_window_margins");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_margins");
     }
     return 0;
 }
@@ -797,7 +797,7 @@ static int api_set_window_paddings(lua_State *L) {
     // implementation
     int err = _impl_set_window_paddings(left, right, top, bottom);
     if (err != 0) {
-        printf("Warning:  api_set_window_paddings");
+        // (TODO: handle errors.) printf("Warning:  api_set_window_paddings");
     }
     return 0;
 }
@@ -813,7 +813,7 @@ static int api_is_key_down(lua_State *L) {
     // implementation
     int err = _impl_is_key_down(key, &val);
     if (err != 0) {
-        printf("Warning:  api_is_key_down");
+        // (TODO: handle errors.) printf("Warning:  api_is_key_down");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -830,7 +830,7 @@ static int api_is_key_pressed(lua_State *L) {
     // implementation
     int err = _impl_is_key_pressed(key, &val);
     if (err != 0) {
-        printf("Warning:  api_is_key_pressed");
+        // (TODO: handle errors.) printf("Warning:  api_is_key_pressed");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -847,7 +847,7 @@ static int api_is_key_released(lua_State *L) {
     // implementation
     int err = _impl_is_key_released(key, &val);
     if (err != 0) {
-        printf("Warning:  api_is_key_released");
+        // (TODO: handle errors.) printf("Warning:  api_is_key_released");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -864,7 +864,7 @@ static int api_is_key_repeat(lua_State *L) {
     // implementation
     int err = _impl_is_key_repeat(key, &val);
     if (err != 0) {
-        printf("Warning:  api_is_key_repeat");
+        // (TODO: handle errors.) printf("Warning:  api_is_key_repeat");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -881,7 +881,7 @@ static int api_is_mouse_down(lua_State *L) {
     // implementation
     int err = _impl_is_mouse_down(mouse_button, &val);
     if (err != 0) {
-        printf("Warning:  api_is_mouse_down");
+        // (TODO: handle errors.) printf("Warning:  api_is_mouse_down");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -898,7 +898,7 @@ static int api_is_mouse_pressed(lua_State *L) {
     // implementation
     int err = _impl_is_mouse_pressed(mouse_button, &val);
     if (err != 0) {
-        printf("Warning:  api_is_mouse_pressed");
+        // (TODO: handle errors.) printf("Warning:  api_is_mouse_pressed");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -915,7 +915,7 @@ static int api_is_mouse_released(lua_State *L) {
     // implementation
     int err = _impl_is_mouse_released(mouse_button, &val);
     if (err != 0) {
-        printf("Warning:  api_is_mouse_released");
+        // (TODO: handle errors.) printf("Warning:  api_is_mouse_released");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -929,7 +929,7 @@ static int api_get_mouse_x(lua_State *L) {
     // implementation
     int err = _impl_get_mouse_x(&val);
     if (err != 0) {
-        printf("Warning:  api_get_mouse_x");
+        // (TODO: handle errors.) printf("Warning:  api_get_mouse_x");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -943,7 +943,7 @@ static int api_get_mouse_y(lua_State *L) {
     // implementation
     int err = _impl_get_mouse_y(&val);
     if (err != 0) {
-        printf("Warning:  api_get_mouse_y");
+        // (TODO: handle errors.) printf("Warning:  api_get_mouse_y");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -957,7 +957,7 @@ static int api_get_gamepad_count(lua_State *L) {
     // implementation
     int err = _impl_get_gamepad_count(&val);
     if (err != 0) {
-        printf("Warning:  api_get_gamepad_count");
+        // (TODO: handle errors.) printf("Warning:  api_get_gamepad_count");
     }
     lua_pushinteger(L, val);
     return 1;
@@ -973,7 +973,7 @@ static int api_get_gamepad_name(lua_State *L) {
     // implementation
     int err = _impl_get_gamepad_name(index, &val);
     if (err != 0) {
-        printf("Warning:  api_get_gamepad_name");
+        // (TODO: handle errors.) printf("Warning:  api_get_gamepad_name");
     }
     lua_pushstring(L, val);
     return 1;
@@ -991,7 +991,7 @@ static int api_is_gamepad_down(lua_State *L) {
     // implementation
     int err = _impl_is_gamepad_down(index, gamepad_button, &val);
     if (err != 0) {
-        printf("Warning:  api_is_gamepad_down");
+        // (TODO: handle errors.) printf("Warning:  api_is_gamepad_down");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -1009,7 +1009,7 @@ static int api_is_gamepad_pressed(lua_State *L) {
     // implementation
     int err = _impl_is_gamepad_pressed(index, gamepad_button, &val);
     if (err != 0) {
-        printf("Warning:  api_is_gamepad_pressed");
+        // (TODO: handle errors.) printf("Warning:  api_is_gamepad_pressed");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -1027,7 +1027,7 @@ static int api_is_gamepad_released(lua_State *L) {
     // implementation
     int err = _impl_is_gamepad_released(index, gamepad_button, &val);
     if (err != 0) {
-        printf("Warning:  api_is_gamepad_released");
+        // (TODO: handle errors.) printf("Warning:  api_is_gamepad_released");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -1045,7 +1045,7 @@ static int api_get_gamepad_axis(lua_State *L) {
     // implementation
     int err = _impl_get_gamepad_axis(index, gamepad_axis, &val);
     if (err != 0) {
-        printf("Warning:  api_get_gamepad_axis");
+        // (TODO: handle errors.) printf("Warning:  api_get_gamepad_axis");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1059,7 +1059,7 @@ static int api_set_mastervolume(lua_State *L) {
     // implementation
     int err = _impl_set_mastervolume(mastervolume);
     if (err != 0) {
-        printf("Warning:  api_set_mastervolume");
+        // (TODO: handle errors.) printf("Warning:  api_set_mastervolume");
     }
     return 0;
 }
@@ -1072,7 +1072,7 @@ static int api_get_mastervolume(lua_State *L) {
     // implementation
     int err = _impl_get_mastervolume(&val);
     if (err != 0) {
-        printf("Warning:  api_get_mastervolume");
+        // (TODO: handle errors.) printf("Warning:  api_get_mastervolume");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1087,7 +1087,7 @@ static int api_load_music(lua_State *L) {
     // implementation
     int err = _impl_ctor_load_music(music_path, val);
     if (err != 0) {
-        printf("Warning:  api_load_music");
+        // (TODO: handle errors.) printf("Warning:  api_load_music");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Music");
@@ -1103,7 +1103,7 @@ static int api_play_music(lua_State *L) {
     // implementation
     int err = _impl_play_music(*music);
     if (err != 0) {
-        printf("Warning:  api_play_music");
+        // (TODO: handle errors.) printf("Warning:  api_play_music");
     }
     return 0;
 }
@@ -1116,7 +1116,7 @@ static int api_pause_music(lua_State *L) {
     // implementation
     int err = _impl_pause_music(*music);
     if (err != 0) {
-        printf("Warning:  api_pause_music");
+        // (TODO: handle errors.) printf("Warning:  api_pause_music");
     }
     return 0;
 }
@@ -1129,7 +1129,7 @@ static int api_resume_music(lua_State *L) {
     // implementation
     int err = _impl_resume_music(*music);
     if (err != 0) {
-        printf("Warning:  api_resume_music");
+        // (TODO: handle errors.) printf("Warning:  api_resume_music");
     }
     return 0;
 }
@@ -1142,7 +1142,7 @@ static int api_stop_music(lua_State *L) {
     // implementation
     int err = _impl_stop_music(*music);
     if (err != 0) {
-        printf("Warning:  api_stop_music");
+        // (TODO: handle errors.) printf("Warning:  api_stop_music");
     }
     return 0;
 }
@@ -1157,7 +1157,7 @@ static int api_is_music_playing(lua_State *L) {
     // implementation
     int err = _impl_is_music_playing(*music, &val);
     if (err != 0) {
-        printf("Warning:  api_is_music_playing");
+        // (TODO: handle errors.) printf("Warning:  api_is_music_playing");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -1173,7 +1173,7 @@ static int api_get_music_length(lua_State *L) {
     // implementation
     int err = _impl_get_music_length(*music, &val);
     if (err != 0) {
-        printf("Warning:  api_get_music_length");
+        // (TODO: handle errors.) printf("Warning:  api_get_music_length");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1189,7 +1189,7 @@ static int api_get_music_length_played(lua_State *L) {
     // implementation
     int err = _impl_get_music_length_played(*music, &val);
     if (err != 0) {
-        printf("Warning:  api_get_music_length_played");
+        // (TODO: handle errors.) printf("Warning:  api_get_music_length_played");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1204,7 +1204,7 @@ static int api_seek_music(lua_State *L) {
     // implementation
     int err = _impl_seek_music(*music, secs);
     if (err != 0) {
-        printf("Warning:  api_seek_music");
+        // (TODO: handle errors.) printf("Warning:  api_seek_music");
     }
     return 0;
 }
@@ -1218,7 +1218,7 @@ static int api_set_music_volume(lua_State *L) {
     // implementation
     int err = _impl_set_music_volume(*music, volume);
     if (err != 0) {
-        printf("Warning:  api_set_music_volume");
+        // (TODO: handle errors.) printf("Warning:  api_set_music_volume");
     }
     return 0;
 }
@@ -1232,7 +1232,7 @@ static int api_set_music_pan(lua_State *L) {
     // implementation
     int err = _impl_set_music_pan(*music, pan);
     if (err != 0) {
-        printf("Warning:  api_set_music_pan");
+        // (TODO: handle errors.) printf("Warning:  api_set_music_pan");
     }
     return 0;
 }
@@ -1246,7 +1246,7 @@ static int api_set_music_pitch(lua_State *L) {
     // implementation
     int err = _impl_set_music_pitch(*music, pitch);
     if (err != 0) {
-        printf("Warning:  api_set_music_pitch");
+        // (TODO: handle errors.) printf("Warning:  api_set_music_pitch");
     }
     return 0;
 }
@@ -1261,7 +1261,7 @@ static int api_get_music_volume(lua_State *L) {
     // implementation
     int err = _impl_get_music_volume(*music, &val);
     if (err != 0) {
-        printf("Warning:  api_get_music_volume");
+        // (TODO: handle errors.) printf("Warning:  api_get_music_volume");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1277,7 +1277,7 @@ static int api_get_music_pan(lua_State *L) {
     // implementation
     int err = _impl_get_music_pan(*music, &val);
     if (err != 0) {
-        printf("Warning:  api_get_music_pan");
+        // (TODO: handle errors.) printf("Warning:  api_get_music_pan");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1293,7 +1293,7 @@ static int api_get_music_pitch(lua_State *L) {
     // implementation
     int err = _impl_get_music_pitch(*music, &val);
     if (err != 0) {
-        printf("Warning:  api_get_music_pitch");
+        // (TODO: handle errors.) printf("Warning:  api_get_music_pitch");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1308,7 +1308,7 @@ static int api_load_sound(lua_State *L) {
     // implementation
     int err = _impl_ctor_load_sound(sound_path, val);
     if (err != 0) {
-        printf("Warning:  api_load_sound");
+        // (TODO: handle errors.) printf("Warning:  api_load_sound");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Sound");
@@ -1325,7 +1325,7 @@ static int api_clone_sound(lua_State *L) {
     // implementation
     int err = _impl_ctor_clone_sound(*orig, val);
     if (err != 0) {
-        printf("Warning:  api_clone_sound");
+        // (TODO: handle errors.) printf("Warning:  api_clone_sound");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Sound");
@@ -1341,7 +1341,7 @@ static int api_play_sound(lua_State *L) {
     // implementation
     int err = _impl_play_sound(*sound);
     if (err != 0) {
-        printf("Warning:  api_play_sound");
+        // (TODO: handle errors.) printf("Warning:  api_play_sound");
     }
     return 0;
 }
@@ -1354,7 +1354,7 @@ static int api_pause_sound(lua_State *L) {
     // implementation
     int err = _impl_pause_sound(*sound);
     if (err != 0) {
-        printf("Warning:  api_pause_sound");
+        // (TODO: handle errors.) printf("Warning:  api_pause_sound");
     }
     return 0;
 }
@@ -1367,7 +1367,7 @@ static int api_resume_sound(lua_State *L) {
     // implementation
     int err = _impl_resume_sound(*sound);
     if (err != 0) {
-        printf("Warning:  api_resume_sound");
+        // (TODO: handle errors.) printf("Warning:  api_resume_sound");
     }
     return 0;
 }
@@ -1380,7 +1380,7 @@ static int api_stop_sound(lua_State *L) {
     // implementation
     int err = _impl_stop_sound(*sound);
     if (err != 0) {
-        printf("Warning:  api_stop_sound");
+        // (TODO: handle errors.) printf("Warning:  api_stop_sound");
     }
     return 0;
 }
@@ -1395,7 +1395,7 @@ static int api_is_sound_playing(lua_State *L) {
     // implementation
     int err = _impl_is_sound_playing(*sound, &val);
     if (err != 0) {
-        printf("Warning:  api_is_sound_playing");
+        // (TODO: handle errors.) printf("Warning:  api_is_sound_playing");
     }
     lua_pushboolean(L, val);
     return 1;
@@ -1410,7 +1410,7 @@ static int api_set_sound_volume(lua_State *L) {
     // implementation
     int err = _impl_set_sound_volume(*sound, volume);
     if (err != 0) {
-        printf("Warning:  api_set_sound_volume");
+        // (TODO: handle errors.) printf("Warning:  api_set_sound_volume");
     }
     return 0;
 }
@@ -1424,7 +1424,7 @@ static int api_set_sound_pan(lua_State *L) {
     // implementation
     int err = _impl_set_sound_pan(*sound, pan);
     if (err != 0) {
-        printf("Warning:  api_set_sound_pan");
+        // (TODO: handle errors.) printf("Warning:  api_set_sound_pan");
     }
     return 0;
 }
@@ -1438,7 +1438,7 @@ static int api_set_sound_pitch(lua_State *L) {
     // implementation
     int err = _impl_set_sound_pitch(*sound, pitch);
     if (err != 0) {
-        printf("Warning:  api_set_sound_pitch");
+        // (TODO: handle errors.) printf("Warning:  api_set_sound_pitch");
     }
     return 0;
 }
@@ -1453,7 +1453,7 @@ static int api_get_sound_volume(lua_State *L) {
     // implementation
     int err = _impl_get_sound_volume(*sound, &val);
     if (err != 0) {
-        printf("Warning:  api_get_sound_volume");
+        // (TODO: handle errors.) printf("Warning:  api_get_sound_volume");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1469,7 +1469,7 @@ static int api_get_sound_pan(lua_State *L) {
     // implementation
     int err = _impl_get_sound_pan(*sound, &val);
     if (err != 0) {
-        printf("Warning:  api_get_sound_pan");
+        // (TODO: handle errors.) printf("Warning:  api_get_sound_pan");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1485,7 +1485,7 @@ static int api_get_sound_pitch(lua_State *L) {
     // implementation
     int err = _impl_get_sound_pitch(*sound, &val);
     if (err != 0) {
-        printf("Warning:  api_get_sound_pitch");
+        // (TODO: handle errors.) printf("Warning:  api_get_sound_pitch");
     }
     lua_pushnumber(L, val);
     return 1;
@@ -1501,7 +1501,7 @@ static int api_load_textfile(lua_State *L) {
     // implementation
     int err = _impl_load_textfile(file_path, &val);
     if (err != 0) {
-        printf("Warning:  api_load_textfile");
+        // (TODO: handle errors.) printf("Warning:  api_load_textfile");
     }
     lua_pushstring(L, val);
     return 1;
@@ -1516,7 +1516,7 @@ static int api_save_textfile(lua_State *L) {
     // implementation
     int err = _impl_save_textfile(file_path, data);
     if (err != 0) {
-        printf("Warning:  api_save_textfile");
+        // (TODO: handle errors.) printf("Warning:  api_save_textfile");
     }
     return 0;
 }
@@ -1530,7 +1530,7 @@ static int api_save_textfile_append(lua_State *L) {
     // implementation
     int err = _impl_save_textfile_append(file_path, data);
     if (err != 0) {
-        printf("Warning:  api_save_textfile_append");
+        // (TODO: handle errors.) printf("Warning:  api_save_textfile_append");
     }
     return 0;
 }
@@ -1541,7 +1541,7 @@ static int api_push_matrix(lua_State *L) {
     // implementation
     int err = _impl_push_matrix();
     if (err != 0) {
-        printf("Warning:  api_push_matrix");
+        // (TODO: handle errors.) printf("Warning:  api_push_matrix");
     }
     return 0;
 }
@@ -1552,7 +1552,7 @@ static int api_pop_matrix(lua_State *L) {
     // implementation
     int err = _impl_pop_matrix();
     if (err != 0) {
-        printf("Warning:  api_pop_matrix");
+        // (TODO: handle errors.) printf("Warning:  api_pop_matrix");
     }
     return 0;
 }
@@ -1563,7 +1563,7 @@ static int api_reset_matrix(lua_State *L) {
     // implementation
     int err = _impl_reset_matrix();
     if (err != 0) {
-        printf("Warning:  api_reset_matrix");
+        // (TODO: handle errors.) printf("Warning:  api_reset_matrix");
     }
     return 0;
 }
@@ -1577,7 +1577,7 @@ static int api_translate(lua_State *L) {
     // implementation
     int err = _impl_translate(delta_x, delta_y);
     if (err != 0) {
-        printf("Warning:  api_translate");
+        // (TODO: handle errors.) printf("Warning:  api_translate");
     }
     return 0;
 }
@@ -1590,7 +1590,7 @@ static int api_rotate(lua_State *L) {
     // implementation
     int err = _impl_rotate(angle);
     if (err != 0) {
-        printf("Warning:  api_rotate");
+        // (TODO: handle errors.) printf("Warning:  api_rotate");
     }
     return 0;
 }
@@ -1605,7 +1605,7 @@ static int api_rotate_at(lua_State *L) {
     // implementation
     int err = _impl_rotate_at(angle, x, y);
     if (err != 0) {
-        printf("Warning:  api_rotate_at");
+        // (TODO: handle errors.) printf("Warning:  api_rotate_at");
     }
     return 0;
 }
@@ -1619,7 +1619,7 @@ static int api_scale(lua_State *L) {
     // implementation
     int err = _impl_scale(scale_x, scale_y);
     if (err != 0) {
-        printf("Warning:  api_scale");
+        // (TODO: handle errors.) printf("Warning:  api_scale");
     }
     return 0;
 }
@@ -1635,7 +1635,7 @@ static int api_scale_at(lua_State *L) {
     // implementation
     int err = _impl_scale_at(scale_x, scale_y, x, y);
     if (err != 0) {
-        printf("Warning:  api_scale_at");
+        // (TODO: handle errors.) printf("Warning:  api_scale_at");
     }
     return 0;
 }
@@ -1649,7 +1649,7 @@ static int api_set_default_blendmode(lua_State *L) {
     // implementation
     int err = _impl_set_default_blendmode(blendmode);
     if (err != 0) {
-        printf("Warning:  api_set_default_blendmode");
+        // (TODO: handle errors.) printf("Warning:  api_set_default_blendmode");
     }
     return 0;
 }
@@ -1663,7 +1663,7 @@ static int api_set_blendmode(lua_State *L) {
     // implementation
     int err = _impl_set_blendmode(blendmode);
     if (err != 0) {
-        printf("Warning:  api_set_blendmode");
+        // (TODO: handle errors.) printf("Warning:  api_set_blendmode");
     }
     return 0;
 }
@@ -1674,7 +1674,7 @@ static int api_reset_blendmode(lua_State *L) {
     // implementation
     int err = _impl_reset_blendmode();
     if (err != 0) {
-        printf("Warning:  api_reset_blendmode");
+        // (TODO: handle errors.) printf("Warning:  api_reset_blendmode");
     }
     return 0;
 }
@@ -1688,7 +1688,7 @@ static int api_set_default_filtermode(lua_State *L) {
     // implementation
     int err = _impl_set_default_filtermode(filtermode);
     if (err != 0) {
-        printf("Warning:  api_set_default_filtermode");
+        // (TODO: handle errors.) printf("Warning:  api_set_default_filtermode");
     }
     return 0;
 }
@@ -1702,7 +1702,7 @@ static int api_set_filtermode(lua_State *L) {
     // implementation
     int err = _impl_set_filtermode(filtermode);
     if (err != 0) {
-        printf("Warning:  api_set_filtermode");
+        // (TODO: handle errors.) printf("Warning:  api_set_filtermode");
     }
     return 0;
 }
@@ -1713,7 +1713,7 @@ static int api_reset_filtermode(lua_State *L) {
     // implementation
     int err = _impl_reset_filtermode();
     if (err != 0) {
-        printf("Warning:  api_reset_filtermode");
+        // (TODO: handle errors.) printf("Warning:  api_reset_filtermode");
     }
     return 0;
 }
@@ -1727,7 +1727,7 @@ static int api_set_shader(lua_State *L) {
     // implementation
     int err = _impl_set_shader(*shader);
     if (err != 0) {
-        printf("Warning:  api_set_shader");
+        // (TODO: handle errors.) printf("Warning:  api_set_shader");
     }
     return 0;
 }
@@ -1738,7 +1738,7 @@ static int api_reset_shader(lua_State *L) {
     // implementation
     int err = _impl_reset_shader();
     if (err != 0) {
-        printf("Warning:  api_reset_shader");
+        // (TODO: handle errors.) printf("Warning:  api_reset_shader");
     }
     return 0;
 }
@@ -1754,7 +1754,7 @@ static int api_set_shader_uniform(lua_State *L) {
     // implementation
     int err = _impl_set_shader_uniform(*shader, uniform_name, uniform_value, which_uniform_value);
     if (err != 0) {
-        printf("Warning:  api_set_shader_uniform");
+        // (TODO: handle errors.) printf("Warning:  api_set_shader_uniform");
     }
     return 0;
 }
@@ -1768,7 +1768,7 @@ static int api_reset_shader_uniform(lua_State *L) {
     // implementation
     int err = _impl_reset_shader_uniform(*shader, uniform_name);
     if (err != 0) {
-        printf("Warning:  api_reset_shader_uniform");
+        // (TODO: handle errors.) printf("Warning:  api_reset_shader_uniform");
     }
     return 0;
 }
@@ -1780,7 +1780,7 @@ static int api_new_shaderbuilder(lua_State *L) {
     // implementation
     int err = _impl_ctor_new_shaderbuilder(val);
     if (err != 0) {
-        printf("Warning:  api_new_shaderbuilder");
+        // (TODO: handle errors.) printf("Warning:  api_new_shaderbuilder");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.ShaderBuilder");
@@ -1799,7 +1799,7 @@ static int api_shaderbuilder_uniform(lua_State *L) {
     // implementation
     int err = _impl_shaderbuilder_uniform(*shaderbuilder, uniform_name, uniform_type);
     if (err != 0) {
-        printf("Warning:  api_shaderbuilder_uniform");
+        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_uniform");
     }
     return 0;
 }
@@ -1813,7 +1813,7 @@ static int api_shaderbuilder_vertex(lua_State *L) {
     // implementation
     int err = _impl_shaderbuilder_vertex(*shaderbuilder, vertex_code);
     if (err != 0) {
-        printf("Warning:  api_shaderbuilder_vertex");
+        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_vertex");
     }
     return 0;
 }
@@ -1827,7 +1827,7 @@ static int api_shaderbuilder_fragment(lua_State *L) {
     // implementation
     int err = _impl_shaderbuilder_fragment(*shaderbuilder, fragment_code);
     if (err != 0) {
-        printf("Warning:  api_shaderbuilder_fragment");
+        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_fragment");
     }
     return 0;
 }
@@ -1841,7 +1841,7 @@ static int api_shaderbuilder_build(lua_State *L) {
     // implementation
     int err = _impl_ctor_shaderbuilder_build(*shaderbuilder, shader);
     if (err != 0) {
-        printf("Warning:  api_shaderbuilder_build");
+        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_build");
     }
     // new value already on top of the stack
     luaL_getmetatable(L, "lyte.Shader");
@@ -2263,7 +2263,7 @@ static int api_set_physics_engine(lua_State *L) {
     // implementation
     int err = _impl_set_physics_engine(state);
     if (err != 0) {
-        printf("Warning:  api_set_physics_engine");
+        // (TODO: handle errors.) printf("Warning:  api_set_physics_engine");
     }
     return 0;
 }

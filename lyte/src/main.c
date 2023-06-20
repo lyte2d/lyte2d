@@ -274,19 +274,30 @@ static void _check_fetch_file_status(lua_State *L) {
         _need_to_load_archives = false;
 
 
-        // _load_lua_file(L, "lyte_boot", true);
+        // _load_lua_file(L, _app_modulename, !_has_repl);
 
-        // app module is set in global LYTE_APP_MODULENAME variable
-        // and loaded at the end of boot
+        lua_pushstring(L, _app_modulename);
+        lua_setglobal(L, "LYTE_APP_MODULENAME");
 
-        _load_lua_file(L, _app_modulename, !_has_repl);
-        // lua_getglobal(L, "require");
-        // lua_pushstring(L, _app_modulename);
-        // docall(L, 1, 0);
+        lua_getglobal(L, "require");
+        lua_pushstring(L, _app_modulename);
 
-        // if (lua_gettop(L) != 0) {
-        //     lua_error(L);
-        // }
+        docall(L, 1, 0);
+
+        if (lua_gettop(L) != 0) {
+            if (!_has_repl) {
+                // lua_error(L);
+                // const char * err =luaL_checkstring(L, -1);
+                // fprintf(stderr, "\n Error (ignored):\n %s\n", err);
+                // lua_pushstring(L, "'app' module not found");
+                // lua_setglobal(L, "LYTE_ERROR_TEXT");
+                lua_settop(L, 0);
+            } else {
+                // lua_pushstring(L, "(REPL MODE) 'app' module not found");
+                // lua_setglobal(L, "LYTE_ERROR_TEXT");
+                lua_settop(L, 0);
+            }
+        }
 
     }
 }
@@ -320,8 +331,20 @@ static void tick_fn_active_norepl(void *data, float dt, int width, int height, b
 
     status = docall(L, 5, 0);
 
-    if (status &&  lua_gettop(L) > 0) {
-        // TODO: check if this triggers
+    if (status != 0) {
+        const char * err =luaL_checkstring(L, -1);
+        fprintf(stderr, "(Error) %s\n", err);
+        lua_setglobal(L, "LYTE_ERROR_TEXT");
+        lua_getglobal(L, "lyte");
+        lua_getglobal(L, "LYTE_TICK_ERROR_FUNC");
+        lua_setfield(L, -2, "tick");
+
+        lua_settop(L, 0);
+    }
+
+    if (lua_gettop(L) > 0) {
+        // shouldn't happen...
+        // fprintf(stderr, "Error!!!!\n");
         lua_getglobal(L, "print");
         lua_insert(L, 1);
         if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)

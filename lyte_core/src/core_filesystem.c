@@ -205,14 +205,14 @@ int lyte_load_textfile(const char * path, const char * *val) {
     if (file == NULL) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
-        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        // fprintf(stderr, "\nWarning: load_text_file('%s') failed with errorcode '%d' error '%s'\n", path, errcode, errstr);
         return errcode;
     }
     size_t len = PHYSFS_fileLength(file);
     uint8_t *buf = malloc(len+1);
     size_t read_len = PHYSFS_readBytes(file, buf, len);
     if (len != read_len) {
-        fprintf(stderr, "File not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
+        fprintf(stderr, "\nFile not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
         return 1;
     }
     buf[len] = 0; // ensure '\0' at the end of the string
@@ -230,7 +230,7 @@ int lyte_save_textfile(const char * path, const char * data) {
     if (file == NULL) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
-        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        fprintf(stderr, "\nFile '%s' error %s\n", path, errstr);
         return errcode;
     }
     PHYSFS_writeBytes(file, data, sz);
@@ -244,7 +244,7 @@ int lyte_save_textfile_append(const char * path, const char * data) {
     if (file == NULL) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
-        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        fprintf(stderr, "\nFile '%s' error %s\n", path, errstr);
         return errcode;
     }
     PHYSFS_writeBytes(file, data, sz);

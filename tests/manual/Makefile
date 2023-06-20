@@ -32,8 +32,16 @@ s09:
 	${LYTE} dir=${EXAMPLES} app=s09_shader_canvas
 
 ##### TESTS
+
+# shaders, sounds etc. mess :)
 test1:
 	${LYTE} app=test1
+
+# image basic stress
+test2:
+	${LYTE} app=test2
+
+# fil io
 file1:
 	${LYTE} app=textfile1
 

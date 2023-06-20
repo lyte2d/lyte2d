@@ -185,7 +185,12 @@ int lyte_draw_image(lyte_Image image, int x, int y) {
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
     // TODO: blendmode?
     sgp_set_image(0, sgimage);
-    sgp_draw_textured_rect(x, y, imageitem->width, imageitem->height);
+
+    // BUGBUG: potential bug. see test2.lua for segfault repro
+    // sgp_draw_textured_rect(x, y, imageitem->width, imageitem->height);
+
+    sgp_draw_textured_rect_ex(0, (sgp_rect){x, y, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
+
     sgp_reset_image(0);
     return 0;
 }

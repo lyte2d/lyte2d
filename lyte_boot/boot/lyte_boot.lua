@@ -10,6 +10,51 @@ unpack = unpack or table.unpack
 
 
 
+local error_title = "Error"
+
+-- TODO: global or under lyte
+-- this will be used to help dev time
+-- errors will be visible on the window instead of crashing/cmdline
+
+_G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
+
+    local error_text = _G.LYTE_ERROR_TEXT or "unknown"
+    local SC = 1
+    local PAD = 20
+
+    lyte.cls(0, 0, 0, 1)
+
+    if (error_text) then
+        local w = lyte.get_text_width(error_title)
+        local h = lyte.get_text_height(error_title)
+        local w2 = lyte.get_text_width(error_text)
+        local h2 = lyte.get_text_height(error_text)
+
+        local wr = math.max(w, w2) + PAD
+        local hr = h + h2 + PAD
+
+        -- lyte.translate(WW/2 - SC*wr/2, HH/2 - SC*hr/2)
+        lyte.translate(PAD, PAD)
+
+        lyte.scale(SC, SC)
+
+        lyte.set_color(1, 1, 0, 1)
+        lyte.draw_text(error_title, PAD/2, PAD/2)
+        lyte.set_color(1, 1, 1, 1)
+        lyte.draw_text(error_text, PAD/2, PAD/2 + SC * h)
+        lyte.set_color(1,0,0,1)
+
+        lyte.draw_rect_line(0,0, wr, hr)
+    end
+end
+
+if not lyte.tick then
+    _G.LYTE_ERROR_TEXT = "function lyte.tick should be implemented"
+    lyte.tick = LYTE_TICK_ERROR_FUNC
+end
+
+
+
 
 -- shader helper (ShaderDef interface)
 
@@ -45,25 +90,60 @@ local function make_lyte_searcher(env)
         code_str = lyte.load_textfile(filename)
         if code_str then
             return function(...)
-                return  loadstring(code_str, filename)(...)
+                -- return loadstring(code_str, filename)(...)
+                -- NOTENOTE: this should be the same between different file types
+                local x,y,a,b,c,d,e,f,g
+                x,y,a,b,c,d,e,f,g = pcall(loadstring(code_str, filename), ...)
+                if x then
+                    return y, a, b, c, d, e, f, g
+                else
+                    print("Error: " .. y)
+                    _G.LYTE_ERROR_TEXT = y
+                    lyte.tick = LYTE_TICK_ERROR_FUNC
+                    return y
+                end
+                -- END NOTENOTE: this should be the same between different file types
             end, filename
         else
+            -- print ("\nmodule warning: ('" .. filename .. "' not found)\n")
             -- FENNEL LOADER
             filename = modulename:gsub("%.", "/")  .. ".fnl"
             code_str = lyte.load_textfile(filename)
+            -- printf("\n\n--$$----------------------------\n" ..code_str  "\n--------------------------------------\n\n\n")
             if (code_str) then
                 return function(...)
-                    return fennel.eval(code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename}, ...)
+                    -- return fennel.eval(code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename}, ...)
+                    -- NOTENOTE: this should be the same between different file types
+                    local x,y,a,b,c,d,e,f,g
+                    local x, y = pcall(fennel.compileString, code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename})
+                    if (x) then
+                        x,y,a,b,c,d,e,f,g = pcall(loadstring(y, filename), ...)
+                    end
+                    if x then
+                        return y, a, b, c, d, e, f, g
+                    else
+                        print("Error: " .. y)
+                        _G.LYTE_ERROR_TEXT = y
+                        lyte.tick = LYTE_TICK_ERROR_FUNC
+                        return y
+                    end
+                    -- END NOTENOTE: this should be the same between different file types
                 end, filename
+            else
+                -- print "\nmodule warning('"' .. filename .. '"' not found)\n"
             end
        end
+       if loaded_chunk then
+
+       end
        if not code_str then
-            print("'app' module mot found");
+            -- print("\n'app' module mot found: module name: " .. modulename .. ", filename: " .. filename);
             if not LYTE_APP_MODULENAME then
-                error("Internal Error: Expecting LYTE_APP_MODULENAME. Not found")
+                error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
             end
+            print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
             if not LYTE_REPL_REQUESTED then
-                error("Lyte entry module not found: " .. LYTE_APP_MODULENAME);
+                error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
             else
                 print("REPL mode: " .. LYTE_REPL_REQUESTED);
                 return function(...)
@@ -125,50 +205,6 @@ end
 
 
 
-
-
-
-local error_title = "Error"
-
--- TODO: global or under lyte
--- this will be used to help dev time
--- errors will be visible on the window instead of crashing/cmdline
-
-local tick_error = function(dt, WW, HH)
-
-    local error_text = _G.LYTE_ERROR_TEXT
-    local SC = 1.5
-    local PAD = 20
-
-    lyte.cls(0, 0, 0, 1)
-
-    if (error_text) then
-        local w = lyte.get_text_width(error_title)
-        local h = lyte.get_text_height(error_title)
-        local w2 = lyte.get_text_width(error_text)
-        local h2 = lyte.get_text_height(error_text)
-
-        local wr = math.max(w, w2) + PAD
-        local hr = h + h2 + PAD
-
-        lyte.translate(WW/2 - SC*wr/2, HH/2 - SC*hr/2)
-
-        lyte.scale(SC, SC)
-
-        lyte.set_color(1, 1, 0, 1)
-        lyte.draw_text(error_title, PAD/2, PAD/2)
-        lyte.set_color(1, 1, 1, 1)
-        lyte.draw_text(error_text, PAD/2, PAD/2 + SC * h)
-        lyte.set_color(1,0,0,1)
-
-        lyte.draw_rect_line(0,0, wr, hr)
-    end
-end
-
-if not lyte.tick then
-    _G.LYTE_ERROR_TEXT = "function lyte.tick should be implemented"
-    lyte.tick = tick_error
-end
 
 
 

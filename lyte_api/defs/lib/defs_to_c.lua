@@ -758,7 +758,7 @@ function CC.Function(args, rets, depth, name, tags, traverse_fn)
 
     CC.result = CC.result ..  tab:rep(depth + 1) ..  "int err = " ..  c_impl_func_name .. "(" .. c_call_args:sub(3)  .. ");\n"
     CC.result = CC.result ..  tab:rep(depth + 1) ..  "if (err != 0) {\n"
-    CC.result = CC.result ..  tab:rep(depth + 2) ..    'printf("Warning:  ' .. c_func_name .. '");\n'
+    CC.result = CC.result ..  tab:rep(depth + 2) ..    '// (TODO: handle errors.) printf("Warning:  ' .. c_func_name .. '");\n'
     CC.result = CC.result ..  tab:rep(depth + 1) ..  "}\n"
 
     -- TODO we decided on 1 return only. simplify this
