@@ -224,6 +224,8 @@ int lyte_set_canvas(lyte_Image image) {
     sgp_translate(0, -imageitem->height);
     sgp_push_transform();
 
+    lyte_set_blendmode(lytecore_state.blendmode);
+
     current_canvas = imageitem;
     return 0;
 }
