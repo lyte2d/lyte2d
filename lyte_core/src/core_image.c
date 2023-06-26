@@ -210,6 +210,10 @@ int lyte_draw_image_rect(lyte_Image image, int x, int y, int src_x, int src_y, i
 }
 
 int lyte_set_canvas(lyte_Image image) {
+    if (current_canvas) {
+        fprintf(stderr, "Canvas was already set.");
+            return 1;
+    }
     ImageItem *imageitem = image.ptr;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
@@ -223,14 +227,18 @@ int lyte_set_canvas(lyte_Image image) {
     sgp_scale(1.0, -1.0);
     sgp_translate(0, -imageitem->height);
     sgp_push_transform();
-
-    lyte_set_blendmode(lytecore_state.blendmode);
+    
+    lyte_set_blendmode(lytecore_state.blendmode); 
 
     current_canvas = imageitem;
     return 0;
 }
 
 int lyte_reset_canvas(void) {
+    if (!current_canvas) {
+        fprintf(stderr, "No canvas was set.");
+            return 1;
+    }
     sgp_pop_transform();
     sg_pass canvas_pass = (sg_pass){ .id = current_canvas->id_pass };
     sg_pass_action pass_action;

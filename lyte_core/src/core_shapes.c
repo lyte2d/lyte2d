@@ -15,7 +15,6 @@
 #define MAX_CIRCLE_TRIS 1024
 #endif
 
-
 int lyte_draw_point(int x, int y) {
     return 0;
 }

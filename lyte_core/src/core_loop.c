@@ -65,7 +65,7 @@ static inline void _tick_function(void) {
 
     sgp_viewport(EMPTY_L, EMPTY_T, win_w-EMPTY_L-EMPTY_R, win_h-EMPTY_T-EMPTY_B);
     sgp_project(-RECT_DELT_L, fwidth+RECT_DELT_R, -RECT_DELT_T, fheight+RECT_DELT_B);
-    sgp_set_blend_mode((sgp_blend_mode)lytecore_state.blendmode);
+    lyte_set_blendmode(lytecore_state.blendmode);
 
 
     lyte_push_matrix();

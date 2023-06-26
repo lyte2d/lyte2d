@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "lyte_core.h"
 #include "map.h"
 
@@ -163,10 +166,35 @@ uint32_t lyte_core_filesystem_fetch_file_async(const char *name, const char *pat
     return _fetchitem.handle;
 }
 
+
+
+int _ensure_dir(const char *path) {
+    struct stat info;
+
+    if( stat( path, &info ) != 0 ) {
+        fprintf(stderr, "Warning: cannot access %s\n", path);
+        return -2;
+    }
+    else if( info.st_mode & S_IFDIR )  {
+        return 0;
+    }
+    else {
+        fprintf(stderr, "Warning: %s is not a directory\n", path);
+        return -3;
+    }
+
+    fprintf(stderr, "Warning: %s's type is unknown\n", path);
+    return -4;
+
+    // NOTE: PHYSFS_stat does not work on top level at this time
+}
+
 int lyte_core_filesystem_set_writeable_path(const char* path) {
-// #if defined(__EMSCRIPTEN__)
-//     path=".";
-// #endif
+    int err = _ensure_dir(path);
+    if (err) {
+        return err;
+    }
+    // !!!NOTE!!! if the path is an actual file, this function destroys the contents !!!
     int success = PHYSFS_setWriteDir(path);
     if (!success) {
         int errcode = PHYSFS_getLastErrorCode();
@@ -180,10 +208,15 @@ int lyte_core_filesystem_add_path_local(const char* path, const char *mount_path
 // #if defined(__EMSCRIPTEN__)
 //     path=".";
 // #endif
+    int err = _ensure_dir(path);
+    if (err) {
+        return err;
+    }
+
     int success = PHYSFS_mount(path, mount_path, 1);
     if (!success) {
         int errcode = PHYSFS_getLastErrorCode();
-        fprintf(stderr, "Failed to mount memory zip: PHYSFS: %d %d, %s\n", success, errcode, PHYSFS_getErrorByCode(errcode));
+        fprintf(stderr, "Failed to mount dir PHYSFS err: %d, %s\n", errcode, PHYSFS_getErrorByCode(errcode));
         return errcode;
     }
     return 0;

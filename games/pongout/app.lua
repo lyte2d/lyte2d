@@ -62,6 +62,7 @@ end
 
 function draw_text_centered(str, x, y)
     local w = lyte.get_text_width(str)
+
     local h = lyte.get_text_height(str)
     lyte.draw_text(str, x - w / 2, y - h / 2)
 end

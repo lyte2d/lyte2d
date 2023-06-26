@@ -143,8 +143,7 @@ static void _fons_render_draw(void *user_ptr, const float *verts, const float *t
     sg_image img = (sg_image){ .id=fontitem->imageid };
 
     sgp_set_image(0,img);
-    sgp_set_blend_mode((sgp_blend_mode)lytecore_state.blendmode);
-    // sgp_set_blend_mode(SGP_BLENDMODE_BLEND);
+    lyte_set_blendmode(lytecore_state.blendmode);
 
     for (int i=0; i<nverts-2; i += 3) {
         int q = 0;

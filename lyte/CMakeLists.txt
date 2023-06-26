@@ -13,6 +13,9 @@ endif()
 
 message("===============> Project: ${PROJECT_NAME}")
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS on)
+
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED true)
 set(CMAKE_CXX_STANDARD 11)

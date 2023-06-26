@@ -34,6 +34,7 @@ local function rect_collision(rect1, rect2)
     return v and h, vh < vv, vh > vv
 end
 
+State = State or {}
 
 local function increase_difficulty()
     if (State.num_briccols < 5) then

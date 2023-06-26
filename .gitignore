@@ -63,6 +63,9 @@ GTAGS
 *.pyc
 
 .vscode
+
+.clangd
+
 build/
 
 tags

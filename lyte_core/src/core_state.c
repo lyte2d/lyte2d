@@ -129,14 +129,14 @@ int lyte_set_default_blendmode(lyte_BlendMode blendmode) {
 }
 
 int lyte_set_blendmode(lyte_BlendMode blendmode) {
-    lytecore_state.blendmode = lytecore_state.default_blendmode;
     sgp_set_blend_mode((sgp_blend_mode)blendmode);
+    lytecore_state.blendmode = blendmode;
     return 0;
 }
 
 int lyte_reset_blendmode(void) {
-    lytecore_state.blendmode = lytecore_state.default_blendmode;
     sgp_set_blend_mode((sgp_blend_mode)lytecore_state.blendmode);
+    lytecore_state.blendmode = lytecore_state.default_blendmode;
     return 0;
 }
 
