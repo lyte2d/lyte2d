@@ -5,7 +5,7 @@ local Data = {}
 Data.apitxt = "API description not found."
 
 do
-    local file = io.open("../docs/lyte.d.ts", "r")
+    local file = io.open("../documents/lyte.d.ts", "r")
     Data.apitxt = file:read("*a")
     file:close()
 end

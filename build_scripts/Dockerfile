@@ -20,6 +20,8 @@ RUN apt-get update \
             nodejs \
             python3-pip \
             python3 \
+            xxd \
+            lua5.1 \
     && update-ca-certificates
 
 # cmake

@@ -1,8 +1,8 @@
-// GENERATED
-// (c) 2023 MG
+// BEGIN: This file is generated
+// -- do not edit directly use code gen --
+//---------------------------------------------------------------------------------------
 
-// api surface: do not edit directly
-// (use codegen to update this file)
+// lyte api code
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -26,7 +26,7 @@ static int enumstring_to_int(EnumStrInt *vals, const char *str) {
     while (vals->str && (strcmp(str, vals->str)!=0)) vals++;
     return vals->value;
 }
-// ---
+
 EnumStrInt lyte_UniformType_strings[] = {
     {"_invalid", LYTE_UNIFORMTYPE__INVALID},
     {"float", LYTE_UNIFORMTYPE_FLOAT},
@@ -95,7 +95,7 @@ EnumStrInt lyte_MouseButton_strings[] = {
 };
 EnumStrInt lyte_KeyboardKey_strings[] = {
     {"space", LYTE_KEYBOARDKEY_SPACE},
-    {"'", LYTE_KEYBOARDKEY_TICK},
+    {"\'", LYTE_KEYBOARDKEY_TICK},
     {",", LYTE_KEYBOARDKEY_COMMA},
     {"-", LYTE_KEYBOARDKEY_DASH},
     {".", LYTE_KEYBOARDKEY_PERIOD},
@@ -222,227 +222,129 @@ EnumStrInt lyte_PhysicsState_strings[] = {
     {"paused", LYTE_PHYSICSSTATE_PAUSED},
     {NULL, -1},
 };
-
-// union helpers
-// which will be set 0 to 3 for known values. -1 for error
-static inline lyte_ShaderUniformValue _get_union_lyte_ShaderUniformValue(lua_State *L, int n, int *which) {
-    lyte_ShaderUniformValue retval = {0};
-    int value_type = lua_type(L, n);
-    if (value_type == LUA_TNUMBER) {
-        // handle LUA_TNUMBER
-        retval.float_val = luaL_checknumber(L, n);
-        *which = 0;
-    }  else if (value_type == LUA_TTABLE) {
-        // handle LUA_TTABLE
-        *which = 1;
-        // list. item type: float max count: 4;
-        static float _buffer[4] = {0};
-        int _count = 0;
-        lua_pushnil(L); // needed for traversing;
-        while (lua_next(L, -2) != 0) {
-            _buffer[_count] = luaL_checknumber(L, -1); // value.  key if needed is at index -2
-            _count++;
-            lua_pop(L, 1);
-            if (_count > 4) { printf("Too many items in the list. Expected: 4\n"); break; };
-        }
-        retval.float_list.values = _buffer;
-        retval.float_list.count = _count;
-    }  else if (value_type == LUA_TUSERDATA) {
-        // handle LUA_TUSERDATA
-        retval.image_val = *(lyte_Image *) luaL_checkudata(L, n, "lyte.Image");
-        *which = 2;
-    }  else {
-        // handle: not matches
-        *which = -1;
-    }
-    return retval;
-}
-
-
-// Handling lyte apis
-
-// [  --  ]
+// quit: [-- ]
 static int api_quit(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_quit();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_quit");
-    }
-    return 0;
+    int _err = _quit();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ number number number number  --  ]
+// cls: [ number  number  number  number -- ]
 static int api_cls(lua_State *L) {
     (void)L;
-    // arguments
     double r = luaL_checknumber(L, 1);
     double g = luaL_checknumber(L, 2);
     double b = luaL_checknumber(L, 3);
     double a = luaL_checknumber(L, 4);
-
-    // implementation
-    int err = _impl_cls(r, g, b, a);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_cls");
-    }
-    return 0;
+    int _err = _cls(r, g, b, a);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ number number number number  --  ]
+// set_color: [ number  number  number  number -- ]
 static int api_set_color(lua_State *L) {
     (void)L;
-    // arguments
     double r = luaL_checknumber(L, 1);
     double g = luaL_checknumber(L, 2);
     double b = luaL_checknumber(L, 3);
     double a = luaL_checknumber(L, 4);
-
-    // implementation
-    int err = _impl_set_color(r, g, b, a);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_color");
-    }
-    return 0;
+    int _err = _set_color(r, g, b, a);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// reset_color: [-- ]
 static int api_reset_color(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_reset_color();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_color");
-    }
-    return 0;
+    int _err = _reset_color();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer  --  ]
+// draw_point: [ number  number -- ]
 static int api_draw_point(lua_State *L) {
     (void)L;
-    // arguments
     int x = luaL_checkinteger(L, 1);
     int y = luaL_checkinteger(L, 2);
-
-    // implementation
-    int err = _impl_draw_point(x, y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_point");
-    }
-    return 0;
+    int _err = _draw_point(x, y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer integer  --  ]
+// draw_line: [ number  number  number  number -- ]
 static int api_draw_line(lua_State *L) {
     (void)L;
-    // arguments
     int x1 = luaL_checkinteger(L, 1);
     int y1 = luaL_checkinteger(L, 2);
     int x2 = luaL_checkinteger(L, 3);
     int y2 = luaL_checkinteger(L, 4);
-
-    // implementation
-    int err = _impl_draw_line(x1, y1, x2, y2);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_line");
-    }
-    return 0;
+    int _err = _draw_line(x1, y1, x2, y2);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer integer  --  ]
+// draw_rect: [ number  number  number  number -- ]
 static int api_draw_rect(lua_State *L) {
     (void)L;
-    // arguments
     int dest_x = luaL_checkinteger(L, 1);
     int dest_y = luaL_checkinteger(L, 2);
     int rect_width = luaL_checkinteger(L, 3);
     int rect_height = luaL_checkinteger(L, 4);
-
-    // implementation
-    int err = _impl_draw_rect(dest_x, dest_y, rect_width, rect_height);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_rect");
-    }
-    return 0;
+    int _err = _draw_rect(dest_x, dest_y, rect_width, rect_height);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer integer  --  ]
+// draw_rect_line: [ number  number  number  number -- ]
 static int api_draw_rect_line(lua_State *L) {
     (void)L;
-    // arguments
     int dest_x = luaL_checkinteger(L, 1);
     int dest_y = luaL_checkinteger(L, 2);
     int rect_width = luaL_checkinteger(L, 3);
     int rect_height = luaL_checkinteger(L, 4);
-
-    // implementation
-    int err = _impl_draw_rect_line(dest_x, dest_y, rect_width, rect_height);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_rect_line");
-    }
-    return 0;
+    int _err = _draw_rect_line(dest_x, dest_y, rect_width, rect_height);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer  --  ]
+// draw_circle: [ number  number  number -- ]
 static int api_draw_circle(lua_State *L) {
     (void)L;
-    // arguments
     int dest_x = luaL_checkinteger(L, 1);
     int dest_y = luaL_checkinteger(L, 2);
     int radius = luaL_checkinteger(L, 3);
-
-    // implementation
-    int err = _impl_draw_circle(dest_x, dest_y, radius);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_circle");
-    }
-    return 0;
+    int _err = _draw_circle(dest_x, dest_y, radius);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer  --  ]
+// draw_circle_line: [ number  number  number -- ]
 static int api_draw_circle_line(lua_State *L) {
     (void)L;
-    // arguments
     int dest_x = luaL_checkinteger(L, 1);
     int dest_y = luaL_checkinteger(L, 2);
     int radius = luaL_checkinteger(L, 3);
-
-    // implementation
-    int err = _impl_draw_circle_line(dest_x, dest_y, radius);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_circle_line");
-    }
-    return 0;
+    int _err = _draw_circle_line(dest_x, dest_y, radius);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ string  -- Image  ]
+// load_image: [ string --  userdata ] (ctor: true)
 static int api_load_image(lua_State *L) {
     (void)L;
-    // arguments
     const char * image_path = luaL_checkstring(L, 1);
-    // return variables
     lyte_Image *val = lua_newuserdata(L, sizeof(lyte_Image));
-    // implementation
-    int err = _impl_ctor_load_image(image_path, val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_load_image");
-    }
-    // new value already on top of the stack
+    int _err = _load_image(image_path, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Image");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ Image integer integer  --  ]
+// draw_image: [ userdata  number  number -- ]
 static int api_draw_image(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
     int dest_x = luaL_checkinteger(L, 2);
     int dest_y = luaL_checkinteger(L, 3);
-
-    // implementation
-    int err = _impl_draw_image(*image, dest_x, dest_y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_image");
-    }
-    return 0;
+    int _err = _draw_image(*image, dest_x, dest_y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Image integer integer integer integer integer integer  --  ]
+// draw_image_rect: [ userdata  number  number  number  number  number  number -- ]
 static int api_draw_image_rect(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
     int dest_x = luaL_checkinteger(L, 2);
     int dest_y = luaL_checkinteger(L, 3);
@@ -450,1405 +352,952 @@ static int api_draw_image_rect(lua_State *L) {
     int src_y = luaL_checkinteger(L, 5);
     int rect_width = luaL_checkinteger(L, 6);
     int rect_height = luaL_checkinteger(L, 7);
-
-    // implementation
-    int err = _impl_draw_image_rect(*image, dest_x, dest_y, src_x, src_y, rect_width, rect_height);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_image_rect");
-    }
-    return 0;
+    int _err = _draw_image_rect(*image, dest_x, dest_y, src_x, src_y, rect_width, rect_height);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Image  -- integer  ]
+// get_image_width: [ userdata --  number ]
 static int api_get_image_width(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_image_width(*image, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_image_width");
-    }
+    int _err = _get_image_width(*image, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Image  -- integer  ]
+// get_image_height: [ userdata --  number ]
 static int api_get_image_height(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_image_height(*image, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_image_height");
-    }
+    int _err = _get_image_height(*image, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer integer  -- Image  ]
+// new_canvas: [ number  number --  userdata ] (ctor: true)
 static int api_new_canvas(lua_State *L) {
     (void)L;
-    // arguments
     int width = luaL_checkinteger(L, 1);
     int height = luaL_checkinteger(L, 2);
-    // return variables
     lyte_Image *val = lua_newuserdata(L, sizeof(lyte_Image));
-    // implementation
-    int err = _impl_ctor_new_canvas(width, height, val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_new_canvas");
-    }
-    // new value already on top of the stack
+    int _err = _new_canvas(width, height, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Image");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ Image  --  ]
+// set_canvas: [ userdata -- ]
 static int api_set_canvas(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Image *canvas_image = luaL_checkudata(L, 1, "lyte.Image");
     // save this value to registry to prevent it from being GC'd
     lua_pushvalue(L, -1); // duplicate the object
     lua_setfield(L, LUA_REGISTRYINDEX, "lyte_canvas_image_SAVE");
-
-    // implementation
-    int err = _impl_set_canvas(*canvas_image);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_canvas");
-    }
-    return 0;
+    int _err = _set_canvas(*canvas_image);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// reset_canvas: [-- ]
 static int api_reset_canvas(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_reset_canvas();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_canvas");
-    }
-    return 0;
+    int _err = _reset_canvas();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Image  -- boolean  ]
+// is_image_canvas: [ userdata --  boolean ]
 static int api_is_image_canvas(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    // return variables
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_image_canvas(*image, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_image_canvas");
-    }
+    int _err = _is_image_canvas(*image, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string number  -- Font  ]
+// load_font: [ string  number --  userdata ] (ctor: true)
 static int api_load_font(lua_State *L) {
     (void)L;
-    // arguments
     const char * font_path = luaL_checkstring(L, 1);
     double size = luaL_checknumber(L, 2);
-    // return variables
     lyte_Font *val = lua_newuserdata(L, sizeof(lyte_Font));
-    // implementation
-    int err = _impl_ctor_load_font(font_path, size, val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_load_font");
-    }
-    // new value already on top of the stack
+    int _err = _load_font(font_path, size, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Font");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ Font  --  ]
+// set_font: [ userdata -- ]
 static int api_set_font(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Font *font = luaL_checkudata(L, 1, "lyte.Font");
     // save this value to registry to prevent it from being GC'd
     lua_pushvalue(L, -1); // duplicate the object
     lua_setfield(L, LUA_REGISTRYINDEX, "lyte_font_SAVE");
-
-    // implementation
-    int err = _impl_set_font(*font);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_font");
-    }
-    return 0;
+    int _err = _set_font(*font);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-
-// [ string integer integer  --  ]
+// draw_text: [ string  number  number -- ]
 static int api_draw_text(lua_State *L) {
     (void)L;
-    // arguments
     const char * text = luaL_checkstring(L, 1);
     int dest_x = luaL_checkinteger(L, 2);
     int dest_y = luaL_checkinteger(L, 3);
-
-    // implementation
-    int err = _impl_draw_text(text, dest_x, dest_y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_draw_text");
-    }
-    return 0;
+    int _err = _draw_text(text, dest_x, dest_y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ string  -- integer  ]
+// get_text_width: [ string --  number ]
 static int api_get_text_width(lua_State *L) {
     (void)L;
-    // arguments
     const char * text = luaL_checkstring(L, 1);
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_text_width(text, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_text_width");
-    }
+    int _err = _get_text_width(text, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string  -- integer  ]
+// get_text_height: [ string --  number ]
 static int api_get_text_height(lua_State *L) {
     (void)L;
-    // arguments
     const char * text = luaL_checkstring(L, 1);
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_text_height(text, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_text_height");
-    }
+    int _err = _get_text_height(text, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer integer  --  ]
+// set_window_minsize: [ number  number -- ]
 static int api_set_window_minsize(lua_State *L) {
     (void)L;
-    // arguments
     int width = luaL_checkinteger(L, 1);
     int height = luaL_checkinteger(L, 2);
-
-    // implementation
-    int err = _impl_set_window_minsize(width, height);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_minsize");
-    }
-    return 0;
+    int _err = _set_window_minsize(width, height);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer  --  ]
+// set_window_size: [ number  number -- ]
 static int api_set_window_size(lua_State *L) {
     (void)L;
-    // arguments
     int width = luaL_checkinteger(L, 1);
     int height = luaL_checkinteger(L, 2);
-
-    // implementation
-    int err = _impl_set_window_size(width, height);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_size");
-    }
-    return 0;
+    int _err = _set_window_size(width, height);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  -- integer  ]
+// get_window_width: [--  number ]
 static int api_get_window_width(lua_State *L) {
     (void)L;
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_window_width(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_window_width");
-    }
+    int _err = _get_window_width(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [  -- integer  ]
+// get_window_height: [--  number ]
 static int api_get_window_height(lua_State *L) {
     (void)L;
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_window_height(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_window_height");
-    }
+    int _err = _get_window_height(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ boolean  --  ]
+// set_fullscreen: [ boolean -- ]
 static int api_set_fullscreen(lua_State *L) {
     (void)L;
-    // arguments
     bool fullscreen = lua_toboolean(L, 1);
-
-    // implementation
-    int err = _impl_set_fullscreen(fullscreen);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_fullscreen");
-    }
-    return 0;
+    int _err = _set_fullscreen(fullscreen);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  -- boolean  ]
+// is_fullscreen: [--  boolean ]
 static int api_is_fullscreen(lua_State *L) {
     (void)L;
-    // return variables
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_fullscreen(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_fullscreen");
-    }
+    int _err = _is_fullscreen(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string  --  ]
+// set_window_title: [ string -- ]
 static int api_set_window_title(lua_State *L) {
     (void)L;
-    // arguments
     const char * title = luaL_checkstring(L, 1);
-
-    // implementation
-    int err = _impl_set_window_title(title);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_title");
-    }
-    return 0;
+    int _err = _set_window_title(title);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ boolean  --  ]
+// set_window_vsync: [ boolean -- ]
 static int api_set_window_vsync(lua_State *L) {
     (void)L;
-    // arguments
     bool vsync = lua_toboolean(L, 1);
-
-    // implementation
-    int err = _impl_set_window_vsync(vsync);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_vsync");
-    }
-    return 0;
+    int _err = _set_window_vsync(vsync);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  -- boolean  ]
+// is_window_vsync: [--  boolean ]
 static int api_is_window_vsync(lua_State *L) {
     (void)L;
-    // return variables
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_window_vsync(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_window_vsync");
-    }
+    int _err = _is_window_vsync(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string  --  ]
+// set_window_icon_file: [ string -- ]
 static int api_set_window_icon_file(lua_State *L) {
     (void)L;
-    // arguments
     const char * icon_path = luaL_checkstring(L, 1);
-
-    // implementation
-    int err = _impl_set_window_icon_file(icon_path);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_icon_file");
-    }
-    return 0;
+    int _err = _set_window_icon_file(icon_path);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer integer  --  ]
+// set_window_margins: [ number  number  number  number -- ]
 static int api_set_window_margins(lua_State *L) {
     (void)L;
-    // arguments
     int left = luaL_checkinteger(L, 1);
     int right = luaL_checkinteger(L, 2);
     int top = luaL_checkinteger(L, 3);
     int bottom = luaL_checkinteger(L, 4);
-
-    // implementation
-    int err = _impl_set_window_margins(left, right, top, bottom);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_margins");
-    }
-    return 0;
+    int _err = _set_window_margins(left, right, top, bottom);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer integer integer  --  ]
+// set_window_paddings: [ number  number  number  number -- ]
 static int api_set_window_paddings(lua_State *L) {
     (void)L;
-    // arguments
     int left = luaL_checkinteger(L, 1);
     int right = luaL_checkinteger(L, 2);
     int top = luaL_checkinteger(L, 3);
     int bottom = luaL_checkinteger(L, 4);
-
-    // implementation
-    int err = _impl_set_window_paddings(left, right, top, bottom);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_window_paddings");
-    }
-    return 0;
+    int _err = _set_window_paddings(left, right, top, bottom);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ KeyboardKey  -- boolean  ]
+// is_key_down: [ string --  boolean ]
 static int api_is_key_down(lua_State *L) {
     (void)L;
-    // arguments
-    const char * key_str = luaL_checkstring(L, 1);
-    lyte_KeyboardKey  key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
-    // return variables
+    const char *key_str = luaL_checkstring(L, 1);
+    lyte_KeyboardKey key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_key_down(key, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_key_down");
-    }
+    int _err = _is_key_down(key, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ KeyboardKey  -- boolean  ]
+// is_key_pressed: [ string --  boolean ]
 static int api_is_key_pressed(lua_State *L) {
     (void)L;
-    // arguments
-    const char * key_str = luaL_checkstring(L, 1);
-    lyte_KeyboardKey  key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
-    // return variables
+    const char *key_str = luaL_checkstring(L, 1);
+    lyte_KeyboardKey key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_key_pressed(key, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_key_pressed");
-    }
+    int _err = _is_key_pressed(key, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ KeyboardKey  -- boolean  ]
+// is_key_released: [ string --  boolean ]
 static int api_is_key_released(lua_State *L) {
     (void)L;
-    // arguments
-    const char * key_str = luaL_checkstring(L, 1);
-    lyte_KeyboardKey  key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
-    // return variables
+    const char *key_str = luaL_checkstring(L, 1);
+    lyte_KeyboardKey key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_key_released(key, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_key_released");
-    }
+    int _err = _is_key_released(key, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ KeyboardKey  -- boolean  ]
+// is_key_repeat: [ string --  boolean ]
 static int api_is_key_repeat(lua_State *L) {
     (void)L;
-    // arguments
-    const char * key_str = luaL_checkstring(L, 1);
-    lyte_KeyboardKey  key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
-    // return variables
+    const char *key_str = luaL_checkstring(L, 1);
+    lyte_KeyboardKey key = enumstring_to_int(lyte_KeyboardKey_strings, key_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_key_repeat(key, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_key_repeat");
-    }
+    int _err = _is_key_repeat(key, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ MouseButton  -- boolean  ]
+// is_mouse_down: [ string --  boolean ]
 static int api_is_mouse_down(lua_State *L) {
     (void)L;
-    // arguments
-    const char * mouse_button_str = luaL_checkstring(L, 1);
-    lyte_MouseButton  mouse_button = enumstring_to_int(lyte_MouseButton_strings, mouse_button_str);
-    // return variables
+    const char *mouse_button_str = luaL_checkstring(L, 1);
+    lyte_MouseButton mouse_button = enumstring_to_int(lyte_MouseButton_strings, mouse_button_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_mouse_down(mouse_button, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_mouse_down");
-    }
+    int _err = _is_mouse_down(mouse_button, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ MouseButton  -- boolean  ]
+// is_mouse_pressed: [ string --  boolean ]
 static int api_is_mouse_pressed(lua_State *L) {
     (void)L;
-    // arguments
-    const char * mouse_button_str = luaL_checkstring(L, 1);
-    lyte_MouseButton  mouse_button = enumstring_to_int(lyte_MouseButton_strings, mouse_button_str);
-    // return variables
+    const char *mouse_button_str = luaL_checkstring(L, 1);
+    lyte_MouseButton mouse_button = enumstring_to_int(lyte_MouseButton_strings, mouse_button_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_mouse_pressed(mouse_button, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_mouse_pressed");
-    }
+    int _err = _is_mouse_pressed(mouse_button, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ MouseButton  -- boolean  ]
+// is_mouse_released: [ string --  boolean ]
 static int api_is_mouse_released(lua_State *L) {
     (void)L;
-    // arguments
-    const char * mouse_button_str = luaL_checkstring(L, 1);
-    lyte_MouseButton  mouse_button = enumstring_to_int(lyte_MouseButton_strings, mouse_button_str);
-    // return variables
+    const char *mouse_button_str = luaL_checkstring(L, 1);
+    lyte_MouseButton mouse_button = enumstring_to_int(lyte_MouseButton_strings, mouse_button_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_mouse_released(mouse_button, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_mouse_released");
-    }
+    int _err = _is_mouse_released(mouse_button, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [  -- integer  ]
+// get_mouse_x: [--  number ]
 static int api_get_mouse_x(lua_State *L) {
     (void)L;
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_mouse_x(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_mouse_x");
-    }
+    int _err = _get_mouse_x(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [  -- integer  ]
+// get_mouse_y: [--  number ]
 static int api_get_mouse_y(lua_State *L) {
     (void)L;
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_mouse_y(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_mouse_y");
-    }
+    int _err = _get_mouse_y(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [  -- integer  ]
+// get_gamepad_count: [--  number ]
 static int api_get_gamepad_count(lua_State *L) {
     (void)L;
-    // return variables
     int val = {0};
-
-    // implementation
-    int err = _impl_get_gamepad_count(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_gamepad_count");
-    }
+    int _err = _get_gamepad_count(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer  -- string  ]
+// get_gamepad_name: [ number --  string ]
 static int api_get_gamepad_name(lua_State *L) {
     (void)L;
-    // arguments
     int index = luaL_checkinteger(L, 1);
-    // return variables
     const char * val = {0};
-
-    // implementation
-    int err = _impl_get_gamepad_name(index, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_gamepad_name");
-    }
+    int _err = _get_gamepad_name(index, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushstring(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer GamepadButton  -- boolean  ]
+// is_gamepad_down: [ number  string --  boolean ]
 static int api_is_gamepad_down(lua_State *L) {
     (void)L;
-    // arguments
     int index = luaL_checkinteger(L, 1);
-    const char * gamepad_button_str = luaL_checkstring(L, 2);
-    lyte_GamepadButton  gamepad_button = enumstring_to_int(lyte_GamepadButton_strings, gamepad_button_str);
-    // return variables
+    const char *gamepad_button_str = luaL_checkstring(L, 2);
+    lyte_GamepadButton gamepad_button = enumstring_to_int(lyte_GamepadButton_strings, gamepad_button_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_gamepad_down(index, gamepad_button, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_gamepad_down");
-    }
+    int _err = _is_gamepad_down(index, gamepad_button, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer GamepadButton  -- boolean  ]
+// is_gamepad_pressed: [ number  string --  boolean ]
 static int api_is_gamepad_pressed(lua_State *L) {
     (void)L;
-    // arguments
     int index = luaL_checkinteger(L, 1);
-    const char * gamepad_button_str = luaL_checkstring(L, 2);
-    lyte_GamepadButton  gamepad_button = enumstring_to_int(lyte_GamepadButton_strings, gamepad_button_str);
-    // return variables
+    const char *gamepad_button_str = luaL_checkstring(L, 2);
+    lyte_GamepadButton gamepad_button = enumstring_to_int(lyte_GamepadButton_strings, gamepad_button_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_gamepad_pressed(index, gamepad_button, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_gamepad_pressed");
-    }
+    int _err = _is_gamepad_pressed(index, gamepad_button, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer GamepadButton  -- boolean  ]
+// is_gamepad_released: [ number  string --  boolean ]
 static int api_is_gamepad_released(lua_State *L) {
     (void)L;
-    // arguments
     int index = luaL_checkinteger(L, 1);
-    const char * gamepad_button_str = luaL_checkstring(L, 2);
-    lyte_GamepadButton  gamepad_button = enumstring_to_int(lyte_GamepadButton_strings, gamepad_button_str);
-    // return variables
+    const char *gamepad_button_str = luaL_checkstring(L, 2);
+    lyte_GamepadButton gamepad_button = enumstring_to_int(lyte_GamepadButton_strings, gamepad_button_str);
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_gamepad_released(index, gamepad_button, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_gamepad_released");
-    }
+    int _err = _is_gamepad_released(index, gamepad_button, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ integer GamepadAxis  -- number  ]
+// get_gamepad_axis: [ number  string --  number ]
 static int api_get_gamepad_axis(lua_State *L) {
     (void)L;
-    // arguments
     int index = luaL_checkinteger(L, 1);
-    const char * gamepad_axis_str = luaL_checkstring(L, 2);
-    lyte_GamepadAxis  gamepad_axis = enumstring_to_int(lyte_GamepadAxis_strings, gamepad_axis_str);
-    // return variables
+    const char *gamepad_axis_str = luaL_checkstring(L, 2);
+    lyte_GamepadAxis gamepad_axis = enumstring_to_int(lyte_GamepadAxis_strings, gamepad_axis_str);
     double val = {0};
-
-    // implementation
-    int err = _impl_get_gamepad_axis(index, gamepad_axis, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_gamepad_axis");
-    }
+    int _err = _get_gamepad_axis(index, gamepad_axis, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ number  --  ]
+// set_mastervolume: [ number -- ]
 static int api_set_mastervolume(lua_State *L) {
     (void)L;
-    // arguments
     double mastervolume = luaL_checknumber(L, 1);
-
-    // implementation
-    int err = _impl_set_mastervolume(mastervolume);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_mastervolume");
-    }
-    return 0;
+    int _err = _set_mastervolume(mastervolume);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  -- number  ]
+// get_mastervolume: [--  number ]
 static int api_get_mastervolume(lua_State *L) {
     (void)L;
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_mastervolume(&val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_mastervolume");
-    }
+    int _err = _get_mastervolume(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string  -- Music  ]
+// load_music: [ string --  userdata ] (ctor: true)
 static int api_load_music(lua_State *L) {
     (void)L;
-    // arguments
     const char * music_path = luaL_checkstring(L, 1);
-    // return variables
     lyte_Music *val = lua_newuserdata(L, sizeof(lyte_Music));
-    // implementation
-    int err = _impl_ctor_load_music(music_path, val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_load_music");
-    }
-    // new value already on top of the stack
+    int _err = _load_music(music_path, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Music");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ Music  --  ]
+// play_music: [ userdata -- ]
 static int api_play_music(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-
-    // implementation
-    int err = _impl_play_music(*music);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_play_music");
-    }
-    return 0;
+    int _err = _play_music(*music);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music  --  ]
+// pause_music: [ userdata -- ]
 static int api_pause_music(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-
-    // implementation
-    int err = _impl_pause_music(*music);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_pause_music");
-    }
-    return 0;
+    int _err = _pause_music(*music);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music  --  ]
+// resume_music: [ userdata -- ]
 static int api_resume_music(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-
-    // implementation
-    int err = _impl_resume_music(*music);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_resume_music");
-    }
-    return 0;
+    int _err = _resume_music(*music);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music  --  ]
+// stop_music: [ userdata -- ]
 static int api_stop_music(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-
-    // implementation
-    int err = _impl_stop_music(*music);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_stop_music");
-    }
-    return 0;
+    int _err = _stop_music(*music);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music  -- boolean  ]
+// is_music_playing: [ userdata --  boolean ]
 static int api_is_music_playing(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    // return variables
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_music_playing(*music, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_music_playing");
-    }
+    int _err = _is_music_playing(*music, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Music  -- number  ]
+// get_music_length: [ userdata --  number ]
 static int api_get_music_length(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_music_length(*music, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_music_length");
-    }
+    int _err = _get_music_length(*music, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Music  -- number  ]
+// get_music_length_played: [ userdata --  number ]
 static int api_get_music_length_played(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_music_length_played(*music, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_music_length_played");
-    }
+    int _err = _get_music_length_played(*music, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Music number  --  ]
+// seek_music: [ userdata  number -- ]
 static int api_seek_music(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
     double secs = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_seek_music(*music, secs);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_seek_music");
-    }
-    return 0;
+    int _err = _seek_music(*music, secs);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music number  --  ]
+// set_music_volume: [ userdata  number -- ]
 static int api_set_music_volume(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
     double volume = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_set_music_volume(*music, volume);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_music_volume");
-    }
-    return 0;
+    int _err = _set_music_volume(*music, volume);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music number  --  ]
+// set_music_pan: [ userdata  number -- ]
 static int api_set_music_pan(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
     double pan = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_set_music_pan(*music, pan);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_music_pan");
-    }
-    return 0;
+    int _err = _set_music_pan(*music, pan);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music number  --  ]
+// set_music_pitch: [ userdata  number -- ]
 static int api_set_music_pitch(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
     double pitch = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_set_music_pitch(*music, pitch);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_music_pitch");
-    }
-    return 0;
+    int _err = _set_music_pitch(*music, pitch);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Music  -- number  ]
+// get_music_volume: [ userdata --  number ]
 static int api_get_music_volume(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_music_volume(*music, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_music_volume");
-    }
+    int _err = _get_music_volume(*music, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Music  -- number  ]
+// get_music_pan: [ userdata --  number ]
 static int api_get_music_pan(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_music_pan(*music, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_music_pan");
-    }
+    int _err = _get_music_pan(*music, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Music  -- number  ]
+// get_music_pitch: [ userdata --  number ]
 static int api_get_music_pitch(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_music_pitch(*music, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_music_pitch");
-    }
+    int _err = _get_music_pitch(*music, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string  -- Sound  ]
+// load_sound: [ string --  userdata ] (ctor: true)
 static int api_load_sound(lua_State *L) {
     (void)L;
-    // arguments
     const char * sound_path = luaL_checkstring(L, 1);
-    // return variables
     lyte_Sound *val = lua_newuserdata(L, sizeof(lyte_Sound));
-    // implementation
-    int err = _impl_ctor_load_sound(sound_path, val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_load_sound");
-    }
-    // new value already on top of the stack
+    int _err = _load_sound(sound_path, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Sound");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ Sound  -- Sound  ]
+// clone_sound: [ userdata --  userdata ] (ctor: true)
 static int api_clone_sound(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *orig = luaL_checkudata(L, 1, "lyte.Sound");
-    // return variables
     lyte_Sound *val = lua_newuserdata(L, sizeof(lyte_Sound));
-    // implementation
-    int err = _impl_ctor_clone_sound(*orig, val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_clone_sound");
-    }
-    // new value already on top of the stack
+    int _err = _clone_sound(*orig, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Sound");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ Sound  --  ]
+// play_sound: [ userdata -- ]
 static int api_play_sound(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-
-    // implementation
-    int err = _impl_play_sound(*sound);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_play_sound");
-    }
-    return 0;
+    int _err = _play_sound(*sound);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound  --  ]
+// pause_sound: [ userdata -- ]
 static int api_pause_sound(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-
-    // implementation
-    int err = _impl_pause_sound(*sound);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_pause_sound");
-    }
-    return 0;
+    int _err = _pause_sound(*sound);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound  --  ]
+// resume_sound: [ userdata -- ]
 static int api_resume_sound(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-
-    // implementation
-    int err = _impl_resume_sound(*sound);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_resume_sound");
-    }
-    return 0;
+    int _err = _resume_sound(*sound);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound  --  ]
+// stop_sound: [ userdata -- ]
 static int api_stop_sound(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-
-    // implementation
-    int err = _impl_stop_sound(*sound);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_stop_sound");
-    }
-    return 0;
+    int _err = _stop_sound(*sound);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound  -- boolean  ]
+// is_sound_playing: [ userdata --  boolean ]
 static int api_is_sound_playing(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-    // return variables
     bool val = {0};
-
-    // implementation
-    int err = _impl_is_sound_playing(*sound, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_is_sound_playing");
-    }
+    int _err = _is_sound_playing(*sound, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Sound number  --  ]
+// set_sound_volume: [ userdata  number -- ]
 static int api_set_sound_volume(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
     double volume = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_set_sound_volume(*sound, volume);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_sound_volume");
-    }
-    return 0;
+    int _err = _set_sound_volume(*sound, volume);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound number  --  ]
+// set_sound_pan: [ userdata  number -- ]
 static int api_set_sound_pan(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
     double pan = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_set_sound_pan(*sound, pan);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_sound_pan");
-    }
-    return 0;
+    int _err = _set_sound_pan(*sound, pan);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound number  --  ]
+// set_sound_pitch: [ userdata  number -- ]
 static int api_set_sound_pitch(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
     double pitch = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_set_sound_pitch(*sound, pitch);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_sound_pitch");
-    }
-    return 0;
+    int _err = _set_sound_pitch(*sound, pitch);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Sound  -- number  ]
+// get_sound_volume: [ userdata --  number ]
 static int api_get_sound_volume(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_sound_volume(*sound, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_sound_volume");
-    }
+    int _err = _get_sound_volume(*sound, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Sound  -- number  ]
+// get_sound_pan: [ userdata --  number ]
 static int api_get_sound_pan(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_sound_pan(*sound, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_sound_pan");
-    }
+    int _err = _get_sound_pan(*sound, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ Sound  -- number  ]
+// get_sound_pitch: [ userdata --  number ]
 static int api_get_sound_pitch(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-    // return variables
     double val = {0};
-
-    // implementation
-    int err = _impl_get_sound_pitch(*sound, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_get_sound_pitch");
-    }
+    int _err = _get_sound_pitch(*sound, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushnumber(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string  -- string  ]
+// load_textfile: [ string --  string ]
 static int api_load_textfile(lua_State *L) {
     (void)L;
-    // arguments
     const char * file_path = luaL_checkstring(L, 1);
-    // return variables
     const char * val = {0};
-
-    // implementation
-    int err = _impl_load_textfile(file_path, &val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_load_textfile");
-    }
+    int _err = _load_textfile(file_path, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushstring(L, val);
-    return 1;
+    return 1; // number of return values
 }
-// [ string string  --  ]
+// save_textfile: [ string  string -- ]
 static int api_save_textfile(lua_State *L) {
     (void)L;
-    // arguments
     const char * file_path = luaL_checkstring(L, 1);
     const char * data = luaL_checkstring(L, 2);
-
-    // implementation
-    int err = _impl_save_textfile(file_path, data);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_save_textfile");
-    }
-    return 0;
+    int _err = _save_textfile(file_path, data);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ string string  --  ]
+// save_textfile_append: [ string  string -- ]
 static int api_save_textfile_append(lua_State *L) {
     (void)L;
-    // arguments
     const char * file_path = luaL_checkstring(L, 1);
     const char * data = luaL_checkstring(L, 2);
-
-    // implementation
-    int err = _impl_save_textfile_append(file_path, data);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_save_textfile_append");
-    }
-    return 0;
+    int _err = _save_textfile_append(file_path, data);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// push_matrix: [-- ]
 static int api_push_matrix(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_push_matrix();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_push_matrix");
-    }
-    return 0;
+    int _err = _push_matrix();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// pop_matrix: [-- ]
 static int api_pop_matrix(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_pop_matrix();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_pop_matrix");
-    }
-    return 0;
+    int _err = _pop_matrix();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// reset_matrix: [-- ]
 static int api_reset_matrix(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_reset_matrix();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_matrix");
-    }
-    return 0;
+    int _err = _reset_matrix();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer  --  ]
+// translate: [ number  number -- ]
 static int api_translate(lua_State *L) {
     (void)L;
-    // arguments
     int delta_x = luaL_checkinteger(L, 1);
     int delta_y = luaL_checkinteger(L, 2);
-
-    // implementation
-    int err = _impl_translate(delta_x, delta_y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_translate");
-    }
-    return 0;
+    int _err = _translate(delta_x, delta_y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ number  --  ]
+// rotate: [ number -- ]
 static int api_rotate(lua_State *L) {
     (void)L;
-    // arguments
     double angle = luaL_checknumber(L, 1);
-
-    // implementation
-    int err = _impl_rotate(angle);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_rotate");
-    }
-    return 0;
+    int _err = _rotate(angle);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ number integer integer  --  ]
+// rotate_at: [ number  number  number -- ]
 static int api_rotate_at(lua_State *L) {
     (void)L;
-    // arguments
     double angle = luaL_checknumber(L, 1);
     int x = luaL_checkinteger(L, 2);
     int y = luaL_checkinteger(L, 3);
-
-    // implementation
-    int err = _impl_rotate_at(angle, x, y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_rotate_at");
-    }
-    return 0;
+    int _err = _rotate_at(angle, x, y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ number number  --  ]
+// scale: [ number  number -- ]
 static int api_scale(lua_State *L) {
     (void)L;
-    // arguments
     double scale_x = luaL_checknumber(L, 1);
     double scale_y = luaL_checknumber(L, 2);
-
-    // implementation
-    int err = _impl_scale(scale_x, scale_y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_scale");
-    }
-    return 0;
+    int _err = _scale(scale_x, scale_y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ integer integer number number  --  ]
+// scale_at: [ number  number  number  number -- ]
 static int api_scale_at(lua_State *L) {
     (void)L;
-    // arguments
     int scale_x = luaL_checkinteger(L, 1);
     int scale_y = luaL_checkinteger(L, 2);
     double x = luaL_checknumber(L, 3);
     double y = luaL_checknumber(L, 4);
-
-    // implementation
-    int err = _impl_scale_at(scale_x, scale_y, x, y);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_scale_at");
-    }
-    return 0;
+    int _err = _scale_at(scale_x, scale_y, x, y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ BlendMode  --  ]
+// set_default_blendmode: [ string -- ]
 static int api_set_default_blendmode(lua_State *L) {
     (void)L;
-    // arguments
-    const char * blendmode_str = luaL_checkstring(L, 1);
-    lyte_BlendMode  blendmode = enumstring_to_int(lyte_BlendMode_strings, blendmode_str);
-
-    // implementation
-    int err = _impl_set_default_blendmode(blendmode);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_default_blendmode");
-    }
-    return 0;
+    const char *blendmode_str = luaL_checkstring(L, 1);
+    lyte_BlendMode blendmode = enumstring_to_int(lyte_BlendMode_strings, blendmode_str);
+    int _err = _set_default_blendmode(blendmode);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ BlendMode  --  ]
+// set_blendmode: [ string -- ]
 static int api_set_blendmode(lua_State *L) {
     (void)L;
-    // arguments
-    const char * blendmode_str = luaL_checkstring(L, 1);
-    lyte_BlendMode  blendmode = enumstring_to_int(lyte_BlendMode_strings, blendmode_str);
-
-    // implementation
-    int err = _impl_set_blendmode(blendmode);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_blendmode");
-    }
-    return 0;
+    const char *blendmode_str = luaL_checkstring(L, 1);
+    lyte_BlendMode blendmode = enumstring_to_int(lyte_BlendMode_strings, blendmode_str);
+    int _err = _set_blendmode(blendmode);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// reset_blendmode: [-- ]
 static int api_reset_blendmode(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_reset_blendmode();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_blendmode");
-    }
-    return 0;
+    int _err = _reset_blendmode();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ FilterMode  --  ]
+// set_default_filtermode: [ string -- ]
 static int api_set_default_filtermode(lua_State *L) {
     (void)L;
-    // arguments
-    const char * filtermode_str = luaL_checkstring(L, 1);
-    lyte_FilterMode  filtermode = enumstring_to_int(lyte_FilterMode_strings, filtermode_str);
-
-    // implementation
-    int err = _impl_set_default_filtermode(filtermode);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_default_filtermode");
-    }
-    return 0;
+    const char *filtermode_str = luaL_checkstring(L, 1);
+    lyte_FilterMode filtermode = enumstring_to_int(lyte_FilterMode_strings, filtermode_str);
+    int _err = _set_default_filtermode(filtermode);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ FilterMode  --  ]
+// set_filtermode: [ string -- ]
 static int api_set_filtermode(lua_State *L) {
     (void)L;
-    // arguments
-    const char * filtermode_str = luaL_checkstring(L, 1);
-    lyte_FilterMode  filtermode = enumstring_to_int(lyte_FilterMode_strings, filtermode_str);
-
-    // implementation
-    int err = _impl_set_filtermode(filtermode);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_filtermode");
-    }
-    return 0;
+    const char *filtermode_str = luaL_checkstring(L, 1);
+    lyte_FilterMode filtermode = enumstring_to_int(lyte_FilterMode_strings, filtermode_str);
+    int _err = _set_filtermode(filtermode);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// reset_filtermode: [-- ]
 static int api_reset_filtermode(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_reset_filtermode();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_filtermode");
-    }
-    return 0;
+    int _err = _reset_filtermode();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-
-// [ Shader  --  ]
+// set_shader: [ userdata -- ]
 static int api_set_shader(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Shader *shader = luaL_checkudata(L, 1, "lyte.Shader");
-
-    // implementation
-    int err = _impl_set_shader(*shader);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_shader");
-    }
-    return 0;
+    int _err = _set_shader(*shader);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  --  ]
+// reset_shader: [-- ]
 static int api_reset_shader(lua_State *L) {
     (void)L;
-
-    // implementation
-    int err = _impl_reset_shader();
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_shader");
-    }
-    return 0;
+    int _err = _reset_shader();
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Shader string ShaderUniformValue  --  ]
+// set_shader_uniform: [ userdata  string  __UNKNOWN_one_of_lyte__ -- ]
 static int api_set_shader_uniform(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Shader *shader = luaL_checkudata(L, 1, "lyte.Shader");
     const char * uniform_name = luaL_checkstring(L, 2);
-    int which_uniform_value;
-    lyte_ShaderUniformValue uniform_value = _get_union_lyte_ShaderUniformValue(L, 3, &which_uniform_value);
-
-    // implementation
-    int err = _impl_set_shader_uniform(*shader, uniform_name, uniform_value, which_uniform_value);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_shader_uniform");
+    lyte_ShaderUniformValue uniform_value = {0}; // WIP: uniform_value;
+    int luatype_id = lua_type(L, 3);
+    // opt: 0 -->  number, 3;
+    if (luatype_id == 3) {
+        uniform_value.which = 0;
+        // TODO
+        float val = luaL_checknumber(L, 3);
+        uniform_value.options.float_val = val;
     }
-    return 0;
+    // opt: 1 -->  table, 5;
+    if (luatype_id == 5) {
+        uniform_value.which = 1;
+        // TODO
+        lyte_FloatVec4 *val = &(lyte_FloatVec4){0};
+    // TABLE_tuple__FloatVec4::float Idx: 3 max: 4
+    if (lua_type(L, 3) != LUA_TTABLE) { fprintf(stderr, "Expected table, got:%s\n", lua_typename(L, 3));  lua_error(L); }; // todo: push error info to stack
+    size_t val_count_3 = lua_objlen(L, 3);
+    if (val_count_3 > 4) { printf("Warning: too many items passed in the tuple. Ignoring extras"); val_count_3 = 4; }
+    val->count = val_count_3;
+    for (size_t i = 1; i <= val_count_3; i++) {
+        // iterate
+        lua_rawgeti(L, 3, i);
+        float listval = luaL_checknumber(L, -1);
+        lua_pop(L, 1);
+        // insert into val...;
+        val->data[i - 1] = listval;
+    }
+        uniform_value.options.vec_val = *val;
+    }
+    // opt: 2 -->  userdata, 7;
+    if (luatype_id == 7) {
+        uniform_value.which = 2;
+        // TODO
+        lyte_Image *val = luaL_checkudata(L, 3, "lyte.Image");
+        uniform_value.options.sampler2D_val = *val;
+    }
+    int _err = _set_shader_uniform(*shader, uniform_name, uniform_value);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ Shader string  --  ]
+// reset_shader_uniform: [ userdata  string -- ]
 static int api_reset_shader_uniform(lua_State *L) {
     (void)L;
-    // arguments
     lyte_Shader *shader = luaL_checkudata(L, 1, "lyte.Shader");
     const char * uniform_name = luaL_checkstring(L, 2);
-
-    // implementation
-    int err = _impl_reset_shader_uniform(*shader, uniform_name);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_reset_shader_uniform");
-    }
-    return 0;
+    int _err = _reset_shader_uniform(*shader, uniform_name);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [  -- ShaderBuilder  ]
+// new_shaderbuilder: [--  userdata ] (ctor: true)
 static int api_new_shaderbuilder(lua_State *L) {
     (void)L;
-    // return variables
     lyte_ShaderBuilder *val = lua_newuserdata(L, sizeof(lyte_ShaderBuilder));
-    // implementation
-    int err = _impl_ctor_new_shaderbuilder(val);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_new_shaderbuilder");
-    }
-    // new value already on top of the stack
+    int _err = _new_shaderbuilder(val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.ShaderBuilder");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// [ ShaderBuilder string UniformType  --  ]
+// shaderbuilder_uniform: [ userdata  string  string -- ]
 static int api_shaderbuilder_uniform(lua_State *L) {
     (void)L;
-    // arguments
     lyte_ShaderBuilder *shaderbuilder = luaL_checkudata(L, 1, "lyte.ShaderBuilder");
     const char * uniform_name = luaL_checkstring(L, 2);
-    const char * uniform_type_str = luaL_checkstring(L, 3);
-    lyte_UniformType  uniform_type = enumstring_to_int(lyte_UniformType_strings, uniform_type_str);
-
-    // implementation
-    int err = _impl_shaderbuilder_uniform(*shaderbuilder, uniform_name, uniform_type);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_uniform");
-    }
-    return 0;
+    const char *uniform_type_str = luaL_checkstring(L, 3);
+    lyte_UniformType uniform_type = enumstring_to_int(lyte_UniformType_strings, uniform_type_str);
+    int _err = _shaderbuilder_uniform(*shaderbuilder, uniform_name, uniform_type);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ ShaderBuilder string  --  ]
+// shaderbuilder_vertex: [ userdata  string -- ]
 static int api_shaderbuilder_vertex(lua_State *L) {
     (void)L;
-    // arguments
     lyte_ShaderBuilder *shaderbuilder = luaL_checkudata(L, 1, "lyte.ShaderBuilder");
     const char * vertex_code = luaL_checkstring(L, 2);
-
-    // implementation
-    int err = _impl_shaderbuilder_vertex(*shaderbuilder, vertex_code);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_vertex");
-    }
-    return 0;
+    int _err = _shaderbuilder_vertex(*shaderbuilder, vertex_code);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ ShaderBuilder string  --  ]
+// shaderbuilder_fragment: [ userdata  string -- ]
 static int api_shaderbuilder_fragment(lua_State *L) {
     (void)L;
-    // arguments
     lyte_ShaderBuilder *shaderbuilder = luaL_checkudata(L, 1, "lyte.ShaderBuilder");
     const char * fragment_code = luaL_checkstring(L, 2);
-
-    // implementation
-    int err = _impl_shaderbuilder_fragment(*shaderbuilder, fragment_code);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_fragment");
-    }
-    return 0;
+    int _err = _shaderbuilder_fragment(*shaderbuilder, fragment_code);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
-// [ ShaderBuilder  -- Shader  ]
+// shaderbuilder_build: [ userdata --  userdata ] (ctor: true)
 static int api_shaderbuilder_build(lua_State *L) {
     (void)L;
-    // arguments
     lyte_ShaderBuilder *shaderbuilder = luaL_checkudata(L, 1, "lyte.ShaderBuilder");
-    // return variables
     lyte_Shader *shader = lua_newuserdata(L, sizeof(lyte_Shader));
-    // implementation
-    int err = _impl_ctor_shaderbuilder_build(*shaderbuilder, shader);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_shaderbuilder_build");
-    }
-    // new value already on top of the stack
+    int _err = _shaderbuilder_build(*shaderbuilder, shader);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
     luaL_getmetatable(L, "lyte.Shader");
     lua_setmetatable(L, -2);
-    return 1;
+    return 1; // number of return values
 }
-// record Image
+// set_physics_engine: [ string -- ]
+static int api_set_physics_engine(lua_State *L) {
+    (void)L;
+    const char *state_str = luaL_checkstring(L, 1);
+    lyte_PhysicsState state = enumstring_to_int(lyte_PhysicsState_strings, state_str);
+    int _err = _set_physics_engine(state);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
+
 enum Image_keys_index {
     IDX_Image_width,
     IDX_Image_height,
@@ -1882,13 +1331,13 @@ static int Image_metatable_newindex(lua_State *L) {
 }
 static int Image_metatable_tostring(lua_State *L) {
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    const char *str = _impl_tostring_lyte_Image(image);
+    const char *str = _tostring_lyte_Image(image);
     lua_pushstring(L, str);
     return 1;
 }
 static int Image_metatable_gc(lua_State *L) {
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    _impl_cleanup_lyte_Image(image);
+    _cleanup_lyte_Image(image);
     return 1;
 }
 static const struct luaL_Reg Image_metatable[] = {
@@ -1906,9 +1355,6 @@ static int luaopen_Image_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// record Image done
-
-// record Font
 enum Font_keys_index {
     IDX_COUNT_Font,
 };
@@ -1933,13 +1379,13 @@ static int Font_metatable_newindex(lua_State *L) {
 }
 static int Font_metatable_tostring(lua_State *L) {
     lyte_Font *font = luaL_checkudata(L, 1, "lyte.Font");
-    const char *str = _impl_tostring_lyte_Font(font);
+    const char *str = _tostring_lyte_Font(font);
     lua_pushstring(L, str);
     return 1;
 }
 static int Font_metatable_gc(lua_State *L) {
     lyte_Font *font = luaL_checkudata(L, 1, "lyte.Font");
-    _impl_cleanup_lyte_Font(font);
+    _cleanup_lyte_Font(font);
     return 1;
 }
 static const struct luaL_Reg Font_metatable[] = {
@@ -1957,9 +1403,6 @@ static int luaopen_Font_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// record Font done
-
-// record Music
 enum Music_keys_index {
     IDX_Music_playing,
     IDX_Music_length,
@@ -2000,7 +1443,7 @@ static int Music_metatable_index(lua_State *L) {
         case IDX_Music_volume: { api_get_music_volume(L); } break;
         case IDX_Music_play: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "play_music"); lua_remove(L, -2); } break;
         case IDX_Music_pause: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "pause_music"); lua_remove(L, -2); } break;
-        case IDX_Music_resume: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "resume _music"); lua_remove(L, -2); } break;
+        case IDX_Music_resume: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "resume_music"); lua_remove(L, -2); } break;
         case IDX_Music_stop: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "stop_music"); lua_remove(L, -2); } break;
         case IDX_Music_seek: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "seek_music"); lua_remove(L, -2); } break;
     }
@@ -2020,13 +1463,13 @@ static int Music_metatable_newindex(lua_State *L) {
 }
 static int Music_metatable_tostring(lua_State *L) {
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    const char *str = _impl_tostring_lyte_Music(music);
+    const char *str = _tostring_lyte_Music(music);
     lua_pushstring(L, str);
     return 1;
 }
 static int Music_metatable_gc(lua_State *L) {
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
-    _impl_cleanup_lyte_Music(music);
+    _cleanup_lyte_Music(music);
     return 1;
 }
 static const struct luaL_Reg Music_metatable[] = {
@@ -2044,9 +1487,6 @@ static int luaopen_Music_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// record Music done
-
-// record Sound
 enum Sound_keys_index {
     IDX_Sound_pan,
     IDX_Sound_pitch,
@@ -2098,13 +1538,13 @@ static int Sound_metatable_newindex(lua_State *L) {
 }
 static int Sound_metatable_tostring(lua_State *L) {
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-    const char *str = _impl_tostring_lyte_Sound(sound);
+    const char *str = _tostring_lyte_Sound(sound);
     lua_pushstring(L, str);
     return 1;
 }
 static int Sound_metatable_gc(lua_State *L) {
     lyte_Sound *sound = luaL_checkudata(L, 1, "lyte.Sound");
-    _impl_cleanup_lyte_Sound(sound);
+    _cleanup_lyte_Sound(sound);
     return 1;
 }
 static const struct luaL_Reg Sound_metatable[] = {
@@ -2122,10 +1562,6 @@ static int luaopen_Sound_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// record Sound done
-
-
-// record Shader
 enum Shader_keys_index {
     IDX_Shader_set,
     IDX_Shader_reset,
@@ -2156,13 +1592,13 @@ static int Shader_metatable_newindex(lua_State *L) {
 }
 static int Shader_metatable_tostring(lua_State *L) {
     lyte_Shader *shader = luaL_checkudata(L, 1, "lyte.Shader");
-    const char *str = _impl_tostring_lyte_Shader(shader);
+    const char *str = _tostring_lyte_Shader(shader);
     lua_pushstring(L, str);
     return 1;
 }
 static int Shader_metatable_gc(lua_State *L) {
     lyte_Shader *shader = luaL_checkudata(L, 1, "lyte.Shader");
-    _impl_cleanup_lyte_Shader(shader);
+    _cleanup_lyte_Shader(shader);
     return 1;
 }
 static const struct luaL_Reg Shader_metatable[] = {
@@ -2180,10 +1616,6 @@ static int luaopen_Shader_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// record Shader done
-
-
-// record ShaderBuilder
 enum ShaderBuilder_keys_index {
     IDX_ShaderBuilder_uniform,
     IDX_ShaderBuilder_vertex,
@@ -2220,13 +1652,13 @@ static int ShaderBuilder_metatable_newindex(lua_State *L) {
 }
 static int ShaderBuilder_metatable_tostring(lua_State *L) {
     lyte_ShaderBuilder *shaderbuilder = luaL_checkudata(L, 1, "lyte.ShaderBuilder");
-    const char *str = _impl_tostring_lyte_ShaderBuilder(shaderbuilder);
+    const char *str = _tostring_lyte_ShaderBuilder(shaderbuilder);
     lua_pushstring(L, str);
     return 1;
 }
 static int ShaderBuilder_metatable_gc(lua_State *L) {
     lyte_ShaderBuilder *shaderbuilder = luaL_checkudata(L, 1, "lyte.ShaderBuilder");
-    _impl_cleanup_lyte_ShaderBuilder(shaderbuilder);
+    _cleanup_lyte_ShaderBuilder(shaderbuilder);
     return 1;
 }
 static const struct luaL_Reg ShaderBuilder_metatable[] = {
@@ -2244,33 +1676,8 @@ static int luaopen_ShaderBuilder_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// record ShaderBuilder done
 
-
-
-
-
-
-
-
-// [ PhysicsState  --  ]
-static int api_set_physics_engine(lua_State *L) {
-    (void)L;
-    // arguments
-    const char * state_str = luaL_checkstring(L, 1);
-    lyte_PhysicsState  state = enumstring_to_int(lyte_PhysicsState_strings, state_str);
-
-    // implementation
-    int err = _impl_set_physics_engine(state);
-    if (err != 0) {
-        // (TODO: handle errors.) printf("Warning:  api_set_physics_engine");
-    }
-    return 0;
-}
-
-// Done: lyte
-static const struct luaL_Reg lyte_api_functions[] = {
-    {"quit", api_quit},
+static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"cls", api_cls},
     {"set_color", api_set_color},
     {"reset_color", api_reset_color},
@@ -2385,14 +1792,19 @@ static int luaopen_lyte_api_functions(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
-// PUBLIC API
+
 int register_lyte(lua_State *L) {
-    luaopen_Image_metatable(L); // register Image's metatable
-    luaopen_Font_metatable(L); // register Font's metatable
-    luaopen_Music_metatable(L); // register Music's metatable
-    luaopen_Sound_metatable(L); // register Sound's metatable
-    luaopen_Shader_metatable(L); // register Shader's metatable
-    luaopen_ShaderBuilder_metatable(L); // register ShaderBuilder's metatable
-    luaopen_lyte_api_functions(L); // register all lyte api functions
+    luaopen_lyte_api_functions(L);
+    luaopen_Image_metatable(L);
+    luaopen_Font_metatable(L);
+    luaopen_Music_metatable(L);
+    luaopen_Sound_metatable(L);
+    luaopen_Shader_metatable(L);
+    luaopen_ShaderBuilder_metatable(L);
     return 0;
 }
+
+// ---
+
+//---------------------------------------------------------------------------------------
+// EOF: This file is generated

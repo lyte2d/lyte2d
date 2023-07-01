@@ -124,24 +124,14 @@ host-website:
 ## codegen things
 gen: codegen-bootzip codegen-apidefs
 
-## currently used build target
-## should be one of the local-config-* or local-build-* (the star part)
-# LOCAL_TARGET=msvc-debug
-LOCAL_TARGET=msvc-minsizerel
+cfg:
+	cmd.exe /c cfg
 
-cfg: local-config-${LOCAL_TARGET}
-
-bld: local-build-${LOCAL_TARGET}
-	ls -al ./out/
-
-## for testing the build more generally
-dev: bld
-	rm \lua\l.exe
-	cp out/lyte.exe \lua/lyte.exe
-	ln -s \lua/lyte.exe \lua/l.exe
+dev:
+	cmd.exe /c dev
 
 po:
-	make dev && cp out\\lyte.exe out\\rel\\bin\\ && make pongout && out\\pongout\\bin\\pongout_win.exe
+	make dev && cp out/lyte.exe out/rel/bin/ && make pongout && out/pongout/bin/pongout_win.exe
 
 dn:
 	make -C defs_new

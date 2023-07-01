@@ -130,7 +130,7 @@ int lyte_load_music(const char *path, lyte_Music *mus) {
     return 0;
 }
 
-int lyte_cleanup_music(lyte_Music mus) {
+int lyte_Music_cleanup(lyte_Music mus) {
     MusicItem *musicitem = mus.ptr;
     if (musicitem == NULL) {
         return 0;
@@ -352,7 +352,7 @@ int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
     return 0;
 }
 
-int lyte_cleanup_sound(lyte_Sound sound) {
+int lyte_Sound_cleanup(lyte_Sound sound) {
     SoundItem *si = sound.ptr;
     if (si == NULL) {
         return 0;

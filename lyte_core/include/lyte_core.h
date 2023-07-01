@@ -208,7 +208,7 @@ int lyte_core_image_cleanup(void);
 
 int lyte_load_image(const char *path, lyte_Image *img);
 int lyte_new_canvas(int w, int h, lyte_Image *img);
-int lyte_cleanup_image(lyte_Image image);
+int lyte_Image_cleanup(lyte_Image image);
 
 int lyte_get_image_width(lyte_Image image, int *val);
 int lyte_get_image_height(lyte_Image image, int *val);
@@ -245,7 +245,7 @@ int lyte_set_mastervolume(double vol);
 
 // music
 int lyte_load_music(const char *path, lyte_Music *mus);
-int lyte_cleanup_music(lyte_Music mus);
+int lyte_Music_cleanup(lyte_Music mus);
 
 int lyte_play_music(lyte_Music mus);
 int lyte_pause_music(lyte_Music mus);
@@ -265,7 +265,7 @@ int lyte_seek_music(lyte_Music mus, double secs);
 // sound
 int lyte_load_sound(const char * sound_path, lyte_Sound *val);
 int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val);
-int lyte_cleanup_sound(lyte_Sound sound);
+int lyte_Sound_cleanup(lyte_Sound sound);
 
 int lyte_play_sound(lyte_Sound snd);
 int lyte_pause_sound(lyte_Sound snd);
@@ -287,7 +287,7 @@ int lyte_core_font_init(void);
 int lyte_core_font_cleanup(void);
 
 int lyte_load_font(const char * font_path, double size, lyte_Font *val);
-int lyte_cleanup_font(lyte_Font font);
+int lyte_Font_cleanup(lyte_Font font);
 
 int lyte_set_font(lyte_Font font);
 int lyte_draw_text(const char * text, int dest_x, int dest_y);
@@ -305,7 +305,7 @@ int lyte_core_shader_set_color(void);
 
 // ShaderBuilder
 int lyte_new_shaderbuilder(lyte_ShaderBuilder *val);
-int lyte_cleanup_shaderbuilder(lyte_ShaderBuilder shaderbuilder);
+int lyte_ShaderBuilder_cleanup(lyte_ShaderBuilder shaderbuilder);
 
 int lyte_shaderbuilder_uniform(lyte_ShaderBuilder shaderbuilder, const char * uniform_name, lyte_UniformType uniform_type);
 int lyte_shaderbuilder_vertex(lyte_ShaderBuilder shaderbuilder, const char * vertex_code);
@@ -313,11 +313,11 @@ int lyte_shaderbuilder_fragment(lyte_ShaderBuilder shaderbuilder, const char * f
 
 // Shader
 int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shader);
-int lyte_cleanup_shader(lyte_Shader shader);
+int lyte_Shader_cleanup(lyte_Shader shader);
 
 int lyte_set_shader(lyte_Shader shader);
 int lyte_reset_shader(void);
-int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value);
+int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value);
 int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name);
 
 

@@ -75,7 +75,7 @@ int lyte_new_shaderbuilder(lyte_ShaderBuilder *val) {
     return 0;
 }
 
-int lyte_cleanup_shaderbuilder(lyte_ShaderBuilder shaderbuilder) {
+int lyte_ShaderBuilder_cleanup(lyte_ShaderBuilder shaderbuilder) {
     ShaderBuilderItem *sbi = shaderbuilder.ptr;
     if (sbi) {
         free(sbi);
@@ -338,7 +338,7 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
     return 0;
 }
 
-int lyte_cleanup_shader(lyte_Shader shader) {
+int lyte_Shader_cleanup(lyte_Shader shader) {
     ShaderItem *shd =shader.ptr;
     if (shd) {
         free(shd->uniform_definitions);
@@ -383,8 +383,8 @@ int lyte_core_shader_set_color() {
     return 0;
 }
 
-int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value, int which_uniform_value) {
-    ShaderItem *shd =shader.ptr;
+int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value) {
+    ShaderItem *shd =shader.ptr;    
     if (!shd) {
         fprintf(stderr, "Shader not found.");
         return 1;
@@ -400,30 +400,30 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
         fprintf(stderr, "Unknown shader uniform: %s\n", uniform_name);
         return 2;
     }
-    switch (which_uniform_value) {
+    switch (uniform_value.which) {
         case 0: { // float/int
-            shd->uniform_floats[sud->location] = uniform_value.float_val;
+            shd->uniform_floats[sud->location] = uniform_value.options.float_val;
             memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
             sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
         case 1: { // vecX/ivecX. X = 2 or 3 or 4
-            if (uniform_value.float_list.count > sud->float_count) {
+            if (uniform_value.options.vec_val.count > sud->float_count) {
                 fprintf(stderr, "warning: too many uniform values sent\n");
-            } else  if (uniform_value.float_list.count > sud->float_count) {
+            } else  if (uniform_value.options.vec_val.count > sud->float_count) {
                 fprintf(stderr, "warning: not enough uniform values sent\n");
             }
-            int count = MAX(MIN(uniform_value.float_list.count, sud->float_count),4);
+            int count = MAX(MIN(uniform_value.options.vec_val.count, sud->float_count),4);
             for (int i=0; i<count; i++) {
-                shd->uniform_floats[sud->location+i] = uniform_value.float_list.values[i];
+                shd->uniform_floats[sud->location+i] = uniform_value.options.vec_val.data[i];
             }
             memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
             sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
         case 2: { // sampler2D
-            shd->images[sud->location] = uniform_value.image_val;
-            uint32_t img_id = *(uint32_t *)uniform_value.image_val.ptr; // **MAGIC_1** NOTE: uint32_t handle is the first item in ImageItem struct in core_image.c file this depens on that magic
+            shd->images[sud->location] = uniform_value.options.sampler2D_val;
+            uint32_t img_id = *(uint32_t *)uniform_value.options.sampler2D_val.ptr; // **MAGIC_1** NOTE: uint32_t handle is the first item in ImageItem struct in core_image.c file this depens on that magic
             sg_image sgimg = (sg_image){.id = img_id};
             sgp_set_image(sud->location, sgimg);
          }

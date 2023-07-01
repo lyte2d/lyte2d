@@ -272,7 +272,7 @@ local _def = {
     H = _cfg.window_height or 500,
     title = _cfg.window_title or "Lyte2D app",
     fullscreen = _cfg.fullscreen or false,
-    vsync = _cfg.window_vsync or true,
+    vsync = _cfg.window_vsync ~= false ,
     default_filtermode = "nearest",
     default_blendmode = "blend",
 }

@@ -4,279 +4,469 @@
 
 local M = {}
 
-local function _basetype(t)
-    return t
+do
+
+    local function _basetype(luatype, nativetype, typename)
+        return {
+            _kind = "_UNKNOWN_basetype_TBD_",
+            luatype = luatype or "_UNKNOWN_TBD_",  -- number, boolean, string, table, userdata ...
+            nativetype = nativetype or "_UNKNOWN_TBD_", -- int32_t, double, bool, const char *, enum, ...
+            typename = typename or "PRIMITIVE"
+        }
+    end
+
+
+
+    -- BASE TYPES
+    function M.String()
+        return _basetype("string", "const char *")
+    end
+
+    function M.Integer()
+        return _basetype("number", "int")
+    end
+
+    function M.Float()
+        return _basetype("number", "float")
+    end
+
+    function M.Number()
+        return _basetype("number", "double")
+    end
+
+    function M.Boolean()
+        return _basetype("boolean", "bool")
+    end
+
+    function M.Nil()
+        return _basetype("nil", "void")
+    end
+
+    -- use this to specify any named type (that you defined as a record or something)
+    function M.Defined(typename) -- Image, Font etc considered "Native"
+        return _basetype(nil, nil, typename)
+    end
+
 end
 
--- BASE TYPES
-function M.String()
-    return _basetype("string" )
+-- dicts have key and value types
+function M.Dict(name, key_type, value_type, _tags)
+    local ret = {}
+    ret._kind = "dict"
+    ret._tags = _tags
+    ret._name = name
+    ret.key_type = key_type
+    ret.value_type = value_type
+    return ret;
 end
 
-function M.Integer()
-    return _basetype("integer")
+
+-- lists have value type
+function M.List(name, value_type, _tags)
+    local ret = {}
+    ret._kind = "list"
+    ret._name = name
+    ret._tags = _tags
+    ret.value_type = value_type
+    return ret;
 end
 
-function M.Float()
-    return _basetype("float")
+
+-- tuples have value type, and a max count
+function M.Tuple(name, value_type, max_count, _tags)
+    local ret = {}
+    ret._kind = "tuple"
+    ret._name = name
+    ret._tags = _tags
+    ret.value_type = value_type
+    ret.max_count = max_count
+    return ret;
 end
 
-function M.Number()
-    return _basetype("number")
-end
 
-function M.Boolean()
-    return _basetype("boolean")
-end
 
-function M.Nil()
-    return _basetype("nil")
-end
-
--- use this to specify any named type (that you defined as a record or something)
-function M.Type(defined_name)
-    return _basetype(defined_name)
-end
 
 -- namespaces have items
-function M.Namespace(name, items, tags)
+-- note: namespaces can only be top level!
+function M.Namespace(name, items, _tags)
     assert(type(name) == "string")
     assert(type(items) == "table")
     local rec = {}
     rec._kind = "namespace"
-    rec._tags = tags
     rec._name = name
+    rec._tags = _tags
     rec.items = items
     return rec
 end
 
--- records have items
-function M.Record(name, items, tags)
+
+
+
+-- records have fields nad methods
+function M.Record(name, fields, methods, _tags)
     assert(type(name) == "string")
-    items = items or {}
-    assert(type(items) == "table")
+    fields = fields or {}
+    methods = methods or {}
+    assert(type(fields) == "table")
+    assert(type(methods) == "table")
     local rec = {}
     rec._kind = "record"
-    rec._tags = tags
     rec._name = name
-    rec.items = items
+    rec._tags = _tags
+    rec.fields = fields
+    rec.methods = methods
     return rec
 end
 
 -- Helper to define an Field for record or namespaces
 -- Namespace and Record types have named items
-function M.Field(name, itemdef, tags)
+function M.Field(name, itemdef, _tags)
     assert(type(name) == "string")
     local ret = {}
-    ret._tags = tags
-    ret._kind = "prop"
+    ret._kind = "field"
     ret._name = name
-    ret.value = itemdef
+    ret._tags = _tags
+    ret.value_type = itemdef
     return ret
 end
 
--- -- Helper to define an Field for record
--- -- Namespace and Record types have named items
--- function M.Field(name, itemdef, tags)
---     assert(type(name) == "string")
---     local ret = {}
---     ret._tags = tags
---     ret._name = name
---     ret.value = itemdef
---     return ret
--- end
 
--- oneofs have options (themselves types)
-function M.OneOf(name, options, tags)
+function M.Method(name, _tags)
+    assert(type(name) == "string")
+    local ret = {}
+    ret._kind = "method"
+    ret._name = name
+    ret._tags = _tags
+    return ret
+end
+
+
+
+-- variants have options (themselves types)
+function M.Variant(name, options, _tags)
     assert(type(options) == "table")
     local rec = {}
-    rec._kind = "oneof"
-    rec._tags = tags
+    rec._kind = "variant"
     rec._name = name
+    rec._tags = _tags
     rec.options = options
     return rec
 end
 
--- Helper to define an Option for OneOf types
-function M.Option(itemdef, tags)
+-- Helper to define an Option for Variant types
+function M.Option(name, itemdef, _tags)
     local ret = {}
     ret._kind = "option"
-    ret._tags = tags
-    ret.value = itemdef
+    ret._name = name
+    ret._tags = _tags
+    ret.value_type = itemdef
     return ret
 end
 
+
+
 -- enums have choices (which are strings)
-function M.Enum(name, choices, tags)
+function M.Enum(name, choices, _tags)
     assert(type(name) == "string", "name: " .. type(name))
     local ret = {}
     ret._kind = "enum"
-    ret._tags = tags
     ret._name = name
+    ret._tags = _tags
     ret.choices = choices
     return ret;
 end
 
--- dicts have key and value types
-function M.Dict(key, value, tags)
-    local ret = {}
-    ret._kind = "dict"
-    ret._tags = tags
-    ret.dict_key = key
-    ret.dict_value = value
-    return ret;
-end
 
--- lists have value type
-function M.List(value, tags)
-    local ret = {}
-    ret._kind = "list"
-    ret._tags = tags
-    ret.value = value
-    return ret;
-end
-
--- function helper for Function and Method calls
-local function _functionlike(kind, name, args, rets, tags)
+-- functions have arg and return types specified in arrays of arg or ret values
+function M.Function(name, args, rets, _tags)
     args = args or {}
     rets = rets or {}
-    local fun = {}
-    fun._kind = kind
-    fun._tags = tags
-    assert(type(name) == "string", "name: " .. type(name))
     assert(type(args) == "table")
     assert(type(rets) == "table")
-    fun._name = name
-    fun.args = args
-    fun.rets = rets
-    -- return def("t_function", tags, {})
-    return fun
-end
--- functions have arg and return types specified in arrays of arg or ret values
-function M.Function(name, args, rets, tags)
-    return _functionlike("function", name, args, rets, tags)
-end
-
-function M.Method(name, args, rets, tags)
-    return _functionlike("method", name, args, rets, tags)
+    assert(type(name) == "string", "name: " .. type(name))
+    local ret = {}
+    ret._kind = "function"
+    ret._name = name
+    ret._tags = _tags
+    ret.args = args
+    ret.rets = rets
+    return ret
 end
 
 -- helper to define function args
-function M.Arg(name, itemdef, tags)
+function M.Arg(name, itemdef, _tags)
     assert(type(name) == "string")
     local ret = {}
-    ret._tags = tags
+    ret._kind = "arg"
     ret._name = name
-    ret.value = itemdef
-    -- return def("fn_arg", tags, itemdef)
+    ret._tags = _tags
+    ret.value_type = itemdef
     return ret
 end
 
 -- helper to define function rets
-function M.Ret(name, itemdef, tags)
+function M.Ret(name, itemdef, _tags)
     local ret  = {}
-    ret._tags = tags
+    ret._kind = "ret"
     ret._name = name
-    ret.value = itemdef
+    ret._tags = _tags
+    ret.value_type = itemdef
     return ret
 end
 
--- ALIAS to have type aliases to Dict, Liet etc
-function M.Alias(name, val, tags)
-    assert(type(name) == "string")
+
+
+
+
+
+function M.process(ns)
     local ret = {}
-    ret._kind = "alias"
-    ret._tags = tags
-    ret._name = name
-    ret.alias_value = val
-    return ret;
-end
+    ret._name = ns._name
+    assert(ns._kind == "namespace", "top level should be a 'namespace' but is '" ..  ns._kind or "nil" .. "'")
 
--- traverse the defined tree with this funciton
-local function traverse(defs, PP, depth)
+    local items = ns.items
 
-    if type(defs) == "string" then
-        PP.Type(defs, "", depth)
-        return
+    ret.enums = {}
+    ret.records = {}
+    ret.variants = {}
+    ret.lists = {}
+    ret.tuples = {}
+    ret.dicts = {}
+    ret.functions = {}
+
+    -- name -> kind mapping
+    local defined_types = {}
+    -- name -> args * rets mapping
+    local function_args_rets = {}
+
+    -- identify defined types to help with filling in information below
+    -- also function name to argument/return info mappings
+    -- also add namespaced "nativename" field to each toplevel
+    for i=1,#items do
+        local item = items[i]
+        defined_types[item._name] = item._kind
+        if item._kind == "function" then
+            function_args_rets[item._name] = {
+                args = item.args,
+                rets = item.rets,
+            }
+        end
+        item._nativename = ns._name .. "_" .. item._name
+        if item._tags and item._tags.ctor then
+            item._nativename = item._nativename .. "_ctor"
+        end
+        if item._tags and item._tags.c_api_skip then
+            item._nativename = "_c_skip_" .. item._nativename
+        end
     end
 
-    local name = defs._name or ""
-    local value = defs.value
-
-        depth = depth or 0
-        assert(type(defs) == "table")
-        -- check if defs has "_kind" to ensure oneof is handled
-
-        if not value then
-            if     defs._kind == "namespace"
-                or defs._kind == "record"
-                or defs._kind == "function"
-                or defs._kind == "enum"
-                or defs._kind == "alias"
-                or defs._kind == "oneof"
-                or defs._kind == "method"
-                or defs._kind == "list"
-                or defs._kind == "dict"
-                then
-                    value = defs
-            else
-                error("Unknown value kind: '" .. defs._kind .. "'")
-            end
-        else
-            -- TODO: this will be an error
-        end
-
-    if type(value) == "string" then
-        PP.Type(value, name, depth)
-    elseif type(value) == "table" then
-
-        if (value._kind) then
-            local k = value._kind
-            local tags = value._tags or {}
-
-            -- namespace and records are special because they have named items themselves
-            if k == "namespace" then
-                local items = value.items
-                PP.NS(items, depth, name, tags, traverse)
-            elseif k == "record" then
-                local items = value.items
-                PP.Record(items, depth, name, tags, traverse)
-            elseif k == "function" then
-                local args = value.args
-                local rets = value.rets
-                PP.Function(args, rets, depth, name, tags, traverse)
-            elseif k == "enum" then
-                PP.Enum(value.choices, depth, name, tags, traverse)
-            elseif k == "alias" then
-                -- local val = value.value (Alias value is already correctly pointing to a type)
-                PP.Alias(value.alias_value, depth, name, tags, traverse)
-            elseif k == "oneof" then
-                local options = value.options
-                PP.OneOf(options, depth, name, tags, traverse)
-
-            elseif k == "method" then
-                local args = value.args
-                local rets = value.rets
-                PP.Method(args, rets, depth, name, tags, traverse)
-            elseif k == "dict" then
-                local dict_key = value.dict_key
-                local dict_value = value.dict_value
-                PP.Dict(dict_key, dict_value, depth, name, tags, traverse)
-            elseif k == "list" then
-                -- local list_value = value.list_value
-                PP.List(value, depth, name, tags, traverse)
-
-            else
-                error("Internal (25): Shouldn't happen.")
-            end
-        else
-            error("Internal (40): value is a table, but does not specify it's kind for name: " .. name)
-        end
-    else
-        error("Internal (50): Unknown value type: " .. type(value) .. " for name " .. (name or ""))
+    local function kind_to_nativetype(kind, typename)
+        if kind == "function" then return "C_UNKNOWN__fn"
+        elseif kind == "record" then return ret._name .. "_" .. typename
+        elseif kind == "variant" then return ret._name .. "_" .. typename
+        elseif kind == "enum" then return ret._name .. "_" .. typename
+        elseif kind == "list" then return ret._name .. "_" .. typename
+        elseif kind == "tuple" then return ret._name .. "_" .. typename
+        elseif kind == "dict" then return ret._name .. "_" .. typename
+        else error("Unknown kind: " .. kind) end
     end
+
+    local function kind_to_luatype(kind)
+        if kind == "function" then return "function"
+        elseif kind == "record" then return "userdata"
+        elseif kind == "variant" then return "__UNKNOWN_one_of_" .. ret._name .. "__"
+        elseif kind == "enum" then return "string"
+        elseif kind == "list" then return "table"
+        elseif kind == "tuple" then return "table"
+        elseif kind == "dict" then return "table"
+        else error("Unknown kind" .. kind) end
+    end
+
+    local function kind_to_lua_metatable(kind, typename)
+        if kind == "record" then
+            return ret._name .. "." .. typename
+        end
+        return nil
+    end
+
+    -- enums
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "enum" then
+            table.insert(ret.enums, item)
+        end
+    end
+
+
+    -- records
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "record" then
+            for j=1,#item.fields do
+                local field = item.fields[j]
+                -- field
+                if field.value_type.typename ~= "PRIMITIVE" then
+                    local kind = defined_types[field.value_type.typename]
+                    field.value_type.luatype = kind_to_luatype(kind)
+                    field.value_type.nativetype = kind_to_nativetype(kind, field.value_type.typename)
+                    field.value_type.metatable = kind_to_lua_metatable(kind, field.value_type.typename)
+                    field.value_type._kind = kind
+                else
+                    field.value_type._kind = "primitive"
+                    field.value_type.typename = nil
+                end
+            end
+
+            -- arg and ret info for this method, from the mapped function
+            for j=1,#item.methods do
+                local method = item.methods[j]
+                local mapped_fn = function_args_rets[method._tags.map_to]
+                if mapped_fn then
+                    method.args = mapped_fn.args
+                    method.rets = mapped_fn.rets
+                else
+                    error("No fn mapping found for the method: " .. method._name .. " from record: " .. item._name)
+                    method.args = "_UNKNOWN_METHOD_ARGS"
+                    method.rets = "_UNKNOWN_METHOD_RETS"
+                end
+            end
+
+            table.insert(ret.records, item)
+        end
+    end
+
+    -- variants
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "variant" then
+            for j=1,#item.options do
+                local opt = item.options[j]
+                -- opt
+                if opt.value_type.typename ~= "PRIMITIVE" then
+                    local kind = defined_types[opt.value_type.typename]
+                    opt.value_type.luatype = kind_to_luatype(kind)
+                    opt.value_type.nativetype = kind_to_nativetype(kind, opt.value_type.typename)
+                    opt.value_type.metatable = kind_to_lua_metatable(kind, opt.value_type.typename)
+                    opt.value_type._kind = kind
+                else
+                    opt.value_type._kind = "primitive"
+                    opt.value_type.typename = nil
+
+                end
+            end
+            table.insert(ret.variants, item)
+        end
+    end
+
+
+    -- lists
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "list" then
+            -- list key
+            if item.value_type.typename ~= "PRIMITIVE" then
+                local kind = defined_types[item.value_type.typename]
+                item.value_type.luatype = kind_to_luatype(kind)
+                item.value_type.nativetype = kind_to_nativetype(kind, item.value_type.typename)
+                item.value_type.metatable = kind_to_lua_metatable(kind, item.value_type.typename)
+                item.value_type._kind = kind
+            else
+                item.value_type._kind = "primitive"
+                item.value_type.typename = nil
+            end
+            table.insert(ret.lists, item)
+        end
+    end
+
+    -- tuples
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "tuple" then
+            -- list key
+            if item.value_type.typename ~= "PRIMITIVE" then
+                local kind = defined_types[item.value_type.typename]
+                item.value_type.luatype = kind_to_luatype(kind)
+                item.value_type.nativetype = kind_to_nativetype(kind, item.value_type.typename)
+                item.value_type.metatable = kind_to_lua_metatable(kind, item.value_type.typename)
+                item.value_type._kind = kind
+            else
+                item.value_type._kind = "primitive"
+                item.value_type.typename = nil
+            end
+            table.insert(ret.tuples, item)
+        end
+    end
+
+    -- dicts
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "dict" then
+            -- dict key
+            if item.key_type.typename ~= "PRIMITIVE" then
+                local kind = defined_types[item.key_type.typename]
+                item.key_type.luatype = kind_to_luatype(kind)
+                item.key_type.nativetype = kind_to_nativetype(kind, item.key_type.typename)
+                item.key_type.metatable = kind_to_lua_metatable(kind, item.key_type.typename)
+                item.key_type._kind = kind
+            else
+                item.key_type._kind = "primitive"
+                item.key_type.typename = nil
+            end
+            -- dict val
+            if item.value_type.typename ~= "PRIMITIVE" then
+                local kind = defined_types[item.value_type.typename]
+                item.value_type.luatype = kind_to_luatype(kind)
+                item.value_type.nativetype = kind_to_nativetype(kind, item.value_type.typename)
+                item.value_type.metatable = kind_to_lua_metatable(kind, item.value_type.typename)
+                item.value_type._kind = kind
+            else
+                item.value_type._kind = "primitive"
+                item.value_type.typename = nil
+            end
+            table.insert(ret.dicts, item)
+        end
+    end
+
+    -- functions
+    for i=1,#items do
+        local item = items[i]
+        if item._kind == "function" then
+            for j=1,#item.args do
+                local arg = item.args[j]
+                -- arg
+                if arg.value_type.typename ~= "PRIMITIVE" then
+                    local kind = defined_types[arg.value_type.typename]
+                    arg.value_type.luatype = kind_to_luatype(kind)
+                    arg.value_type.nativetype = kind_to_nativetype(kind, arg.value_type.typename)
+                    arg.value_type.metatable = kind_to_lua_metatable(kind, arg.value_type.typename)
+                    arg.value_type._kind = kind;
+                else
+                    arg.value_type._kind = "primitive"
+                    arg.value_type.typename = nil
+                end
+            end
+            for j=1,#item.rets do
+                local ret = item.rets[j]
+                -- ret
+                if ret.value_type.typename ~= "PRIMITIVE" then
+                    local kind = defined_types[ret.value_type.typename]
+                    ret.value_type.luatype = kind_to_luatype(kind)
+                    ret.value_type.nativetype = kind_to_nativetype(kind, ret.value_type.typename)
+                    ret.value_type.metatable = kind_to_lua_metatable(kind, ret.value_type.typename)
+                    ret.value_type._kind = kind
+                else
+                    ret.value_type._kind = "primitive"
+                    ret.value_type.typename = nil
+                end
+            end
+
+            table.insert(ret.functions, item)
+        end
+    end
+
+
+    return ret
 end
 
-M.traverse = traverse
 
 return M

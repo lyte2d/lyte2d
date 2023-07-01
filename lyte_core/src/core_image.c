@@ -132,7 +132,7 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
     return 0;
 }
 
-int lyte_cleanup_image(lyte_Image image) {
+int lyte_Image_cleanup(lyte_Image image) {
     ImageItem *imageitem = image.ptr;
     if (!imageitem) {
         return 0;

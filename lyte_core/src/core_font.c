@@ -219,7 +219,7 @@ int lyte_load_font(const char * path, double size, lyte_Font *val) {
     return 0;
 }
 
-int lyte_cleanup_font(lyte_Font font) {
+int lyte_Font_cleanup(lyte_Font font) {
     FontItem *fontitem = font.ptr;
 
     if (fontitem == NULL) {

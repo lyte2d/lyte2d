@@ -1,15 +1,29 @@
-do-c:
-	lua lib/defs_to_c.lua
+.PHONY: do-lua do-fnl do-ts do-tl do-c output-dir  all
 
-do-txt:
-	lua lib/defs_to_tree.lua > output/_lyte_api.txt
+default: all
 
-do-ts:
-	lua lib/defs_to_typescript.lua > output/_lyte_api.d.ts
+#all: output-dir do-c do-tldo-ts do-lua do-fnl
+
+all: output-dir do-c do-tl do-ts do-lua
 
 do-lua:
 	lua lib/defs_to_inspectoutput.lua > output/_lyte_api.lua
 
-all: do-lua  do-txt do-ts do-c
+do-fnl:
+	# (fennel lib/defs_to_fenneloutput.fnl) | tail -n +3 | cat > output/_lyte_api.fnl
+	(fennel lib/defs_to_fenneloutput.fnl) | cat > output/_lyte_api.fnl
 
-.PHONY: all do-ts do-lua do-c do-txt
+do-ts:
+	lua lib/defs_to_typescript.lua > output/lyte.d.ts
+
+do-tl:
+	lua lib/defs_to_teal.lua > output/lyte.d.tl
+
+do-c:
+	lua lib/defs_to_c.lua
+
+output-dir:
+	mkdir -p output
+
+
+
