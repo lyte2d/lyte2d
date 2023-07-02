@@ -471,6 +471,14 @@ static int api_get_text_height(lua_State *L) {
     lua_pushinteger(L, val);
     return 1; // number of return values
 }
+// set_window_resizable: [ boolean -- ]
+static int api_set_window_resizable(lua_State *L) {
+    (void)L;
+    bool resizable = lua_toboolean(L, 1);
+    int _err = _set_window_resizable(resizable);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
 // set_window_minsize: [ number  number -- ]
 static int api_set_window_minsize(lua_State *L) {
     (void)L;
@@ -506,6 +514,15 @@ static int api_get_window_height(lua_State *L) {
     (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushinteger(L, val);
     return 1; // number of return values
+}
+// set_window_position: [ number  number -- ]
+static int api_set_window_position(lua_State *L) {
+    (void)L;
+    int x = luaL_checkinteger(L, 1);
+    int y = luaL_checkinteger(L, 2);
+    int _err = _set_window_position(x, y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
 // set_fullscreen: [ boolean -- ]
 static int api_set_fullscreen(lua_State *L) {
@@ -1701,10 +1718,12 @@ static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"draw_text", api_draw_text},
     {"get_text_width", api_get_text_width},
     {"get_text_height", api_get_text_height},
+    {"set_window_resizable", api_set_window_resizable},
     {"set_window_minsize", api_set_window_minsize},
     {"set_window_size", api_set_window_size},
     {"get_window_width", api_get_window_width},
     {"get_window_height", api_get_window_height},
+    {"set_window_position", api_set_window_position},
     {"set_fullscreen", api_set_fullscreen},
     {"is_fullscreen", api_is_fullscreen},
     {"set_window_title", api_set_window_title},

@@ -35,15 +35,15 @@ static inline void _tick_function(void) {
 
     int win_w, win_h;
 
-    float RECT_DELT_L = lytecore_state.window_paddings.left;
-    float RECT_DELT_R = lytecore_state.window_paddings.right;
-    float RECT_DELT_T = lytecore_state.window_paddings.top;
-    float RECT_DELT_B = lytecore_state.window_paddings.bottom;
+    float PL = lytecore_state.window_paddings.left;
+    float PR = lytecore_state.window_paddings.right;
+    float PT = lytecore_state.window_paddings.top;
+    float PB = lytecore_state.window_paddings.bottom;
 
-    float EMPTY_L = lytecore_state.window_margins.left;
-    float EMPTY_R = lytecore_state.window_margins.right;
-    float EMPTY_T = lytecore_state.window_margins.top;
-    float EMPTY_B = lytecore_state.window_margins.bottom;
+    float ML = lytecore_state.window_margins.left;
+    float MR = lytecore_state.window_margins.right;
+    float MT = lytecore_state.window_margins.top;
+    float MB = lytecore_state.window_margins.bottom;
 
 #if defined(__EMSCRIPTEN__)
     win_w = emsc_width();
@@ -52,8 +52,8 @@ static inline void _tick_function(void) {
         glfwGetFramebufferSize(lytecore_state.window, &win_w, &win_h);
 #endif
 
-    int fwidth = win_w - RECT_DELT_L - RECT_DELT_R;
-    int fheight = win_h - RECT_DELT_T - RECT_DELT_B; // BUGG?
+    int fwidth = win_w - PL - PR;
+    int fheight = win_h - PT - PB; // BUGG?
     lytecore_state.window_size.width = win_w;
     lytecore_state.window_size.height = win_h;
     bool resized = false;
@@ -63,8 +63,8 @@ static inline void _tick_function(void) {
 
     sgp_begin(win_w, win_h);
 
-    sgp_viewport(EMPTY_L, EMPTY_T, win_w-EMPTY_L-EMPTY_R, win_h-EMPTY_T-EMPTY_B);
-    sgp_project(-RECT_DELT_L, fwidth+RECT_DELT_R, -RECT_DELT_T, fheight+RECT_DELT_B);
+    sgp_viewport(ML, MT, win_w-ML-MR, win_h-MT-MB);
+    sgp_project(-PL, fwidth+PR, -PT, fheight+PB);
     lyte_set_blendmode(lytecore_state.blendmode);
 
 

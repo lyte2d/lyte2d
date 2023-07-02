@@ -190,6 +190,11 @@ local lyte_namespace = Namespace("lyte", {
     }, {
         Ret("val", Integer()),
     }, {d="Get the height of the given text line."}),
+    
+    Function("set_window_resizable", {
+        Arg("resizable", Boolean()),
+    }, nil, {d=[[ Set the window resizable flag to the given value. 
+                  Must be set before the window is opened.]]}),
 
     Function("set_window_minsize", {
         Arg("width", Integer()),
@@ -208,6 +213,11 @@ local lyte_namespace = Namespace("lyte", {
     Function("get_window_height", nil, {
         Ret("val", Integer()),
     }, {d="Get the height of the window."}),
+
+    Function("set_window_position", {
+        Arg("x", Integer()),
+        Arg("y", Integer()),
+    }, nil, {d="Set the window's position."}),
 
     Function("set_fullscreen", {
         Arg("fullscreen", Boolean()),

@@ -166,6 +166,12 @@ static inline int _get_text_height(const char * text, int *val) {
     _err = lyte_get_text_height(text, val);
     return _err;
 }
+static inline int _set_window_resizable(bool resizable) {
+    (void)resizable;
+    int _err = 0;
+    _err = lyte_set_window_resizable(resizable);
+    return _err;
+}
 static inline int _set_window_minsize(int width, int height) {
     (void)width;(void)height;
     int _err = 0;
@@ -188,6 +194,12 @@ static inline int _get_window_height(int *val) {
     (void)val;
     int _err = 0;
     _err = lyte_get_window_height(val);
+    return _err;
+}
+static inline int _set_window_position(int x, int y) {
+    (void)x;(void)y;
+    int _err = 0;
+    _err = lyte_set_window_position(x, y);
     return _err;
 }
 static inline int _set_fullscreen(bool fullscreen) {

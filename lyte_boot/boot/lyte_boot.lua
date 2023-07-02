@@ -273,8 +273,9 @@ local _def = {
     title = _cfg.window_title or "Lyte2D app",
     fullscreen = _cfg.fullscreen or false,
     vsync = _cfg.window_vsync ~= false ,
-    default_filtermode = "nearest",
-    default_blendmode = "blend",
+    resizable = _cfg.window_resizable ~= false,
+    default_filtermode = _cfg.default_filtermode or "nearest",
+    default_blendmode = _cfg.default_blendmode or "blend",
 }
 
 -- hidden feature: config.lua can set this
@@ -282,7 +283,9 @@ if not lyte.tick_loading then
     lyte.tick_loading = tick_loading
 end
 
-
+-- before window opens
+lyte.set_window_resizable(_def.resizable)
+-- window opens below
 lyte.set_window_size(_def.W, _def.H)
 lyte.set_window_title(_def.title)
 lyte.set_window_vsync(_def.vsync)

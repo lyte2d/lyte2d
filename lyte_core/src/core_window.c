@@ -17,8 +17,10 @@
 #include "stb_image.h" // icon
 
 static bool _window_inited = false;
+static bool _window_resizable = true;
 
 int lyte_core_window_init(void) {
+
 #if defined(__EMSCRIPTEN__)
     emsc_init("#canvas", EMSC_TRY_WEBGL2);
 #endif
@@ -41,6 +43,11 @@ int lyte_core_window_init(void) {
     lytecore_state.window = glfwCreateWindow(emsc_width(), emsc_height(), lytecore_state.window_title, NULL, NULL);
     emscripten_set_window_title(lytecore_state.window_title);
 #else
+    // start the window hidden so that it can be carried to the center
+    glfwWindowHint(GLFW_VISIBLE, 0); // start invisible
+    if (!_window_resizable) {
+        glfwWindowHint(GLFW_RESIZABLE, _window_resizable);
+    }
     lytecore_state.window = glfwCreateWindow(lytecore_state.window_size.width, lytecore_state.window_size.height, lytecore_state.window_title, NULL, NULL);
 #endif
 
@@ -52,13 +59,16 @@ int lyte_core_window_init(void) {
     // make the window current for opengl
     glfwMakeContextCurrent(lytecore_state.window);
 
+    GLFWvidmode *mode = NULL;
+
     lytecore_state.monitor = glfwGetWindowMonitor(lytecore_state.window);
     if (!lytecore_state.monitor) {
         // this is expected
         GLFWmonitor* primary = glfwGetPrimaryMonitor();
         lytecore_state.monitor = primary;
 
-        const GLFWvidmode *mode = glfwGetVideoMode(primary);
+        mode = (GLFWvidmode *)glfwGetVideoMode(primary);
+        
         lytecore_state.mode = (void *)mode;
     }
 
@@ -83,6 +93,15 @@ int lyte_core_window_init(void) {
         return -4;
     }
 
+#if !defined(__EMSCRIPTEN__)
+    // move to the center
+    int w = mode->width / 2 - lytecore_state.window_size.width / 2;
+    int h = mode->height / 2 - lytecore_state.window_size.height / 2;
+    glfwSetWindowPos(lytecore_state.window, w, h); 
+    // show window
+    glfwShowWindow(lytecore_state.window);
+#endif
+
     // NOTE: Input code and window are tighyly integrated. We need to initialize this here
     lyte_core_input_init();
 
@@ -97,6 +116,15 @@ int lyte_core_window_cleanup(void) {
     sgp_shutdown();
     sg_shutdown();
     glfwTerminate();
+    return 0;
+}
+
+int lyte_set_window_resizable(bool resizable) {
+    if (lytecore_state.window) {
+        fprintf(stderr, "Resizable flag can only be set before the window is opened\n");
+        return -1;
+    }
+    _window_resizable = resizable;
     return 0;
 }
 
@@ -160,6 +188,15 @@ int lyte_get_window_height(int *val) {
     *val = h;
     lytecore_state.window_size.width = w;
     lytecore_state.window_size.height = h;
+    return 0;
+}
+
+int lyte_set_window_position(int x, int y) {
+#if !defined(__EMSCRIPTEN__)
+    if (lytecore_state.window) {
+        glfwSetWindowPos(lytecore_state.window, x, y);
+    }
+#endif
     return 0;
 }
 

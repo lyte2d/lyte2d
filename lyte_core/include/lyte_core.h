@@ -131,10 +131,12 @@ int lyte_scale_at(int scale_x, int scale_y, double x, double y);
 int lyte_core_window_init(void);
 int lyte_core_window_cleanup(void);
 
+int lyte_set_window_resizable(bool resizable);
 int lyte_set_window_minsize(int width, int height);
 int lyte_set_window_size(int width, int height);
 int lyte_get_window_width(int *val);
 int lyte_get_window_height(int *val);
+int lyte_set_window_position(int x, int y);
 int lyte_set_fullscreen(bool fullscreen);
 int lyte_is_fullscreen(bool *val);
 int lyte_set_window_title(const char * title);

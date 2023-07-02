@@ -17,6 +17,7 @@ return {
     window_title = "pong-out :)",
     fulscreen = false,
     window_vsync = true,
+    window_resizable = false,
     default_filtermode = "nearest", -- linear
     default_blendmode = "blend",
   }

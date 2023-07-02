@@ -260,7 +260,8 @@ int lyte_draw_text(const char * text, int dest_x, int dest_y) {
     fonsSetSize(ctx, fontsize);
     fonsVertMetrics(ctx, NULL, NULL, &fontheight);
     fonsSetBlur(ctx, 0);
-    double last_x = fonsDrawText(ctx, dest_x, dest_y + (fontheight*2.0/3.0), text,  NULL);
+    // double last_x = fonsDrawText(ctx, dest_x, dest_y + (fontheight*2.0/3.0), text,  NULL);
+    double last_x = fonsDrawText(ctx, dest_x, dest_y + fontheight, text,  NULL);
 
     return 0;
 }
