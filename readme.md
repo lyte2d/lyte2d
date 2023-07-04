@@ -12,13 +12,17 @@ Lyte2D website: https://simple-bits.com/lyte
 - Documentation: [/documents](/documents)
 - Example code: [/examples](/examples)
 
+### How to build
+
+- TBD
+
 ### License
 
 This project is licensed under the terms of the MIT license. See [/LICENSE.md](/LICENSE.md) file for details.
 
 Lyte2D depends on other software which have various licenses:
 
-- [/documents/licenses.txt](/docs/licenses.txt) file for all the licenses in one file, or
+- [/documents/licenses.txt](/documents/licenses.txt) file for all the licenses in one file, or
 - [/dependencies](/dependencies) directory for all dependencies and their respective licenses.
 
 

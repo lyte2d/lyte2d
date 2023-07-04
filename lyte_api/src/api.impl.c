@@ -21,9 +21,8 @@
 
 // implementation specific includes here:
 
-#include "lyte_api.h"
 #include "lyte_core.h"
-#include "lyte_physics.h"
+/* #include "lyte_physics.h" */
 
 static inline int _quit(void) {
     int _err = 0;
@@ -673,7 +672,7 @@ static inline int _shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Sh
 static inline int _set_physics_engine(lyte_PhysicsState state) {
     (void)state;
     int _err = 0;
-    _err = lyte_set_physics_engine(state);
+    /* _err = lyte_set_physics_engine(state); */
     return _err;
 }
 static inline int _cleanup_lyte_Image(lyte_Image *image) {

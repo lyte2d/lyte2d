@@ -3,10 +3,10 @@ cmake_policy(SET CMP0091 NEW)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if( WIN_GUI )
     # project(lyte_gui C)
-    project(lyte_gui  LANGUAGES C CXX)
+    project(lyte_gui  LANGUAGES C )
 else()
     # project(lyte C)
-    project(lyte  LANGUAGES C CXX)
+    project(lyte  LANGUAGES C )
 endif()
 
 
@@ -18,8 +18,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED true)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_executable(${PROJECT_NAME})
 
@@ -58,7 +58,7 @@ else()
     # set(CMAKE_C_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++ -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
     # set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -static-libstdc++ -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
     #set(CMAKE_CXX_STANDARD_LIBRARIES "-static-libgcc -lwsock32 -lws2_32 ${CMAKE_CXX_STANDARD_LIBRARIES}")
-    set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -static-libgcc") #-lws2_32 -lwsock32")
+    # set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -static-libgcc") #-lws2_32 -lwsock32")
 
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic,--whole-archive -lwinpthread -Wl,--no-whole-archive")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-Bstatic")
@@ -90,13 +90,13 @@ endif()
 
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_physics ${CMAKE_CURRENT_BINARY_DIR}/lyte_physics)
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_physics ${CMAKE_CURRENT_BINARY_DIR}/lyte_physics)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     lyte_core
-    lyte_physics
+    #    lyte_physics
     lua51-static
     isocline
 )
