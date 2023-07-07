@@ -131,6 +131,11 @@ int lyte_scale_at(int scale_x, int scale_y, double x, double y);
 int lyte_core_window_init(void);
 int lyte_core_window_cleanup(void);
 
+int lyte_get_monitor_count(int *val);
+int lyte_get_monitor_name(int index, const char * *val);
+int lyte_get_monitor_width(int index, int *val);
+int lyte_get_monitor_height(int index, int *val);
+int lyte_set_window_monitor(int index);
 int lyte_set_window_resizable(bool resizable);
 int lyte_set_window_minsize(int width, int height);
 int lyte_set_window_size(int width, int height);

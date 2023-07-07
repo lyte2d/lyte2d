@@ -21,8 +21,8 @@
 
 // implementation specific includes here:
 
+
 #include "lyte_core.h"
-/* #include "lyte_physics.h" */
 
 static inline int _quit(void) {
     int _err = 0;
@@ -163,6 +163,36 @@ static inline int _get_text_height(const char * text, int *val) {
     (void)text;(void)val;
     int _err = 0;
     _err = lyte_get_text_height(text, val);
+    return _err;
+}
+static inline int _get_monitor_count(int *val) {
+    (void)val;
+    int _err = 0;
+    _err = lyte_get_monitor_count(val);
+    return _err;
+}
+static inline int _get_monitor_name(int index, const char * *val) {
+    (void)index;(void)val;
+    int _err = 0;
+    _err = lyte_get_monitor_name(index, val);
+    return _err;
+}
+static inline int _get_monitor_width(int index, int *val) {
+    (void)index;(void)val;
+    int _err = 0;
+    _err = lyte_get_monitor_width(index, val);
+    return _err;
+}
+static inline int _get_monitor_height(int index, int *val) {
+    (void)index;(void)val;
+    int _err = 0;
+    _err = lyte_get_monitor_height(index, val);
+    return _err;
+}
+static inline int _set_window_monitor(int index) {
+    (void)index;
+    int _err = 0;
+    _err = lyte_set_window_monitor(index);
     return _err;
 }
 static inline int _set_window_resizable(bool resizable) {
@@ -672,7 +702,7 @@ static inline int _shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Sh
 static inline int _set_physics_engine(lyte_PhysicsState state) {
     (void)state;
     int _err = 0;
-    /* _err = lyte_set_physics_engine(state); */
+    // _err = lyte_set_physics_engine(state);
     return _err;
 }
 static inline int _cleanup_lyte_Image(lyte_Image *image) {

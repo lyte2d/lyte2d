@@ -27,10 +27,17 @@ global record lyte
     draw_text: function(text: string, dest_x: number, dest_y: number)
     get_text_width: function(text: string): number
     get_text_height: function(text: string): number
+    get_monitor_count: function(): number
+    get_monitor_name: function(index: number): string
+    get_monitor_width: function(index: number): number
+    get_monitor_height: function(index: number): number
+    set_window_monitor: function(index: number)
+    set_window_resizable: function(resizable: boolean)
     set_window_minsize: function(width: number, height: number)
     set_window_size: function(width: number, height: number)
     get_window_width: function(): number
     get_window_height: function(): number
+    set_window_position: function(x: number, y: number)
     set_fullscreen: function(fullscreen: boolean)
     is_fullscreen: function(): boolean
     set_window_title: function(title: string)
@@ -113,20 +120,24 @@ global record lyte
     shaderbuilder_build: function(shaderbuilder: ShaderBuilder): Shader
     set_physics_engine: function(state: PhysicsState)
     -- lists
+    -- tuples
     type FloatVec4 = {number}
     -- dicts
     type UniformNamesToTypes = {string: UniformType}
-    -- oneofs
-    type ShaderUniformValue = any -- note: teal doesn't allow this: number | FloatVec4 | Image
+    -- variants
+    type ShaderUniformValue = number | FloatVec4 | Image
     -- records
     record Image
+        userdata
         width: number
         height: number
         is_canvas: boolean
     end
     record Font
+        userdata
     end
     record Music
+        userdata
         playing: boolean
         length: number
         length_played: number
@@ -140,6 +151,7 @@ global record lyte
         seek: function (music: Music, secs: number)
     end
     record Sound
+        userdata
         pan: number
         pitch: number
         volume: number
@@ -150,15 +162,18 @@ global record lyte
         stop: function (sound: Sound)
     end
     record Shader
+        userdata
         set: function (shader: Shader, uniform_name: string, uniform_value: ShaderUniformValue)
         reset: function (shader: Shader, uniform_name: string)
     end
     record ShaderDef
+        userdata
         frag: string
         vert: string
         uniforms: UniformNamesToTypes
     end
     record ShaderBuilder
+        userdata
         uniform: function (shaderbuilder: ShaderBuilder, uniform_name: string, uniform_type: UniformType)
         vertex: function (shaderbuilder: ShaderBuilder, vertex_code: string)
         fragment: function (shaderbuilder: ShaderBuilder, fragment_code: string)

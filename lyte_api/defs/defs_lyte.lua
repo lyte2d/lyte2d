@@ -190,11 +190,38 @@ local lyte_namespace = Namespace("lyte", {
     }, {
         Ret("val", Integer()),
     }, {d="Get the height of the given text line."}),
+
+    Function("get_monitor_count", nil, {
+        Ret("val", Integer()),
+    }, {d="Get the number of currently connected monitors."}),
     
+    Function("get_monitor_name", {
+        Arg("index", Integer()),
+    }, {
+        Ret("val", String()),
+    }, {d="Get the name of the monitor at the index"}),
+    
+    Function("get_monitor_width", {
+        Arg("index", Integer()),
+    }, {
+        Ret("val", Integer()),
+    }, {d="Get the width of the monitor at the index"}),
+
+    Function("get_monitor_height", {
+        Arg("index", Integer()),
+    }, {
+        Ret("val", Integer()),
+    }, {d="Get the height of the monitor at the index"}),
+    
+    Function("set_window_monitor", {
+        Arg("index", Integer()),
+    }, nil, {d=[[ Set the window's initial monitor to the indexed value.
+ Must be set before the window is opened.]]}),
+
     Function("set_window_resizable", {
         Arg("resizable", Boolean()),
-    }, nil, {d=[[ Set the window resizable flag to the given value. 
-                  Must be set before the window is opened.]]}),
+    }, nil, {d=[[ Set the window resizable flag to the given value.
+ Must be set before the window is opened.]]}),
 
     Function("set_window_minsize", {
         Arg("width", Integer()),

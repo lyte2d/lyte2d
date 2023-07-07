@@ -41,14 +41,14 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     if (file == NULL) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
-        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        fprintf(stderr, "\nFile '%s': '%s'\n", path, errstr);
         return errcode;
     }
     size_t len = PHYSFS_fileLength(file);
     uint8_t *buf = malloc(len);
     size_t read_len = PHYSFS_readBytes(file, buf, len);
     if (len != read_len) {
-        fprintf(stderr, "File not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
+        fprintf(stderr, "\nFile not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
         return 1;
     }
     int width;
@@ -56,7 +56,7 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     int channels;
     uint8_t *data = stbi_load_from_memory(buf, read_len, &width, &height, &channels, 4);
     if (!data) {
-        fprintf(stderr, "Image file failed to load: %s\n", path);
+        fprintf(stderr, "\nImage file failed to load: %s\n", path);
         return 2;
     }
     sg_image_desc image_desc = {0};
@@ -227,8 +227,8 @@ int lyte_set_canvas(lyte_Image image) {
     sgp_scale(1.0, -1.0);
     sgp_translate(0, -imageitem->height);
     sgp_push_transform();
-    
-    lyte_set_blendmode(lytecore_state.blendmode); 
+
+    lyte_set_blendmode(lytecore_state.blendmode);
 
     current_canvas = imageitem;
     return 0;

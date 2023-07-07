@@ -179,14 +179,14 @@ int lyte_load_font(const char * path, double size, lyte_Font *val) {
     if (file == NULL) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
-        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        fprintf(stderr, "\nFile '%s': '%s'\n", path, errstr);
         return errcode;
     }
     size_t len = PHYSFS_fileLength(file);
     uint8_t *buf = malloc(len);
     size_t read_len = PHYSFS_readBytes(file, buf, len);
     if (len != read_len) {
-        fprintf(stderr, "File not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
+        fprintf(stderr, "\nFile not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
         return 1;
     }
 

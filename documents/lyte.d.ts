@@ -13,8 +13,7 @@ declare namespace lyte {
     function draw_circle_line(dest_x: number, dest_y: number, radius: number): void
     function load_image(image_path: string): Image
     function draw_image(image: Image, dest_x: number, dest_y: number): void
-    function draw_image_rect(image: Image, dest_x: number, dest_y: number,
-        src_x: number, src_y: number, rect_width: number, rect_height: number): void
+    function draw_image_rect(image: Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number): void
     function get_image_width(image: Image): number
     function get_image_height(image: Image): number
     function new_canvas(width: number, height: number): Image
@@ -27,10 +26,17 @@ declare namespace lyte {
     function draw_text(text: string, dest_x: number, dest_y: number): void
     function get_text_width(text: string): number
     function get_text_height(text: string): number
+    function get_monitor_count(): number
+    function get_monitor_name(index: number): string
+    function get_monitor_width(index: number): number
+    function get_monitor_height(index: number): number
+    function set_window_monitor(index: number): void
+    function set_window_resizable(resizable: boolean): void
     function set_window_minsize(width: number, height: number): void
     function set_window_size(width: number, height: number): void
     function get_window_width(): number
     function get_window_height(): number
+    function set_window_position(x: number, y: number): void
     function set_fullscreen(fullscreen: boolean): void
     function is_fullscreen(): boolean
     function set_window_title(title: string): void
@@ -113,10 +119,11 @@ declare namespace lyte {
     function shaderbuilder_build(shaderbuilder: ShaderBuilder): Shader
     function set_physics_engine(state: PhysicsState): void
     // lists
+    // tuples
     type FloatVec4 = number[]
     // dicts
     type UniformNamesToTypes = {[key: string]: UniformType}
-    // oneofs
+    // variants
     type ShaderUniformValue = number | FloatVec4 | Image
     // records
     type Image = {
@@ -165,21 +172,21 @@ declare namespace lyte {
         build: (shaderbuilder: ShaderBuilder) => Shader
     }
     // enums
-    type UniformType =
+    type UniformType = 
         "_invalid" | "float" | "vec2" | "vec3" | "vec4" | "int" | "ivec2" | "ivec3" | "ivec4" | "mat4" |
-        "sampler2D"
-    type BlendMode =
-        "none" | "blend" | "add" | "mod" | "mul"
-    type FilterMode =
-        "_invalid" | "nearest" | "linear"
-    type GamepadAxis =
-        "left_x" | "left_y" | "right_x" | "right_y" | "left_trigger" | "right_trigger"
-    type GamepadButton =
+        "sampler2D" 
+    type BlendMode = 
+        "none" | "blend" | "add" | "mod" | "mul" 
+    type FilterMode = 
+        "_invalid" | "nearest" | "linear" 
+    type GamepadAxis = 
+        "left_x" | "left_y" | "right_x" | "right_y" | "left_trigger" | "right_trigger" 
+    type GamepadButton = 
         "pad_a" | "pad_b" | "pad_x" | "pad_y" | "left_bumper" | "right_bumper" | "back" | "start" | "guide" |
-        "left_thumb" | "right_thumb" | "dpad_up" | "dpad_right" | "dpad_down" | "dpad_left"
-    type MouseButton =
-        "mb1" | "mb2" | "mb3" | "mb4" | "mb5" | "mb6" | "mb7" | "mb8"
-    type KeyboardKey =
+        "left_thumb" | "right_thumb" | "dpad_up" | "dpad_right" | "dpad_down" | "dpad_left" 
+    type MouseButton = 
+        "mb1" | "mb2" | "mb3" | "mb4" | "mb5" | "mb6" | "mb7" | "mb8" 
+    type KeyboardKey = 
         "space" | "'" | "," | "-" | "." | "/" | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" |
         "9" | ";" | "=" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
         "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "[" | "\\" | "]" |
@@ -190,8 +197,8 @@ declare namespace lyte {
         "f21" | "f22" | "f23" | "f24" | "f25" | "kp_0" | "kp_1" | "kp_2" | "kp_3" | "kp_4" | "kp_5" |
         "kp_6" | "kp_7" | "kp_8" | "kp_9" | "kp_decimal" | "kp_divide" | "kp_multiply" | "kp_subtract" |
         "kp_add" | "kp_enter" | "kp_equal" | "left_shift" | "left_control" | "left_alt" | "left_super" |
-        "right_shift" | "right_control" | "right_alt" | "right_super" | "menu"
-    type PhysicsState =
-        "off" | "on" | "paused"
+        "right_shift" | "right_control" | "right_alt" | "right_super" | "menu" 
+    type PhysicsState = 
+        "off" | "on" | "paused" 
     }
 

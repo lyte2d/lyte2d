@@ -62,7 +62,7 @@ GTAGS
 *.log
 *.pyc
 
-.vscode
+/.vscode/
 
 .clangd
 

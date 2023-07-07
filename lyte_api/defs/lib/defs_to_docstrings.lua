@@ -9,9 +9,9 @@ local WHITESPACE = 4
 -- local footer = "\n-- EOF: This file is generated\n"
 
 -- whitespace
-local S = (" "):rep(WHITESPACE)
-local SS = S:rep(2)
-local SSS= S:rep(3)
+local S = ""
+local SS = (" "):rep(WHITESPACE)
+local SSS= SS:rep(2)
 
 -- T = T .. header
 
@@ -24,7 +24,7 @@ local function get_t_name_basic(x)
     if x._kind == "primitive" then
         return x.luatype
     elseif x.typename then
-        return x.typename
+        return D._name .. "." .. x.typename
     end
     -- todo: error
     return "UNKNOWN" .. x._kind
@@ -34,11 +34,11 @@ local function get_t_name(x, full)
     if not full then return get_t_name_basic(x) end
 
     if x._kind == "dict" then
-        return "{" .. get_t_name(x.key_type) .. ": " .. get_t_name(x.value_type) .. "}"
+        return "{[" .. get_t_name(x.key_type) .. "]: " .. get_t_name(x.value_type) .. "}"
     elseif x._kind == "list" then
-        return "{" .. get_t_name(x.value_type) .. "}"
+        return get_t_name(x.value_type) .. "[]"
     elseif x._kind == "tuple" then
-        return "{" .. get_t_name(x.value_type) .. "}"
+        return get_t_name(x.value_type) .. "[]"
     elseif x._kind == "variant" then
         local name = ""
         local num = #x.options
@@ -51,22 +51,17 @@ local function get_t_name(x, full)
     return get_t_name_basic(x)
 end
 
-local function get_fn(f, is_method)
+local function get_method(f)
     local L = ""
-    local title = "function "
+    local title = "fun"
     local sep = ": "
-    if not is_method then
-        title = S .. f._name .. ": function"
-        sep = ": "
-    end
-    -- name
     L = L .. title .. "("
-        for ia, a in ipairs(f.args) do
-            L = L .. a._name .. ": " .. get_t_name(a.value_type)
-            if ia < #f.args then
-                L = L .. ", "
-            end
+    for ia, a in ipairs(f.args) do
+        L = L .. a._name .. ": " .. get_t_name(a.value_type)
+        if ia < #f.args then
+            L = L .. ", "
         end
+    end
     L = L .. ")"
     -- rets
     if #f.rets == 0 then
@@ -86,15 +81,49 @@ local function get_fn(f, is_method)
     return L
 end
 
+
+local function get_fn(f)
+    local L = ""
+    local title = S .. "--- @type " .. " fun"
+    local sep = ": "
+
+    -- name
+    L = L .. title .. "("
+    for ia, a in ipairs(f.args) do
+        L = L .. a._name .. ": " .. get_t_name(a.value_type)
+        if ia < #f.args then
+            L = L .. ", "
+        end
+    end
+    L = L .. ")"
+    -- rets
+    if #f.rets == 0 then
+    --    L = L .. ")"
+    else
+        L = L .. sep
+        if #f.rets > 1 then L = L .. "(" end
+        for ir, r in ipairs(f.rets) do
+            L = L .. get_t_name(r.value_type)
+            if ir < #f.rets then
+                L = L .. ", "
+            end
+        end
+        if #f.rets > 1 then L = L .. ")" end
+    end
+    L = L .. "\nfunction " .. D._name .. "." .. f._name .. "() end";
+    L = L .. "\n"
+    return L
+end
+
 ----------------------------------
 -- namespace begin
 ----------------------------------
-T = T .. "global record " .. D._name .. "\n"
+T = T .. "local " .. D._name .. " = {}\n"
 
 ----------------------------------
 -- functions
 ----------------------------------
-T = T .. S .. "-- functions\n"
+T = T .. S .. "\n\n-- functions\n\n"
 for _,f in ipairs(D.functions) do
     local L = get_fn(f)
     -- DONE
@@ -104,87 +133,87 @@ end
 ----------------------------------
 -- lists
 ----------------------------------
-T = T .. S .. "-- lists\n"
+T = T .. S .. "\n\n-- lists\n\n"
 for _,l in ipairs(D.lists) do
-    T = T .. S .. "type " .. l._name .. " = " ..  get_t_name(l, true) .. "\n"
+    T = T .. S .. "--- @alias " .. D._name .. "." .. l._name .. " " ..  get_t_name(l, true) .. "\n"
 end
 
 ----------------------------------
 -- tuples
 ----------------------------------
-T = T .. S .. "-- tuples\n"
+T = T .. S .. "\n\n-- tuples\n\n"
 for _,l in ipairs(D.tuples) do
-    T = T .. S .. "type " .. l._name .. " = " ..  get_t_name(l, true) .. "\n"
+    T = T .. S .. "--- @alias " .. D._name .. "."  .. l._name .. " " ..  get_t_name(l, true) .. "\n"
 end
 
 ----------------------------------
 -- dicts
 ----------------------------------
-T = T .. S .. "-- dicts\n"
+T = T .. S .. "\n\n-- dicts\n\n"
 for _,d in ipairs(D.dicts) do
-    T = T .. S .. "type " .. d._name .. " = " .. get_t_name(d, true) .. "\n"
+    T = T .. S .. "--- @alias " .. D._name .. "."  .. d._name .. " " .. get_t_name(d, true) .. "\n"
 end
 
 ----------------------------------
 -- variants
 ----------------------------------
-T = T .. S .. "-- variants\n"
+T = T .. S .. "\n\n-- variants\n\n"
 for _,o in ipairs(D.variants) do
-    T = T .. S .. "type " .. o._name .. " = " .. get_t_name(o, true) .. "\n"
+    T = T .. S .. "--- @alias " .. D._name .. "."  .. o._name .. " " .. get_t_name(o, true) .. "\n"
 end
 
 
 ----------------------------------
 -- records
 ----------------------------------
-T = T .. S .. "-- records\n"
+T = T .. S .. "\n\n-- records\n\n"
 for _,r in ipairs(D.records) do
     local L = ""
     -- name
-    L = L .. S .. "record " .. r._name .. "\n"
-    L = L .. SS .. "userdata\n"
+    L = L .. S .. "--- @class " .. D._name .. "."  .. r._name .. "\n"
     -- fields
     for _,f in ipairs(r.fields) do
-        L = L .. SS .. f._name .. ": " .. get_t_name(f.value_type) .. "\n"
+        L = L .. SS .. "--- @field " .. f._name .. " " .. get_t_name(f.value_type) .. "\n"
     end
     -- methods
     for _,m in ipairs(r.methods) do
-        L = L .. SS .. m._name .. ": " .. get_fn(m, true)
+        L = L .. SS .. "--- @field " .. m._name .. " " .. get_method(m)
     end
+    L = L .. S .. "" .. D._name .. "."  .. r._name .. " = {}\n"
     -- DONE
-    L = L .. S .. "end\n"
-    T = T .. L
+    T = T .. L .. "\n"
 end
 
 ----------------------------------
 -- enums
 ----------------------------------
-T = T .. S .. "-- enums\n"
+T = T .. S .. "\n\n-- enums\n\n"
 for _,e in ipairs(D.enums) do
-    -- name
-    T = T .. S .. "enum " .. e._name .. "\n"
+    local L = ""
 
-    local L = SS
+    L = L .. S .. "---@alias " .. D._name .. "."  .. e._name .. ""
+
+    L = L .. SS
     for nc, c in ipairs(e.choices) do
         if c == "\\" then c = "\\\\" end
         L = L .. '"' .. c .. '"'
-        if nc < #e.choices then L = L .. " " end
+        if nc < #e.choices then L = L .. " | " end
         if #L > 100 then
-            T = T .. L .. "\n"
-            L = SS
+            -- T = T .. L .. "\n--- "
+            -- L = SS
         else
             L = L .. " "
         end
     end
     -- DONE
-    T = T .. L .. "\n" .. S .. "end\n"
+    T = T .. L .. "\n" 
 end
 
 
 ----------------------------------
 -- namespace end
 ----------------------------------
-T = T .. "end\n"
+T = T .. "\n\nreturn " .. D._name .. "\n"
 
 
 

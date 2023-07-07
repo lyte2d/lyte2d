@@ -68,7 +68,7 @@ int lyte_core_window_init(void) {
         lytecore_state.monitor = primary;
 
         mode = (GLFWvidmode *)glfwGetVideoMode(primary);
-        
+
         lytecore_state.mode = (void *)mode;
     }
 
@@ -97,7 +97,7 @@ int lyte_core_window_init(void) {
     // move to the center
     int w = mode->width / 2 - lytecore_state.window_size.width / 2;
     int h = mode->height / 2 - lytecore_state.window_size.height / 2;
-    glfwSetWindowPos(lytecore_state.window, w, h); 
+    glfwSetWindowPos(lytecore_state.window, w, h);
     // show window
     glfwShowWindow(lytecore_state.window);
 #endif
@@ -116,6 +116,35 @@ int lyte_core_window_cleanup(void) {
     sgp_shutdown();
     sg_shutdown();
     glfwTerminate();
+    return 0;
+}
+
+int lyte_get_monitor_count(int *val) {
+    // TODO
+    (void)val;
+    return 0;
+}
+
+int lyte_get_monitor_name(int index, const char * *val) {
+    // TODO
+    (void)index; (void)val;
+    return 0;
+}
+
+int lyte_get_monitor_width(int index, int *val) {
+    // TODO
+    (void)index; (void)val;
+    return 0;
+}
+
+int lyte_get_monitor_height(int index, int *val) {
+    // TODO
+    return 0;
+}
+
+int lyte_set_window_monitor(int index) {
+    // TODO
+    (void)index;
     return 0;
 }
 
@@ -282,14 +311,14 @@ int lyte_set_window_icon_file(const char * path) {
     if (file == NULL) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
-        fprintf(stderr, "File '%s' error %s\n", path, errstr);
+        fprintf(stderr, "\nFile '%s': '%s'\n", path, errstr);
         return errcode;
     }
     size_t len = PHYSFS_fileLength(file);
     uint8_t *buf = malloc(len);
     size_t read_len = PHYSFS_readBytes(file, buf, len);
     if (len != read_len) {
-        fprintf(stderr, "File not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
+        fprintf(stderr, "\nFile not fully read. Path: %s. File size is %zu bytes, but read %zu bytes.\n", path, len, read_len);
         return 1;
     }
     int width;
@@ -297,7 +326,7 @@ int lyte_set_window_icon_file(const char * path) {
     int channels;
     uint8_t *data = stbi_load_from_memory(buf, read_len, &width, &height, &channels, 4);
     if (!data) {
-        fprintf(stderr, "Image file failed to load: %s\n", path);
+        fprintf(stderr, "\nImage file failed to load: %s\n", path);
         return 2;
     }
 

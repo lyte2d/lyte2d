@@ -471,6 +471,53 @@ static int api_get_text_height(lua_State *L) {
     lua_pushinteger(L, val);
     return 1; // number of return values
 }
+// get_monitor_count: [--  number ]
+static int api_get_monitor_count(lua_State *L) {
+    (void)L;
+    int val = {0};
+    int _err = _get_monitor_count(&val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    lua_pushinteger(L, val);
+    return 1; // number of return values
+}
+// get_monitor_name: [ number --  string ]
+static int api_get_monitor_name(lua_State *L) {
+    (void)L;
+    int index = luaL_checkinteger(L, 1);
+    const char * val = {0};
+    int _err = _get_monitor_name(index, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    lua_pushstring(L, val);
+    return 1; // number of return values
+}
+// get_monitor_width: [ number --  number ]
+static int api_get_monitor_width(lua_State *L) {
+    (void)L;
+    int index = luaL_checkinteger(L, 1);
+    int val = {0};
+    int _err = _get_monitor_width(index, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    lua_pushinteger(L, val);
+    return 1; // number of return values
+}
+// get_monitor_height: [ number --  number ]
+static int api_get_monitor_height(lua_State *L) {
+    (void)L;
+    int index = luaL_checkinteger(L, 1);
+    int val = {0};
+    int _err = _get_monitor_height(index, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    lua_pushinteger(L, val);
+    return 1; // number of return values
+}
+// set_window_monitor: [ number -- ]
+static int api_set_window_monitor(lua_State *L) {
+    (void)L;
+    int index = luaL_checkinteger(L, 1);
+    int _err = _set_window_monitor(index);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
 // set_window_resizable: [ boolean -- ]
 static int api_set_window_resizable(lua_State *L) {
     (void)L;
@@ -1718,6 +1765,11 @@ static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"draw_text", api_draw_text},
     {"get_text_width", api_get_text_width},
     {"get_text_height", api_get_text_height},
+    {"get_monitor_count", api_get_monitor_count},
+    {"get_monitor_name", api_get_monitor_name},
+    {"get_monitor_width", api_get_monitor_width},
+    {"get_monitor_height", api_get_monitor_height},
+    {"set_window_monitor", api_set_window_monitor},
     {"set_window_resizable", api_set_window_resizable},
     {"set_window_minsize", api_set_window_minsize},
     {"set_window_size", api_set_window_size},

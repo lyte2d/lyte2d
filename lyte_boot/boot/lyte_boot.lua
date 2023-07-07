@@ -1,5 +1,16 @@
 --[[ (c) mg ]]
 
+do
+    local _has, _dbg = pcall(require, "lldebugger")
+    if _has then
+        print("(Debugger Enabled)")
+        _dbg.start()
+    -- else
+    --     print "(no debugger)"
+    end
+end
+
+
 lyte = lyte or {}
 
 -- lua 5.1 vs others
@@ -166,32 +177,32 @@ local function make_lyte_searcher(env)
                     end
                 end
             end
-            if not code_str then
-                        if not LYTE_APP_MODULENAME then
-                            error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
-                        end
-                        print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
-                        if not LYTE_REPL_REQUESTED then
-                            error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
-                        else
-                            print("REPL mode: " .. LYTE_REPL_REQUESTED);
-                            return function(...)
-                                return ""
-                            end, filename
-                        end
-                        if not LYTE_APP_MODULENAME then
-                            error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
-                        end
-                        print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
-                        if not LYTE_REPL_REQUESTED then
-                            error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
-                        else
-                            print("REPL mode: " .. LYTE_REPL_REQUESTED);
-                            return function(...)
-                                return ""
-                            end, filename
-                        end
-            end
+            -- if not code_str then
+            --             if not LYTE_APP_MODULENAME then
+            --                 error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
+            --             end
+            --             print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
+            --             if not LYTE_REPL_REQUESTED then
+            --                 error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
+            --             else
+            --                 print("REPL mode: " .. LYTE_REPL_REQUESTED);
+            --                 return function(...)
+            --                     return ""
+            --                 end, filename
+            --             end
+            --             if not LYTE_APP_MODULENAME then
+            --                 error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
+            --             end
+            --             print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
+            --             if not LYTE_REPL_REQUESTED then
+            --                 error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
+            --             else
+            --                 print("REPL mode: " .. LYTE_REPL_REQUESTED);
+            --                 return function(...)
+            --                     return ""
+            --                 end, filename
+            --             end
+            -- end
        end
     end
     return loader_lyte
@@ -265,6 +276,7 @@ end
 
 -- try to see if a "config.lua/fnl" file exists here.. it may set up window before everything else
 local loaded_cfg, _cfg = pcall(require, "config")
+-- local _cfg = require("config")
 
 -- DEFAULTS
 local _def = {
@@ -302,4 +314,3 @@ end
 
 
 lyte.reset_font()
-
