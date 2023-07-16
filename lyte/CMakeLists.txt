@@ -36,7 +36,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
     # target_link_options(${PROJECT_NAME} PRIVATE --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/web/lyte.html  -sTOTAL_STACK=64MB -sINITIAL_MEMORY=256MB -sALLOW_MEMORY_GROWTH=1 -sUSE_GLFW=3 -sUSE_WEBGL2=1 -sFULL_ES3=1 -sLEGACY_RUNTIME=1 -sEXPORTED_FUNCTIONS=['_malloc'])
-    target_link_options(${PROJECT_NAME} PRIVATE --shell-file ${CMAKE_CURRENT_SOURCE_DIR}../lyte_core/html/lyte.html  )
+    target_link_options(${PROJECT_NAME} PRIVATE --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core/html/lyte.html  )
     # target_link_options(${PROJECT_NAME} PRIVATE --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/images)
     # WASM+JS size optimizations
     # target_link_options(${PROJECT_NAME} PRIVATE -sNO_FILESYSTEM=1 -sASSERTIONS=0 -sMALLOC=emmalloc --closure=1)
