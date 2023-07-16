@@ -10,7 +10,7 @@
 
 #include <signal.h>
 
-#include "lyte_repl.h"
+#include "repl.h"
 #include "lyte_api.h"
 #include "lyte_core.h"
 // #include "lyte_physics.h"

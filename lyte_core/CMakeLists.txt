@@ -26,7 +26,7 @@ else()
     set(GLFW_BUILD_DOCS OFF)
     set(GLFW_INSTALL ON)
     set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/glfw-3.3.8 ${CMAKE_CURRENT_BINARY_DIR}/glfw)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glfw-3.3.8 ${CMAKE_CURRENT_BINARY_DIR}/glfw)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
         glfw
@@ -49,14 +49,14 @@ set(PHYSFS_ARCHIVE_ISO9660 OFF)
 set(PHYSFS_ARCHIVE_VDF OFF)
 set(PHYSFS_ARCHIVE_ZIP ON)
 set(PHYSFS_ARCHIVE_7Z ON)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     physfs-static
 )
 
 
 message("===> Adding FreeType")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/freetype ${CMAKE_CURRENT_BINARY_DIR}/freetype)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/freetype ${CMAKE_CURRENT_BINARY_DIR}/freetype)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   freetype
 )
@@ -65,23 +65,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     ./include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/include
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/include
   PRIVATE
     ./src
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
     ${GLFW_SOURCE_DIR}/include
     ${GLFW_SOURCE_DIR}/dependencies
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/sokol
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/sokol_gp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/stb_image
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/fontstash
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/raudio/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/raudio/sc/external
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/sokol
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/sokol_gp
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/stb_image
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/fontstash
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/raudio/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/raudio/sc/external
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/src/map.c
+    ./src/map.c
     ./src/core_lib_impls.c
     ./src/core_audio.c
     ./src/core_filesystem.c
@@ -93,9 +93,9 @@ target_sources(${PROJECT_NAME} PRIVATE
     ./src/core_shapes.c
     ./src/core_state.c
     ./src/core_window.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/src/lyte_emsc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/stb_image/stb_image.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/raudio/src/raudio.c
+    ./src/lyte_emsc.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/stb_image/stb_image.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/deps/raudio/src/raudio.c
 )
 
 

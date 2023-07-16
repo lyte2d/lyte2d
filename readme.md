@@ -4,13 +4,13 @@
 
 Lyte2D is a comfy little Lua framework for game development that is OSS and free. Lyte2D is a work in progress!
 
-- [Lyte2D website (https://lyte2d.com)](https://lyte2d.com)
+- [Lyte2D website](https://lyte2d.com)
 - [Github repo](https://github.com/lyte2d/lyte2d)
 - [Downloads](https://github.com/lyte2d/lyte2d/releases)
 
-
-- Documentation: [/documents](/documents)
-- Example code: [/examples](/examples)
+- Documentation: [lyte2d/documents/manual](https://github.com/lyte2d/documents/manual)
+- Example code: [lyte2d/documents/examples](https://github.com/lyte2d/documents/examples)
+- Typings: [lyte2d/documents/typings](https://github.com/lyte2d/documents/typings)
 
 - Community: [Discord](https://discord.gg/BKPfQrCaNU) and [Discussions](https://github.com/lyte2d/lyte2d/discussions)
 
@@ -26,15 +26,13 @@ This readme contains information about _developing_ Lyte2D _itself_. For develop
 
 ### Windows
 - On Windows you'll need a Windows 10/11 SDK And a VS 2022 SDK cmdline (full VS installation is not needed)
-- Run:
-  - `config.cmd`
-  - `build.cmd`
+- `config.cmd`
+- `build.cmd`
 
 ### Linux or Windows with WSL (Tested only with Ubuntu)
 - Dockerfile contains all the requirements documented in executable form. Install those locally.
-- Run:
-  - `./config.sh`
-  - `./build.sh`
+- `./config.sh`
+- `./build.sh`
 
 ### WASM
 - Emscripten SDK needs to be installed and activated. (See Dockerfile for how)
@@ -51,6 +49,6 @@ This readme contains information about _developing_ Lyte2D _itself_. For develop
 
 ## License
 
-- This project is licensed under the terms of the MIT license. See [/LICENSE.md](/LICENSE.md) file for details.
-- Lyte2D depends on other software which have various licenses. See [/documents/licenses.txt](/documents/licenses.txt) file for details.
+- This project is licensed under the terms of the MIT license. See [LICENSE](/LICENSE.md) file for details.
+- Lyte2D depends on other software which have various licenses. See [licenses_all.txt](/licenses_all.txt) file for details.
 

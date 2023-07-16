@@ -14,7 +14,7 @@ VERSION=$(cat version.txt)
 CURRDIR=$(pwd)
 # relative source locations
 SOURCEDIR=$CURRDIR
-DOCDIR=$CURRDIR/documents
+DOCDIR=$CURRDIR
 # relative build & release locations
 BUILDDIR=$CURRDIR/out/docker
 RELDIR=$CURRDIR/out/rel
@@ -38,17 +38,17 @@ echo "lyte2d version: ${VERSION} sourcedir: ${SOURCEDIR} outdir: ${BUILDDIR}"
 echo "@@@ CONFIGURE: $(date)"
 
 echo " @@ cfg: wingui"
-cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -DWIN_GUI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCEDIR/mingw.cmake -S $SOURCEDIR/lyte -B $BUILDDIR/wingui
+cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -DWIN_GUI=1 -DCMAKE_TOOLCHAIN_FILE=$SOURCEDIR/mingw.cmake -S $SOURCEDIR -B $BUILDDIR/wingui
 
 echo " @@ cfg: wasm"
 source /emsdk/emsdk_env.sh
-emcmake cmake  -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -S $SOURCEDIR/lyte -B $BUILDDIR/wasm
+emcmake cmake  -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles" -S $SOURCEDIR -B $BUILDDIR/wasm
 
 echo " @@ cfg: linux"
-cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -S $SOURCEDIR/lyte -B $BUILDDIR/linux
+cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -S $SOURCEDIR -B $BUILDDIR/linux
 
 echo " @@ cfg: win"
-cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=$SOURCEDIR/mingw.cmake -S $SOURCEDIR/lyte -B $BUILDDIR/win
+cmake  -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=$SOURCEDIR/mingw.cmake -S $SOURCEDIR -B $BUILDDIR/win
 
 
 #############
@@ -98,9 +98,10 @@ rm -rf $ZIPDIR
 mkdir -p $ZIPDIR
 mkdir -p $TMPDIR
 
-cp -r $DOCDIR/licenses.txt $TMPDIR/
-cp -r $DOCDIR/readme.md $TMPDIR/
-# cp -r $DOCDIR/guide.md $TMPDIR/
+cp -r $DOCDIR/LICENSE $TMPDIR/
+cp -r $DOCDIR/licenses_all.txt $TMPDIR/
+cp -r $DOCDIR/lyte_readme.md $TMPDIR/
+
 cp -r $BINDIR/* $TMPDIR/
 
 cd $TMPDIR
@@ -108,10 +109,10 @@ echo " @@ to be packed: ls -al:"
 pwd
 ls -al
 echo " @@"
-$ZIPCMD $ZIPDIR/lyte2d.windows-gui.x64.v$VERSION.zip  licenses.txt readme.md   lyte_gui.exe
-$ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             licenses.txt readme.md   lyte.html lyte.js lyte.wasm
-$ZIPCMD $ZIPDIR/lyte2d.linux.x64.v$VERSION.zip        licenses.txt readme.md   lyte
-$ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      licenses.txt readme.md   lyte.exe
+$ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      LICENSE licenses_all.txt lyte_readme.md   lyte.exe lyte_gui.exe
+$ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             LICENSE licenses_all.txt lyte_readme.md   lyte.html lyte.js lyte.wasm
+$ZIPCMD $ZIPDIR/lyte2d.linux.x64.v$VERSION.zip        LICENSE licenses_all.txt lyte_readme.md   lyte
+# $ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      licenses_all.txt lyte_readme.md   lyte.exe
 # $ZIPCMD $ZIPDIR/lyte2d.EVERYTHING.x64.v$VERSION.zip   licenses.txt readme.md   lyte* lyte*.*
 cd ..
 

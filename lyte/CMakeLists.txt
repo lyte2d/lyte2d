@@ -36,7 +36,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
 
     # target_link_options(${PROJECT_NAME} PRIVATE --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/web/lyte.html  -sTOTAL_STACK=64MB -sINITIAL_MEMORY=256MB -sALLOW_MEMORY_GROWTH=1 -sUSE_GLFW=3 -sUSE_WEBGL2=1 -sFULL_ES3=1 -sLEGACY_RUNTIME=1 -sEXPORTED_FUNCTIONS=['_malloc'])
-    target_link_options(${PROJECT_NAME} PRIVATE --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/html/lyte.html  )
+    target_link_options(${PROJECT_NAME} PRIVATE --shell-file ${CMAKE_CURRENT_SOURCE_DIR}../lyte_core/html/lyte.html  )
     # target_link_options(${PROJECT_NAME} PRIVATE --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/images)
     # WASM+JS size optimizations
     # target_link_options(${PROJECT_NAME} PRIVATE -sNO_FILESYSTEM=1 -sASSERTIONS=0 -sMALLOC=emmalloc --closure=1)
@@ -91,8 +91,8 @@ endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_physics ${CMAKE_CURRENT_BINARY_DIR}/lyte_physics)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../dependencies/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     lyte_core
@@ -117,14 +117,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ./src
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_boot/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/include
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/include
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
     ./src/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/src/api_generated.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/nbchar.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_repl/src/repl.c
+    ./src/nbchar.c
+    ./src/repl.c
 )
 
