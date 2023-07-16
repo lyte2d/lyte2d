@@ -6,6 +6,7 @@ on:
       - rel
 jobs:
   build-with-docker:
+    permissions: write-all
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout Lyte2D
@@ -28,7 +29,6 @@ jobs:
         run: bash ./docker_fullbuild.sh
 
       - name: Create github release for Lyte2D
-        permissions: write-all
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
