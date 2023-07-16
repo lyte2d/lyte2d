@@ -1,28 +1,56 @@
-## Lyte2D
+# Lyte2D
 
-### What
+## What
 
 Lyte2D is a comfy little Lua framework for game development that is OSS and free. Lyte2D is a work in progress!
 
-Lyte2D website: https://simple-bits.com/lyte
+- [Lyte2D website (https://lyte2d.com)](https://lyte2d.com)
+- [Github repo](https://github.com/lyte2d/lyte2d)
+- [Downloads](https://github.com/lyte2d/lyte2d/releases)
 
-### Links
 
-- Downloads: [/releases](https://github.com/morew4rd/lyte2d/releases)
 - Documentation: [/documents](/documents)
 - Example code: [/examples](/examples)
 
-### How to build
+- Community: [Discord](https://discord.gg/BKPfQrCaNU) and [Discussions](https://github.com/lyte2d/lyte2d/discussions)
 
-- TBD
+This readme contains information about _developing_ Lyte2D _itself_. For developing _with_ Lyte2D, check out the links above.
 
-### License
+## How to build locally (expert mode)
 
-This project is licensed under the terms of the MIT license. See [/LICENSE.md](/LICENSE.md) file for details.
+- You already know what you need to have on your machine/env. (Optinally you already have judged my CMakeLists.txt files :D)
+- `cmake -B ./build -S .` (and with all your optional specific configuration you'd like to pass)
+- `cmake --build ./build`
 
-Lyte2D depends on other software which have various licenses:
+## How to build locally (scripts)
 
-- [/documents/licenses.txt](/documents/licenses.txt) file for all the licenses in one file, or
-- [/dependencies](/dependencies) directory for all dependencies and their respective licenses.
+### Windows
+- On Windows you'll need a Windows 10/11 SDK And a VS 2022 SDK cmdline (full VS installation is not needed)
+- Run:
+  - `config.cmd`
+  - `build.cmd`
 
+### Linux or Windows with WSL (Tested only with Ubuntu)
+- Dockerfile contains all the requirements documented in executable form. Install those locally.
+- Run:
+  - `./config.sh`
+  - `./build.sh`
+
+### WASM
+- Emscripten SDK needs to be installed and activated. (See Dockerfile for how)
+- See `fullinstall.sh` (wasm config/build parts)
+
+## How to test "official" builds (docker)
+
+### Prep
+- Install docker
+- Build the docker image with `./docker_make_buildimage.sh`
+
+### Run
+- `./docker_fullbuild.sh`
+
+## License
+
+- This project is licensed under the terms of the MIT license. See [/LICENSE.md](/LICENSE.md) file for details.
+- Lyte2D depends on other software which have various licenses. See [/documents/licenses.txt](/documents/licenses.txt) file for details.
 

@@ -6,19 +6,6 @@ default:
 
 ## Note: Every target is "PHONY" in this Makefile
 
-
-## Code generators (local development use)
-
-codegen-bootzip:
-	rm -f out/boot.zip
-	cd lyte_boot/boot && zip -9 -u -r ../../out/boot.zip . -x *.tl && cd ../..
-	cd out && xxd -i boot.zip ../lyte_boot/include/_boot_zip_generated.c && cd ../..
-	mv out/boot.zip out/boot_old.zip
-	rm -f out/boot.zip
-
-codegen-apidefs:
-	make -C lyte_api/defs all
-
 ## Local / Dev builds
 
 local-config-msvc-minsizerel:
@@ -58,30 +45,6 @@ local-build-gcc-debug:
 	cp -f ./out/builds/gcc_debug ./out/
 
 
-## Build the official build image locally
-## 0. Have WSL/mingw + dev tools installed along with Docker
-## 1. make docker-image-build  --> create the docker
-## 2. make official-build  --> creates an "official build" in the out/rel folder
-
-docker-image-build:
-	docker build -t more/builder:0.1 -f ./build_scripts/Dockerfile .
-	docker tag more/builder:0.1 more/builder:latest
-
-official-build:
-	./build_scripts/official_build.sh
-
-## Personal use/convenience (MG)
-
-DOCKER_RUN_INTERACTIVE=docker run -it --rm --name=builder \
-    	--mount type=bind,source=${PWD},target=/src \
-		--workdir /src \
-    	-t more/builder:latest
-
-# Shell on the builder image for debugging build issues
-docker-bash:
-	${DOCKER_RUN_INTERACTIVE} bash
-
-
 clean-docker:
 	rm -rf /src/out/rel
 	rm -rf /src/out/docker
@@ -93,45 +56,20 @@ copy-rel-out: clean-out-bins
 	cp ./out/rel/bin/* ./out/
 	ls -al ./out/
 
-pongout:
-	rm -rf ./out/pongout
-	mkdir ./out/pongout
-	games/pongout/build.sh ./out/rel/bin ./out/pongout
 
-website:
-	rm -rf out/website
-	mkdir -p out/website
-	# copy lyte wasm files to the website folder
-	cp ./out/docker/wasm/lyte.html ./out/website
-	cp ./out/docker/wasm/lyte.js ./out/website
-	cp ./out/docker/wasm/lyte.wasm ./out/website
-	# make examples.zip inside the website folder
-	cd ./examples && zip -9 -u -r ../out/website/examples.zip * && cd ..
-	# make the website
-	make -C website_src
 
-## To host web pages locally for testing:
-##   with python: python -m http.server
-##   with node: http-server (install with npm install -g http-server)
+## Code generators (local development use)
 
-host-pongout:
-	cd out/pongout/web && http-server . && cd ../../..
+codegen-bootzip:
+	rm -f out/boot.zip
+	cd lyte_boot/boot && zip -9 -u -r ../../out/boot.zip . -x *.tl && cd ../..
+	cd out && xxd -i boot.zip ../lyte_boot/include/_boot_zip_generated.c && cd ../..
+	mv out/boot.zip out/boot_old.zip
+	rm -f out/boot.zip
 
-host-website:
-	cd out/website && http-server . && cd ..
-
+codegen-apidefs:
+	make -C lyte_api/defs all
 
 ## codegen things
 gen: codegen-bootzip codegen-apidefs
 
-cfg:
-	cmd.exe /c cfg
-
-dev:
-	cmd.exe /c dev
-
-po:
-	make dev && cp out/lyte.exe out/rel/bin/ && make pongout && out/pongout/bin/pongout_win.exe
-
-dn:
-	make -C defs_new

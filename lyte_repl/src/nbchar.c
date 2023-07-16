@@ -27,7 +27,7 @@ int _t = 0;
 #include <sys/select.h>
 #include <unistd.h>
 #include <termios.h>
-#include <stropts.h>
+// #include <stropts.h>
 #include <fcntl.h>
 
 void nbchar_enable_raw_mode(void)

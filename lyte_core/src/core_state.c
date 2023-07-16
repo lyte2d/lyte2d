@@ -27,7 +27,7 @@ int lyte_core_state_init(lyte_Config config) {
     lytecore_state.filtermode = config.filtermode;
 
     lytecore_state.exe_name = config.exe_name;
-    lytecore_state.window_title = config.window_title;
+    lytecore_state.window_title = "?"; //config.window_title;
     lytecore_state.window_size = config.window_size;
     lytecore_state.window_min_size = config.window_min_size;
 

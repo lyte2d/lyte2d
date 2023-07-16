@@ -52,7 +52,7 @@ typedef struct lyte_Config {
     lyte_Args args;
     bool vsync;
     const char *exe_name;
-    const char *window_title;
+    // const char *window_title;
     lyte_Size window_size;
     lyte_Size window_min_size;
     lyte_BlendMode blendmode;

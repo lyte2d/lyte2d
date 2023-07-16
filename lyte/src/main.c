@@ -554,7 +554,7 @@ int main(int argc, char *argv[]) {
         .vsync = true,
         .blendmode = LYTE_BLENDMODE_BLEND,
         .filtermode = LYTE_FILTERMODE_NEAREST,
-        .window_title = "lyte",
+        // .window_title = "lyte",
         .window_size = (lyte_Size){ .width=LYTE_INIT_WIDTH, .height=LYTE_INIT_HEIGHT },
         .window_min_size = (lyte_Size){ .width=0, .height=0 },
     });

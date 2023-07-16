@@ -118,97 +118,82 @@ local tl_src = lyte.load_textfile(tl_file)
 _G.tl = loadstring(tl_src, tl_file)()
 
 
+local function lyte_lua_loader(modulename)
+    local filename = modulename:gsub("%.", "/")  .. ".lua"
+    local code_str = lyte.load_textfile(filename)
+    if code_str then
+        return function(...)
+            return run_many(code_str, filename, ...)
+        end, filename
+    end
+end
+
+
 local function make_lyte_searcher(env)
     local function loader_lyte(modulename)
         local filename = nil
         local code_str= nil
-        -- LUA LOADER
-        filename = modulename:gsub("%.", "/")  .. ".lua"
-        code_str = lyte.load_textfile(filename)
-        if code_str then
-            return function(...)
-                return run_many(code_str, filename, ...)
-            end, filename
-        else
-            -- FENNEL LOADER
-            filename = modulename:gsub("%.", "/")  .. ".fnl"
-            code_str = lyte.load_textfile(filename)
-            if (code_str) then
-                return function(...)
-                    -- macro loader vs function loader
-                    if env == "_COMPILER" then
-                        -- macro loadewr
-                        return fennel.eval(code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename}, ...)
-                    else
-                        local x, y = pcall(fennel.compileString, code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename})
-                        return run_many(y, filename, ...)
-                    end
-                    -- END NOTENOTE: this should be the same between different file types
-                end, filename
-            else
-                -- TEAL LOADER
-                filename = modulename:gsub("%.", "/")  .. ".tl"
-                code_str = lyte.load_textfile(filename)
-                if (code_str) then
-                    return function(...)
-                            local done, result = pcall(tl.process_string, code_str, _G.LYTE_TEAL_LAX_MODE, nil, "@"..filename, modulename)
-                            if (not done) then
-                                _G.LYTE_ERROR_TEXT = "<teal error> " .. result
-                                print ("tl.process_string failed. file: " .. filename .. ", error: " .. result)
-                            end
-                            if (#result.syntax_errors > 0) then
-                                _G.LYTE_ERROR_TEXT = "<teal Syntax error> file: " .. filename
-                                print("errors:")
-                                for k,v in ipairs(result.syntax_errors) do print (k, fennel.view(v)) end
-                                error(_G.LYTE_ERROR_TEXT)
-                            end
-                            local lua_code = tl.pretty_print_ast(result.ast)
-                            return run_many(lua_code, filename, ...)
-                    end, filename
-                else
-                    -- MOONSCRIPT LOADER
-                    filename = modulename:gsub("%.", "/")  .. ".moon"
-                    code_str = lyte.load_textfile(filename)
-                    if (code_str) then
-                        print("monoscript is not yet supported")
-                    else
+        local lang = nil
+        local languages = {"fnl", "tl", "moon"}
 
-                        --handled below
-                    end
-                end
+        for _, ext in ipairs(languages) do
+            filename = modulename:gsub("%.", "/")  .. "." .. ext
+            code_str = lyte.load_textfile(filename)
+            if code_str then
+                lang = ext
+                break
             end
-            -- if not code_str then
-            --             if not LYTE_APP_MODULENAME then
-            --                 error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
-            --             end
-            --             print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
-            --             if not LYTE_REPL_REQUESTED then
-            --                 error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
-            --             else
-            --                 print("REPL mode: " .. LYTE_REPL_REQUESTED);
-            --                 return function(...)
-            --                     return ""
-            --                 end, filename
-            --             end
-            --             if not LYTE_APP_MODULENAME then
-            --                 error("\nInternal Error: expecting LYTE_APP_MODULENAME but not found")
-            --             end
-            --             print("\nLyte entry module not found: " .. LYTE_APP_MODULENAME);
-            --             if not LYTE_REPL_REQUESTED then
-            --                 error("\nMissing entry module: " .. LYTE_APP_MODULENAME);
-            --             else
-            --                 print("REPL mode: " .. LYTE_REPL_REQUESTED);
-            --                 return function(...)
-            --                     return ""
-            --                 end, filename
-            --             end
-            -- end
-       end
+        end
+
+        -- if lang == "lua" then
+        --     return function(...)
+        --         return run_many(code_str, filename, ...)
+        --     end, filename
+        --
+        -- elseif...
+        if lang == "fnl" then
+            return function(...)
+                -- macro loader vs function loader
+                if env == "_COMPILER" then
+                    -- macro loadewr
+                    return fennel.eval(code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename}, ...)
+                else
+                    local x, y = pcall(fennel.compileString, code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename})
+                    return run_many(y, filename, ...)
+                end
+                -- END NOTENOTE: this should be the same between different file types
+            end, filename
+        elseif lang == "tl" then
+            return function(...)
+                    local done, result = pcall(tl.process_string, code_str, _G.LYTE_TEAL_LAX_MODE, nil, "@"..filename, modulename)
+                    if (not done) then
+                        _G.LYTE_ERROR_TEXT = "<teal error> " .. result
+                        print ("tl.process_string failed. file: " .. filename .. ", error: " .. result)
+                    end
+                    if (#result.syntax_errors > 0) then
+                        _G.LYTE_ERROR_TEXT = "<teal Syntax error> file: " .. filename
+                        print("errors:")
+                        for k,v in ipairs(result.syntax_errors) do print (k, fennel.view(v)) end
+                        error(_G.LYTE_ERROR_TEXT)
+                    end
+                    local lua_code = tl.pretty_print_ast(result.ast)
+                    return run_many(lua_code, filename, ...)
+            end, filename
+        elseif lang == "moon" then
+            print("Internal warning: moonscript is not yet supported")
+        --elseif lang == nil then
+        --    print("Internal error: lang is nil")
+        else
+            print("Internal error: Unknown/incorrectly configured lang: " .. lang)
+        end
+
     end
     return loader_lyte
 end
 
-table.insert(package.loaders, 2, make_lyte_searcher(_G))
+table.insert(package.loaders, 2, lyte_lua_loader)
+
+table.insert(package.loaders, 3, make_lyte_searcher(nil))
 table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
 
 
@@ -216,7 +201,7 @@ table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
 -- REPL helpers
 
 _G.LYTE_REPL_EVAL_FENNEL = function(str)
-    return fennel.eval(str, {correlate=true, env=env, filename="@lyte_repl", moduleName="lyte_repl"})
+    return fennel.eval(str, {correlate=true, env=nil, filename="@lyte_repl", moduleName="lyte_repl"})
 end
 
 _G.LYTE_REPL_EVAL_LUA  = function(str)

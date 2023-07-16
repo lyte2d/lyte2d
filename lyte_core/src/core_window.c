@@ -263,11 +263,18 @@ int lyte_set_fullscreen(bool fullscreen) {
             lytecore_state.fullscreen = fullscreen = false;
         }
     }
+    return 0;
 #else
+    if (!lytecore_state.window) {
+        lytecore_state.fullscreen = fullscreen;
+        return 0;
+    }
+
     static int win_x = 0;
     static int win_y = 0;
     static int win_save_w = 0;
     static int win_save_h = 0;
+    // static int win_save_refresh_rate = 0;
     if (fullscreen != lytecore_state.fullscreen) {
             GLFWmonitor *monitor = NULL;
             int err = get_current_monitor(&monitor, lytecore_state.window);
@@ -280,15 +287,21 @@ int lyte_set_fullscreen(bool fullscreen) {
             glfwGetWindowPos(lytecore_state.window, &win_x, &win_y);
             win_save_w = lytecore_state.window_size.width;
             win_save_h = lytecore_state.window_size.height;
+            // win_save_refresh_rate = mode->refreshRate;
             glfwGetWindowSize(lytecore_state.window,&lytecore_state.window_size.width, &lytecore_state.window_size.height);
             glfwSetWindowMonitor(lytecore_state.window, lytecore_state.monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            lyte_set_window_vsync(lytecore_state.vsync);
         } else {
             glfwSetWindowMonitor(lytecore_state.window, NULL, win_x, win_y, win_save_w, win_save_h, GLFW_DONT_CARE);
+            lyte_set_window_vsync(lytecore_state.vsync);
+            // bool is_vsync;
+            // lyte_is_window_vsync(&is_vsync);
+            // if(is_vsync) {printf("vsync\n");} else {printf("no vsync\n");}
         }
         lytecore_state.fullscreen = fullscreen;
     }
-#endif
     return 0;
+#endif
 }
 
 int lyte_is_fullscreen(bool *val) {

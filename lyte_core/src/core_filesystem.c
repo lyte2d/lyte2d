@@ -241,7 +241,7 @@ int lyte_load_textfile(const char * path, const char * *val) {
         // fprintf(stderr, "\nWarning: load_text_file('%s') failed with errorcode '%d' error '%s'\n", path, errcode, errstr);
         // this is not an error, but should be logged just in case the developer cares
         // in lyte_gui, these outputs won't be seen, so the players won't be seeing these warnings anyway
-        fprintf(stderr, "\nWarning: could not load file '%s', error: '%s'", path, errstr); // errstr has next line...
+        fprintf(stderr, "Warning: could not load file '%s', error: '%s'\n", path, errstr); // errstr has next line...
         return errcode;
     }
     size_t len = PHYSFS_fileLength(file);
