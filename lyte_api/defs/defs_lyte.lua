@@ -194,13 +194,13 @@ local lyte_namespace = Namespace("lyte", {
     Function("get_monitor_count", nil, {
         Ret("val", Integer()),
     }, {d="Get the number of currently connected monitors."}),
-    
+
     Function("get_monitor_name", {
         Arg("index", Integer()),
     }, {
         Ret("val", String()),
     }, {d="Get the name of the monitor at the index"}),
-    
+
     Function("get_monitor_width", {
         Arg("index", Integer()),
     }, {
@@ -212,7 +212,7 @@ local lyte_namespace = Namespace("lyte", {
     }, {
         Ret("val", Integer()),
     }, {d="Get the height of the monitor at the index"}),
-    
+
     Function("set_window_monitor", {
         Arg("index", Integer()),
     }, nil, {d=[[ Set the window's initial monitor to the indexed value.
@@ -764,9 +764,9 @@ local lyte_namespace = Namespace("lyte", {
     -- ------------------------------------------------------------------------------------------------------------------------------------------------------
     -- -- BEGIN: PHYSICS ------------------------------
 
-    Function("set_physics_engine", {
-        Arg("state", Defined("PhysicsState")),
-    }, nil, {d="Set the physics engine state."});
+    -- Function("set_physics_engine", {
+    --     Arg("state", Defined("PhysicsState")),
+    -- }, nil, {d="Set the physics engine state."});
 
     -- Function("reset_physics_engine", nil, nil, {d="Reset the physics engine state."});
 
@@ -844,7 +844,7 @@ local lyte_namespace = Namespace("lyte", {
 
     -- Enum("PhysicsConfig", {"num_dimensions", "gravity_x", "gravity_y", "gravity_z", "ERP", "CFM", }), -- there's a lot more
 
-    Enum("PhysicsState", {"off", "on", "paused"}, {d="Physics engine state.", dd={["off"]="Physics engine off", ["on"]="Physics engine on", ["paused"]="Physics engine paused"}}), -- dd: testing enum docs
+    -- Enum("PhysicsState", {"off", "on", "paused"}, {d="Physics engine state.", dd={["off"]="Physics engine off", ["on"]="Physics engine on", ["paused"]="Physics engine paused"}}), -- dd: testing enum docs
 
 
     -- END:   PHYSICS ------------------------------

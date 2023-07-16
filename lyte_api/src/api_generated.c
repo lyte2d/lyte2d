@@ -216,12 +216,6 @@ EnumStrInt lyte_KeyboardKey_strings[] = {
     {"menu", LYTE_KEYBOARDKEY_MENU},
     {NULL, -1},
 };
-EnumStrInt lyte_PhysicsState_strings[] = {
-    {"off", LYTE_PHYSICSSTATE_OFF},
-    {"on", LYTE_PHYSICSSTATE_ON},
-    {"paused", LYTE_PHYSICSSTATE_PAUSED},
-    {NULL, -1},
-};
 // quit: [-- ]
 static int api_quit(lua_State *L) {
     (void)L;
@@ -1352,15 +1346,6 @@ static int api_shaderbuilder_build(lua_State *L) {
     lua_setmetatable(L, -2);
     return 1; // number of return values
 }
-// set_physics_engine: [ string -- ]
-static int api_set_physics_engine(lua_State *L) {
-    (void)L;
-    const char *state_str = luaL_checkstring(L, 1);
-    lyte_PhysicsState state = enumstring_to_int(lyte_PhysicsState_strings, state_str);
-    int _err = _set_physics_engine(state);
-    (void)_err;  // TODO: handle '_err' in case it's not 0
-    return 0; // number of return values
-}
 
 enum Image_keys_index {
     IDX_Image_width,
@@ -1855,7 +1840,6 @@ static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"shaderbuilder_vertex", api_shaderbuilder_vertex},
     {"shaderbuilder_fragment", api_shaderbuilder_fragment},
     {"shaderbuilder_build", api_shaderbuilder_build},
-    {"set_physics_engine", api_set_physics_engine},
     {NULL, NULL}, // sentinel
 };
 static int luaopen_lyte_api_functions(lua_State *L) {

@@ -246,13 +246,4 @@ typedef enum lyte_KeyboardKey {
     LYTE_KEYBOARDKEY_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 } lyte_KeyboardKey;
 
-typedef enum lyte_PhysicsState {
-    LYTE_PHYSICSSTATE_OFF,// order: 0, str: 'off'
-    LYTE_PHYSICSSTATE_ON,// order: 1, str: 'on'
-    LYTE_PHYSICSSTATE_PAUSED,// order: 2, str: 'paused'
-    LYTE_PHYSICSSTATE_COUNT = 3,
-    LYTE_PHYSICSSTATE_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
-} lyte_PhysicsState;
-
-
 #endif  // API_ENUMS_H_INCLUDED

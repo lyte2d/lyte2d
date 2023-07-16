@@ -699,12 +699,7 @@ static inline int _shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Sh
     _err = lyte_shaderbuilder_build(shaderbuilder, shader);
     return _err;
 }
-static inline int _set_physics_engine(lyte_PhysicsState state) {
-    (void)state;
-    int _err = 0;
-    // _err = lyte_set_physics_engine(state);
-    return _err;
-}
+
 static inline int _cleanup_lyte_Image(lyte_Image *image) {
     (void)image;
     int _ret = 0;
