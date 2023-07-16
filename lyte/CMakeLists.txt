@@ -3,10 +3,10 @@ cmake_policy(SET CMP0091 NEW)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if( WIN_GUI )
     # project(lyte_gui C)
-    project(lyte_gui  LANGUAGES C )
+    project("lyte_gui"  LANGUAGES C )
 else()
     # project(lyte C)
-    project(lyte  LANGUAGES C )
+    project("lyte"  LANGUAGES C )
 endif()
 
 

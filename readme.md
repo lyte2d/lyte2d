@@ -8,9 +8,9 @@ Lyte2D is a comfy little Lua framework for game development that is OSS and free
 - [Github repo](https://github.com/lyte2d/lyte2d)
 - [Downloads](https://github.com/lyte2d/lyte2d/releases)
 
-- Documentation: [lyte2d/documents/manual](https://github.com/lyte2d/documents/manual)
-- Example code: [lyte2d/documents/examples](https://github.com/lyte2d/documents/examples)
-- Typings: [lyte2d/documents/typings](https://github.com/lyte2d/documents/typings)
+- Documentation: [lyte2d/documents/manual](https://github.com/lyte2d/documents/tree/main/manual)
+- Example code: [lyte2d/documents/examples](https://github.com/lyte2d/documents/tree/main/examples)
+- Typings: [lyte2d/documents/typings](https://github.com/lyte2d/documents/tree/main/typings)
 
 - Community: [Discord](https://discord.gg/BKPfQrCaNU) and [Discussions](https://github.com/lyte2d/lyte2d/discussions)
 
