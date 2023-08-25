@@ -85,6 +85,7 @@ typedef struct lyte_CoreState {
     void *shader; // ShaderItem (internal)
 
     bool do_quit; // set to true to quit the app
+    bool first_frame; // first frame of the tick function
 
     lyte_TickFunction tick_fn;
     void *app_data;

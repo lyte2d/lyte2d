@@ -57,8 +57,9 @@ static inline void _tick_function(void) {
     lytecore_state.window_size.width = win_w;
     lytecore_state.window_size.height = win_h;
     bool resized = false;
-    if (prev_w != lytecore_state.window_size.width || prev_h != lytecore_state.window_size.height) {
+    if (lytecore_state.first_frame || prev_w != lytecore_state.window_size.width || prev_h != lytecore_state.window_size.height) {
         resized = true;
+        lytecore_state.first_frame = false;
     }
 
     sgp_begin(win_w, win_h);
@@ -99,6 +100,7 @@ static inline void _tick_function(void) {
 int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data) {
     lytecore_state.tick_fn = tick_fn;
     lytecore_state.app_data = app_data;
+    lytecore_state.first_frame = true; // this will cause "resized" flag to be set so that initial "tick" can set app data correctly
     return 0;
 }
 
