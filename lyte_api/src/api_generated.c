@@ -832,6 +832,9 @@ static int api_load_music(lua_State *L) {
 static int api_play_music(lua_State *L) {
     (void)L;
     lyte_Music *music = luaL_checkudata(L, 1, "lyte.Music");
+    // save this value to registry to prevent it from being GC'd
+    lua_pushvalue(L, -1); // duplicate the object
+    lua_setfield(L, LUA_REGISTRYINDEX, "lyte_music_SAVE");
     int _err = _play_music(*music);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values

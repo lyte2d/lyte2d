@@ -149,7 +149,7 @@ local lyte_namespace = Namespace("lyte", {
     }, {d="Create a canvas image with given width and height.", ctor=true}),
 
     Function("set_canvas", {
-        Arg("canvas_image", Defined("Image"), {save_to_registry=true}), -- TODO: save_to_registry
+        Arg("canvas_image", Defined("Image"), {save_to_registry=true}),
     }, nil, {d="Set the effective canvas image. All draw operations will go to this canvas until it's reset."}),
 
     Function("reset_canvas", nil, nil, {d="Reset the drawing target, back to screen."}),
@@ -168,7 +168,7 @@ local lyte_namespace = Namespace("lyte", {
     }, {d="Load the font specified in the path, and set the initial size.", ctor=true}),
 
     Function("set_font", {
-        Arg("font", Defined("Font"), {nativetype="udata", save_to_registry=true}), -- TODO: save_to_registry
+        Arg("font", Defined("Font"), {nativetype="udata", save_to_registry=true}),
     }, nil, {d="Set the effective font to be used in the drawing operations."}),
 
     Function("reset_font", nil, nil, {d="Reset the font to its default value.", c_api_skip=true}),
@@ -387,7 +387,7 @@ local lyte_namespace = Namespace("lyte", {
     }, {d="Load the music specified in the path.", ctor=true}),
 
     Function("play_music", {
-        Arg("music", Defined("Music")), -- TODO: save to registry??
+        Arg("music", Defined("Music"), {save_to_registry=true}),
     }, nil, {d="Play the music."}),
 
     Function("pause_music", {
