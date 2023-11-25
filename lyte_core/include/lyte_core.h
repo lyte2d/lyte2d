@@ -50,6 +50,7 @@ typedef void (*lyte_TickFunction)(void *app_data, float delta_time, int width, i
 
 typedef struct lyte_Config {
     lyte_Args args;
+    bool fullscreen;
     bool vsync;
     const char *exe_name;
     // const char *window_title;
