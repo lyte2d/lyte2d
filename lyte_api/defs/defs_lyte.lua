@@ -49,7 +49,7 @@ local lyte_namespace = Namespace("lyte", {
         Arg("window_width", Integer(), {optional=true, default=0.0}),
         Arg("window_height", Integer(), {optional=true, default=0.0}),
         Arg("window_resized", Boolean(), {optional=true, default=false}),
-    }, nil, {d="Tick function. Should be created by the user.", c_api_skip=true}),
+    }, nil, {d="Tick function. Should be created by the user.", c_api_skip=true, callback=true}),
 
     Function("quit", nil, nil, {d="Quit the application by closing the window."}),
 

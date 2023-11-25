@@ -14,6 +14,7 @@ local SS = (" "):rep(WHITESPACE)
 local SSS= SS:rep(2)
 
 -- T = T .. header
+T = T .. "--- @meta\n\n"
 
 ----------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
@@ -84,7 +85,13 @@ end
 
 local function get_fn(f)
     local L = ""
-    local title = S .. "--- @type " .. " fun"
+    local prefix
+    if f._tags.callback then
+        prefix = "--- @field " .. f._name
+    else
+        prefix = "--- @type"
+    end
+    local title = S .. prefix .. " fun"
     local sep = ": "
 
     -- name
@@ -98,7 +105,7 @@ local function get_fn(f)
     L = L .. ")"
     -- rets
     if #f.rets == 0 then
-    --    L = L .. ")"
+        --    L = L .. ")"
     else
         L = L .. sep
         if #f.rets > 1 then L = L .. "(" end
@@ -110,32 +117,58 @@ local function get_fn(f)
         end
         if #f.rets > 1 then L = L .. ")" end
     end
-    L = L .. "\nfunction " .. D._name .. "." .. f._name .. "() end";
+
     L = L .. "\n"
+
+    if not f._tags.callback then
+        L = L .. "function " .. D._name .. "." .. f._name .. "() end\n";
+    end
+
+    return L
+end
+
+local function get_docs(d)
+    L = ""
+
+    if not d._tags or not d._tags.d then
+        return L
+    end
+
+    for line in d._tags.d:gmatch("[^\n]+") do
+        L = L .. S .. "--- " .. line .. "\n"
+    end
+
     return L
 end
 
 ----------------------------------
 -- namespace begin
 ----------------------------------
-T = T .. "local " .. D._name .. " = {}\n"
+T = T .. "--- @class " .. D._name .. "\n"
 
 ----------------------------------
 -- functions
 ----------------------------------
-T = T .. S .. "\n\n-- functions\n\n"
+C = ""
+F = S .. "\n\n-- functions\n\n"
 for _,f in ipairs(D.functions) do
-    local L = get_fn(f)
+    local L = get_docs(f) .. get_fn(f)
     -- DONE
-    T = T .. L
+    if not f._tags.callback then
+        F = F .. L
+    else
+        C = C .. SS .. L
+    end
 end
+
+T = T .. C .. D._name .. " = {}\n" .. F
 
 ----------------------------------
 -- lists
 ----------------------------------
 T = T .. S .. "\n\n-- lists\n\n"
 for _,l in ipairs(D.lists) do
-    T = T .. S .. "--- @alias " .. D._name .. "." .. l._name .. " " ..  get_t_name(l, true) .. "\n"
+    T = T .. get_docs(l) .. S .. "--- @alias " .. D._name .. "." .. l._name .. " " ..  get_t_name(l, true) .. "\n"
 end
 
 ----------------------------------
@@ -143,7 +176,7 @@ end
 ----------------------------------
 T = T .. S .. "\n\n-- tuples\n\n"
 for _,l in ipairs(D.tuples) do
-    T = T .. S .. "--- @alias " .. D._name .. "."  .. l._name .. " " ..  get_t_name(l, true) .. "\n"
+    T = T .. get_docs(l) .. S .. "--- @alias " .. D._name .. "."  .. l._name .. " " ..  get_t_name(l, true) .. "\n"
 end
 
 ----------------------------------
@@ -151,7 +184,7 @@ end
 ----------------------------------
 T = T .. S .. "\n\n-- dicts\n\n"
 for _,d in ipairs(D.dicts) do
-    T = T .. S .. "--- @alias " .. D._name .. "."  .. d._name .. " " .. get_t_name(d, true) .. "\n"
+    T = T .. get_docs(d) .. S .. "--- @alias " .. D._name .. "."  .. d._name .. " " .. get_t_name(d, true) .. "\n"
 end
 
 ----------------------------------
@@ -159,7 +192,7 @@ end
 ----------------------------------
 T = T .. S .. "\n\n-- variants\n\n"
 for _,o in ipairs(D.variants) do
-    T = T .. S .. "--- @alias " .. D._name .. "."  .. o._name .. " " .. get_t_name(o, true) .. "\n"
+    T = T .. get_docs(o) .. S .. "--- @alias " .. D._name .. "."  .. o._name .. " " .. get_t_name(o, true) .. "\n"
 end
 
 
@@ -168,15 +201,17 @@ end
 ----------------------------------
 T = T .. S .. "\n\n-- records\n\n"
 for _,r in ipairs(D.records) do
-    local L = ""
+    local L = get_docs(r)
     -- name
     L = L .. S .. "--- @class " .. D._name .. "."  .. r._name .. "\n"
     -- fields
     for _,f in ipairs(r.fields) do
+        L = L .. SS .. get_docs(f)
         L = L .. SS .. "--- @field " .. f._name .. " " .. get_t_name(f.value_type) .. "\n"
     end
     -- methods
     for _,m in ipairs(r.methods) do
+        L = L .. SS .. get_docs(m)
         L = L .. SS .. "--- @field " .. m._name .. " " .. get_method(m)
     end
     L = L .. S .. "" .. D._name .. "."  .. r._name .. " = {}\n"
@@ -189,7 +224,7 @@ end
 ----------------------------------
 T = T .. S .. "\n\n-- enums\n\n"
 for _,e in ipairs(D.enums) do
-    local L = ""
+    local L = get_docs(e)
 
     L = L .. S .. "---@alias " .. D._name .. "."  .. e._name .. ""
 
@@ -206,7 +241,7 @@ for _,e in ipairs(D.enums) do
         end
     end
     -- DONE
-    T = T .. L .. "\n" 
+    T = T .. L .. "\n"
 end
 
 
