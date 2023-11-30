@@ -288,6 +288,7 @@ lyte.set_window_title(_def.title)
 lyte.set_window_vsync(_def.vsync)
 lyte.set_default_filtermode(_def.default_filtermode)
 lyte.set_default_blendmode(_def.default_blendmode)
+lyte.set_fullscreen(_def.fullscreen)
 
 lyte.set_window_icon_file("lyte_boot_assets/icon.png")
 

@@ -551,6 +551,7 @@ int main(int argc, char *argv[]) {
         .args.argc = argc,
         .args.argv = argv,
         .exe_name = argv[0],
+        .fullscreen = false,
         .vsync = true,
         .blendmode = LYTE_BLENDMODE_BLEND,
         .filtermode = LYTE_FILTERMODE_NEAREST,
