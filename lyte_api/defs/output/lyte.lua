@@ -1,241 +1,362 @@
-local lyte = {}
+--- @meta
+
+--- @class lyte
+    --- Tick function. Should be created by the user.
+--- @field tick fun(delta_time: number, window_width: number, window_height: number, window_resized: boolean)
+lyte = {}
 
 
 -- functions
 
---- @type  fun(delta_time: number, window_width: number, window_height: number, window_resized: boolean)
-function lyte.tick() end
---- @type  fun()
+--- Quit the application by closing the window.
+--- @type fun()
 function lyte.quit() end
---- @type  fun(r: number, g: number, b: number, a: number)
+--- Clear the screen or current canvas if one is used.
+--- @type fun(r: number, g: number, b: number, a: number)
 function lyte.cls() end
---- @type  fun(r: number, g: number, b: number, a: number)
+--- Set the foreground color to be used in the drawing operations.
+--- @type fun(r: number, g: number, b: number, a: number)
 function lyte.set_color() end
---- @type  fun()
+--- Reset the foreground color to its default value.
+--- @type fun()
 function lyte.reset_color() end
---- @type  fun(x: number, y: number)
+--- Draw a point.
+--- @type fun(x: number, y: number)
 function lyte.draw_point() end
---- @type  fun(x1: number, y1: number, x2: number, y2: number)
+--- Draw a line
+--- @type fun(x1: number, y1: number, x2: number, y2: number)
 function lyte.draw_line() end
---- @type  fun(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
+--- Draw a filled rectangle.
+--- @type fun(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
 function lyte.draw_rect() end
---- @type  fun(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
+--- Draw a rectangle border.
+--- @type fun(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
 function lyte.draw_rect_line() end
---- @type  fun(dest_x: number, dest_y: number, radius: number)
+--- Draw a filled circle.
+--- @type fun(dest_x: number, dest_y: number, radius: number)
 function lyte.draw_circle() end
---- @type  fun(dest_x: number, dest_y: number, radius: number)
+--- Draw a circle border.
+--- @type fun(dest_x: number, dest_y: number, radius: number)
 function lyte.draw_circle_line() end
---- @type  fun(image_path: string): lyte.Image
+--- Load the image specified in the path.
+--- @type fun(image_path: string): lyte.Image
 function lyte.load_image() end
---- @type  fun(image: lyte.Image, dest_x: number, dest_y: number)
+--- Draw an image.
+--- @type fun(image: lyte.Image, dest_x: number, dest_y: number)
 function lyte.draw_image() end
---- @type  fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)
+--- Draw a rectangular area from the image.
+--- @type fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)
 function lyte.draw_image_rect() end
---- @type  fun(image: lyte.Image): number
+--- Get the width of the image.
+--- @type fun(image: lyte.Image): number
 function lyte.get_image_width() end
---- @type  fun(image: lyte.Image): number
+--- Get the height of the image.
+--- @type fun(image: lyte.Image): number
 function lyte.get_image_height() end
---- @type  fun(width: number, height: number): lyte.Image
+--- Create a canvas image with given width and height.
+--- @type fun(width: number, height: number): lyte.Image
 function lyte.new_canvas() end
---- @type  fun(canvas_image: lyte.Image)
+--- Set the effective canvas image. All draw operations will go to this canvas until it's reset.
+--- @type fun(canvas_image: lyte.Image)
 function lyte.set_canvas() end
---- @type  fun()
+--- Reset the drawing target, back to screen.
+--- @type fun()
 function lyte.reset_canvas() end
---- @type  fun(image: lyte.Image): boolean
+--- Check if the image was created as a canvas.
+--- @type fun(image: lyte.Image): boolean
 function lyte.is_image_canvas() end
---- @type  fun(font_path: string, size: number): lyte.Font
+--- Load the font specified in the path, and set the initial size.
+--- @type fun(font_path: string, size: number): lyte.Font
 function lyte.load_font() end
---- @type  fun(font: lyte.Font)
+--- Set the effective font to be used in the drawing operations.
+--- @type fun(font: lyte.Font)
 function lyte.set_font() end
---- @type  fun()
+--- Reset the font to its default value.
+--- @type fun()
 function lyte.reset_font() end
---- @type  fun(text: string, dest_x: number, dest_y: number)
+--- Draw a text line.
+--- @type fun(text: string, dest_x: number, dest_y: number)
 function lyte.draw_text() end
---- @type  fun(text: string): number
+--- Get the width of the given text line.
+--- @type fun(text: string): number
 function lyte.get_text_width() end
---- @type  fun(text: string): number
+--- Get the height of the given text line.
+--- @type fun(text: string): number
 function lyte.get_text_height() end
---- @type  fun(): number
+--- Get the number of currently connected monitors.
+--- @type fun(): number
 function lyte.get_monitor_count() end
---- @type  fun(index: number): string
+--- Get the name of the monitor at the index
+--- @type fun(index: number): string
 function lyte.get_monitor_name() end
---- @type  fun(index: number): number
+--- Get the width of the monitor at the index
+--- @type fun(index: number): number
 function lyte.get_monitor_width() end
---- @type  fun(index: number): number
+--- Get the height of the monitor at the index
+--- @type fun(index: number): number
 function lyte.get_monitor_height() end
---- @type  fun(index: number)
+---  Set the window's initial monitor to the indexed value.
+---  Must be set before the window is opened.
+--- @type fun(index: number)
 function lyte.set_window_monitor() end
---- @type  fun(resizable: boolean)
+---  Set the window resizable flag to the given value.
+---  Must be set before the window is opened.
+--- @type fun(resizable: boolean)
 function lyte.set_window_resizable() end
---- @type  fun(width: number, height: number)
+--- Set the window's minimum possible size.
+--- @type fun(width: number, height: number)
 function lyte.set_window_minsize() end
---- @type  fun(width: number, height: number)
+--- Set the window's size.
+--- @type fun(width: number, height: number)
 function lyte.set_window_size() end
---- @type  fun(): number
+--- Get the width of the window.
+--- @type fun(): number
 function lyte.get_window_width() end
---- @type  fun(): number
+--- Get the height of the window.
+--- @type fun(): number
 function lyte.get_window_height() end
---- @type  fun(x: number, y: number)
+--- Set the window's position.
+--- @type fun(x: number, y: number)
 function lyte.set_window_position() end
---- @type  fun(fullscreen: boolean)
+--- Set the window to fullscreen, or windowed mode.
+--- @type fun(fullscreen: boolean)
 function lyte.set_fullscreen() end
---- @type  fun(): boolean
+--- Check if the window is set to fullscreen.
+--- @type fun(): boolean
 function lyte.is_fullscreen() end
---- @type  fun(title: string)
+--- Set the window's title.
+--- @type fun(title: string)
 function lyte.set_window_title() end
---- @type  fun(vsync: boolean)
+--- Set the window vsync flag to the given value.
+--- @type fun(vsync: boolean)
 function lyte.set_window_vsync() end
---- @type  fun(): boolean
+--- Check if the window vsync flag is set.
+--- @type fun(): boolean
 function lyte.is_window_vsync() end
---- @type  fun(icon_path: string)
+--- Set the window icon.
+--- @type fun(icon_path: string)
 function lyte.set_window_icon_file() end
---- @type  fun(left: number, right: number, top: number, bottom: number)
+--- Set the window margins. Margins are ignored and no drawing can be made there..
+--- @type fun(left: number, right: number, top: number, bottom: number)
 function lyte.set_window_margins() end
---- @type  fun(left: number, right: number, top: number, bottom: number)
+--- Set the window paddings. Paddings are can be drawn on.
+--- @type fun(left: number, right: number, top: number, bottom: number)
 function lyte.set_window_paddings() end
---- @type  fun(key: lyte.KeyboardKey): boolean
+--- Check if the given key is down.
+--- @type fun(key: lyte.KeyboardKey): boolean
 function lyte.is_key_down() end
---- @type  fun(key: lyte.KeyboardKey): boolean
+--- Check if the given key is pressed.
+--- @type fun(key: lyte.KeyboardKey): boolean
 function lyte.is_key_pressed() end
---- @type  fun(key: lyte.KeyboardKey): boolean
+--- Check if the given key is released.
+--- @type fun(key: lyte.KeyboardKey): boolean
 function lyte.is_key_released() end
---- @type  fun(key: lyte.KeyboardKey): boolean
+--- Check if the given key is repeated.
+--- @type fun(key: lyte.KeyboardKey): boolean
 function lyte.is_key_repeat() end
---- @type  fun(mouse_button: lyte.MouseButton): boolean
+--- Check if the given mouse button is down.
+--- @type fun(mouse_button: lyte.MouseButton): boolean
 function lyte.is_mouse_down() end
---- @type  fun(mouse_button: lyte.MouseButton): boolean
+--- Check if the given mouse button is pressed.
+--- @type fun(mouse_button: lyte.MouseButton): boolean
 function lyte.is_mouse_pressed() end
---- @type  fun(mouse_button: lyte.MouseButton): boolean
+--- Check if the given mouse button is released.
+--- @type fun(mouse_button: lyte.MouseButton): boolean
 function lyte.is_mouse_released() end
---- @type  fun(): number
+--- Get the mouse x position.
+--- @type fun(): number
 function lyte.get_mouse_x() end
---- @type  fun(): number
+--- Get the mouse y position.
+--- @type fun(): number
 function lyte.get_mouse_y() end
---- @type  fun(): number
+--- Get the number of gamepads.
+--- @type fun(): number
 function lyte.get_gamepad_count() end
---- @type  fun(index: number): string
+--- Get the name of the gamepad at the given index.
+--- @type fun(index: number): string
 function lyte.get_gamepad_name() end
---- @type  fun(index: number, gamepad_button: lyte.GamepadButton): boolean
+--- Check if the given button of the gamepad at the given index is down.
+--- @type fun(index: number, gamepad_button: lyte.GamepadButton): boolean
 function lyte.is_gamepad_down() end
---- @type  fun(index: number, gamepad_button: lyte.GamepadButton): boolean
+--- Check if the given button of the gamepad at the given index is pressed.
+--- @type fun(index: number, gamepad_button: lyte.GamepadButton): boolean
 function lyte.is_gamepad_pressed() end
---- @type  fun(index: number, gamepad_button: lyte.GamepadButton): boolean
+--- Check if the given button of the gamepad at the given index is released.
+--- @type fun(index: number, gamepad_button: lyte.GamepadButton): boolean
 function lyte.is_gamepad_released() end
---- @type  fun(index: number, gamepad_axis: lyte.GamepadAxis): number
+--- Get the given axis of the gamepad at the given index.
+--- @type fun(index: number, gamepad_axis: lyte.GamepadAxis): number
 function lyte.get_gamepad_axis() end
---- @type  fun(mastervolume: number)
+--- Set the master volume.
+--- @type fun(mastervolume: number)
 function lyte.set_mastervolume() end
---- @type  fun(): number
+--- Get the master volume.
+--- @type fun(): number
 function lyte.get_mastervolume() end
---- @type  fun(music_path: string): lyte.Music
+--- Load the music specified in the path.
+--- @type fun(music_path: string): lyte.Music
 function lyte.load_music() end
---- @type  fun(music: lyte.Music)
+--- Play the music.
+--- @type fun(music: lyte.Music)
 function lyte.play_music() end
---- @type  fun(music: lyte.Music)
+--- Pause the music.
+--- @type fun(music: lyte.Music)
 function lyte.pause_music() end
---- @type  fun(music: lyte.Music)
+--- Resume the music.
+--- @type fun(music: lyte.Music)
 function lyte.resume_music() end
---- @type  fun(music: lyte.Music)
+--- Stop the music.
+--- @type fun(music: lyte.Music)
 function lyte.stop_music() end
---- @type  fun(music: lyte.Music): boolean
+--- Check if the given music is playing.
+--- @type fun(music: lyte.Music): boolean
 function lyte.is_music_playing() end
---- @type  fun(music: lyte.Music): number
+--- Get the length of the given music object in seconds.
+--- @type fun(music: lyte.Music): number
 function lyte.get_music_length() end
---- @type  fun(music: lyte.Music): number
+--- Get the already played length of the given music object in seconds.
+--- @type fun(music: lyte.Music): number
 function lyte.get_music_length_played() end
---- @type  fun(music: lyte.Music, secs: number)
+--- Move the music time played to the given value.
+--- @type fun(music: lyte.Music, secs: number)
 function lyte.seek_music() end
---- @type  fun(music: lyte.Music, volume: number)
+--- Set the volume of the given music object.
+--- @type fun(music: lyte.Music, volume: number)
 function lyte.set_music_volume() end
---- @type  fun(music: lyte.Music, pan: number)
+--- Set the pan of the given music object.
+--- @type fun(music: lyte.Music, pan: number)
 function lyte.set_music_pan() end
---- @type  fun(music: lyte.Music, pitch: number)
+--- Set the pitch of the given music object.
+--- @type fun(music: lyte.Music, pitch: number)
 function lyte.set_music_pitch() end
---- @type  fun(music: lyte.Music): number
+--- Get the volume of the given music object.
+--- @type fun(music: lyte.Music): number
 function lyte.get_music_volume() end
---- @type  fun(music: lyte.Music): number
+--- Get the pan of the given music object.
+--- @type fun(music: lyte.Music): number
 function lyte.get_music_pan() end
---- @type  fun(music: lyte.Music): number
+--- Get the pitch of the given music object.
+--- @type fun(music: lyte.Music): number
 function lyte.get_music_pitch() end
---- @type  fun(sound_path: string): lyte.Sound
+--- Load the sound specified in the path.
+--- @type fun(sound_path: string): lyte.Sound
 function lyte.load_sound() end
---- @type  fun(orig: lyte.Sound): lyte.Sound
+--- Clone the sound specified in the path.
+--- @type fun(orig: lyte.Sound): lyte.Sound
 function lyte.clone_sound() end
---- @type  fun(sound: lyte.Sound)
+--- Play the sound.
+--- @type fun(sound: lyte.Sound)
 function lyte.play_sound() end
---- @type  fun(sound: lyte.Sound)
+--- Pause the sound.
+--- @type fun(sound: lyte.Sound)
 function lyte.pause_sound() end
---- @type  fun(sound: lyte.Sound)
+--- Resume the sound.
+--- @type fun(sound: lyte.Sound)
 function lyte.resume_sound() end
---- @type  fun(sound: lyte.Sound)
+--- Stop the sound.
+--- @type fun(sound: lyte.Sound)
 function lyte.stop_sound() end
---- @type  fun(sound: lyte.Sound): boolean
+--- Check if the given sound is playing.
+--- @type fun(sound: lyte.Sound): boolean
 function lyte.is_sound_playing() end
---- @type  fun(sound: lyte.Sound, volume: number)
+--- Set the volume of the given sound object.
+--- @type fun(sound: lyte.Sound, volume: number)
 function lyte.set_sound_volume() end
---- @type  fun(sound: lyte.Sound, pan: number)
+--- Set the pan of the given sound object.
+--- @type fun(sound: lyte.Sound, pan: number)
 function lyte.set_sound_pan() end
---- @type  fun(sound: lyte.Sound, pitch: number)
+--- Set the pitch of the given sound object.
+--- @type fun(sound: lyte.Sound, pitch: number)
 function lyte.set_sound_pitch() end
---- @type  fun(sound: lyte.Sound): number
+--- Get the volume of the given sound object.
+--- @type fun(sound: lyte.Sound): number
 function lyte.get_sound_volume() end
---- @type  fun(sound: lyte.Sound): number
+--- Get the pan of the given sound object.
+--- @type fun(sound: lyte.Sound): number
 function lyte.get_sound_pan() end
---- @type  fun(sound: lyte.Sound): number
+--- Get the pitch of the given sound object.
+--- @type fun(sound: lyte.Sound): number
 function lyte.get_sound_pitch() end
---- @type  fun(file_path: string): string
+--- Load the file in the path.
+--- @type fun(file_path: string): string
 function lyte.load_textfile() end
---- @type  fun(file_path: string, data: string)
+--- Append the text to the file in the path. Override if the file exists. Create if it doesn't exist.
+--- @type fun(file_path: string, data: string)
 function lyte.save_textfile() end
---- @type  fun(file_path: string, data: string)
+--- Append the text to the file in the path. Append at the end if the file exists. Create if it doesn't exist.
+--- @type fun(file_path: string, data: string)
 function lyte.save_textfile_append() end
---- @type  fun()
+--- Push the transform matrix.
+--- @type fun()
 function lyte.push_matrix() end
---- @type  fun()
+--- Pop the transform matrix.
+--- @type fun()
 function lyte.pop_matrix() end
---- @type  fun()
+--- Reset the transformation matrix (load identity matrix.)
+--- @type fun()
 function lyte.reset_matrix() end
---- @type  fun(delta_x: number, delta_y: number)
+--- Apply translation (changes transform matrix.)
+--- @type fun(delta_x: number, delta_y: number)
 function lyte.translate() end
---- @type  fun(angle: number)
+--- Apply rotation (changes transform matrix.)
+--- @type fun(angle: number)
 function lyte.rotate() end
---- @type  fun(angle: number, x: number, y: number)
+--- Apply rotation at the given location (changes transform matrix.)
+--- @type fun(angle: number, x: number, y: number)
 function lyte.rotate_at() end
---- @type  fun(scale_x: number, scale_y: number)
+--- Apply scaling (changes transform matrix.)
+--- @type fun(scale_x: number, scale_y: number)
 function lyte.scale() end
---- @type  fun(scale_x: number, scale_y: number, x: number, y: number)
+--- Apply scaling at the given location (changes transform matrix.)
+--- @type fun(scale_x: number, scale_y: number, x: number, y: number)
 function lyte.scale_at() end
---- @type  fun(blendmode: lyte.BlendMode)
+--- Set the default blendmode.
+--- @type fun(blendmode: lyte.BlendMode)
 function lyte.set_default_blendmode() end
---- @type  fun(blendmode: lyte.BlendMode)
+--- Set the effective blendmode.
+--- @type fun(blendmode: lyte.BlendMode)
 function lyte.set_blendmode() end
---- @type  fun()
+--- Reset the blendmode value to its default value.
+--- @type fun()
 function lyte.reset_blendmode() end
---- @type  fun(filtermode: lyte.FilterMode)
+--- Set the default filtermode.
+--- @type fun(filtermode: lyte.FilterMode)
 function lyte.set_default_filtermode() end
---- @type  fun(filtermode: lyte.FilterMode)
+--- Set the effective filtermode.
+--- @type fun(filtermode: lyte.FilterMode)
 function lyte.set_filtermode() end
---- @type  fun()
+--- Reset the filtermode value to its default value.
+--- @type fun()
 function lyte.reset_filtermode() end
---- @type  fun(shaderdef: lyte.ShaderDef): lyte.Shader
+--- Create a shader with given specification.
+--- @type fun(shaderdef: lyte.ShaderDef): lyte.Shader
 function lyte.new_shader() end
---- @type  fun(shader: lyte.Shader)
+--- Set the custom shader and use it for consequent calls.
+--- @type fun(shader: lyte.Shader)
 function lyte.set_shader() end
---- @type  fun()
+--- Reset the shader, back to framework defaults.
+--- @type fun()
 function lyte.reset_shader() end
---- @type  fun(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
+--- Set the specified uniform.
+--- @type fun(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
 function lyte.set_shader_uniform() end
---- @type  fun(shader: lyte.Shader, uniform_name: string)
+--- Reset the specified uniform.
+--- @type fun(shader: lyte.Shader, uniform_name: string)
 function lyte.reset_shader_uniform() end
---- @type  fun(): lyte.ShaderBuilder
+--- Create a ShaderBuilder object.
+--- @type fun(): lyte.ShaderBuilder
 function lyte.new_shaderbuilder() end
---- @type  fun(shaderbuilder: lyte.ShaderBuilder, uniform_name: string, uniform_type: lyte.UniformType)
+--- Add uniform definition to the shaderbuilder
+--- @type fun(shaderbuilder: lyte.ShaderBuilder, uniform_name: string, uniform_type: lyte.UniformType)
 function lyte.shaderbuilder_uniform() end
---- @type  fun(shaderbuilder: lyte.ShaderBuilder, vertex_code: string)
+--- Add vertex code to the shaderbuilder
+--- @type fun(shaderbuilder: lyte.ShaderBuilder, vertex_code: string)
 function lyte.shaderbuilder_vertex() end
---- @type  fun(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
+--- Add fragment to the shaderbuilder
+--- @type fun(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
 function lyte.shaderbuilder_fragment() end
---- @type  fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
+--- Add fragment to the shaderbuilder
+--- @type fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
 function lyte.shaderbuilder_build() end
 
 
@@ -245,6 +366,7 @@ function lyte.shaderbuilder_build() end
 
 -- tuples
 
+--- Tuple of floats
 --- @alias lyte.FloatVec4 number[]
 
 
@@ -255,74 +377,89 @@ function lyte.shaderbuilder_build() end
 
 -- variants
 
+--- Shader uniform value
 --- @alias lyte.ShaderUniformValue number | lyte.FloatVec4 | lyte.Image
 
 
 -- records
 
+--- Image type
 --- @class lyte.Image
-    --- @field width number
-    --- @field height number
-    --- @field is_canvas boolean
+        --- @field width number
+        --- @field height number
+        --- @field is_canvas boolean
 lyte.Image = {}
 
+--- Font type.
 --- @class lyte.Font
 lyte.Font = {}
 
+--- Music type.
 --- @class lyte.Music
-    --- @field playing boolean
-    --- @field length number
-    --- @field length_played number
-    --- @field pan number
-    --- @field pitch number
-    --- @field volume number
-    --- @field play fun(music: lyte.Music)
-    --- @field pause fun(music: lyte.Music)
-    --- @field resume fun(music: lyte.Music)
-    --- @field stop fun(music: lyte.Music)
-    --- @field seek fun(music: lyte.Music, secs: number)
+        --- @field playing boolean
+        --- @field length number
+        --- @field length_played number
+        --- @field pan number
+        --- @field pitch number
+        --- @field volume number
+        --- @field play fun(music: lyte.Music)
+        --- @field pause fun(music: lyte.Music)
+        --- @field resume fun(music: lyte.Music)
+        --- @field stop fun(music: lyte.Music)
+        --- @field seek fun(music: lyte.Music, secs: number)
 lyte.Music = {}
 
+--- Sound type.
 --- @class lyte.Sound
-    --- @field pan number
-    --- @field pitch number
-    --- @field volume number
-    --- @field clone fun(orig: lyte.Sound): lyte.Sound
-    --- @field pause fun(sound: lyte.Sound)
-    --- @field play fun(sound: lyte.Sound)
-    --- @field resume fun(sound: lyte.Sound)
-    --- @field stop fun(sound: lyte.Sound)
+        --- @field pan number
+        --- @field pitch number
+        --- @field volume number
+        --- @field clone fun(orig: lyte.Sound): lyte.Sound
+        --- @field pause fun(sound: lyte.Sound)
+        --- @field play fun(sound: lyte.Sound)
+        --- @field resume fun(sound: lyte.Sound)
+        --- @field stop fun(sound: lyte.Sound)
 lyte.Sound = {}
 
+--- Shader type
 --- @class lyte.Shader
-    --- @field set fun(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
-    --- @field reset fun(shader: lyte.Shader, uniform_name: string)
+        --- @field set fun(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
+        --- @field reset fun(shader: lyte.Shader, uniform_name: string)
 lyte.Shader = {}
 
+--- Shader definition: uniforms declaration, vertex and fragment shader code.
 --- @class lyte.ShaderDef
-    --- @field frag string
-    --- @field vert string
-    --- @field uniforms lyte.UniformNamesToTypes
+        --- @field frag string
+        --- @field vert string
+        --- @field uniforms lyte.UniformNamesToTypes
 lyte.ShaderDef = {}
 
+--- ShaderBuilder type
 --- @class lyte.ShaderBuilder
-    --- @field uniform fun(shaderbuilder: lyte.ShaderBuilder, uniform_name: string, uniform_type: lyte.UniformType)
-    --- @field vertex fun(shaderbuilder: lyte.ShaderBuilder, vertex_code: string)
-    --- @field fragment fun(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
-    --- @field build fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
+        --- @field uniform fun(shaderbuilder: lyte.ShaderBuilder, uniform_name: string, uniform_type: lyte.UniformType)
+        --- @field vertex fun(shaderbuilder: lyte.ShaderBuilder, vertex_code: string)
+        --- @field fragment fun(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
+        --- @field build fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
 lyte.ShaderBuilder = {}
 
 
 
 -- enums
 
----@alias lyte.UniformType    "_invalid" |  "float" |  "vec2" |  "vec3" |  "vec4" |  "int" |  "ivec2" | "ivec3" | "ivec4" | "mat4" | "sampler2D"
----@alias lyte.BlendMode    "none" |  "blend" |  "add" |  "mod" |  "mul" 
+--- Acceptable uniformtype values.
+---@alias lyte.UniformType    "_invalid" |  "float" |  "vec2" |  "vec3" | "vec4" | "int" | "ivec2" | "ivec3" | "ivec4" | "mat4" | "sampler2D"
+--- Acceptable blendmode values.
+---@alias lyte.BlendMode    "none" |  "blend" |  "add" |  "mod" |  "mul"
+--- Acceptable filtermode values.
 ---@alias lyte.FilterMode    "_invalid" |  "nearest" |  "linear" 
----@alias lyte.GamepadAxis    "left_x" |  "left_y" |  "right_x" |  "right_y" |  "left_trigger" |  "right_trigger"
----@alias lyte.GamepadButton    "pad_a" |  "pad_b" |  "pad_x" |  "pad_y" |  "left_bumper" |  "right_bumper" | "back" | "start" | "guide" | "left_thumb" | "right_thumb" | "dpad_up" | "dpad_right" | "dpad_down" | "dpad_left"
----@alias lyte.MouseButton    "mb1" |  "mb2" |  "mb3" |  "mb4" |  "mb5" |  "mb6" |  "mb7" |  "mb8" 
----@alias lyte.KeyboardKey    "space" |  "'" |  "," |  "-" |  "." |  "/" |  "0" |  "1" |  "2" |  "3" | "4" | "5" | "6" | "7" | "8" | "9" | ";" | "=" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "[" | "\\" | "]" | "`" | "world_1" | "world_2" | "escape" | "enter" | "tab" | "backspace" | "insert" | "delete" | "right" | "left" | "down" | "up" | "page_up" | "page_down" | "home" | "end" | "caps_lock" | "scroll_lock" | "num_lock" | "print_screen" | "pause" | "f1" | "f2" | "f3" | "f4" | "f5" | "f6" | "f7" | "f8" | "f9" | "f10" | "f11" | "f12" | "f13" | "f14" | "f15" | "f16" | "f17" | "f18" | "f19" | "f20" | "f21" | "f22" | "f23" | "f24" | "f25" | "kp_0" | "kp_1" | "kp_2" | "kp_3" | "kp_4" | "kp_5" | "kp_6" | "kp_7" | "kp_8" | "kp_9" | "kp_decimal" | "kp_divide" | "kp_multiply" | "kp_subtract" | "kp_add" | "kp_enter" | "kp_equal" | "left_shift" | "left_control" | "left_alt" | "left_super" | "right_shift" | "right_control" | "right_alt" | "right_super" | "menu"
+--- Acceptable gamepadaxis values.
+---@alias lyte.GamepadAxis    "left_x" |  "left_y" |  "right_x" | "right_y" | "left_trigger" | "right_trigger"
+--- Acceptable gamepadbutton values.
+---@alias lyte.GamepadButton    "pad_a" |  "pad_b" |  "pad_x" | "pad_y" | "left_bumper" | "right_bumper" | "back" | "start" | "guide" | "left_thumb" | "right_thumb" | "dpad_up" | "dpad_right" | "dpad_down" | "dpad_left"
+--- Acceptable mousebutton values.
+---@alias lyte.MouseButton    "mb1" |  "mb2" |  "mb3" |  "mb4" |  "mb5" | "mb6" | "mb7" | "mb8"
+--- Acceptable keyboardkey values.
+---@alias lyte.KeyboardKey    "space" |  "'" |  "," |  "-" |  "." | "/" | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | ";" | "=" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "[" | "\\" | "]" | "`" | "world_1" | "world_2" | "escape" | "enter" | "tab" | "backspace" | "insert" | "delete" | "right" | "left" | "down" | "up" | "page_up" | "page_down" | "home" | "end" | "caps_lock" | "scroll_lock" | "num_lock" | "print_screen" | "pause" | "f1" | "f2" | "f3" | "f4" | "f5" | "f6" | "f7" | "f8" | "f9" | "f10" | "f11" | "f12" | "f13" | "f14" | "f15" | "f16" | "f17" | "f18" | "f19" | "f20" | "f21" | "f22" | "f23" | "f24" | "f25" | "kp_0" | "kp_1" | "kp_2" | "kp_3" | "kp_4" | "kp_5" | "kp_6" | "kp_7" | "kp_8" | "kp_9" | "kp_decimal" | "kp_divide" | "kp_multiply" | "kp_subtract" | "kp_add" | "kp_enter" | "kp_equal" | "left_shift" | "left_control" | "left_alt" | "left_super" | "right_shift" | "right_control" | "right_alt" | "right_super" | "menu"
 
 
 return lyte
