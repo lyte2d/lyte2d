@@ -68,7 +68,7 @@ target_include_directories(${PROJECT_NAME}
     # ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_wasm/include
   PRIVATE
     ./src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_api/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../lyte/api/include
     # ${CMAKE_CURRENT_SOURCE_DIR}/../lyte_common/include
     ${GLFW_SOURCE_DIR}/include
     ${GLFW_SOURCE_DIR}/dependencies

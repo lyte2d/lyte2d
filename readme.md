@@ -26,13 +26,13 @@ This readme contains information about _developing_ Lyte2D _itself_. For develop
 
 ### Windows
 - On Windows you'll need a Windows 10/11 SDK And a VS 2022 SDK cmdline (full VS installation is not needed)
-- `config.cmd`
-- `build.cmd`
+- `local_config.cmd`
+- `local_build.cmd`
 
 ### Linux or Windows with WSL (Tested only with Ubuntu)
 - Dockerfile contains all the requirements documented in executable form. Install those locally.
-- `./config.sh`
-- `./build.sh`
+- `./local_config.sh`
+- `./local_build.sh`
 
 ### WASM
 - Emscripten SDK needs to be installed and activated. (See Dockerfile for how)
@@ -49,6 +49,6 @@ This readme contains information about _developing_ Lyte2D _itself_. For develop
 
 ## License
 
-- This project is licensed under the terms of the MIT license. See [LICENSE](/LICENSE.md) file for details.
+- This project is licensed under the terms of the MIT license. See [LICENSE](/LICENSE) file for details.
 - Lyte2D depends on other software which have various licenses. See [licenses_all.txt](/licenses_all.txt) file for details.
 
