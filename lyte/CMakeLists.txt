@@ -91,8 +91,8 @@ endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_physics ${CMAKE_CURRENT_BINARY_DIR}/lyte_physics)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     lyte_core
