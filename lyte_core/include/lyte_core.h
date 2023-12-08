@@ -227,6 +227,12 @@ int lyte_set_canvas(lyte_Image image);
 int lyte_reset_canvas(void);
 int lyte_is_image_canvas(lyte_Image image, bool *val);
 
+int lyte_new_imagebatch(lyte_Image image, lyte_ImageBatch *val);
+int lyte_ImageBatch_cleanup(lyte_ImageBatch imagebatch);
+int lyte_reset_imagebatch(lyte_ImageBatch imagebatch);
+int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, int dest_x, int dest_y, int dest_width, int dest_height, int src_x, int src_y, int src_width, int src_height);
+int lyte_get_imagebatch_rect_count(lyte_ImageBatch imagebatch, int *val);
+int lyte_draw_imagebatch(lyte_ImageBatch imagebatch);
 
 // -------------------------
 // core_shapes
@@ -234,6 +240,8 @@ int lyte_is_image_canvas(lyte_Image image, bool *val);
 
 int lyte_draw_point(int x, int y);
 int lyte_draw_line(int x1, int y1, int x2, int y2);
+int lyte_draw_triangle(int ax, int ay, int bx, int by, int cx, int cy);
+int lyte_draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy);
 int lyte_draw_rect(int dest_x, int dest_y, int rect_width, int rect_height);
 int lyte_draw_rect_line(int dest_x, int dest_y, int rect_width, int rect_height);
 int lyte_draw_circle(int dest_x, int dest_y, int radius);

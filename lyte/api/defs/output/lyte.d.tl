@@ -7,6 +7,8 @@ global record lyte
     reset_color: function()
     draw_point: function(x: number, y: number)
     draw_line: function(x1: number, y1: number, x2: number, y2: number)
+    draw_triangle: function(ax: number, ay: number, bx: number, by: number, cx: number, cy: number)
+    draw_triangle_line: function(ax: number, ay: number, bx: number, by: number, cx: number, cy: number)
     draw_rect: function(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
     draw_rect_line: function(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
     draw_circle: function(dest_x: number, dest_y: number, radius: number)
@@ -20,6 +22,11 @@ global record lyte
     set_canvas: function(canvas_image: Image)
     reset_canvas: function()
     is_image_canvas: function(image: Image): boolean
+    new_imagebatch: function(image: Image): ImageBatch
+    reset_imagebatch: function(imagebatch: ImageBatch)
+    add_imagebatch_rect: function(imagebatch: ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
+    get_imagebatch_rect_count: function(imagebatch: ImageBatch): number
+    draw_imagebatch: function(imagebatch: ImageBatch)
     load_font: function(font_path: string, size: number): Font
     set_font: function(font: Font)
     reset_font: function()
@@ -130,6 +137,13 @@ global record lyte
         width: number
         height: number
         is_canvas: boolean
+    end
+    record ImageBatch
+        userdata
+        rect_count: number
+        add_rect: function (imagebatch: ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
+        draw: function (imagebatch: ImageBatch)
+        reset: function (imagebatch: ImageBatch)
     end
     record Font
         userdata

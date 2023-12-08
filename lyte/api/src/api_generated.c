@@ -272,6 +272,32 @@ static int api_draw_line(lua_State *L) {
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
 }
+// draw_triangle: [ number  number  number  number  number  number -- ]
+static int api_draw_triangle(lua_State *L) {
+    (void)L;
+    int ax = luaL_checkinteger(L, 1);
+    int ay = luaL_checkinteger(L, 2);
+    int bx = luaL_checkinteger(L, 3);
+    int by = luaL_checkinteger(L, 4);
+    int cx = luaL_checkinteger(L, 5);
+    int cy = luaL_checkinteger(L, 6);
+    int _err = _draw_triangle(ax, ay, bx, by, cx, cy);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
+// draw_triangle_line: [ number  number  number  number  number  number -- ]
+static int api_draw_triangle_line(lua_State *L) {
+    (void)L;
+    int ax = luaL_checkinteger(L, 1);
+    int ay = luaL_checkinteger(L, 2);
+    int bx = luaL_checkinteger(L, 3);
+    int by = luaL_checkinteger(L, 4);
+    int cx = luaL_checkinteger(L, 5);
+    int cy = luaL_checkinteger(L, 6);
+    int _err = _draw_triangle_line(ax, ay, bx, by, cx, cy);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
 // draw_rect: [ number  number  number  number -- ]
 static int api_draw_rect(lua_State *L) {
     (void)L;
@@ -410,6 +436,60 @@ static int api_is_image_canvas(lua_State *L) {
     (void)_err;  // TODO: handle '_err' in case it's not 0
     lua_pushboolean(L, val);
     return 1; // number of return values
+}
+// new_imagebatch: [ userdata --  userdata ] (ctor: true)
+static int api_new_imagebatch(lua_State *L) {
+    (void)L;
+    lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
+    lyte_ImageBatch *val = lua_newuserdata(L, sizeof(lyte_ImageBatch));
+    int _err = _new_imagebatch(*image, val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    // constructed value is already on top of the stack
+    luaL_getmetatable(L, "lyte.ImageBatch");
+    lua_setmetatable(L, -2);
+    return 1; // number of return values
+}
+// reset_imagebatch: [ userdata -- ]
+static int api_reset_imagebatch(lua_State *L) {
+    (void)L;
+    lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
+    int _err = _reset_imagebatch(*imagebatch);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
+// add_imagebatch_rect: [ userdata  number  number  number  number  number  number  number  number -- ]
+static int api_add_imagebatch_rect(lua_State *L) {
+    (void)L;
+    lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
+    int dest_x = luaL_checkinteger(L, 2);
+    int dest_y = luaL_checkinteger(L, 3);
+    int dest_width = luaL_checkinteger(L, 4);
+    int dest_height = luaL_checkinteger(L, 5);
+    int src_x = luaL_checkinteger(L, 6);
+    int src_y = luaL_checkinteger(L, 7);
+    int src_width = luaL_checkinteger(L, 8);
+    int src_height = luaL_checkinteger(L, 9);
+    int _err = _add_imagebatch_rect(*imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
+// get_imagebatch_rect_count: [ userdata --  number ]
+static int api_get_imagebatch_rect_count(lua_State *L) {
+    (void)L;
+    lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
+    int val = {0};
+    int _err = _get_imagebatch_rect_count(*imagebatch, &val);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    lua_pushinteger(L, val);
+    return 1; // number of return values
+}
+// draw_imagebatch: [ userdata -- ]
+static int api_draw_imagebatch(lua_State *L) {
+    (void)L;
+    lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
+    int _err = _draw_imagebatch(*imagebatch);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
 }
 // load_font: [ string  number --  userdata ] (ctor: true)
 static int api_load_font(lua_State *L) {
@@ -1407,6 +1487,66 @@ static int luaopen_Image_metatable(lua_State *L) {
     lua_settop(L, 0);
     return 0;
 }
+enum ImageBatch_keys_index {
+    IDX_ImageBatch_rect_count,
+    IDX_ImageBatch_add_rect,
+    IDX_ImageBatch_draw,
+    IDX_ImageBatch_reset,
+    IDX_COUNT_ImageBatch,
+};
+static const char *ImageBatch_keys[] = {
+    "rect_count",
+    "add_rect",
+    "draw",
+    "reset",
+    NULL,  // required sentinel
+};
+static int ImageBatch_metatable_index(lua_State *L) {
+    int key_id = luaL_checkoption(L, -1, NULL, ImageBatch_keys);
+    lua_pop(L, 1); // remove the string key from the stack
+    switch (key_id) {
+        case IDX_ImageBatch_rect_count: { api_get_imagebatch_rect_count(L); } break;
+        case IDX_ImageBatch_add_rect: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "add_imagebatch_rect"); lua_remove(L, -2); } break;
+        case IDX_ImageBatch_draw: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "draw_imagebatch"); lua_remove(L, -2); } break;
+        case IDX_ImageBatch_reset: { lua_getglobal(L, "lyte"); lua_getfield(L, -1, "reset_imagebatch"); lua_remove(L, -2); } break;
+    }
+    return 1;
+}
+static int ImageBatch_metatable_newindex(lua_State *L) {
+    int key_id = luaL_checkoption(L, 2, NULL, ImageBatch_keys);
+    lua_remove(L, 2); // remove the string key from the stack
+    switch (key_id) {
+        default: { luaL_error(L, "Field is not settable."); } break;
+    }
+    lua_settop(L, 0);
+    return 1;
+}
+static int ImageBatch_metatable_tostring(lua_State *L) {
+    lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
+    const char *str = _tostring_lyte_ImageBatch(imagebatch);
+    lua_pushstring(L, str);
+    return 1;
+}
+static int ImageBatch_metatable_gc(lua_State *L) {
+    lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
+    _cleanup_lyte_ImageBatch(imagebatch);
+    return 1;
+}
+static const struct luaL_Reg ImageBatch_metatable[] = {
+    {"__index", ImageBatch_metatable_index },
+    {"__newindex", ImageBatch_metatable_newindex },
+    {"__tostring", ImageBatch_metatable_tostring },
+    {"__gc", ImageBatch_metatable_gc },
+    {NULL, NULL} // sentinel ;
+};
+static int luaopen_ImageBatch_metatable(lua_State *L) {
+    luaL_newmetatable(L, "lyte.ImageBatch");
+    lua_pushvalue(L, -1); // duplicates the metatable
+    lua_setfield(L, -2, "__index");
+    luaL_register(L, NULL, ImageBatch_metatable);
+    lua_settop(L, 0);
+    return 0;
+}
 enum Font_keys_index {
     IDX_COUNT_Font,
 };
@@ -1735,6 +1875,8 @@ static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"reset_color", api_reset_color},
     {"draw_point", api_draw_point},
     {"draw_line", api_draw_line},
+    {"draw_triangle", api_draw_triangle},
+    {"draw_triangle_line", api_draw_triangle_line},
     {"draw_rect", api_draw_rect},
     {"draw_rect_line", api_draw_rect_line},
     {"draw_circle", api_draw_circle},
@@ -1748,6 +1890,11 @@ static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"set_canvas", api_set_canvas},
     {"reset_canvas", api_reset_canvas},
     {"is_image_canvas", api_is_image_canvas},
+    {"new_imagebatch", api_new_imagebatch},
+    {"reset_imagebatch", api_reset_imagebatch},
+    {"add_imagebatch_rect", api_add_imagebatch_rect},
+    {"get_imagebatch_rect_count", api_get_imagebatch_rect_count},
+    {"draw_imagebatch", api_draw_imagebatch},
     {"load_font", api_load_font},
     {"set_font", api_set_font},
     {"draw_text", api_draw_text},
@@ -1854,6 +2001,7 @@ static int luaopen_lyte_api_functions(lua_State *L) {
 int register_lyte(lua_State *L) {
     luaopen_lyte_api_functions(L);
     luaopen_Image_metatable(L);
+    luaopen_ImageBatch_metatable(L);
     luaopen_Font_metatable(L);
     luaopen_Music_metatable(L);
     luaopen_Sound_metatable(L);

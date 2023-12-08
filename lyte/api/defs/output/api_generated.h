@@ -16,6 +16,7 @@
 typedef struct lyte_FloatVec4 { float data[4]; size_t count; } lyte_FloatVec4;
 // Dict: skipped in C api for now: UniformNamesToTypes
 typedef struct lyte_Image { void *ptr; } lyte_Image;
+typedef struct lyte_ImageBatch { void *ptr; } lyte_ImageBatch;
 typedef struct lyte_Font { void *ptr; } lyte_Font;
 typedef struct lyte_Music { void *ptr; } lyte_Music;
 typedef struct lyte_Sound { void *ptr; } lyte_Sound;

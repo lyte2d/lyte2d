@@ -16,11 +16,27 @@
 #endif
 
 int lyte_draw_point(int x, int y) {
+    sgp_draw_filled_rect(x, y, 1, 1);
     return 0;
 }
 
 int lyte_draw_line(int x1, int y1, int x2, int y2) {
     sgp_draw_line(x1, y1, x2, y2);
+    return 0;
+}
+
+int lyte_draw_triangle(int ax, int ay, int bx, int by, int cx, int cy) {
+    sgp_draw_filled_triangle(ax, ay, bx, by, cx, cy);
+    return 0;
+}
+
+int lyte_draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy) {
+    sgp_line lines[4] = {
+        (sgp_line){{ax, ay}, {bx, by}},
+        (sgp_line){{bx, by}, {cx, cy}},
+        (sgp_line){{cx, cy}, {ax, ay}},
+    };
+    sgp_draw_lines(lines, 4);
     return 0;
 }
 

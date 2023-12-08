@@ -81,6 +81,24 @@ local lyte_namespace = Namespace("lyte", {
         Arg("y2", Integer()),
     }, nil, {d="Draw a line"}),
 
+    Function("draw_triangle", {
+        Arg("ax", Integer()),
+        Arg("ay", Integer()),
+        Arg("bx", Integer()),
+        Arg("by", Integer()),
+        Arg("cx", Integer()),
+        Arg("cy", Integer()),
+    }, nil, {d="Draw a filled triangle"}),
+
+    Function("draw_triangle_line", {
+        Arg("ax", Integer()),
+        Arg("ay", Integer()),
+        Arg("bx", Integer()),
+        Arg("by", Integer()),
+        Arg("cx", Integer()),
+        Arg("cy", Integer()),
+    }, nil, {d="Draw a triangle border"}),
+
     Function("draw_rect", {
         Arg("dest_x", Integer()),
         Arg("dest_y", Integer()),
@@ -159,6 +177,38 @@ local lyte_namespace = Namespace("lyte", {
     }, {
         Ret("val", Boolean()),
     }, {d="Check if the image was created as a canvas."}),
+
+    Function("new_imagebatch", {
+        Arg("image", Defined("Image")),
+    }, {
+        Ret("val", Defined("ImageBatch")),
+    }, {d="Create an image batch", ctor=true}),
+
+    Function("reset_imagebatch", {
+        Arg("imagebatch", Defined("ImageBatch")),
+    }, nil, {d="Reset the image batch, remove all added rects."}),
+
+    Function("add_imagebatch_rect", {
+        Arg("imagebatch", Defined("ImageBatch")),
+        Arg("dest_x", Integer()),
+        Arg("dest_y", Integer()),
+        Arg("dest_width", Integer()),
+        Arg("dest_height", Integer()),
+        Arg("src_x", Integer()),
+        Arg("src_y", Integer()),
+        Arg("src_width", Integer()),
+        Arg("src_height", Integer()),
+    }, nil, {d="Add a recta to the image batch (from it's initial image)."}),
+
+    Function("get_imagebatch_rect_count", {
+        Arg("imagebatch", Defined("ImageBatch")),
+    }, {
+        Ret("val", Integer()),
+    }, {d="Get the number of rects in the image batch."}),
+
+    Function("draw_imagebatch", {
+        Arg("imagebatch", Defined("ImageBatch")),
+    }, nil, {d="Draw the image batch."}) ,
 
     Function("load_font", {
         Arg("font_path", String()),
@@ -648,6 +698,14 @@ local lyte_namespace = Namespace("lyte", {
         Field("height", Integer(), {map_read = "get_image_height"}),
         Field("is_canvas", Boolean(), {map_read = "is_image_canvas"}),
     }, nil, {d="Image type"}),
+
+    Record("ImageBatch", {
+        Field("rect_count", Integer(), {map_read = "get_imagebatch_rect_count"}),
+    }, {
+        Method("add_rect", {map_to = "add_imagebatch_rect"}),
+        Method("draw", {map_to = "draw_imagebatch"}),
+        Method("reset", {map_to = "reset_imagebatch"}),
+    }, {d="ImageBatch type."}),
 
     Record("Font", nil, nil, {d="Font type."}),
 

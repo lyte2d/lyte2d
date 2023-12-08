@@ -48,6 +48,12 @@ function lyte.tick(dt, width, height)
     -- a portion of the image (sprite's ticks are 16x16. draw #3)
     lyte.draw_image_rect(image_1, 10, 90, 16*(3-1), 0, 16, 16)
 
+    -- 0.7.4: new drawing primitives
+    lyte.draw_line(10,10,100,100)
+    lyte.draw_point(102,102)
+    lyte.draw_triangle(150,150,154,200, 220,200)
+    lyte.draw_triangle_line(150,50,154,100, 220,100)
+
     lyte.pop_matrix()
 end
 

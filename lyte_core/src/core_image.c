@@ -13,12 +13,12 @@
 #include "sokol_gp.h"
 #include "stb_image.h"
 
-#ifndef INIT_NUM_IMAGEITEMS
-#define INIT_NUM_IMAGEITEMS 10
-#endif
+// #define MAX_IMAGEBATCH_RECT_CAPACITY 1024
+#define INITIAL_IMAGEBATCH_RECT_CAPACITY 16
 
 typedef struct ImageItem {
     uint32_t handle; // **MAGIC_1** NOTE: needs to stay the first element in the struct. (pointer magic in core_shader.c)
+    int ref;
     int width;
     int height;
     bool is_canvas; // if true, values below should also be set
@@ -78,6 +78,7 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     ii->width = width;
     ii->height = height;
     ii->is_canvas = false;
+    ii->ref = 1;
 
     img->ptr = ii;
     free(buf);
@@ -128,21 +129,33 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
         return 3;
     }
     c->id_pass = fb_pass.id;
+    c->ref = 1;
+
     img->ptr = c;
     return 0;
 }
 
+static inline void _free_imageitem(ImageItem *imageitem) {
+    if (!imageitem) {
+        return;
+    }
+    if (imageitem->ref > 0) {
+        imageitem->ref -= 1;
+    }
+    if (imageitem->ref == 0) {
+        if (imageitem->is_canvas) {
+            sg_destroy_image((sg_image){.id = imageitem->id_depth_image});
+            sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
+        }
+        sg_destroy_image((sg_image){.id = imageitem->handle});
+        free(imageitem);
+    }
+}
+
 int lyte_Image_cleanup(lyte_Image image) {
     ImageItem *imageitem = image.ptr;
-    if (!imageitem) {
-        return 0;
-    }
-    if (imageitem->is_canvas) {
-        sg_destroy_image((sg_image){.id = imageitem->id_depth_image});
-        sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
-    }
-    sg_destroy_image((sg_image){.id = imageitem->handle});
-    free(imageitem);
+    _free_imageitem(imageitem);
+    image.ptr = NULL;
     return 0;
 }
 
@@ -255,3 +268,89 @@ int lyte_reset_canvas(void) {
     current_canvas = NULL;
     return 0;
 }
+
+
+typedef struct ImageBatchItem {
+    lyte_Image image;
+    int capacity; // capacity
+    int count; // current count
+    sgp_textured_rect *rects;
+} ImageBatchItem;
+
+
+int lyte_new_imagebatch(lyte_Image image, lyte_ImageBatch *val) {
+    ImageBatchItem *ibi = malloc(sizeof(ImageBatchItem));
+
+    ibi->image = image; // TODO: keep a ref!
+
+    ibi->capacity = 0;
+    ibi->count = 0;
+    ibi->rects = NULL;
+    ImageItem *imageitem = ibi->image.ptr;
+    imageitem->ref += 1;
+
+    val->ptr = ibi;
+    return 0;
+}
+
+int lyte_ImageBatch_cleanup(lyte_ImageBatch imagebatch) {
+    ImageBatchItem *ibi = imagebatch.ptr;
+    if (ibi->rects != NULL) {
+        free(ibi->rects);
+        ibi->rects = NULL;
+        ibi->capacity = 0;
+        ibi->count = 0;
+    }
+    ImageItem *imageitem = ibi->image.ptr;
+    _free_imageitem(imageitem);
+    ibi->image.ptr = NULL;
+    return 0;
+}
+
+int lyte_reset_imagebatch(lyte_ImageBatch imagebatch) {
+    ImageBatchItem *ibi = imagebatch.ptr;
+    if (ibi->rects) {
+        memset(ibi->rects, 0, sizeof(sgp_textured_rect)*ibi->capacity);
+        ibi->count = 0;
+    }
+    return 0;
+}
+int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, int dest_x, int dest_y, int dest_width, int dest_height, int src_x, int src_y, int src_width, int src_height) {
+    ImageBatchItem *ibi = imagebatch.ptr;
+    if (!ibi->rects) {
+        // initial allocation
+        ibi->count = 0;
+        ibi->capacity = INITIAL_IMAGEBATCH_RECT_CAPACITY;
+        ibi->rects = malloc(sizeof(sgp_textured_rect) * ibi->capacity);
+    }
+    if (ibi->count > ibi->capacity - 3) {
+        // grow capacity
+        ibi->capacity = ibi->capacity * 2;
+        ibi->rects  = realloc(ibi->rects, sizeof(sgp_textured_rect) * ibi->capacity);
+    }
+    ibi->rects[ibi->count] = (sgp_textured_rect){
+        (sgp_rect){dest_x, dest_y, dest_width, dest_height},
+        (sgp_rect){src_x, src_y, src_width, src_height},
+    };
+    ibi->count += 1;
+    return 0;
+}
+
+int lyte_get_imagebatch_rect_count(lyte_ImageBatch imagebatch, int *val) {
+    ImageBatchItem *ibi = imagebatch.ptr;
+    *val = ibi->count;
+    return 0;
+}
+
+int lyte_draw_imagebatch(lyte_ImageBatch imagebatch) {
+    ImageBatchItem *ibi = imagebatch.ptr;
+    if (ibi->rects) {
+        ImageItem *imageitem = ibi->image.ptr;
+        sg_image sgimage = (sg_image){ .id = imageitem->handle };
+        sgp_set_image(0, sgimage);
+        sgp_draw_textured_rects_ex(0, ibi->rects, ibi->count);
+        sgp_reset_image(0);
+    }
+    return 0;
+}
+

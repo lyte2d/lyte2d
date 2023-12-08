@@ -26,6 +26,12 @@ function lyte.draw_point() end
 --- Draw a line
 --- @type fun(x1: number, y1: number, x2: number, y2: number)
 function lyte.draw_line() end
+--- Draw a filled triangle
+--- @type fun(ax: number, ay: number, bx: number, by: number, cx: number, cy: number)
+function lyte.draw_triangle() end
+--- Draw a triangle border
+--- @type fun(ax: number, ay: number, bx: number, by: number, cx: number, cy: number)
+function lyte.draw_triangle_line() end
 --- Draw a filled rectangle.
 --- @type fun(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
 function lyte.draw_rect() end
@@ -65,6 +71,21 @@ function lyte.reset_canvas() end
 --- Check if the image was created as a canvas.
 --- @type fun(image: lyte.Image): boolean
 function lyte.is_image_canvas() end
+--- Create an image batch
+--- @type fun(image: lyte.Image): lyte.ImageBatch
+function lyte.new_imagebatch() end
+--- Reset the image batch, remove all added rects.
+--- @type fun(imagebatch: lyte.ImageBatch)
+function lyte.reset_imagebatch() end
+--- Add a recta to the image batch (from it's initial image).
+--- @type fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
+function lyte.add_imagebatch_rect() end
+--- Get the number of rects in the image batch.
+--- @type fun(imagebatch: lyte.ImageBatch): number
+function lyte.get_imagebatch_rect_count() end
+--- Draw the image batch.
+--- @type fun(imagebatch: lyte.ImageBatch)
+function lyte.draw_imagebatch() end
 --- Load the font specified in the path, and set the initial size.
 --- @type fun(font_path: string, size: number): lyte.Font
 function lyte.load_font() end
@@ -389,6 +410,14 @@ function lyte.shaderbuilder_build() end
         --- @field height number
         --- @field is_canvas boolean
 lyte.Image = {}
+
+--- ImageBatch type.
+--- @class lyte.ImageBatch
+        --- @field rect_count number
+        --- @field add_rect fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
+        --- @field draw fun(imagebatch: lyte.ImageBatch)
+        --- @field reset fun(imagebatch: lyte.ImageBatch)
+lyte.ImageBatch = {}
 
 --- Font type.
 --- @class lyte.Font

@@ -7,6 +7,8 @@ declare namespace lyte {
     function reset_color(): void
     function draw_point(x: number, y: number): void
     function draw_line(x1: number, y1: number, x2: number, y2: number): void
+    function draw_triangle(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): void
+    function draw_triangle_line(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): void
     function draw_rect(dest_x: number, dest_y: number, rect_width: number, rect_height: number): void
     function draw_rect_line(dest_x: number, dest_y: number, rect_width: number, rect_height: number): void
     function draw_circle(dest_x: number, dest_y: number, radius: number): void
@@ -20,6 +22,11 @@ declare namespace lyte {
     function set_canvas(canvas_image: Image): void
     function reset_canvas(): void
     function is_image_canvas(image: Image): boolean
+    function new_imagebatch(image: Image): ImageBatch
+    function reset_imagebatch(imagebatch: ImageBatch): void
+    function add_imagebatch_rect(imagebatch: ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number): void
+    function get_imagebatch_rect_count(imagebatch: ImageBatch): number
+    function draw_imagebatch(imagebatch: ImageBatch): void
     function load_font(font_path: string, size: number): Font
     function set_font(font: Font): void
     function reset_font(): void
@@ -129,6 +136,12 @@ declare namespace lyte {
         width: number
         height: number
         is_canvas: boolean
+    }
+    type ImageBatch = {
+        rect_count: number
+        add_rect: (imagebatch: ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number) => void
+        draw: (imagebatch: ImageBatch) => void
+        reset: (imagebatch: ImageBatch) => void
     }
     type Font = {
     }

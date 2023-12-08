@@ -56,6 +56,18 @@ static inline int _draw_line(int x1, int y1, int x2, int y2) {
     _err = lyte_draw_line(x1, y1, x2, y2);
     return _err;
 }
+static inline int _draw_triangle(int ax, int ay, int bx, int by, int cx, int cy) {
+    (void)ax;(void)ay;(void)bx;(void)by;(void)cx;(void)cy;
+    int _err = 0;
+    _err = lyte_draw_triangle(ax, ay, bx, by, cx, cy);
+    return _err;
+}
+static inline int _draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy) {
+    (void)ax;(void)ay;(void)bx;(void)by;(void)cx;(void)cy;
+    int _err = 0;
+    _err = lyte_draw_triangle_line(ax, ay, bx, by, cx, cy);
+    return _err;
+}
 static inline int _draw_rect(int dest_x, int dest_y, int rect_width, int rect_height) {
     (void)dest_x;(void)dest_y;(void)rect_width;(void)rect_height;
     int _err = 0;
@@ -131,6 +143,36 @@ static inline int _is_image_canvas(lyte_Image image, bool *val) {
     (void)image;(void)val;
     int _err = 0;
     _err = lyte_is_image_canvas(image, val);
+    return _err;
+}
+static inline int _new_imagebatch(lyte_Image image, lyte_ImageBatch *val) {
+    (void)image;(void)val;
+    int _err = 0;
+    _err = lyte_new_imagebatch(image, val);
+    return _err;
+}
+static inline int _reset_imagebatch(lyte_ImageBatch imagebatch) {
+    (void)imagebatch;
+    int _err = 0;
+    _err = lyte_reset_imagebatch(imagebatch);
+    return _err;
+}
+static inline int _add_imagebatch_rect(lyte_ImageBatch imagebatch, int dest_x, int dest_y, int dest_width, int dest_height, int src_x, int src_y, int src_width, int src_height) {
+    (void)imagebatch;(void)dest_x;(void)dest_y;(void)dest_width;(void)dest_height;(void)src_x;(void)src_y;(void)src_width;(void)src_height;
+    int _err = 0;
+    _err = lyte_add_imagebatch_rect(imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height);
+    return _err;
+}
+static inline int _get_imagebatch_rect_count(lyte_ImageBatch imagebatch, int *val) {
+    (void)imagebatch;(void)val;
+    int _err = 0;
+    _err = lyte_get_imagebatch_rect_count(imagebatch, val);
+    return _err;
+}
+static inline int _draw_imagebatch(lyte_ImageBatch imagebatch) {
+    (void)imagebatch;
+    int _err = 0;
+    _err = lyte_draw_imagebatch(imagebatch);
     return _err;
 }
 static inline int _load_font(const char * font_path, double size, lyte_Font *val) {
@@ -707,6 +749,18 @@ static inline const char *_tostring_lyte_Image(lyte_Image *image) {
     (void)image;
     char *_ret = "[lyte.Image]";
     // _ret = lyte_Image_tostring(*image)
+    return (const char *)_ret;
+    }
+static inline int _cleanup_lyte_ImageBatch(lyte_ImageBatch *imagebatch) {
+    (void)imagebatch;
+    int _ret = 0;
+    _ret = lyte_ImageBatch_cleanup(*imagebatch);
+    return _ret;
+}
+static inline const char *_tostring_lyte_ImageBatch(lyte_ImageBatch *imagebatch) {
+    (void)imagebatch;
+    char *_ret = "[lyte.ImageBatch]";
+    // _ret = lyte_ImageBatch_tostring(*imagebatch)
     return (const char *)_ret;
     }
 static inline int _cleanup_lyte_Font(lyte_Font *font) {
