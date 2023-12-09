@@ -119,11 +119,11 @@ int lyte_cls(double r, double g, double b, double a);
 int lyte_push_matrix(void);
 int lyte_pop_matrix(void);
 int lyte_reset_matrix(void);
-int lyte_translate(int delta_x, int delta_y);
+int lyte_translate(double delta_x, double delta_y);
 int lyte_rotate(double angle);
-int lyte_rotate_at(double angle, int x, int y);
+int lyte_rotate_at(double angle, double x, double y);
 int lyte_scale(double scale_x, double scale_y);
-int lyte_scale_at(int scale_x, int scale_y, double x, double y);
+int lyte_scale_at(double scale_x, double scale_y, double x, double y);
 
 
 // -------------------------
@@ -221,8 +221,8 @@ int lyte_Image_cleanup(lyte_Image image);
 
 int lyte_get_image_width(lyte_Image image, int *val);
 int lyte_get_image_height(lyte_Image image, int *val);
-int lyte_draw_image(lyte_Image image, int x, int y);
-int lyte_draw_image_rect(lyte_Image image, int x, int y, int src_x, int src_y, int w, int h);
+int lyte_draw_image(lyte_Image image, double x, double y);
+int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, double src_y, double w, double h);
 int lyte_set_canvas(lyte_Image image);
 int lyte_reset_canvas(void);
 int lyte_is_image_canvas(lyte_Image image, bool *val);
@@ -230,7 +230,7 @@ int lyte_is_image_canvas(lyte_Image image, bool *val);
 int lyte_new_imagebatch(lyte_Image image, lyte_ImageBatch *val);
 int lyte_ImageBatch_cleanup(lyte_ImageBatch imagebatch);
 int lyte_reset_imagebatch(lyte_ImageBatch imagebatch);
-int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, int dest_x, int dest_y, int dest_width, int dest_height, int src_x, int src_y, int src_width, int src_height);
+int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, double dest_x, double dest_y, double dest_width, double dest_height, double src_x, double src_y, double src_width, double src_height);
 int lyte_get_imagebatch_rect_count(lyte_ImageBatch imagebatch, int *val);
 int lyte_draw_imagebatch(lyte_ImageBatch imagebatch);
 
@@ -238,14 +238,14 @@ int lyte_draw_imagebatch(lyte_ImageBatch imagebatch);
 // core_shapes
 // -------------------------
 
-int lyte_draw_point(int x, int y);
-int lyte_draw_line(int x1, int y1, int x2, int y2);
-int lyte_draw_triangle(int ax, int ay, int bx, int by, int cx, int cy);
-int lyte_draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy);
-int lyte_draw_rect(int dest_x, int dest_y, int rect_width, int rect_height);
-int lyte_draw_rect_line(int dest_x, int dest_y, int rect_width, int rect_height);
-int lyte_draw_circle(int dest_x, int dest_y, int radius);
-int lyte_draw_circle_line(int dest_x, int dest_y, int radius);
+int lyte_draw_point(double x, double y);
+int lyte_draw_line(double x1, double y1, double x2, double y2);
+int lyte_draw_triangle(double ax, double ay, double bx, double by, double cx, double cy);
+int lyte_draw_triangle_line(double ax, double ay, double bx, double by, double cx, double cy);
+int lyte_draw_rect(double dest_x, double dest_y, double rect_width, double rect_height);
+int lyte_draw_rect_line(double dest_x, double dest_y, double rect_width, double rect_height);
+int lyte_draw_circle(double dest_x, double dest_y, double radius);
+int lyte_draw_circle_line(double dest_x, double dest_y, double radius);
 
 
 // -------------------------
@@ -307,7 +307,7 @@ int lyte_load_font(const char * font_path, double size, lyte_Font *val);
 int lyte_Font_cleanup(lyte_Font font);
 
 int lyte_set_font(lyte_Font font);
-int lyte_draw_text(const char * text, int dest_x, int dest_y);
+int lyte_draw_text(const char * text, double dest_x, double dest_y);
 int lyte_get_text_width(const char * text, int *val);
 int lyte_get_text_height(const char * text, int *val);
 

@@ -46,49 +46,49 @@ static inline int _reset_color(void) {
     _err = lyte_reset_color();
     return _err;
 }
-static inline int _draw_point(int x, int y) {
+static inline int _draw_point(double x, double y) {
     (void)x;(void)y;
     int _err = 0;
     _err = lyte_draw_point(x, y);
     return _err;
 }
-static inline int _draw_line(int x1, int y1, int x2, int y2) {
+static inline int _draw_line(double x1, double y1, double x2, double y2) {
     (void)x1;(void)y1;(void)x2;(void)y2;
     int _err = 0;
     _err = lyte_draw_line(x1, y1, x2, y2);
     return _err;
 }
-static inline int _draw_triangle(int ax, int ay, int bx, int by, int cx, int cy) {
+static inline int _draw_triangle(double ax, double ay, double bx, double by, double cx, double cy) {
     (void)ax;(void)ay;(void)bx;(void)by;(void)cx;(void)cy;
     int _err = 0;
     _err = lyte_draw_triangle(ax, ay, bx, by, cx, cy);
     return _err;
 }
-static inline int _draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy) {
+static inline int _draw_triangle_line(double ax, double ay, double bx, double by, double cx, double cy) {
     (void)ax;(void)ay;(void)bx;(void)by;(void)cx;(void)cy;
     int _err = 0;
     _err = lyte_draw_triangle_line(ax, ay, bx, by, cx, cy);
     return _err;
 }
-static inline int _draw_rect(int dest_x, int dest_y, int rect_width, int rect_height) {
+static inline int _draw_rect(double dest_x, double dest_y, double rect_width, double rect_height) {
     (void)dest_x;(void)dest_y;(void)rect_width;(void)rect_height;
     int _err = 0;
     _err = lyte_draw_rect(dest_x, dest_y, rect_width, rect_height);
     return _err;
 }
-static inline int _draw_rect_line(int dest_x, int dest_y, int rect_width, int rect_height) {
+static inline int _draw_rect_line(double dest_x, double dest_y, double rect_width, double rect_height) {
     (void)dest_x;(void)dest_y;(void)rect_width;(void)rect_height;
     int _err = 0;
     _err = lyte_draw_rect_line(dest_x, dest_y, rect_width, rect_height);
     return _err;
 }
-static inline int _draw_circle(int dest_x, int dest_y, int radius) {
+static inline int _draw_circle(double dest_x, double dest_y, double radius) {
     (void)dest_x;(void)dest_y;(void)radius;
     int _err = 0;
     _err = lyte_draw_circle(dest_x, dest_y, radius);
     return _err;
 }
-static inline int _draw_circle_line(int dest_x, int dest_y, int radius) {
+static inline int _draw_circle_line(double dest_x, double dest_y, double radius) {
     (void)dest_x;(void)dest_y;(void)radius;
     int _err = 0;
     _err = lyte_draw_circle_line(dest_x, dest_y, radius);
@@ -100,13 +100,13 @@ static inline int _load_image(const char * image_path, lyte_Image *val) {
     _err = lyte_load_image(image_path, val);
     return _err;
 }
-static inline int _draw_image(lyte_Image image, int dest_x, int dest_y) {
+static inline int _draw_image(lyte_Image image, double dest_x, double dest_y) {
     (void)image;(void)dest_x;(void)dest_y;
     int _err = 0;
     _err = lyte_draw_image(image, dest_x, dest_y);
     return _err;
 }
-static inline int _draw_image_rect(lyte_Image image, int dest_x, int dest_y, int src_x, int src_y, int rect_width, int rect_height) {
+static inline int _draw_image_rect(lyte_Image image, double dest_x, double dest_y, double src_x, double src_y, double rect_width, double rect_height) {
     (void)image;(void)dest_x;(void)dest_y;(void)src_x;(void)src_y;(void)rect_width;(void)rect_height;
     int _err = 0;
     _err = lyte_draw_image_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height);
@@ -159,7 +159,7 @@ static inline int _reset_imagebatch(lyte_ImageBatch imagebatch) {
     _err = lyte_reset_imagebatch(imagebatch);
     return _err;
 }
-static inline int _add_imagebatch_rect(lyte_ImageBatch imagebatch, int dest_x, int dest_y, int dest_width, int dest_height, int src_x, int src_y, int src_width, int src_height) {
+static inline int _add_imagebatch_rect(lyte_ImageBatch imagebatch, double dest_x, double dest_y, double dest_width, double dest_height, double src_x, double src_y, double src_width, double src_height) {
     (void)imagebatch;(void)dest_x;(void)dest_y;(void)dest_width;(void)dest_height;(void)src_x;(void)src_y;(void)src_width;(void)src_height;
     int _err = 0;
     _err = lyte_add_imagebatch_rect(imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height);
@@ -189,7 +189,7 @@ static inline int _set_font(lyte_Font font) {
     _err = lyte_set_font(font);
     return _err;
 }
-static inline int _draw_text(const char * text, int dest_x, int dest_y) {
+static inline int _draw_text(const char * text, double dest_x, double dest_y) {
     (void)text;(void)dest_x;(void)dest_y;
     int _err = 0;
     _err = lyte_draw_text(text, dest_x, dest_y);
@@ -624,7 +624,7 @@ static inline int _reset_matrix(void) {
     _err = lyte_reset_matrix();
     return _err;
 }
-static inline int _translate(int delta_x, int delta_y) {
+static inline int _translate(double delta_x, double delta_y) {
     (void)delta_x;(void)delta_y;
     int _err = 0;
     _err = lyte_translate(delta_x, delta_y);
@@ -636,7 +636,7 @@ static inline int _rotate(double angle) {
     _err = lyte_rotate(angle);
     return _err;
 }
-static inline int _rotate_at(double angle, int x, int y) {
+static inline int _rotate_at(double angle, double x, double y) {
     (void)angle;(void)x;(void)y;
     int _err = 0;
     _err = lyte_rotate_at(angle, x, y);
@@ -648,7 +648,7 @@ static inline int _scale(double scale_x, double scale_y) {
     _err = lyte_scale(scale_x, scale_y);
     return _err;
 }
-static inline int _scale_at(int scale_x, int scale_y, double x, double y) {
+static inline int _scale_at(double scale_x, double scale_y, double x, double y) {
     (void)scale_x;(void)scale_y;(void)x;(void)y;
     int _err = 0;
     _err = lyte_scale_at(scale_x, scale_y, x, y);

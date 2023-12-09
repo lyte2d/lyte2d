@@ -70,59 +70,59 @@ local lyte_namespace = Namespace("lyte", {
     Function("reset_color", nil, nil, {d="Reset the foreground color to its default value."}),
 
     Function("draw_point", {
-        Arg("x", Integer()),
-        Arg("y", Integer()),
+        Arg("x", Number()),
+        Arg("y", Number()),
     }, nil, {d="Draw a point."}),
 
     Function("draw_line", {
-        Arg("x1", Integer()),
-        Arg("y1", Integer()),
-        Arg("x2", Integer()),
-        Arg("y2", Integer()),
+        Arg("x1", Number()),
+        Arg("y1", Number()),
+        Arg("x2", Number()),
+        Arg("y2", Number()),
     }, nil, {d="Draw a line"}),
 
     Function("draw_triangle", {
-        Arg("ax", Integer()),
-        Arg("ay", Integer()),
-        Arg("bx", Integer()),
-        Arg("by", Integer()),
-        Arg("cx", Integer()),
-        Arg("cy", Integer()),
+        Arg("ax", Number()),
+        Arg("ay", Number()),
+        Arg("bx", Number()),
+        Arg("by", Number()),
+        Arg("cx", Number()),
+        Arg("cy", Number()),
     }, nil, {d="Draw a filled triangle"}),
 
     Function("draw_triangle_line", {
-        Arg("ax", Integer()),
-        Arg("ay", Integer()),
-        Arg("bx", Integer()),
-        Arg("by", Integer()),
-        Arg("cx", Integer()),
-        Arg("cy", Integer()),
+        Arg("ax", Number()),
+        Arg("ay", Number()),
+        Arg("bx", Number()),
+        Arg("by", Number()),
+        Arg("cx", Number()),
+        Arg("cy", Number()),
     }, nil, {d="Draw a triangle border"}),
 
     Function("draw_rect", {
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("rect_width", Integer()),
-        Arg("rect_height", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("rect_width", Number()),
+        Arg("rect_height", Number()),
     }, nil, {d="Draw a filled rectangle."}),
 
     Function("draw_rect_line", {
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("rect_width", Integer()),
-        Arg("rect_height", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("rect_width", Number()),
+        Arg("rect_height", Number()),
     }, nil, {d="Draw a rectangle border."}),
 
     Function("draw_circle", {
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("radius", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("radius", Number()),
     }, nil, {d="Draw a filled circle."}),
 
     Function("draw_circle_line", {
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("radius", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("radius", Number()),
     }, nil, {d="Draw a circle border."}),
 
     Function("load_image", {
@@ -133,18 +133,18 @@ local lyte_namespace = Namespace("lyte", {
 
     Function("draw_image", {
         Arg("image", Defined("Image")),
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
     }, nil, {d="Draw an image."}),
 
     Function("draw_image_rect", {
         Arg("image", Defined("Image")),
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("src_x", Integer()),
-        Arg("src_y", Integer()),
-        Arg("rect_width", Integer()),
-        Arg("rect_height", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("src_x", Number()),
+        Arg("src_y", Number()),
+        Arg("rect_width", Number()),
+        Arg("rect_height", Number()),
     }, nil, {d="Draw a rectangular area from the image."}),
 
     Function("get_image_width", {
@@ -190,14 +190,14 @@ local lyte_namespace = Namespace("lyte", {
 
     Function("add_imagebatch_rect", {
         Arg("imagebatch", Defined("ImageBatch")),
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
-        Arg("dest_width", Integer()),
-        Arg("dest_height", Integer()),
-        Arg("src_x", Integer()),
-        Arg("src_y", Integer()),
-        Arg("src_width", Integer()),
-        Arg("src_height", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("dest_width", Number()),
+        Arg("dest_height", Number()),
+        Arg("src_x", Number()),
+        Arg("src_y", Number()),
+        Arg("src_width", Number()),
+        Arg("src_height", Number()),
     }, nil, {d="Add a recta to the image batch (from it's initial image)."}),
 
     Function("get_imagebatch_rect_count", {
@@ -225,8 +225,8 @@ local lyte_namespace = Namespace("lyte", {
 
     Function("draw_text", {
         Arg("text", String()),
-        Arg("dest_x", Integer()),
-        Arg("dest_y", Integer()),
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
     }, nil, {d="Draw a text line."}),
 
     Function("get_text_width", {
@@ -598,8 +598,8 @@ local lyte_namespace = Namespace("lyte", {
     Function("reset_matrix", nil, nil, {d="Reset the transformation matrix (load identity matrix.)"}),
 
     Function("translate", {
-        Arg("delta_x", Integer()),
-        Arg("delta_y", Integer()),
+        Arg("delta_x", Number()),
+        Arg("delta_y", Number()),
     }, nil, {d="Apply translation (changes transform matrix.)"}),
 
     Function("rotate", {
@@ -608,8 +608,8 @@ local lyte_namespace = Namespace("lyte", {
 
     Function("rotate_at", {
         Arg("angle", Number()),
-        Arg("x", Integer()),
-        Arg("y", Integer()),
+        Arg("x", Number()),
+        Arg("y", Number()),
     }, nil, {d="Apply rotation at the given location (changes transform matrix.)"}),
 
     Function("scale", {
@@ -618,8 +618,8 @@ local lyte_namespace = Namespace("lyte", {
     }, nil, {d="Apply scaling (changes transform matrix.)"}),
 
     Function("scale_at", {
-        Arg("scale_x", Integer()),
-        Arg("scale_y", Integer()),
+        Arg("scale_x", Number()),
+        Arg("scale_y", Number()),
         Arg("x", Number()),
         Arg("y", Number()),
     }, nil, {d="Apply scaling at the given location (changes transform matrix.)"}),

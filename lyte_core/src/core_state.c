@@ -183,7 +183,7 @@ int lyte_reset_matrix(void) {
     return 0;
 }
 
-int lyte_translate(int delta_x, int delta_y) {
+int lyte_translate(double delta_x, double delta_y) {
     sgp_translate(delta_x, delta_y);
     return 0;
 }
@@ -193,7 +193,7 @@ int lyte_rotate(double angle) {
     return 0;
 }
 
-int lyte_rotate_at(double angle, int x, int y) {
+int lyte_rotate_at(double angle, double x, double y) {
     sgp_rotate_at(angle, x, y);
     return 0;
 }
@@ -203,7 +203,7 @@ int lyte_scale(double scale_x, double scale_y) {
     return 0;
 }
 
-int lyte_scale_at(int scale_x, int scale_y, double x, double y) {
+int lyte_scale_at(double scale_x, double scale_y, double x, double y) {
     sgp_scale_at(scale_x, scale_y, x, y);
     return 0;
 }
