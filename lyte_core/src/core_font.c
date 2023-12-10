@@ -243,7 +243,7 @@ int lyte_set_font(lyte_Font font) {
     return 0;
 }
 
-int lyte_draw_text(const char * text, int dest_x, int dest_y) {
+int lyte_draw_text(const char * text, double dest_x, double dest_y) {
     if (current_font == NULL) {
         fprintf(stderr, "No font set.\n");
         return -1;

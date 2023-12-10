@@ -255,8 +255,8 @@ static int api_reset_color(lua_State *L) {
 // draw_point: [ number  number -- ]
 static int api_draw_point(lua_State *L) {
     (void)L;
-    int x = luaL_checkinteger(L, 1);
-    int y = luaL_checkinteger(L, 2);
+    double x = luaL_checknumber(L, 1);
+    double y = luaL_checknumber(L, 2);
     int _err = _draw_point(x, y);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -264,10 +264,10 @@ static int api_draw_point(lua_State *L) {
 // draw_line: [ number  number  number  number -- ]
 static int api_draw_line(lua_State *L) {
     (void)L;
-    int x1 = luaL_checkinteger(L, 1);
-    int y1 = luaL_checkinteger(L, 2);
-    int x2 = luaL_checkinteger(L, 3);
-    int y2 = luaL_checkinteger(L, 4);
+    double x1 = luaL_checknumber(L, 1);
+    double y1 = luaL_checknumber(L, 2);
+    double x2 = luaL_checknumber(L, 3);
+    double y2 = luaL_checknumber(L, 4);
     int _err = _draw_line(x1, y1, x2, y2);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -275,12 +275,12 @@ static int api_draw_line(lua_State *L) {
 // draw_triangle: [ number  number  number  number  number  number -- ]
 static int api_draw_triangle(lua_State *L) {
     (void)L;
-    int ax = luaL_checkinteger(L, 1);
-    int ay = luaL_checkinteger(L, 2);
-    int bx = luaL_checkinteger(L, 3);
-    int by = luaL_checkinteger(L, 4);
-    int cx = luaL_checkinteger(L, 5);
-    int cy = luaL_checkinteger(L, 6);
+    double ax = luaL_checknumber(L, 1);
+    double ay = luaL_checknumber(L, 2);
+    double bx = luaL_checknumber(L, 3);
+    double by = luaL_checknumber(L, 4);
+    double cx = luaL_checknumber(L, 5);
+    double cy = luaL_checknumber(L, 6);
     int _err = _draw_triangle(ax, ay, bx, by, cx, cy);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -288,12 +288,12 @@ static int api_draw_triangle(lua_State *L) {
 // draw_triangle_line: [ number  number  number  number  number  number -- ]
 static int api_draw_triangle_line(lua_State *L) {
     (void)L;
-    int ax = luaL_checkinteger(L, 1);
-    int ay = luaL_checkinteger(L, 2);
-    int bx = luaL_checkinteger(L, 3);
-    int by = luaL_checkinteger(L, 4);
-    int cx = luaL_checkinteger(L, 5);
-    int cy = luaL_checkinteger(L, 6);
+    double ax = luaL_checknumber(L, 1);
+    double ay = luaL_checknumber(L, 2);
+    double bx = luaL_checknumber(L, 3);
+    double by = luaL_checknumber(L, 4);
+    double cx = luaL_checknumber(L, 5);
+    double cy = luaL_checknumber(L, 6);
     int _err = _draw_triangle_line(ax, ay, bx, by, cx, cy);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -301,10 +301,10 @@ static int api_draw_triangle_line(lua_State *L) {
 // draw_rect: [ number  number  number  number -- ]
 static int api_draw_rect(lua_State *L) {
     (void)L;
-    int dest_x = luaL_checkinteger(L, 1);
-    int dest_y = luaL_checkinteger(L, 2);
-    int rect_width = luaL_checkinteger(L, 3);
-    int rect_height = luaL_checkinteger(L, 4);
+    double dest_x = luaL_checknumber(L, 1);
+    double dest_y = luaL_checknumber(L, 2);
+    double rect_width = luaL_checknumber(L, 3);
+    double rect_height = luaL_checknumber(L, 4);
     int _err = _draw_rect(dest_x, dest_y, rect_width, rect_height);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -312,10 +312,10 @@ static int api_draw_rect(lua_State *L) {
 // draw_rect_line: [ number  number  number  number -- ]
 static int api_draw_rect_line(lua_State *L) {
     (void)L;
-    int dest_x = luaL_checkinteger(L, 1);
-    int dest_y = luaL_checkinteger(L, 2);
-    int rect_width = luaL_checkinteger(L, 3);
-    int rect_height = luaL_checkinteger(L, 4);
+    double dest_x = luaL_checknumber(L, 1);
+    double dest_y = luaL_checknumber(L, 2);
+    double rect_width = luaL_checknumber(L, 3);
+    double rect_height = luaL_checknumber(L, 4);
     int _err = _draw_rect_line(dest_x, dest_y, rect_width, rect_height);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -323,9 +323,9 @@ static int api_draw_rect_line(lua_State *L) {
 // draw_circle: [ number  number  number -- ]
 static int api_draw_circle(lua_State *L) {
     (void)L;
-    int dest_x = luaL_checkinteger(L, 1);
-    int dest_y = luaL_checkinteger(L, 2);
-    int radius = luaL_checkinteger(L, 3);
+    double dest_x = luaL_checknumber(L, 1);
+    double dest_y = luaL_checknumber(L, 2);
+    double radius = luaL_checknumber(L, 3);
     int _err = _draw_circle(dest_x, dest_y, radius);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -333,9 +333,9 @@ static int api_draw_circle(lua_State *L) {
 // draw_circle_line: [ number  number  number -- ]
 static int api_draw_circle_line(lua_State *L) {
     (void)L;
-    int dest_x = luaL_checkinteger(L, 1);
-    int dest_y = luaL_checkinteger(L, 2);
-    int radius = luaL_checkinteger(L, 3);
+    double dest_x = luaL_checknumber(L, 1);
+    double dest_y = luaL_checknumber(L, 2);
+    double radius = luaL_checknumber(L, 3);
     int _err = _draw_circle_line(dest_x, dest_y, radius);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -356,8 +356,8 @@ static int api_load_image(lua_State *L) {
 static int api_draw_image(lua_State *L) {
     (void)L;
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    int dest_x = luaL_checkinteger(L, 2);
-    int dest_y = luaL_checkinteger(L, 3);
+    double dest_x = luaL_checknumber(L, 2);
+    double dest_y = luaL_checknumber(L, 3);
     int _err = _draw_image(*image, dest_x, dest_y);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -366,12 +366,12 @@ static int api_draw_image(lua_State *L) {
 static int api_draw_image_rect(lua_State *L) {
     (void)L;
     lyte_Image *image = luaL_checkudata(L, 1, "lyte.Image");
-    int dest_x = luaL_checkinteger(L, 2);
-    int dest_y = luaL_checkinteger(L, 3);
-    int src_x = luaL_checkinteger(L, 4);
-    int src_y = luaL_checkinteger(L, 5);
-    int rect_width = luaL_checkinteger(L, 6);
-    int rect_height = luaL_checkinteger(L, 7);
+    double dest_x = luaL_checknumber(L, 2);
+    double dest_y = luaL_checknumber(L, 3);
+    double src_x = luaL_checknumber(L, 4);
+    double src_y = luaL_checknumber(L, 5);
+    double rect_width = luaL_checknumber(L, 6);
+    double rect_height = luaL_checknumber(L, 7);
     int _err = _draw_image_rect(*image, dest_x, dest_y, src_x, src_y, rect_width, rect_height);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -461,14 +461,14 @@ static int api_reset_imagebatch(lua_State *L) {
 static int api_add_imagebatch_rect(lua_State *L) {
     (void)L;
     lyte_ImageBatch *imagebatch = luaL_checkudata(L, 1, "lyte.ImageBatch");
-    int dest_x = luaL_checkinteger(L, 2);
-    int dest_y = luaL_checkinteger(L, 3);
-    int dest_width = luaL_checkinteger(L, 4);
-    int dest_height = luaL_checkinteger(L, 5);
-    int src_x = luaL_checkinteger(L, 6);
-    int src_y = luaL_checkinteger(L, 7);
-    int src_width = luaL_checkinteger(L, 8);
-    int src_height = luaL_checkinteger(L, 9);
+    double dest_x = luaL_checknumber(L, 2);
+    double dest_y = luaL_checknumber(L, 3);
+    double dest_width = luaL_checknumber(L, 4);
+    double dest_height = luaL_checknumber(L, 5);
+    double src_x = luaL_checknumber(L, 6);
+    double src_y = luaL_checknumber(L, 7);
+    double src_width = luaL_checknumber(L, 8);
+    double src_height = luaL_checknumber(L, 9);
     int _err = _add_imagebatch_rect(*imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -519,8 +519,8 @@ static int api_set_font(lua_State *L) {
 static int api_draw_text(lua_State *L) {
     (void)L;
     const char * text = luaL_checkstring(L, 1);
-    int dest_x = luaL_checkinteger(L, 2);
-    int dest_y = luaL_checkinteger(L, 3);
+    double dest_x = luaL_checknumber(L, 2);
+    double dest_y = luaL_checknumber(L, 3);
     int _err = _draw_text(text, dest_x, dest_y);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -1214,8 +1214,8 @@ static int api_reset_matrix(lua_State *L) {
 // translate: [ number  number -- ]
 static int api_translate(lua_State *L) {
     (void)L;
-    int delta_x = luaL_checkinteger(L, 1);
-    int delta_y = luaL_checkinteger(L, 2);
+    double delta_x = luaL_checknumber(L, 1);
+    double delta_y = luaL_checknumber(L, 2);
     int _err = _translate(delta_x, delta_y);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -1232,8 +1232,8 @@ static int api_rotate(lua_State *L) {
 static int api_rotate_at(lua_State *L) {
     (void)L;
     double angle = luaL_checknumber(L, 1);
-    int x = luaL_checkinteger(L, 2);
-    int y = luaL_checkinteger(L, 3);
+    double x = luaL_checknumber(L, 2);
+    double y = luaL_checknumber(L, 3);
     int _err = _rotate_at(angle, x, y);
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
@@ -1250,8 +1250,8 @@ static int api_scale(lua_State *L) {
 // scale_at: [ number  number  number  number -- ]
 static int api_scale_at(lua_State *L) {
     (void)L;
-    int scale_x = luaL_checkinteger(L, 1);
-    int scale_y = luaL_checkinteger(L, 2);
+    double scale_x = luaL_checknumber(L, 1);
+    double scale_y = luaL_checknumber(L, 2);
     double x = luaL_checknumber(L, 3);
     double y = luaL_checknumber(L, 4);
     int _err = _scale_at(scale_x, scale_y, x, y);

@@ -189,7 +189,7 @@ int lyte_is_image_canvas(lyte_Image image, bool *val) {
     return 0;
 }
 
-int lyte_draw_image(lyte_Image image, int x, int y) {
+int lyte_draw_image(lyte_Image image, double x, double y) {
     ImageItem *imageitem = image.ptr;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
@@ -208,7 +208,7 @@ int lyte_draw_image(lyte_Image image, int x, int y) {
     return 0;
 }
 
-int lyte_draw_image_rect(lyte_Image image, int x, int y, int src_x, int src_y, int w, int h) {
+int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, double src_y, double w, double h) {
     ImageItem *imageitem = image.ptr;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
@@ -315,7 +315,7 @@ int lyte_reset_imagebatch(lyte_ImageBatch imagebatch) {
     }
     return 0;
 }
-int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, int dest_x, int dest_y, int dest_width, int dest_height, int src_x, int src_y, int src_width, int src_height) {
+int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, double dest_x, double dest_y, double dest_width, double dest_height, double src_x, double src_y, double src_width, double src_height) {
     ImageBatchItem *ibi = imagebatch.ptr;
     if (!ibi->rects) {
         // initial allocation

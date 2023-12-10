@@ -15,22 +15,22 @@
 #define MAX_CIRCLE_TRIS 1024
 #endif
 
-int lyte_draw_point(int x, int y) {
+int lyte_draw_point(double x, double y) {
     sgp_draw_filled_rect(x, y, 1, 1);
     return 0;
 }
 
-int lyte_draw_line(int x1, int y1, int x2, int y2) {
+int lyte_draw_line(double x1, double y1, double x2, double y2) {
     sgp_draw_line(x1, y1, x2, y2);
     return 0;
 }
 
-int lyte_draw_triangle(int ax, int ay, int bx, int by, int cx, int cy) {
+int lyte_draw_triangle(double ax, double ay, double bx, double by, double cx, double cy) {
     sgp_draw_filled_triangle(ax, ay, bx, by, cx, cy);
     return 0;
 }
 
-int lyte_draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy) {
+int lyte_draw_triangle_line(double ax, double ay, double bx, double by, double cx, double cy) {
     sgp_line lines[4] = {
         (sgp_line){{ax, ay}, {bx, by}},
         (sgp_line){{bx, by}, {cx, cy}},
@@ -40,12 +40,12 @@ int lyte_draw_triangle_line(int ax, int ay, int bx, int by, int cx, int cy) {
     return 0;
 }
 
-int lyte_draw_rect(int x, int y, int w, int h) {
+int lyte_draw_rect(double x, double y, double w, double h) {
     sgp_draw_filled_rect(x, y, w, h);
     return 0;
 }
 
-int lyte_draw_rect_line(int x, int y, int w, int h) {
+int lyte_draw_rect_line(double x, double y, double w, double h) {
     sgp_line lines[4] = {
         (sgp_line){{x, y}, {x, y+h}},
         (sgp_line){{x, y+h}, {x+w, y+h}},
@@ -56,7 +56,7 @@ int lyte_draw_rect_line(int x, int y, int w, int h) {
     return 0;
 }
 
-int lyte_draw_circle(int dest_x, int dest_y, int radius) {
+int lyte_draw_circle(double dest_x, double dest_y, double radius) {
     float x = (float)dest_x;
     float y = (float)dest_y;
     float r = (float)radius;
@@ -79,7 +79,7 @@ int lyte_draw_circle(int dest_x, int dest_y, int radius) {
     return 0;
 }
 
-int lyte_draw_circle_line(int dest_x, int dest_y, int radius) {
+int lyte_draw_circle_line(double dest_x, double dest_y, double radius) {
     float x = (float)dest_x;
     float y = (float)dest_y;
     float r = (float)radius;
