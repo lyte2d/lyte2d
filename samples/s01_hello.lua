@@ -51,8 +51,14 @@ function lyte.tick(dt, width, height)
     -- 0.7.4: new drawing primitives
     lyte.draw_line(10,10,100,100)
     lyte.draw_point(102,102)
-    lyte.draw_triangle(150,150,154,200, 220,200)
+
     lyte.draw_triangle_line(150,50,154,100, 220,100)
+    lyte.draw_triangle(150,150,154,200, 220,200)
+
+    lyte.draw_ellipse(250, 50, 30, 10)
+    lyte.draw_ellipse_line(220, 50, 30, 10)
+    lyte.draw_ellipse(250, 150, 10, 40)
+    lyte.draw_ellipse_line(220, 150, 6, 30)
 
     lyte.pop_matrix()
 end

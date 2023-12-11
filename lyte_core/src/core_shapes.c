@@ -57,9 +57,20 @@ int lyte_draw_rect_line(double x, double y, double w, double h) {
 }
 
 int lyte_draw_circle(double dest_x, double dest_y, double radius) {
+    return lyte_draw_ellipse(dest_x, dest_y, radius, radius);
+}
+
+int lyte_draw_circle_line(double dest_x, double dest_y, double radius) {
+    return lyte_draw_ellipse_line(dest_x, dest_y, radius, radius);
+}
+
+int lyte_draw_ellipse(double dest_x, double dest_y, double radius_x, double radius_y) {
     float x = (float)dest_x;
     float y = (float)dest_y;
-    float r = (float)radius;
+    float r = (float)((radius_x + radius_y)/2.0);
+
+    float xr = (float)radius_x / r;
+    float yr = (float)radius_y / r;
 
     static sgp_triangle tris[MAX_CIRCLE_TRIS];
     int count = MIN(MAX(7.0f, 2.0f * r / (float)M_PI), MAX_CIRCLE_TRIS);
@@ -69,31 +80,34 @@ int lyte_draw_circle(double dest_x, double dest_y, double radius) {
         tris[i].a.x = x;
         tris[i].a.y = y;
 
-        tris[i].b.x = x + r * sinf(i * delta_angle);
-        tris[i].b.y = y - r * cosf(i * delta_angle);
+        tris[i].b.x = x + r * xr *sinf(i * delta_angle);
+        tris[i].b.y = y - r * yr * cosf(i * delta_angle);
 
-        tris[i].c.x = x + r * sinf((i+1)* delta_angle);
-        tris[i].c.y = y - r * cosf((i+1) * delta_angle);
+        tris[i].c.x = x + r * xr * sinf((i+1)* delta_angle);
+        tris[i].c.y = y - r * yr * cosf((i+1) * delta_angle);
     }
     sgp_draw_filled_triangles(tris, count);
     return 0;
 }
 
-int lyte_draw_circle_line(double dest_x, double dest_y, double radius) {
+int lyte_draw_ellipse_line(double dest_x, double dest_y, double radius_x, double radius_y) {
     float x = (float)dest_x;
     float y = (float)dest_y;
-    float r = (float)radius;
+    float r = (float)((radius_x + radius_y)/2.0);
+
+    float xr = (float)radius_x / r;
+    float yr = (float)radius_y / r;
 
     static sgp_line lines[MAX_CIRCLE_TRIS];
     int count = MIN(MAX(7.0f, 2.0f * r / (float)M_PI), MAX_CIRCLE_TRIS);
     float delta_angle = 2.0*(float)M_PI/(float)count;
 
     for (int i=0; i<count; i++) {
-        lines[i].a.x = x + r * sinf(i * delta_angle);
-        lines[i].a.y = y - r * cosf(i * delta_angle);
+        lines[i].a.x = x + r * xr * sinf(i * delta_angle);
+        lines[i].a.y = y - r * yr * cosf(i * delta_angle);
 
-        lines[i].b.x = x + r * sinf((i+1)* delta_angle);
-        lines[i].b.y = y - r * cosf((i+1) * delta_angle);
+        lines[i].b.x = x + r * xr * sinf((i+1)* delta_angle);
+        lines[i].b.y = y - r * yr * cosf((i+1) * delta_angle);
     }
     sgp_draw_lines(lines, count);
     return 0;

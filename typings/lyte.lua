@@ -44,6 +44,12 @@ function lyte.draw_circle() end
 --- Draw a circle border.
 --- @type fun(dest_x: number, dest_y: number, radius: number)
 function lyte.draw_circle_line() end
+--- Draw a filled ellipse.
+--- @type fun(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
+function lyte.draw_ellipse() end
+--- Draw an ellipse border.
+--- @type fun(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
+function lyte.draw_ellipse_line() end
 --- Load the image specified in the path.
 --- @type fun(image_path: string): lyte.Image
 function lyte.load_image() end

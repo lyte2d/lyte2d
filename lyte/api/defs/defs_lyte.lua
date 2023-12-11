@@ -125,6 +125,21 @@ local lyte_namespace = Namespace("lyte", {
         Arg("radius", Number()),
     }, nil, {d="Draw a circle border."}),
 
+    Function("draw_ellipse", {
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("radius_x", Number()),
+        Arg("radius_y", Number()),
+    }, nil, {d="Draw a filled ellipse."}),
+
+    Function("draw_ellipse_line", {
+        Arg("dest_x", Number()),
+        Arg("dest_y", Number()),
+        Arg("radius_x", Number()),
+        Arg("radius_y", Number()),
+    }, nil, {d="Draw an ellipse border."}),
+
+
     Function("load_image", {
         Arg("image_path", String()),
     },{

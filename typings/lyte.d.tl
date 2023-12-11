@@ -13,6 +13,8 @@ global record lyte
     draw_rect_line: function(dest_x: number, dest_y: number, rect_width: number, rect_height: number)
     draw_circle: function(dest_x: number, dest_y: number, radius: number)
     draw_circle_line: function(dest_x: number, dest_y: number, radius: number)
+    draw_ellipse: function(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
+    draw_ellipse_line: function(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
     load_image: function(image_path: string): Image
     draw_image: function(image: Image, dest_x: number, dest_y: number)
     draw_image_rect: function(image: Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)

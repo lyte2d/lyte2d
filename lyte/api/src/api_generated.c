@@ -340,6 +340,28 @@ static int api_draw_circle_line(lua_State *L) {
     (void)_err;  // TODO: handle '_err' in case it's not 0
     return 0; // number of return values
 }
+// draw_ellipse: [ number  number  number  number -- ]
+static int api_draw_ellipse(lua_State *L) {
+    (void)L;
+    double dest_x = luaL_checknumber(L, 1);
+    double dest_y = luaL_checknumber(L, 2);
+    double radius_x = luaL_checknumber(L, 3);
+    double radius_y = luaL_checknumber(L, 4);
+    int _err = _draw_ellipse(dest_x, dest_y, radius_x, radius_y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
+// draw_ellipse_line: [ number  number  number  number -- ]
+static int api_draw_ellipse_line(lua_State *L) {
+    (void)L;
+    double dest_x = luaL_checknumber(L, 1);
+    double dest_y = luaL_checknumber(L, 2);
+    double radius_x = luaL_checknumber(L, 3);
+    double radius_y = luaL_checknumber(L, 4);
+    int _err = _draw_ellipse_line(dest_x, dest_y, radius_x, radius_y);
+    (void)_err;  // TODO: handle '_err' in case it's not 0
+    return 0; // number of return values
+}
 // load_image: [ string --  userdata ] (ctor: true)
 static int api_load_image(lua_State *L) {
     (void)L;
@@ -1881,6 +1903,8 @@ static const struct luaL_Reg lyte_api_functions[] = {    {"quit", api_quit},
     {"draw_rect_line", api_draw_rect_line},
     {"draw_circle", api_draw_circle},
     {"draw_circle_line", api_draw_circle_line},
+    {"draw_ellipse", api_draw_ellipse},
+    {"draw_ellipse_line", api_draw_ellipse_line},
     {"load_image", api_load_image},
     {"draw_image", api_draw_image},
     {"draw_image_rect", api_draw_image_rect},

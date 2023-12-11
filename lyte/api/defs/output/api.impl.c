@@ -92,6 +92,18 @@ static inline int _draw_circle_line(double dest_x, double dest_y, double radius)
     _err = lyte_draw_circle_line(dest_x, dest_y, radius);
     return _err;
 }
+static inline int _draw_ellipse(double dest_x, double dest_y, double radius_x, double radius_y) {
+    (void)dest_x;(void)dest_y;(void)radius_x;(void)radius_y;
+    int _err = 0;
+    _err = lyte_draw_ellipse(dest_x, dest_y, radius_x, radius_y);
+    return _err;
+}
+static inline int _draw_ellipse_line(double dest_x, double dest_y, double radius_x, double radius_y) {
+    (void)dest_x;(void)dest_y;(void)radius_x;(void)radius_y;
+    int _err = 0;
+    _err = lyte_draw_ellipse_line(dest_x, dest_y, radius_x, radius_y);
+    return _err;
+}
 static inline int _load_image(const char * image_path, lyte_Image *val) {
     (void)image_path;(void)val;
     int _err = 0;

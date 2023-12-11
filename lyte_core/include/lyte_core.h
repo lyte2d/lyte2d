@@ -246,6 +246,8 @@ int lyte_draw_rect(double dest_x, double dest_y, double rect_width, double rect_
 int lyte_draw_rect_line(double dest_x, double dest_y, double rect_width, double rect_height);
 int lyte_draw_circle(double dest_x, double dest_y, double radius);
 int lyte_draw_circle_line(double dest_x, double dest_y, double radius);
+int lyte_draw_ellipse(double dest_x, double dest_y, double radius_x, double radius_y);
+int lyte_draw_ellipse_line(double dest_x, double dest_y, double radius_x, double radius_y);
 
 
 // -------------------------

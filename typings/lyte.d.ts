@@ -13,6 +13,8 @@ declare namespace lyte {
     function draw_rect_line(dest_x: number, dest_y: number, rect_width: number, rect_height: number): void
     function draw_circle(dest_x: number, dest_y: number, radius: number): void
     function draw_circle_line(dest_x: number, dest_y: number, radius: number): void
+    function draw_ellipse(dest_x: number, dest_y: number, radius_x: number, radius_y: number): void
+    function draw_ellipse_line(dest_x: number, dest_y: number, radius_x: number, radius_y: number): void
     function load_image(image_path: string): Image
     function draw_image(image: Image, dest_x: number, dest_y: number): void
     function draw_image_rect(image: Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number): void
