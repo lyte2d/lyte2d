@@ -118,9 +118,24 @@ local tl_src = lyte.load_textfile(tl_file)
 _G.tl = loadstring(tl_src, tl_file)()
 
 
-local function lyte_lua_loader(modulename)
-    local filename = modulename:gsub("%.", "/")  .. ".lua"
+-- TODO: lyte.file_exists() API to get rid of file not exists warnings
+local function load_lua_file_or_dir_module(modulename, ext)
+    local filename = modulename:gsub("%.", "/")  .. "." .. ext
     local code_str = lyte.load_textfile(filename)
+    if not code_str then
+        -- try "dir/init.lua" variation
+        filename = modulename:gsub("%.", "/")  .. "/init." .. ext
+        code_str = lyte.load_textfile(filename)
+    end
+    return code_str, filename
+end
+
+local function lyte_lua_loader(modulename)
+    local filename = nil
+    local code_str = nil
+    code_str, filename = load_lua_file_or_dir_module(modulename, "lua")
+    -- filename = modulename:gsub("%.", "/")  .. ".lua"
+    -- code_str = lyte.load_textfile(filename)
     if code_str then
         return function(...)
             return run_many(code_str, filename, ...)
@@ -134,11 +149,12 @@ local function make_lyte_searcher(env)
         local filename = nil
         local code_str= nil
         local lang = nil
-        local languages = {"fnl", "tl", "moon"}
+        local languages = {"fnl", "tl"}
 
         for _, ext in ipairs(languages) do
-            filename = modulename:gsub("%.", "/")  .. "." .. ext
-            code_str = lyte.load_textfile(filename)
+            -- filename = modulename:gsub("%.", "/")  .. "." .. ext
+            -- code_str = lyte.load_textfile(filename)
+            code_str, filename = load_lua_file_or_dir_module(modulename, ext)
             if code_str then
                 lang = ext
                 break
@@ -179,10 +195,6 @@ local function make_lyte_searcher(env)
                     local lua_code = tl.pretty_print_ast(result.ast)
                     return run_many(lua_code, filename, ...)
             end, filename
-        elseif lang == "moon" then
-            print("Internal warning: moonscript is not yet supported")
-        --elseif lang == nil then
-        --    print("Internal error: lang is nil")
         else
             print("Internal error: Unknown/incorrectly configured lang: " .. lang)
         end
@@ -231,10 +243,11 @@ _G.LYTE_SET_REPL_FENNEL = function()
     _G.LYTE_REPL_EVAL = _G.LYTE_REPL_EVAL_FENNEL
 end
 
--- TODO teal (and moonscript) versions
+
 if LYTE_REPL_REQUESTED == "fennel" or LYTE_REPL_REQUESTED == "fnl" then
     _G.LYTE_SET_REPL_FENNEL()
 else
+    -- tl (teal) based repl doesn't make much sense
     _G.LYTE_SET_REPL_LUA()
 end
 
