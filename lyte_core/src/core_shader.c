@@ -282,8 +282,9 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
     shader_desc.fs.image_sampler_pairs[0].image_slot = 0;
     shader_desc.fs.image_sampler_pairs[0].sampler_slot = 0;
     shader_desc.fs.samplers[0].used = true;
-    shader_desc.fs.images[0].image_type=SG_IMAGETYPE_2D;
-    shader_desc.fs.images[0].sample_type=SG_IMAGESAMPLETYPE_FLOAT;
+    shader_desc.fs.images[0].used = true;
+    shader_desc.fs.images[0].image_type = SG_IMAGETYPE_2D;
+    shader_desc.fs.images[0].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
 
     shd->num_images += 1; // current_image
 
@@ -301,8 +302,9 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
             shader_desc.fs.image_sampler_pairs[img_idx].image_slot = img_idx;
             shader_desc.fs.image_sampler_pairs[img_idx].sampler_slot = img_idx;
             shader_desc.fs.samplers[img_idx].used = true;
-            shader_desc.fs.images[img_idx].image_type=SG_IMAGETYPE_2D;
-            shader_desc.fs.images[img_idx].sample_type=SG_IMAGESAMPLETYPE_FLOAT;
+            shader_desc.fs.images[img_idx].used = true;
+            shader_desc.fs.images[img_idx].image_type = SG_IMAGETYPE_2D;
+            shader_desc.fs.images[img_idx].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
             sud->location = img_idx;
             img_idx++;
             shd->num_images += 1;

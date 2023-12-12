@@ -19,8 +19,7 @@
 static bool _window_inited = false;
 static bool _window_resizable = true;
 
-void _sg_log(const char* tag, uint32_t log_level, uint32_t log_item_id, const char* message, uint32_t line_nr, const char* filename, void* user_data)
-{
+void _sg_log(const char* tag, uint32_t log_level, uint32_t log_item_id, const char* message, uint32_t line_nr, const char* filename, void* user_data) {
     if (!message) {
         return;
     }
