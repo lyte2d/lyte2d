@@ -12,6 +12,7 @@ import os, shutil, sys
 import gen_util as util
 
 module_names = {
+    'slog_':    'log',
     'sg_':      'gfx',
     'sapp_':    'app',
     'stm_':     'time',
@@ -22,6 +23,7 @@ module_names = {
 }
 
 c_source_paths = {
+    'slog_':    'sokol-zig/src/sokol/c/sokol_log.c',
     'sg_':      'sokol-zig/src/sokol/c/sokol_gfx.c',
     'sapp_':    'sokol-zig/src/sokol/c/sokol_app.c',
     'stm_':     'sokol-zig/src/sokol/c/sokol_time.c',
@@ -36,6 +38,11 @@ ignores = [
     'sdtx_vprintf',
     'sg_install_trace_hooks',
     'sg_trace_hooks',
+]
+
+# functions that need to be exposed as 'raw' C callbacks without a Zig wrapper function
+c_callbacks = [
+    'slog_func'
 ]
 
 # NOTE: syntax for function results: "func_name.RESULT"
@@ -205,7 +212,7 @@ def as_c_arg_type(arg_type, prefix):
     elif is_const_struct_ptr(arg_type):
         return f"[*c]const {as_zig_struct_type(util.extract_ptr_type(arg_type), prefix)}"
     elif is_prim_ptr(arg_type):
-        return f"[*c] {as_zig_prim_type(util.extract_ptr_type(arg_type))}"
+        return f"[*c]{as_zig_prim_type(util.extract_ptr_type(arg_type))}"
     elif is_const_prim_ptr(arg_type):
         return f"[*c]const {as_zig_prim_type(util.extract_ptr_type(arg_type))}"
     else:
@@ -235,7 +242,7 @@ def as_zig_arg_type(arg_prefix, arg_type, prefix):
         # not a bug, pass const structs by value
         return pre + f"{as_zig_struct_type(util.extract_ptr_type(arg_type), prefix)}"
     elif is_prim_ptr(arg_type):
-        return pre + f"* {as_zig_prim_type(util.extract_ptr_type(arg_type))}"
+        return pre + f"*{as_zig_prim_type(util.extract_ptr_type(arg_type))}"
     elif is_const_prim_ptr(arg_type):
         return pre + f"*const {as_zig_prim_type(util.extract_ptr_type(arg_type))}"
     else:
@@ -264,6 +271,8 @@ def funcptr_result_c(field_type):
     res_type = field_type[:field_type.index('(*)')].strip()
     if res_type == 'void':
         return 'void'
+    elif is_prim_type(res_type):
+        return as_zig_prim_type(res_type)
     elif util.is_const_void_ptr(res_type):
         return '?*const anyopaque'
     elif util.is_void_ptr(res_type):
@@ -316,7 +325,7 @@ def gen_struct(decl, prefix):
         if is_prim_type(field_type):
             l(f"    {field_name}: {as_zig_prim_type(field_type)} = {type_default_value(field_type)},")
         elif is_struct_type(field_type):
-            l(f"    {field_name}: {as_zig_struct_type(field_type, prefix)} = .{{ }},")
+            l(f"    {field_name}: {as_zig_struct_type(field_type, prefix)} = .{{}},")
         elif is_enum_type(field_type):
             l(f"    {field_name}: {as_zig_enum_type(field_type, prefix)} = .{enum_default_item(field_type)},")
         elif util.is_string_ptr(field_type):
@@ -328,7 +337,7 @@ def gen_struct(decl, prefix):
         elif is_const_prim_ptr(field_type):
             l(f"    {field_name}: ?[*]const {as_zig_prim_type(util.extract_ptr_type(field_type))} = null,")
         elif util.is_func_ptr(field_type):
-            l(f"    {field_name}: ?meta.FnPtr(fn({funcptr_args_c(field_type, prefix)}) callconv(.C) {funcptr_result_c(field_type)}) = null,")
+            l(f"    {field_name}: ?*const fn ({funcptr_args_c(field_type, prefix)}) callconv(.C) {funcptr_result_c(field_type)} = null,")
         elif util.is_1d_array_type(field_type):
             array_type = util.extract_array_type(field_type)
             array_sizes = util.extract_array_sizes(field_type)
@@ -348,7 +357,7 @@ def gen_struct(decl, prefix):
                 t1 = f"[_]{zig_type}"
                 l(f"    {field_name}: {t0} = {t1}{{{def_val}}} ** {array_sizes[0]},")
             elif util.is_const_void_ptr(array_type):
-                l(f"    {field_name}: [{array_sizes[0]}]?*const anyopaque = [_]?*const anyopaque {{ null }} ** {array_sizes[0]},")
+                l(f"    {field_name}: [{array_sizes[0]}]?*const anyopaque = [_]?*const anyopaque{{null}} ** {array_sizes[0]},")
             else:
                 sys.exit(f"ERROR gen_struct: array {field_name}: {field_type} => {array_type} [{array_sizes[0]}]")
         elif util.is_2d_array_type(field_type):
@@ -359,11 +368,11 @@ def gen_struct(decl, prefix):
                 def_val = type_default_value(array_type)
             elif is_struct_type(array_type):
                 zig_type = as_zig_struct_type(array_type, prefix)
-                def_val = ".{ }"
+                def_val = ".{}"
             else:
                 sys.exit(f"ERROR gen_struct is_2d_array_type: {array_type}")
             t0 = f"[{array_sizes[0]}][{array_sizes[1]}]{zig_type}"
-            l(f"    {field_name}: {t0} = [_][{array_sizes[1]}]{zig_type}{{[_]{zig_type}{{ {def_val} }}**{array_sizes[1]}}}**{array_sizes[0]},")
+            l(f"    {field_name}: {t0} = [_][{array_sizes[1]}]{zig_type}{{[_]{zig_type}{{{def_val}}} ** {array_sizes[1]}}} ** {array_sizes[0]},")
         else:
             sys.exit(f"ERROR gen_struct: {field_name}: {field_type};")
     l("};")
@@ -391,31 +400,35 @@ def gen_func_c(decl, prefix):
 def gen_func_zig(decl, prefix):
     c_func_name = decl['name']
     zig_func_name = util.as_lower_camel_case(check_override(decl['name']), prefix)
-    zig_res_type = funcdecl_result_zig(decl, prefix)
-    l(f"pub fn {zig_func_name}({funcdecl_args_zig(decl, prefix)}) {zig_res_type} {{")
-    if is_zig_string(zig_res_type):
-        # special case: convert C string to Zig string slice
-        s = f"    return cStrToZig({c_func_name}("
-    elif zig_res_type != 'void':
-        s = f"    return {c_func_name}("
+    if c_func_name in c_callbacks:
+        # a simple forwarded C callback function
+        l(f"pub const {zig_func_name} = {c_func_name};")
     else:
-        s = f"    {c_func_name}("
-    for i, param_decl in enumerate(decl['params']):
-        if i > 0:
-            s += ", "
-        arg_name = param_decl['name']
-        arg_type = param_decl['type']
-        if is_const_struct_ptr(arg_type):
-            s += f"&{arg_name}"
-        elif util.is_string_ptr(arg_type):
-            s += f"@ptrCast([*c]const u8,{arg_name})"
+        zig_res_type = funcdecl_result_zig(decl, prefix)
+        l(f"pub fn {zig_func_name}({funcdecl_args_zig(decl, prefix)}) {zig_res_type} {{")
+        if is_zig_string(zig_res_type):
+            # special case: convert C string to Zig string slice
+            s = f"    return cStrToZig({c_func_name}("
+        elif zig_res_type != 'void':
+            s = f"    return {c_func_name}("
         else:
-            s += arg_name
-    if is_zig_string(zig_res_type):
-        s += ")"
-    s += ");"
-    l(s)
-    l("}")
+            s = f"    {c_func_name}("
+        for i, param_decl in enumerate(decl['params']):
+            if i > 0:
+                s += ", "
+            arg_name = param_decl['name']
+            arg_type = param_decl['type']
+            if is_const_struct_ptr(arg_type):
+                s += f"&{arg_name}"
+            elif util.is_string_ptr(arg_type):
+                s += f"@ptrCast({arg_name})"
+            else:
+                s += arg_name
+        if is_zig_string(zig_res_type):
+            s += ")"
+        s += ");"
+        l(s)
+        l("}")
 
 def pre_parse(inp):
     global struct_types
@@ -433,7 +446,6 @@ def pre_parse(inp):
 
 def gen_imports(inp, dep_prefixes):
     l('const builtin = @import("builtin");')
-    l('const meta = @import("std").meta;')
     for dep_prefix in dep_prefixes:
         dep_module_name = module_names[dep_prefix]
         l(f'const {dep_prefix[:-1]} = @import("{dep_module_name}.zig");')
@@ -442,7 +454,7 @@ def gen_imports(inp, dep_prefixes):
 def gen_helpers(inp):
     l('// helper function to convert a C string to a Zig string slice')
     l('fn cStrToZig(c_str: [*c]const u8) [:0]const u8 {')
-    l('  return @import("std").mem.span(c_str);')
+    l('    return @import("std").mem.span(c_str);')
     l('}')
     if inp['prefix'] in ['sg_', 'sdtx_', 'sshape_']:
         l('// helper function to convert "anything" to a Range struct')
@@ -457,21 +469,18 @@ def gen_helpers(inp):
         l('            }')
         l('        },')
         l('        .Struct, .Array => {')
-        l('            switch (builtin.zig_backend) {')
-        l('                .stage1 => return .{ .ptr = &val, .size = @sizeOf(@TypeOf(val)) },')
-        l('                else => @compileError("Structs and arrays must be passed as pointers to asRange"),')
-        l('            }')
+        l('            @compileError("Structs and arrays must be passed as pointers to asRange");')
         l('        },')
         l('        else => {')
         l('            @compileError("Cannot convert to range!");')
-        l('        }')
+        l('        },')
         l('    }')
         l('}')
         l('')
     if inp['prefix'] == 'sdtx_':
         l('// std.fmt compatible Writer')
         l('pub const Writer = struct {')
-        l('    pub const Error = error { };')
+        l('    pub const Error = error{};')
         l('    pub fn writeAll(self: Writer, bytes: []const u8) Error!void {')
         l('        _ = self;')
         l('        for (bytes) |byte| {')
@@ -481,14 +490,14 @@ def gen_helpers(inp):
         l('    pub fn writeByteNTimes(self: Writer, byte: u8, n: u64) Error!void {')
         l('        _ = self;')
         l('        var i: u64 = 0;')
-        l('        while (i < n): (i += 1) {')
+        l('        while (i < n) : (i += 1) {')
         l('            putc(byte);')
         l('        }')
         l('    }')
         l('};')
         l('// std.fmt-style formatted print')
         l('pub fn print(comptime fmt: anytype, args: anytype) void {')
-        l('    var writer: Writer = .{};')
+        l('    const writer: Writer = .{};')
         l('    @import("std").fmt.format(writer, fmt, args) catch {};')
         l('}')
         l('')

@@ -277,9 +277,14 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
     shd->num_uniform_floats += 4; // r,g,b,a for current_color
 
     // if user calls draw_image, this is the corresponding MAGIC image name
-    shader_desc.fs.images[0].name="current_image";
-    shader_desc.fs.images[0].image_type=SG_IMAGETYPE_2D;
-    shader_desc.fs.images[0].sampler_type=SG_SAMPLERTYPE_FLOAT;
+    shader_desc.fs.image_sampler_pairs[0].glsl_name = "current_image";
+    shader_desc.fs.image_sampler_pairs[0].used = true;
+    shader_desc.fs.image_sampler_pairs[0].image_slot = 0;
+    shader_desc.fs.image_sampler_pairs[0].sampler_slot = 0;
+    shader_desc.fs.samplers[0].used = true;
+    shader_desc.fs.images[0].used = true;
+    shader_desc.fs.images[0].image_type = SG_IMAGETYPE_2D;
+    shader_desc.fs.images[0].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
 
     shd->num_images += 1; // current_image
 
@@ -292,9 +297,14 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
         ShaderUniformDefinition *sud = &shd->uniform_definitions[i];
         if (sud->type == LYTE_UNIFORMTYPE_SAMPLER2D) {
             // image
-            shader_desc.fs.images[img_idx].name = sud->name;
-            shader_desc.fs.images[img_idx].image_type=SG_IMAGETYPE_2D;
-            shader_desc.fs.images[img_idx].sampler_type=SG_SAMPLERTYPE_FLOAT;
+            shader_desc.fs.image_sampler_pairs[img_idx].glsl_name = sud->name;
+            shader_desc.fs.image_sampler_pairs[img_idx].used = true;
+            shader_desc.fs.image_sampler_pairs[img_idx].image_slot = img_idx;
+            shader_desc.fs.image_sampler_pairs[img_idx].sampler_slot = img_idx;
+            shader_desc.fs.samplers[img_idx].used = true;
+            shader_desc.fs.images[img_idx].used = true;
+            shader_desc.fs.images[img_idx].image_type = SG_IMAGETYPE_2D;
+            shader_desc.fs.images[img_idx].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
             sud->location = img_idx;
             img_idx++;
             shd->num_images += 1;
@@ -384,7 +394,7 @@ int lyte_core_shader_set_color() {
 }
 
 int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value) {
-    ShaderItem *shd =shader.ptr;    
+    ShaderItem *shd =shader.ptr;
     if (!shd) {
         fprintf(stderr, "Shader not found.");
         return 1;

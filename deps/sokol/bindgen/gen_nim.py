@@ -10,6 +10,7 @@ import gen_util as util
 import os, shutil, sys
 
 module_names = {
+    'slog_':    'log',
     'sg_':      'gfx',
     'sapp_':    'app',
     'sapp_sg':  'glue',
@@ -21,6 +22,7 @@ module_names = {
 }
 
 c_source_paths = {
+    'slog_':    'sokol-nim/src/sokol/c/sokol_log.c',
     'sg_':      'sokol-nim/src/sokol/c/sokol_gfx.c',
     'sapp_':    'sokol-nim/src/sokol/c/sokol_app.c',
     'sapp_sg':  'sokol-nim/src/sokol/c/sokol_glue.c',
@@ -30,6 +32,10 @@ c_source_paths = {
     'sdtx_':    'sokol-nim/src/sokol/c/sokol_debugtext.c',
     'sshape_':  'sokol-nim/src/sokol/c/sokol_shape.c',
 }
+
+c_callbacks = [
+    'slog_func',
+]
 
 ignores = [
     'sdtx_printf',
@@ -47,10 +53,14 @@ overrides = {
     'SG_BUFFERTYPE_INDEXBUFFER':    'SG_BUFFERTYPE_INDEX_BUFFER',
     'SG_ACTION_DONTCARE':           'SG_ACTION_DONT_CARE',
     'ptr':                          'addr', # range ptr
+    'func':                         'fn',
+    'slog_func':                    'fn',
 }
 
 enumPrefixOverrides = {
     # sokol_gfx.h
+    'LOADACTION': 'loadAction',
+    'STOREACTION': 'storeAction',
     'PIXELFORMAT': 'pixelFormat',
     'RESOURCESTATE': 'resourceState',
     'BUFFERTYPE': 'bufferType',
@@ -412,22 +422,26 @@ def funcdecl_result(decl, prefix):
     return nim_res_type
 
 def gen_func_nim(decl, prefix):
-    nim_func_name = as_camel_case(check_override(decl['name']), prefix, wrap=False)
+    c_func_name = decl['name']
+    nim_func_name = as_camel_case(check_override(c_func_name), prefix, wrap=False)
     nim_res_type = funcdecl_result(decl, prefix)
-    l(f"proc c_{nim_func_name}({funcdecl_args_c(decl, prefix)}):{nim_res_type} {{.cdecl, importc:\"{decl['name']}\".}}")
-    l(f"proc {wrap_keywords(nim_func_name)}*({funcdecl_args_nim(decl, prefix)}):{nim_res_type} =")
-    s = f"    c_{nim_func_name}("
-    for i, param_decl in enumerate(decl['params']):
-        if i > 0:
-            s += ", "
-        arg_name = param_decl['name']
-        arg_type = param_decl['type']
-        if is_const_struct_ptr(arg_type):
-            s += f"unsafeAddr({arg_name})"
-        else:
-            s += arg_name
-    s += ")"
-    l(s)
+    if c_func_name in c_callbacks:
+        l(f"proc {nim_func_name}*({funcdecl_args_c(decl, prefix)}):{nim_res_type} {{.cdecl, importc:\"{c_func_name}\".}}")
+    else:
+        l(f"proc c_{nim_func_name}({funcdecl_args_c(decl, prefix)}):{nim_res_type} {{.cdecl, importc:\"{c_func_name}\".}}")
+        l(f"proc {wrap_keywords(nim_func_name)}*({funcdecl_args_nim(decl, prefix)}):{nim_res_type} =")
+        s = f"    c_{nim_func_name}("
+        for i, param_decl in enumerate(decl['params']):
+            if i > 0:
+                s += ", "
+            arg_name = param_decl['name']
+            arg_type = param_decl['type']
+            if is_const_struct_ptr(arg_type):
+                s += f"addr({arg_name})"
+            else:
+                s += arg_name
+        s += ")"
+        l(s)
     l("")
 
 def gen_array_converters(decl, prefix):
@@ -441,15 +455,15 @@ def gen_array_converters(decl, prefix):
             if util.is_1d_array_type(field['type']):
                 n = array_sizes[0]
                 l(f'converter to{struct_name}{field_name}*[N:static[int]](items: array[N, {array_base_type}]): array[{n}, {array_base_type}] =')
-                l(f'  static: assert(N < {n})')
+                l(f'  static: assert(N <= {n})')
                 l(f'  for index,item in items.pairs: result[index]=item')
                 l('')
             elif util.is_2d_array_type(field['type']):
                 x = array_sizes[1]
                 y = array_sizes[0]
                 l(f'converter to{struct_name}{field_name}*[Y:static[int], X:static[int]](items: array[Y, array[X, {array_base_type}]]): array[{y}, array[{x}, {array_base_type}]] =')
-                l(f'  static: assert(X < {x})')
-                l(f'  static: assert(Y < {y})')
+                l(f'  static: assert(X <= {x})')
+                l(f'  static: assert(Y <= {y})')
                 l(f'  for indexY,itemY in items.pairs:')
                 l(f'    for indexX, itemX in itemY.pairs:')
                 l(f'      result[indexY][indexX] = itemX')
@@ -548,10 +562,12 @@ def gen_extra(inp):
     #if inp['prefix'] in ['sg_', 'sdtx_', 'sshape_']:
     #    l('# helper function to convert "anything" into a Range')
     #    l('converter to_Range*[T](source: T): Range =')
-    #    l('  Range(addr: source.unsafeAddr, size: source.sizeof.uint)')
+    #    l('  Range(addr: source.addr, size: source.sizeof.uint)')
     #    l('')
     c_source_path = '/'.join(c_source_paths[inp['prefix']].split('/')[3:])
     l('{.passc:"-DSOKOL_NIM_IMPL".}')
+    l('when defined(release):')
+    l('  {.passc:"-DNDEBUG".}')
     l(f'{{.compile:"{c_source_path}".}}')
 
 def gen_module(inp, dep_prefixes):

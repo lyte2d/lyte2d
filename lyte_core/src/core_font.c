@@ -43,6 +43,7 @@ typedef struct FontItem {
     void *fontdata;
     uint8_t *buffer;
     uint32_t imageid;
+    uint32_t samplerid;
     int width;
     int height;
     int font;
@@ -72,13 +73,19 @@ static int _fons_render_create(void *user_ptr, int width, int height) {
         .height = height,
         // .pixel_format = SG_PIXELFORMAT_R8,
         .pixel_format = SG_PIXELFORMAT_RGBA8,
-        .min_filter = (sg_filter)lytecore_state.filtermode,
-        .mag_filter = (sg_filter)lytecore_state.filtermode,
         .type = SG_IMAGETYPE_2D,
         .usage = SG_USAGE_DYNAMIC,
     };
     sg_image img = sg_make_image(&imdesc);
+
+    sg_sampler_desc smpdesc = (sg_sampler_desc){
+        .min_filter = (sg_filter)lytecore_state.filtermode,
+        .mag_filter = (sg_filter)lytecore_state.filtermode,
+    };
+    sg_sampler smp = sg_make_sampler(&smpdesc);
+
     fontitem->imageid = img.id;
+    fontitem->samplerid = smp.id;
     fontitem->buffer = malloc(width*height*4);
     return 1;
 }
@@ -88,6 +95,8 @@ static void _fons_render_delete(void *user_ptr) {
     FontItem *fontitem = (FontItem *)user_ptr;
     sg_image img = (sg_image){ .id=fontitem->imageid };
     sg_destroy_image(img);
+    sg_sampler smp = (sg_sampler){ .id=fontitem->samplerid };
+    sg_destroy_sampler(smp);
     fontitem->imageid = 0;
     free(fontitem->buffer);
 }
@@ -141,8 +150,10 @@ static void _fons_render_draw(void *user_ptr, const float *verts, const float *t
     int height = fontitem->height;
 
     sg_image img = (sg_image){ .id=fontitem->imageid };
+    sgp_set_image(0, img);
+    sg_sampler smp = (sg_sampler){ .id=fontitem->samplerid };
+    sgp_set_sampler(0, smp);
 
-    sgp_set_image(0,img);
     lyte_set_blendmode(lytecore_state.blendmode);
 
     for (int i=0; i<nverts-2; i += 3) {
@@ -165,7 +176,7 @@ static void _fons_render_draw(void *user_ptr, const float *verts, const float *t
         sgp_push_transform();
         // sgp_scale(1.0/M_FONT_MULT,1.0/M_FONT_MULT);
         sgp_translate(p1x,p1y);
-        sgp_draw_textured_rect_ex(0, (sgp_rect){0,0,(p3x-p1x), (p3y-p1y)}, (sgp_rect){t1x*width, t1y*height, (t3x-t1x)*width, (t3y-t1y)*height});
+        sgp_draw_textured_rect(0, (sgp_rect){0,0,(p3x-p1x), (p3y-p1y)}, (sgp_rect){t1x*width, t1y*height, (t3x-t1x)*width, (t3y-t1y)*height});
         sgp_pop_transform();
 
     }
@@ -195,6 +206,7 @@ int lyte_load_font(const char * path, double size, lyte_Font *val) {
     fi->atlas_dim = FONT_ATLAS_SIZE;
     fi->fontsize = size;
     fi->imageid = 0;
+    fi->samplerid = 0;
     fi->width = 0;
     fi->height = 0;
     fi->fontdata = buf;

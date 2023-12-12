@@ -138,6 +138,7 @@ The following is a quick example on how to this library with Sokol GFX and Sokol
 #include "sokol_gp.h"
 #include "sokol_app.h"
 #include "sokol_glue.h"
+#include "sokol_log.h"
 
 #include <stdio.h> // for fprintf()
 #include <stdlib.h> // for exit()
@@ -183,7 +184,10 @@ static void frame(void) {
 // Called when the application is initializing.
 static void init(void) {
     // Initialize Sokol GFX.
-    sg_desc sgdesc = {.context = sapp_sgcontext()};
+    sg_desc sgdesc = {
+        .context = sapp_sgcontext(),
+        .logger.func = slog_func
+    };
     sg_setup(&sgdesc);
     if(!sg_isvalid()) {
         fprintf(stderr, "Failed to create Sokol GFX context!\n");
@@ -214,8 +218,8 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         .init_cb = init,
         .frame_cb = frame,
         .cleanup_cb = cleanup,
-        .window_title = "Triangle (Sokol GP)",
-        .sample_count = 4, // Enable anti aliasing.
+        .window_title = "Rectangle (Sokol GP)",
+        .logger.func = slog_func,
     };
 }
 ```
@@ -285,6 +289,20 @@ The library provides drawing functions for all the basic primitives, that is,
 for points, lines, triangles and rectangles, such as `sgp_draw_line()` and `sgp_draw_filled_rect()`.
 Check the cheat sheet or the header for more.
 All of them have batched variations.
+
+## Drawing textured primitives
+
+To draw textured rectangles you can use `sgp_set_image(0, img)` and then `sgp_draw_filled_rect()`,
+this will draw an entire texture into a rectangle.
+You should later reset the image with `sgp_reset_image(0)` to restore the bound image to default white image,
+otherwise you will have glitches when drawing a solid color.
+
+In case you want to draw a specific source from the texture,
+you should use `sgp_draw_textured_rect()` instead.
+
+By default textures are drawn using a simple nearest filter sampler,
+you can change the sampler with `sgp_set_sampler(0, smp)` before drawing a texture,
+it's recommended to restore the default sampler using `sgp_reset_sampler(0)`.
 
 ## Color modulation
 
@@ -387,9 +405,12 @@ void sgp_set_blend_mode(sgp_blend_mode blend_mode);       /* Sets current blend 
 void sgp_reset_blend_mode(void);                          /* Resets current blend mode to default (no blending). */
 void sgp_set_color(float r, float g, float b, float a);   /* Sets current color modulation. */
 void sgp_reset_color(void);                               /* Resets current color modulation to default (white). */
-void sgp_set_image(int channel, sg_image image);          /* Sets current bound texture in a texture channel. */
-void sgp_unset_image(int channel);                        /* Remove current bound texture in a texture channel (no texture). */
-void sgp_reset_image(int channel);                        /* Resets current bound texture in a channel to default (white texture). */
+void sgp_set_image(int channel, sg_image image);          /* Sets current bound image in a texture channel. */
+void sgp_unset_image(int channel);                        /* Remove current bound image in a texture channel (no texture). */
+void sgp_reset_image(int channel);                        /* Resets current bound image in a texture channel to default (white texture). */
+void sgp_set_sampler(int channel, sg_sampler sampler);    /* Sets current bound sampler in a texture channel. */
+void sgp_unset_sampler(int channel);                      /* Remove current bound sampler in a texture channel (no sampler). */
+void sgp_reset_sampler(int channel);                      /* Resets current bound sampler in a texture channel to default (nearest sampler). */
 
 /* State change functions for all pipelines. */
 void sgp_viewport(int x, int y, int w, int h);            /* Sets the screen area to draw into. */
@@ -410,10 +431,8 @@ void sgp_draw_filled_triangle(float ax, float ay, float bx, float by, float cx, 
 void sgp_draw_filled_triangles_strip(const sgp_point* points, uint32_t count);                /* Draws strip of triangles. */
 void sgp_draw_filled_rects(const sgp_rect* rects, uint32_t count);                            /* Draws a batch of rectangles. */
 void sgp_draw_filled_rect(float x, float y, float w, float h);                                /* Draws a single rectangle. */
-void sgp_draw_textured_rects(const sgp_rect* rects, uint32_t count);                          /* Draws a batch of textured rectangles. */
-void sgp_draw_textured_rect(float x, float y, float w, float h);                              /* Draws a single textured rectangle. */
-void sgp_draw_textured_rects_ex(int channel, const sgp_textured_rect* rects, uint32_t count); /* Draws a batch textured rectangle, each from a source region. */
-void sgp_draw_textured_rect_ex(int channel, sgp_rect dest_rect, sgp_rect src_rect);           /* Draws a single textured rectangle from a source region. */
+void sgp_draw_textured_rects(int channel, const sgp_textured_rect* rects, uint32_t count);    /* Draws a batch textured rectangle, each from a source region. */
+void sgp_draw_textured_rect(int channel, sgp_rect dest_rect, sgp_rect src_rect);              /* Draws a single textured rectangle from a source region. */
 
 /* Querying functions. */
 sgp_state* sgp_query_state(void); /* Returns the current draw state. */
@@ -442,6 +461,8 @@ very useful for simplifying finite state machines in game devlopment.
 
 ## Updates
 
+* **31-Oct-2023**: Update to latest Sokol, introduced new WebGPU backend.
+* **30-Sep-2023**: Update to latest Sokol, deprecated GLES2 backend, add image sampler APIs, changes in draw textured APIs.
 * **31-Dec-2021**: The library was open sourced.
 * **05-Aug-2020**: Added support for custom shaders.
 * **03-Jun-2020**: Added the batch optimizer.
@@ -454,7 +475,6 @@ These are features I would like to implement someday in the future
 
 * Draw textured triangles
 * Support drawing primitives with colored vertices
-* Seamless automatic texture atlas packer (to allow more batching)
 
 ## Screenshots
 
