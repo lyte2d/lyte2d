@@ -18,6 +18,7 @@
 
 typedef struct ImageItem {
     uint32_t handle; // **MAGIC_1** NOTE: needs to stay the first element in the struct. (pointer magic in core_shader.c)
+    uint32_t sampler_handle;
     int ref;
     int width;
     int height;
@@ -62,19 +63,23 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     sg_image_desc image_desc = {0};
     image_desc.width = width;
     image_desc.height = height;
-    image_desc.min_filter = (sg_filter)lytecore_state.filtermode;
-    image_desc.mag_filter = (sg_filter)lytecore_state.filtermode;
-    // image_desc.wrap_u = SG_WRAP_REPEAT;
-    // image_desc.wrap_v = SG_WRAP_REPEAT;
-    image_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
-    image_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
     image_desc.data.subimage[0][0].ptr = data;
     image_desc.data.subimage[0][0].size = (size_t)(width * height * 4);
     sg_image sgimage = sg_make_image(&image_desc);
     stbi_image_free(data);
 
+    sg_sampler_desc sampler_desc = {0};
+    sampler_desc.min_filter = (sg_filter)lytecore_state.filtermode;
+    sampler_desc.mag_filter = (sg_filter)lytecore_state.filtermode;
+    // sampler_desc.wrap_u = SG_WRAP_REPEAT;
+    // sampler_desc.wrap_v = SG_WRAP_REPEAT;
+    sampler_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
+    sampler_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
+    sg_sampler sgsampler = sg_make_sampler(&sampler_desc);
+
     ImageItem *ii = malloc(sizeof(ImageItem));
     ii->handle = sgimage.id;
+    ii->sampler_handle = sgsampler.id;
     ii->width = width;
     ii->height = height;
     ii->is_canvas = false;
@@ -97,16 +102,19 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
     fb_image_desc.render_target = true;
     fb_image_desc.width = w;
     fb_image_desc.height = h;
-    // fb_image_desc.min_filter = (sg_filter)_lib->filtermode; // TODO: filtermode for canvas
-    // fb_image_desc.mag_filter = (sg_filter)_lib->filtermode;
-    fb_image_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
-    fb_image_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
     sg_image fb_image = sg_make_image(&fb_image_desc);
     if(sg_query_image_state(fb_image) != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Failed to create frame buffer image\n");
         return 1;
     }
     c->handle = fb_image.id;
+    sg_sampler_desc fb_sampler_desc = {0};
+    // fb_sampler_desc.min_filter = (sg_filter)_lib->filtermode; // TODO: filtermode for canvas
+    // fb_sampler_desc.mag_filter = (sg_filter)_lib->filtermode;
+    fb_sampler_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
+    fb_sampler_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
+    sg_sampler fb_sampler = sg_make_sampler(&fb_sampler_desc);
+    c->sampler_handle = fb_sampler.id;
     // create frame buffer depth stencil
     sg_image_desc fb_depth_image_desc = {0};
     fb_depth_image_desc.render_target = true;
@@ -148,6 +156,7 @@ static inline void _free_imageitem(ImageItem *imageitem) {
             sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
         }
         sg_destroy_image((sg_image){.id = imageitem->handle});
+        sg_destroy_sampler((sg_sampler){.id = imageitem->sampler_handle});
         free(imageitem);
     }
 }
@@ -198,11 +207,13 @@ int lyte_draw_image(lyte_Image image, double x, double y) {
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
     // TODO: blendmode?
     sgp_set_image(0, sgimage);
+    sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
+    sgp_set_sampler(0, sgsampler);
 
     // BUGBUG: potential bug. see test2.lua for segfault repro
     // sgp_draw_textured_rect(x, y, imageitem->width, imageitem->height);
 
-    sgp_draw_textured_rect_ex(0, (sgp_rect){x, y, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
+    sgp_draw_textured_rect(0, (sgp_rect){x, y, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
 
     sgp_reset_image(0);
     return 0;
@@ -217,7 +228,9 @@ int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, dou
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
     // TODO: blendmode?
     sgp_set_image(0, sgimage);
-    sgp_draw_textured_rect_ex(0, (sgp_rect){x, y, w, h}, (sgp_rect){src_x, src_y, w, h});
+    sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
+    sgp_set_sampler(0, sgsampler);
+    sgp_draw_textured_rect(0, (sgp_rect){x, y, w, h}, (sgp_rect){src_x, src_y, w, h});
     sgp_reset_image(0);
     return 0;
 }
@@ -256,11 +269,11 @@ int lyte_reset_canvas(void) {
     sg_pass canvas_pass = (sg_pass){ .id = current_canvas->id_pass };
     sg_pass_action pass_action;
     memset(&pass_action, 0, sizeof(sg_pass_action));
-    pass_action.colors[0].action = SG_ACTION_CLEAR;
-    pass_action.colors[0].value.r = 1.0f;
-    pass_action.colors[0].value.g = 1.0f;
-    pass_action.colors[0].value.b = 1.0f;
-    pass_action.colors[0].value.a = 1.0f;
+    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
+    pass_action.colors[0].clear_value.r = 1.0f;
+    pass_action.colors[0].clear_value.g = 1.0f;
+    pass_action.colors[0].clear_value.b = 1.0f;
+    pass_action.colors[0].clear_value.a = 1.0f;
     sg_begin_pass(canvas_pass, &pass_action);
     sgp_flush();
     sgp_end();
@@ -348,7 +361,9 @@ int lyte_draw_imagebatch(lyte_ImageBatch imagebatch) {
         ImageItem *imageitem = ibi->image.ptr;
         sg_image sgimage = (sg_image){ .id = imageitem->handle };
         sgp_set_image(0, sgimage);
-        sgp_draw_textured_rects_ex(0, ibi->rects, ibi->count);
+        sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
+        sgp_set_sampler(0, sgsampler);
+        sgp_draw_textured_rects(0, ibi->rects, ibi->count);
         sgp_reset_image(0);
     }
     return 0;

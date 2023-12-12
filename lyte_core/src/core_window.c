@@ -19,6 +19,25 @@
 static bool _window_inited = false;
 static bool _window_resizable = true;
 
+void _sg_log(const char* tag, uint32_t log_level, uint32_t log_item_id, const char* message, uint32_t line_nr, const char* filename, void* user_data)
+{
+    if (!message) {
+        return;
+    }
+
+    switch (log_item_id) {
+        case SG_LOGITEM_GL_SHADER_LINKING_FAILED: {
+            printf("Failed to link shader:\n%s", message);
+        } break;
+        case SG_LOGITEM_GL_SHADER_COMPILATION_FAILED: {
+            printf("Failed to compile shader:\n%s", message);
+        } break;
+        default: {
+            return;
+        } break;
+    }
+}
+
 int lyte_core_window_init(void) {
 
 #if defined(__EMSCRIPTEN__)
@@ -78,7 +97,7 @@ int lyte_core_window_init(void) {
         glfwSwapInterval(0);
     }
 
-    sg_desc sgdesc = {0};
+    sg_desc sgdesc = {.logger.func = _sg_log};
     sg_setup(&sgdesc);
     if(!sg_isvalid()) {
         fprintf(stderr, "Failed to create Sokol GFX context\n");

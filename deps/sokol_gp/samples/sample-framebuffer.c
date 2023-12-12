@@ -7,12 +7,14 @@ This sample showcases how to use Sokol GP to draw inside frame buffers (render t
 #include "sokol_gp.h"
 #include "sokol_app.h"
 #include "sokol_glue.h"
+#include "sokol_log.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 static sg_image fb_image;
 static sg_image fb_depth_image;
+static sg_sampler linear_sampler;
 static sg_pass fb_pass;
 
 static void draw_triangles(void) {
@@ -45,11 +47,11 @@ static void draw_fbo(void) {
 
     sg_pass_action pass_action;
     memset(&pass_action, 0, sizeof(sg_pass_action));
-    pass_action.colors[0].action = SG_ACTION_CLEAR;
-    pass_action.colors[0].value.r = 1.0f;
-    pass_action.colors[0].value.g = 1.0f;
-    pass_action.colors[0].value.b = 1.0f;
-    pass_action.colors[0].value.a = 0.2f;
+    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
+    pass_action.colors[0].clear_value.r = 1.0f;
+    pass_action.colors[0].clear_value.g = 1.0f;
+    pass_action.colors[0].clear_value.b = 1.0f;
+    pass_action.colors[0].clear_value.a = 0.2f;
     sg_begin_pass(fb_pass, &pass_action);
     sgp_flush();
     sgp_end();
@@ -69,14 +71,24 @@ static void frame(void) {
     float time = sapp_frame_count() / 60.0f;
     sgp_set_blend_mode(SGP_BLENDMODE_BLEND);
     draw_fbo();
+    int i = 0;
     for(int y=0;y<height;y+=192) {
         for(int x=0;x<width;x+=192) {
             sgp_push_transform();
             sgp_rotate_at(time, x+64, y+64);
             sgp_set_image(0, fb_image);
-            sgp_draw_textured_rect(x, y, 128, 128);
+            sgp_set_sampler(0, linear_sampler);
+            if (i % 2 == 0) {
+                sgp_draw_filled_rect(x, y, 128, 128);
+            } else {
+                sgp_rect dest_rect = {x, y, 128, 128};
+                sgp_rect src_rect = {0, 0, 128, 128};
+                sgp_draw_textured_rect(0, dest_rect, src_rect);
+            }
             sgp_reset_image(0);
+            sgp_reset_sampler(0);
             sgp_pop_transform();
+            i++;
         }
     }
 
@@ -91,7 +103,10 @@ static void frame(void) {
 
 static void init(void) {
     // initialize Sokol GFX
-    sg_desc sgdesc = {.context = sapp_sgcontext()};
+    sg_desc sgdesc = {
+        .context = sapp_sgcontext(),
+        .logger.func = slog_func
+    };
     sg_setup(&sgdesc);
     if(!sg_isvalid()) {
         fprintf(stderr, "Failed to create Sokol GFX context!\n");
@@ -112,10 +127,6 @@ static void init(void) {
     fb_image_desc.render_target = true;
     fb_image_desc.width = 128;
     fb_image_desc.height = 128;
-    fb_image_desc.min_filter = SG_FILTER_LINEAR;
-    fb_image_desc.mag_filter = SG_FILTER_LINEAR;
-    fb_image_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
-    fb_image_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
     fb_image = sg_make_image(&fb_image_desc);
     if(sg_query_image_state(fb_image) != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Failed to create frame buffer image\n");
@@ -132,6 +143,19 @@ static void init(void) {
     fb_depth_image = sg_make_image(&fb_depth_image_desc);
     if(sg_query_image_state(fb_depth_image) != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Failed to create frame buffer depth image\n");
+        exit(-1);
+    }
+
+    // create linear sampler
+    sg_sampler_desc linear_sampler_desc = {
+        .min_filter = SG_FILTER_LINEAR,
+        .mag_filter = SG_FILTER_LINEAR,
+        .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+        .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+    };
+    linear_sampler = sg_make_sampler(&linear_sampler_desc);
+    if(sg_query_sampler_state(linear_sampler) != SG_RESOURCESTATE_VALID) {
+        fprintf(stderr, "failed to create linear sampler");
         exit(-1);
     }
 
@@ -163,6 +187,6 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         .frame_cb = frame,
         .cleanup_cb = cleanup,
         .window_title = "Frame buffer (Sokol GP)",
-        .sample_count = 4,
+        .logger.func = slog_func,
     };
 }

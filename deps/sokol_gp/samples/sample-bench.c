@@ -15,6 +15,7 @@ there is a 2.2x in FPS gains.
 #include "sokol_app.h"
 #include "sokol_glue.h"
 #include "sokol_time.h"
+#include "sokol_log.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +32,7 @@ static void bench_repeated_textured(void) {
     sgp_set_image(0, image1);
     for(int y=0;y<count;++y) {
         for(int x=0;x<count;++x) {
-            sgp_draw_textured_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
+            sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
         }
     }
     sgp_reset_image(0);
@@ -42,7 +43,7 @@ static void bench_multiple_textured(void) {
     for(int y=0;y<count;++y) {
         for(int x=0;x<count;++x) {
             sgp_set_image(0, x % 2 == 0 ? image1 : image2);
-            sgp_draw_textured_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
+            sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
         }
     }
     sgp_reset_image(0);
@@ -59,7 +60,7 @@ static void bench_colored_textured(void) {
                 sgp_set_color(0, 255, 0, 255);
             else
                 sgp_set_color(0, 0, 255, 255);
-            sgp_draw_textured_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
+            sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
         }
     }
     sgp_reset_image(0);
@@ -90,7 +91,6 @@ static void bench_colored_filled(void) {
 }
 
 static void bench_mixed(void) {
-    sgp_set_image(0, image1);
     for(int diagonal = 0; diagonal < 2*count - 1; ++diagonal) {
         int advance = _sg_max(diagonal - count + 1, 0);
         for(int y = diagonal - advance, x = advance; y >= 0 && x < count; --y, ++x) {
@@ -100,13 +100,15 @@ static void bench_mixed(void) {
                 sgp_set_color(0, 255, 0, 255);
             else
                 sgp_set_color(0, 0, 255, 255);
-            if((x+y) % 2 == 0)
+            if((x+y) % 2 == 0) {
                 sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
-            else
-                sgp_draw_textured_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
+            } else {
+                sgp_set_image(0, image1);
+                sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
+                sgp_reset_image(0);
+            }
         }
     }
-    sgp_reset_image(0);
 }
 
 static void bench_sync_mixed(void) {
@@ -119,7 +121,7 @@ static void bench_sync_mixed(void) {
                 sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
             } else {
                 sgp_set_color(0, 255, 0, 255);
-                sgp_draw_textured_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
+                sgp_draw_filled_rect(x*rect_count*2, y*rect_count*2, rect_count, rect_count);
             }
         }
     }
@@ -129,7 +131,7 @@ static void bench_sync_mixed(void) {
 static void draw_cat(void) {
     sgp_reset_color();
     sgp_set_image(0, image1);
-    sgp_draw_textured_rect(0, 0, rect_count*count*2, rect_count*count*2);
+    sgp_draw_filled_rect(0, 0, rect_count*count*2, rect_count*count*2);
     sgp_reset_image(0);
 }
 
@@ -212,8 +214,6 @@ static sg_image create_image(int width, int height) {
     memset(&image_desc, 0, sizeof(sg_image_desc));
     image_desc.width = width;
     image_desc.height = height;
-    image_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
-    image_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
     image_desc.data.subimage[0][0].ptr = data;
     image_desc.data.subimage[0][0].size = num_pixels;
     sg_image image = sg_make_image(&image_desc);
@@ -226,7 +226,10 @@ static void init(void) {
     stm_setup();
 
     // initialize Sokol GFX
-    sg_desc sgdesc = {.context = sapp_sgcontext()};
+    sg_desc sgdesc = {
+        .context = sapp_sgcontext(),
+        .logger.func = slog_func
+    };
     sg_setup(&sgdesc);
     if(!sg_isvalid()) {
         fprintf(stderr, "Failed to create Sokol GFX context!\n");
@@ -244,15 +247,14 @@ static void init(void) {
         exit(-1);
     }
 
-#ifdef _SAPP_LINUX
+#if defined(_SAPP_LINUX) && defined(SOKOL_GLCORE33)
     /* Disable swap interval */
     _sapp_glx_swapinterval(0);
 #endif
 
     image1 = create_image(128, 128);
     image2 = create_image(128, 128);
-    sg_image_info imginfo = sg_query_image_info(image1);
-    image_ratio = imginfo.width / (float)imginfo.height;
+    image_ratio = 1.0f;
 }
 
 static void cleanup(void) {
@@ -272,5 +274,6 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         .window_title = "Bench (Sokol GP)",
         .width = 1280,
         .height = 1280,
+        .logger.func = slog_func,
     };
 }
