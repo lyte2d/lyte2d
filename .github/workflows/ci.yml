@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - rel
+    tags:
+      - test
 jobs:
   build-with-docker:
     permissions: write-all
