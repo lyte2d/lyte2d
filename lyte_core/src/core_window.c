@@ -26,10 +26,10 @@ void _sg_log(const char* tag, uint32_t log_level, uint32_t log_item_id, const ch
 
     switch (log_item_id) {
         case SG_LOGITEM_GL_SHADER_LINKING_FAILED: {
-            printf("Failed to link shader:\n%s", message);
+            fprintf(stderr, "Failed to link shader:\n%s", message);
         } break;
         case SG_LOGITEM_GL_SHADER_COMPILATION_FAILED: {
-            printf("Failed to compile shader:\n%s", message);
+            fprintf(stderr, "Failed to compile shader:\n%s", message);
         } break;
         default: {
             return;
