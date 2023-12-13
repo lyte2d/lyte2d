@@ -72,7 +72,9 @@
 #elif defined(__APPLE__) && defined(__MACH__)
 #define ODE_PLATFORM_OSX
 #else
-#error "Need some help identifying the platform!"
+// MG CHANGE
+// #error "Need some help identifying the platform!"
+#define ODE_PLATFORM_LINUX
 #endif
 
 /* Additional platform defines used in the code */

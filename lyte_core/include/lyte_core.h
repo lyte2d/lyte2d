@@ -340,4 +340,11 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
 int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name);
 
 
+// -------------------------
+// core_physics
+// -------------------------
+
+int lyte_physics_init(void);
+int lyte_physics_cleanup(void);
+
 #endif  // LYTE_CORE_H_INCLUDED

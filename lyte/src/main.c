@@ -470,7 +470,7 @@ static int init(void) {
     err = lyte_core_audio_init();
     err = lyte_core_font_init();
     err = lyte_core_shader_init();
-    /* err = lyte_physics_init(); */
+    err = lyte_physics_init();
 
     lua_State *L = luaL_newstate();
     lua_atpanic(L, _lua_panic_fn);
@@ -538,7 +538,7 @@ static int cleanup(void) {
     err = lyte_core_font_cleanup();
     err = lyte_core_shader_cleanup();
     err = lyte_core_filesystem_cleanup();
-    /* err = lyte_physics_cleanup(); */
+    err = lyte_physics_cleanup();
 
     return err;
 }

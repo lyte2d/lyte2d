@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(lyte_core C)
+project(lyte_core C CXX)
 message("===============> Project: ${PROJECT_NAME}")
 
 add_library(${PROJECT_NAME} STATIC)
@@ -54,13 +54,20 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     physfs-static
 )
 
-
 message("===> Adding FreeType")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/freetype ${CMAKE_CURRENT_BINARY_DIR}/freetype)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   freetype
 )
 
+message("===> Adding ODE")
+set(ODE_WITH_DEMOS OFF)
+set(ODE_WITH_TESTS OFF)
+set(ODE_NO_BUILTIN_THREADING_IMPL ON)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/ode-0.16.4 ${CMAKE_CURRENT_BINARY_DIR}/ode)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ODE
+)
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC
@@ -89,6 +96,7 @@ target_sources(${PROJECT_NAME} PRIVATE
     ./src/core_input.c
     ./src/core_image.c
     ./src/core_loop.c
+    ./src/core_physics.c
     ./src/core_shader.c
     ./src/core_shapes.c
     ./src/core_state.c

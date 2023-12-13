@@ -95,7 +95,10 @@ double dTimerTicksPerSecond()
 // instructions have executed and data has been written back before the cpu
 // time stamp counter is read. the CPUID instruction is used to serialize.
 
-#elif defined(PENTIUM)
+
+// #elif defined(PENTIUM)
+// MG: removed. Should fallback to Posix (trying to get WASM to build)
+#elif defined(PENTIUM_REMOVE_____)
 
 // we need to know the clock rate so that the timing function can report
 // accurate times. this number only needs to be set accurately if we're
@@ -107,7 +110,7 @@ double dTimerTicksPerSecond()
 
 static inline void getClockCount (unsigned long cc[2])
 {
-#ifndef X86_64_SYSTEM	
+#ifndef X86_64_SYSTEM
     asm volatile (
         "rdtsc\n"
         "movl %%eax,(%%esi)\n"
@@ -119,7 +122,7 @@ static inline void getClockCount (unsigned long cc[2])
         "movl %%eax,(%%rsi)\n"
         "movl %%edx,4(%%rsi)\n"
         : : "S" (cc) : "%eax","%edx","cc","memory");
-#endif  
+#endif
 }
 
 
@@ -152,7 +155,7 @@ static inline double loadClockCount (unsigned long a[2])
 #else
     asm volatile ("fildll %1; fstpl %0" : "=m" (ret) : "m" (a[0]) :
     "cc","memory");
-#endif  
+#endif
     return ret;
 }
 
@@ -219,10 +222,10 @@ double dTimerTicksPerSecond()
 
 
 //****************************************************************************
-// Otherwise, do the implementation based on Macintosh Microseconds 
+// Otherwise, do the implementation based on Macintosh Microseconds
 // or POSIX gettimeofday().
 
-#else 
+#else
 
 #if defined(macintosh)
 
