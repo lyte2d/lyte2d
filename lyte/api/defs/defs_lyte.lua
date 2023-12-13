@@ -9,6 +9,7 @@ local Integer = apidef.Integer
 local Float = apidef.Float
 local Number = apidef.Number
 local Boolean = apidef.Boolean
+local Pointer = apidef.Pointer
 local Nil = apidef.Nil
 local Defined = apidef.Defined
 local Record = apidef.Record
@@ -836,6 +837,16 @@ local lyte_namespace = Namespace("lyte", {
     -- ------------------------------------------------------------------------------------------------------------------------------------------------------
     -- ------------------------------------------------------------------------------------------------------------------------------------------------------
     -- -- BEGIN: PHYSICS ------------------------------
+    -- Record("MY_TEST_REC", {
+    --     Field("mehptr", Pointer(), {map_read = "MY_TEST"}),
+    -- }, nil, {d="my test rec"}),
+
+    -- Function("MY_TEST", {
+    --     Arg("bla", String()),
+    --     Arg("myptr", Pointer()),
+    -- }, {
+    --     Ret("hehptr", Pointer()),
+    -- }, {d="my test"}),
 
     -- Function("set_physics_engine", {
     --     Arg("state", Defined("PhysicsState")),

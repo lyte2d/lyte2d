@@ -16,6 +16,15 @@
 
 #include "api.impl.c"  // inline implementations in this file
 
+// lightuserdata  helper (modeled after luaL_check* functions in lauxlib.c)
+void *_checklightuserdata(lua_State *L, int narg) {
+    void *ret = lua_touserdata(L, narg);
+    if (ret == NULL && !lua_islightuserdata(L, narg)) {
+        luaL_typerror(L, narg, lua_typename(L, LUA_TLIGHTUSERDATA));
+    }
+    return ret;
+}
+
 // enum helpers
 typedef struct EnumStrInt {
     const char *str;

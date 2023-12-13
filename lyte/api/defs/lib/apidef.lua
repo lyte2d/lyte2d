@@ -38,6 +38,10 @@ do
         return _basetype("boolean", "bool")
     end
 
+    function M.Pointer() -- for usage with light userdata
+        return _basetype("userdata", "void *")
+    end
+
     function M.Nil()
         return _basetype("nil", "void")
     end

@@ -22,7 +22,11 @@ local SSS= S:rep(3)
 
 local function get_t_name_basic(x)
     if x._kind == "primitive" then
-        return x.luatype
+        if x.luatype == "userdata" then
+            return "object"
+        else
+            return x.luatype
+        end
     elseif x.typename then
         return x.typename
     end

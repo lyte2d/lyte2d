@@ -96,6 +96,15 @@ local api_c_top = [[
 
 #include "api.impl.c"  // inline implementations in this file
 
+// lightuserdata  helper (modeled after luaL_check* functions in lauxlib.c)
+void *_checklightuserdata(lua_State *L, int narg) {
+    void *ret = lua_touserdata(L, narg);
+    if (ret == NULL && !lua_islightuserdata(L, narg)) {
+        luaL_typerror(L, narg, lua_typename(L, LUA_TLIGHTUSERDATA));
+    }
+    return ret;
+}
+
 // enum helpers
 typedef struct EnumStrInt {
     const char *str;
@@ -281,6 +290,7 @@ local function get_check_fn_for_variant_args(name, vk, nt, idx, var_name, BASIC_
         ret = ret .. SS .. "// TODO\n"
         ret = ret .. BASIC_FN("val" , idx, o.value_type, SS);
 
+        -- o.value_type._kind == "primitive" for light userdata
         local ptr = ""
         if lt == "userdata" or vk == "list" or vk == "dict" or vk == "tuple" then
             ptr = "*"
@@ -302,6 +312,7 @@ local function get_fn_push_line(name, value_type)
     elseif t == "number" and nt == "int" then pushfn = "lua_pushinteger"
     elseif t == "number" then pushfn = "lua_pushnumber"
     elseif t == "string" then pushfn = "lua_pushstring"
+    elseif t == "userdata" then pushfn = "lua_pushlightuserdata"
     else
         -- error("WHAT TO PUSH FOR???????????? " .. t .. "---" .. name);
     end
@@ -332,7 +343,12 @@ local function get_check_fn_for_basic(name, idx, value_type, space)
     -- if vk == "variant" then check_fn = check_fn .. "SPECIAL_TODO_FOR_ONEOF___" .. name
     if vk == "variant" then check_fn = check_fn .. get_check_fn_for_variant_args(vn,vk, nt, idx, name, get_check_fn_for_basic)
     elseif vk == "enum" then check_fn = check_fn .. "enumstring_to_int(" .. nt .. "_strings, " .. name  .. "_str);\n"  -- on enum, return
-    elseif t == "userdata" then check_fn = check_fn .. "luaL_checkudata(L, " .. idx .. ', "' .. D._name .. "." .. vn .. '");\n'
+
+        -- full userdata
+    elseif t == "userdata" and vk ~= "primitive" then check_fn = check_fn .. "luaL_checkudata(L, " .. idx .. ', "' .. D._name .. "." .. vn .. '");\n'
+    -- light userdata (t and vn ~= nil seems to be needed down as well. make a var?)
+    elseif t == "userdata" then check_fn = check_fn .. "_checklightuserdata(L, " .. idx .. ');\n'
+
     elseif t == "boolean" then check_fn = check_fn .. "lua_toboolean"
     elseif t == "number" and nt == "int" then check_fn = "luaL_checkinteger"
     elseif t == "number" then check_fn = check_fn .. "luaL_checknumber"
@@ -346,8 +362,9 @@ local function get_check_fn_for_basic(name, idx, value_type, space)
          check_fn = check_fn .. "(L, " .. idx ..");\n"
     end
 
+    -- t == userdata and vk == primivie ==> light userdata
     local ptr = " "
-    if t == "userdata" or vk == "list" or vk == "dict" or vk == "tuple" then
+    if (t == "userdata" and vk ~= "primitive") or vk == "list" or vk == "dict" or vk == "tuple" then
         ptr = " *"
     end
 
@@ -468,9 +485,10 @@ for _,f in ipairs(D.functions) do
             arg_ret_lst = arg_ret_lst .. a.value_type.nativetype .. " " .. a._name
             local ptr = ""
             local save_ref = a._tags and a._tags.save_to_registry
-            if  a.value_type.luatype == "userdata" or
-                a.value_type._kind == "tuple"
-                then ptr = "*"
+            local vn = a.value_type.typename -- non-nil for full userdata, nil for light userdata
+            if  (a.value_type.luatype == "userdata" and a.value_type._kind ~= "primitive" ) or
+                a.value_type._kind == "tuple" then
+                    ptr =   "*"
             end
             call_args = call_args .. ptr .. a._name
             lib_call_args = lib_call_args .. a._name
@@ -482,7 +500,7 @@ for _,f in ipairs(D.functions) do
                 lib_call_args = lib_call_args .. ", "
             end
             void_lst = void_lst .. "(void)" .. a._name .. ";"
-            
+
             if save_ref then
                 local registry_lst = ""
                 registry_lst = registry_lst .. S ..  "// save this value to registry to prevent it from being GC'd\n"
