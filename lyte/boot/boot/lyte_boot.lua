@@ -47,9 +47,29 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
         local h2 = lyte.get_text_height(error_text)
 
         -- lyte.translate(WW/2 - SC*wr/2, HH/2 - SC*hr/2)
-        lyte.translate(PAD, PAD)
+        lyte.translate(PAD, PAD/2)
 
         lyte.scale(SC, SC)
+
+        if _G.LYTE_ERROR_LINE then
+            local prefix_width = lyte.get_text_width(_G.LYTE_ERROR_LINE.prefix)
+            local prefix_x = PAD/2
+            local error_x = prefix_x + prefix_width
+
+            lyte.set_color(1,1,0,1)
+            lyte.draw_text(_G.LYTE_ERROR_LINE.prefix, prefix_x, 0)
+
+
+            lyte.set_color(1,1,1,1)
+            lyte.draw_text(_G.LYTE_ERROR_LINE.line, error_x, 0)
+
+            local underline_y = h2 * 0.6
+
+            lyte.set_color(1,0,0,1)
+            lyte.draw_text(_G.LYTE_ERROR_LINE.underline, error_x, underline_y)
+
+            lyte.translate(0, h2 + PAD)
+        end
 
         lyte.set_color(1, 1, 0, 1)
         lyte.draw_text(error_title, PAD/2, 0)
@@ -68,28 +88,9 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
         lyte.set_color(1,0,0,1)
 
         local wr = max_line_width + PAD
-        local hr = h + h2 * y + PAD
+        local hr = h + h2 * y + PAD/2
 
         lyte.draw_rect_line(0,0, wr, hr)
-
-        if _G.LYTE_ERROR_LINE then
-            local prefix_width = lyte.get_text_width(_G.LYTE_ERROR_LINE.prefix)
-            local prefix_x = PAD/2
-            local error_x = prefix_x + prefix_width
-            local error_y = hr + PAD/2
-
-            lyte.set_color(1,1,0,1)
-            lyte.draw_text(_G.LYTE_ERROR_LINE.prefix, prefix_x, error_y)
-
-
-            lyte.set_color(1,1,1,1)
-            lyte.draw_text(_G.LYTE_ERROR_LINE.line, error_x, error_y)
-
-            local underline_y = error_y + h2 * 0.6
-
-            lyte.set_color(1,0,0,1)
-            lyte.draw_text(_G.LYTE_ERROR_LINE.underline, error_x, underline_y)
-        end
     end
 end
 
