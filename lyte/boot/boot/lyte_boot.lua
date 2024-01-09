@@ -88,7 +88,7 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
         lyte.set_color(1,0,0,1)
 
         local wr = max_line_width + PAD
-        local hr = h + h2 * y + PAD/2
+        local hr = h + h2 * y + PAD
 
         lyte.draw_rect_line(0,0, wr, hr)
     end
