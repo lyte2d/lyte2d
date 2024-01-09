@@ -1,5 +1,8 @@
 --[[ (c) mg ]]
 
+local TAB_WIDTH = 4
+local TAB_WHITESPACE = (" "):rep(TAB_WIDTH)
+
 do
     local _has, _dbg = pcall(require, "lldebugger")
     if _has then
@@ -40,13 +43,8 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
     lyte.cls(0, 0, 0, 1)
 
     if (error_text) then
-        local w = lyte.get_text_width(error_title)
         local h = lyte.get_text_height(error_title)
-        local w2 = lyte.get_text_width(error_text)
         local h2 = lyte.get_text_height(error_text)
-
-        local wr = math.max(w, w2) + PAD
-        local hr = h + h2 + PAD
 
         -- lyte.translate(WW/2 - SC*wr/2, HH/2 - SC*hr/2)
         lyte.translate(PAD, PAD)
@@ -54,10 +52,23 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
         lyte.scale(SC, SC)
 
         lyte.set_color(1, 1, 0, 1)
-        lyte.draw_text(error_title, PAD/2, PAD/2)
+        lyte.draw_text(error_title, PAD/2, 0)
         lyte.set_color(1, 1, 1, 1)
-        lyte.draw_text(error_text, PAD/2, PAD/2 + SC * h)
+
+        local y = 0
+        local max_line_width = 0
+
+        for error_line in error_text:gmatch("[^\n]+") do
+            max_line_width = math.max(max_line_width, lyte.get_text_width(error_line))
+            error_line = error_line:gsub("\t", TAB_WHITESPACE)
+            lyte.draw_text(error_line, PAD/2, (SC + y) * h2)
+            y = y + 1
+        end
+
         lyte.set_color(1,0,0,1)
+
+        local wr = max_line_width + PAD
+        local hr = h + h2 * y  + PAD
 
         lyte.draw_rect_line(0,0, wr, hr)
     end
