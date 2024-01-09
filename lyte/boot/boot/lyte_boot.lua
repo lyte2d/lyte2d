@@ -68,14 +68,69 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
         lyte.set_color(1,0,0,1)
 
         local wr = max_line_width + PAD
-        local hr = h + h2 * y  + PAD
+        local hr = h + h2 * y + PAD
 
         lyte.draw_rect_line(0,0, wr, hr)
+
+        if _G.LYTE_ERROR_LINE then
+            local prefix_width = lyte.get_text_width(_G.LYTE_ERROR_LINE.prefix)
+            local prefix_x = PAD/2
+            local error_x = prefix_x + prefix_width
+            local error_y = hr + PAD/2
+
+            lyte.set_color(1,1,0,1)
+            lyte.draw_text(_G.LYTE_ERROR_LINE.prefix, prefix_x, error_y)
+
+
+            lyte.set_color(1,1,1,1)
+            lyte.draw_text(_G.LYTE_ERROR_LINE.line, error_x, error_y)
+
+            local underline_y = error_y + h2 * 0.6
+
+            lyte.set_color(1,0,0,1)
+            lyte.draw_text(_G.LYTE_ERROR_LINE.underline, error_x, underline_y)
+        end
     end
 end
 
+
+local function get_error_line(text)
+    local path, line_num = text:match("^(.-):(%d*):.-\n")
+
+    if not path or not line_num then
+        return
+    end
+
+    line_num = tonumber(line_num)
+
+    local file = lyte.load_textfile(path)
+    local line_i = 1
+    for line in file:gmatch("[^\n]+") do
+        if line_i == line_num then
+            line = line:match("^[%s]*(.-)[%s]*$")
+            local prefix = path .. ":" .. line_num .. ": "
+
+            return {
+                prefix = prefix,
+                line = line,
+                underline = ("~"):rep(#line),
+            }
+        end
+
+        line_i = line_i + 1
+    end
+end
+
+
+_G.LYTE_SET_ERROR_TEXT_AND_LINE = function(text)
+    _G.LYTE_ERROR_TEXT = text
+    _G.LYTE_ERROR_LINE = get_error_line(text)
+end
+
+
 if not lyte.tick then
     _G.LYTE_ERROR_TEXT = "function lyte.tick should be implemented"
+    _G.LYTE_ERROR_LINE = nil
     lyte.tick = LYTE_TICK_ERROR_FUNC
 end
 
@@ -106,7 +161,7 @@ local function run_many(codestr, filename, ...)
         return y, a, b, c, d, e, f, g
     else
         print("Error: " .. y)
-        _G.LYTE_ERROR_TEXT = y
+        _G.LYTE_SET_ERROR_TEXT_AND_LINE(y)
         lyte.tick = LYTE_TICK_ERROR_FUNC
         return y
     end
@@ -195,10 +250,12 @@ local function make_lyte_searcher(env)
                     local done, result = pcall(tl.process_string, code_str, _G.LYTE_TEAL_LAX_MODE, nil, "@"..filename, modulename)
                     if (not done) then
                         _G.LYTE_ERROR_TEXT = "<teal error> " .. result
+                        _G.LYTE_ERROR_LINE = get_error_line(result)
                         print ("tl.process_string failed. file: " .. filename .. ", error: " .. result)
                     end
                     if (#result.syntax_errors > 0) then
                         _G.LYTE_ERROR_TEXT = "<teal Syntax error> file: " .. filename
+                        _G.LYTE_ERROR_LINE = get_error_line(result)
                         print("errors:")
                         for k,v in ipairs(result.syntax_errors) do print (k, fennel.view(v)) end
                         error(_G.LYTE_ERROR_TEXT)

@@ -333,8 +333,11 @@ static void tick_fn_active_norepl(void *data, float dt, int width, int height, b
 
     if (status != 0) {
         const char * err =luaL_checkstring(L, -1);
+        lua_remove(L, -1);
         fprintf(stderr, "(Error) %s\n", err);
-        lua_setglobal(L, "LYTE_ERROR_TEXT");
+        lua_getglobal(L, "LYTE_SET_ERROR_TEXT_AND_LINE");
+        lua_pushstring(L, err);
+        lua_call(L, 1, 0);
         lua_getglobal(L, "lyte");
         lua_getglobal(L, "LYTE_TICK_ERROR_FUNC");
         lua_setfield(L, -2, "tick");
