@@ -90,7 +90,7 @@ end
 
 local function run_many(codestr, filename, ...)
     local x,y,a,b,c,d,e,f,g
-    x,y,a,b,c,d,e,f,g = pcall(loadstring(codestr, filename), ...)
+    x,y,a,b,c,d,e,f,g = pcall(loadstring(codestr, "@"..filename), ...)
     if x then
         return y, a, b, c, d, e, f, g
     else
