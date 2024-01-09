@@ -205,7 +205,7 @@ static int _try_load(lua_State *L) {
 
     //err = luaL_dostring(L, (const char *)module_file_buf);
     char path_with_at[4096] = {0};
-    sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepatha and not part of code
+    sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepath and not part of code
     // err = luaL_loadbuffer(L, (const char *)module_file_buf, strlen(module_file_buf), (const char *)path_with_at);
     err = luaL_loadbuffer(L, (const char *)file_content, strlen(file_content), (const char *)path_with_at);
     if (err == 0) {
@@ -333,8 +333,11 @@ static void tick_fn_active_norepl(void *data, float dt, int width, int height, b
 
     if (status != 0) {
         const char * err =luaL_checkstring(L, -1);
+        lua_remove(L, -1);
         fprintf(stderr, "(Error) %s\n", err);
-        lua_setglobal(L, "LYTE_ERROR_TEXT");
+        lua_getglobal(L, "LYTE_SET_ERROR_TEXT_AND_LINE");
+        lua_pushstring(L, err);
+        lua_call(L, 1, 0);
         lua_getglobal(L, "lyte");
         lua_getglobal(L, "LYTE_TICK_ERROR_FUNC");
         lua_setfield(L, -2, "tick");
