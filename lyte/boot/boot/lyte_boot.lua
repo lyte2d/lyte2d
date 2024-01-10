@@ -2,6 +2,7 @@
 
 local TAB_WIDTH = 4
 local TAB_WHITESPACE = (" "):rep(TAB_WIDTH)
+local LINES_PATTERN = "([^\n]*)[\n]?"
 
 do
     local _has, _dbg = pcall(require, "lldebugger")
@@ -78,7 +79,7 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
         local y = 0
         local max_line_width = 0
 
-        for error_line in error_text:gmatch("[^\n]+") do
+        for error_line in error_text:gmatch(LINES_PATTERN) do
             max_line_width = math.max(max_line_width, lyte.get_text_width(error_line))
             error_line = error_line:gsub("\t", TAB_WHITESPACE)
             lyte.draw_text(error_line, PAD/2, (SC + y) * h2)
@@ -106,7 +107,7 @@ local function get_error_line(text)
 
     local file = lyte.load_textfile(path)
     local line_i = 1
-    for line in file:gmatch("[^\n]+") do
+    for line in file:gmatch(LINES_PATTERN) do
         if line_i == line_num then
             line = line:match("^[%s]*(.-)[%s]*$")
             local prefix = path .. ":" .. line_num .. ": "
