@@ -423,7 +423,7 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
             } else  if (uniform_value.options.vec_val.count > sud->float_count) {
                 fprintf(stderr, "warning: not enough uniform values sent\n");
             }
-            int count = MAX(MIN(uniform_value.options.vec_val.count, sud->float_count),4);
+            int count = MIN(MAX(uniform_value.options.vec_val.count, sud->float_count),4);
             for (int i=0; i<count; i++) {
                 shd->uniform_floats[sud->location+i] = uniform_value.options.vec_val.data[i];
             }
