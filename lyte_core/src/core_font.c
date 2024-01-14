@@ -225,14 +225,15 @@ int lyte_load_font(const char * path, double size, lyte_Font *val) {
     fi->fonsctx = fonsCreateInternal(&params);
     fi->font = fonsAddFontMem(fi->fonsctx, path, buf, read_len, false);
 
-    val->ptr = fi;
+    // val = (lyte_Font *)&fi;
+    *val = fi;
 
     PHYSFS_close(file);
     return 0;
 }
 
 int lyte_Font_cleanup(lyte_Font font) {
-    FontItem *fontitem = font.ptr;
+    FontItem *fontitem = font;
 
     if (fontitem == NULL) {
         return 0;
@@ -244,7 +245,7 @@ int lyte_Font_cleanup(lyte_Font font) {
 }
 
 int lyte_set_font(lyte_Font font) {
-    FontItem *fontitem = font.ptr;
+    FontItem *fontitem = font;
 
     if (fontitem == NULL) {
         fprintf(stderr, "Font with not found\n");

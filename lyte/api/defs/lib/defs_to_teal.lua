@@ -1,201 +1,148 @@
-----------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------
-local D = require "defs_lyte";
-local T = ""
+require "lib.apidef"  -- TypeMaps
 
-local WHITESPACE = 4
-
--- local header  = "-- BEGIN: This file is generated\n\n"
--- local footer = "\n-- EOF: This file is generated\n"
-
--- whitespace
-local S = (" "):rep(WHITESPACE)
-local SS = S:rep(2)
-local SSS= S:rep(3)
-
--- T = T .. header
-
-----------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------
-
--- helpers
-
-local function get_t_name_basic(x)
-    if x._kind == "primitive" then
-        return x.luatype
-    elseif x.typename then
-        return x.typename
-    end
-    -- todo: error
-    return "UNKNOWN" .. x._kind
-end
-
-local function get_t_name(x, full)
-    if not full then return get_t_name_basic(x) end
-
-    if x._kind == "dict" then
-        return "{" .. get_t_name(x.key_type) .. ": " .. get_t_name(x.value_type) .. "}"
-    elseif x._kind == "list" then
-        return "{" .. get_t_name(x.value_type) .. "}"
-    elseif x._kind == "tuple" then
-        return "{" .. get_t_name(x.value_type) .. "}"
-    elseif x._kind == "variant" then
-        local name = ""
-        local num = #x.options
-        for io, o in ipairs(x.options) do
-            name = name .. get_t_name(o.value_type)
-            if io ~= num then name = name .. " | " end
-        end
-        return name
-    end
-    return get_t_name_basic(x)
-end
-
-local function get_fn(f, is_method)
-    local L = ""
-    local title = "function "
-    local sep = ": "
-    if not is_method then
-        title = S .. f._name .. ": function"
-        sep = ": "
-    end
-    -- name
-    L = L .. title .. "("
-        for ia, a in ipairs(f.args) do
-            L = L .. a._name .. ": " .. get_t_name(a.value_type)
-            if ia < #f.args then
-                L = L .. ", "
+local function get_function_like(fn, name, is_method, is_mapped, orig_ns)
+    local function get_namespaced_name(func, n)
+        if func.namespace then
+            if is_mapped then
+                return orig_ns .. "." ..  n
+            else
+                return func.namespace .. "." .. n
             end
-        end
-    L = L .. ")"
-    -- rets
-    if #f.rets == 0 then
-    --    L = L .. ")"
-    else
-        L = L .. sep
-        if #f.rets > 1 then L = L .. "(" end
-        for ir, r in ipairs(f.rets) do
-            L = L .. get_t_name(r.value_type)
-            if ir < #f.rets then
-                L = L .. ", "
-            end
-        end
-        if #f.rets > 1 then L = L .. ")" end
-    end
-    L = L .. "\n"
-    return L
-end
-
-----------------------------------
--- namespace begin
-----------------------------------
-T = T .. "global record " .. D._name .. "\n"
-
-----------------------------------
--- functions
-----------------------------------
-T = T .. S .. "-- functions\n"
-for _,f in ipairs(D.functions) do
-    local L = get_fn(f)
-    -- DONE
-    T = T .. L
-end
-
-----------------------------------
--- lists
-----------------------------------
-T = T .. S .. "-- lists\n"
-for _,l in ipairs(D.lists) do
-    T = T .. S .. "type " .. l._name .. " = " ..  get_t_name(l, true) .. "\n"
-end
-
-----------------------------------
--- tuples
-----------------------------------
-T = T .. S .. "-- tuples\n"
-for _,l in ipairs(D.tuples) do
-    T = T .. S .. "type " .. l._name .. " = " ..  get_t_name(l, true) .. "\n"
-end
-
-----------------------------------
--- dicts
-----------------------------------
-T = T .. S .. "-- dicts\n"
-for _,d in ipairs(D.dicts) do
-    T = T .. S .. "type " .. d._name .. " = " .. get_t_name(d, true) .. "\n"
-end
-
-----------------------------------
--- variants
-----------------------------------
-T = T .. S .. "-- variants\n"
-for _,o in ipairs(D.variants) do
-    T = T .. S .. "type " .. o._name .. " = " .. get_t_name(o, true) .. "\n"
-end
-
-
-----------------------------------
--- records
-----------------------------------
-T = T .. S .. "-- records\n"
-for _,r in ipairs(D.records) do
-    local L = ""
-    -- name
-    L = L .. S .. "record " .. r._name .. "\n"
-    L = L .. SS .. "userdata\n"
-    -- fields
-    for _,f in ipairs(r.fields) do
-        L = L .. SS .. f._name .. ": " .. get_t_name(f.value_type) .. "\n"
-    end
-    -- methods
-    for _,m in ipairs(r.methods) do
-        L = L .. SS .. m._name .. ": " .. get_fn(m, true)
-    end
-    -- DONE
-    L = L .. S .. "end\n"
-    T = T .. L
-end
-
-----------------------------------
--- enums
-----------------------------------
-T = T .. S .. "-- enums\n"
-for _,e in ipairs(D.enums) do
-    -- name
-    T = T .. S .. "enum " .. e._name .. "\n"
-
-    local L = SS
-    for nc, c in ipairs(e.choices) do
-        if c == "\\" then c = "\\\\" end
-        L = L .. '"' .. c .. '"'
-        if nc < #e.choices then L = L .. " " end
-        if #L > 100 then
-            T = T .. L .. "\n"
-            L = SS
         else
-            L = L .. " "
+            return n
         end
     end
-    -- DONE
-    T = T .. L .. "\n" .. S .. "end\n"
+
+    local ret = ""
+    --
+    if fn.mapto then
+        ret =  get_function_like(fn.mapto, name, is_method, true, fn.namespace)
+    else
+        if not is_method then
+            ret = ret .. name .. ": function"
+        else
+            ret = ret ..  "function"
+        end
+        ret = ret  .. "("
+        for i, a in ipairs(fn.args) do
+            local doc = a.doc
+            local typename = TypeMaps[a.type] and TypeMaps[a.type]["tl"] or get_namespaced_name(fn, a.type)
+            ret = ret .. a.name .. ": " .. typename
+            -- if doc then ret = ret .. " /*"  .. doc .. "*/" end
+            if i < #fn.args then ret = ret .. ", " end
+        end
+        ret = ret .. ")"
+    -- consider lifting this limitation in the future
+        if #fn.rets > 1 then error("Functions are expected to return at most 1 value.") end
+        if #fn.rets == 1 then
+            -- if is_method then ret = ret .. " => "  else ret = ret .. ": " end
+            ret = ret .. ": "
+            local r = fn.rets[1]
+            local doc = r.doc
+            local typename = TypeMaps[r.type] and TypeMaps[r.type]["tl"] or get_namespaced_name(fn, r.type)
+            ret = ret .. typename
+            -- if doc then ret = ret .. " /*"  .. doc .. "*/" end
+        else
+            -- if is_method then ret = ret .. " => void" end
+        end
+    end
+    return ret
 end
 
 
-----------------------------------
--- namespace end
-----------------------------------
-T = T .. "end\n"
+return function(NS)
+    local out = "";
 
+    -- indents
+    local SPC    = (" "):rep(4)
+    local SPC2   = SPC:rep(2)
 
+    out = out .. "-- generated\n" -- return value
+    out = out .. "global record " .. NS.name .. "\n"
 
-----------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------
+    out = out .. "\n" .. SPC .. "-- functions\n\n"
+    for _, x in ipairs(NS.functions) do
+        local fnmap = x.fnmap or ""
+        -- if x.doc then out = out .. SPC .. "-- " .. x.doc .. " [impl: "  ..  x.impl .. "/" .. fnmap .. "]\n"
+        if x.doc then out = out .. SPC .. "-- " .. x.doc .. "\n"
+        end
+        out = out .. SPC .. get_function_like(x, x.name, false, false, false, x.namespace) .. "\n"
+    end
 
--- T = T .. footer
+    out = out .. "\n" .. SPC .. "-- records\n\n"
+    for _, x in ipairs(NS.records) do
+        if x.doc then out = out .. SPC .. "-- " .. x.doc .. "\n" end
+        out = out .. SPC .. "record " .. x.name .. "\n"
+        for _, f in ipairs(x.fields) do
+            local typename = TypeMaps[f.type] and TypeMaps[f.type]["tl"] or NS.name .. "." .. f.type -- "object /*" .. f.type .."*/"
+            -- local typename = TypeMaps[f.type] and TypeMaps[f.type]["tl"] or "object /*" .. f.type .."*/"
+            local mapping = ""
+            -- if f.mapreadname then mapping = " -- read maps to: " .. f.mapreadname .. "" end
+            -- if f.mapwritename then mapping = mapping .. ", write maps to: " .. f.mapwritename end
+            out = out .. SPC2 .. f.name .. ": " .. typename .. mapping .. "\n"
+        end
+        for _, m in ipairs(x.methods) do
+            local mapping = get_function_like(m.mapto, m.name, true, false, m.namespace) -- .. " -- maps to: " .. m.mapto.name
+            out = out .. SPC2 .. m.name .. ": " ..  mapping .. "\n"
+        end
+        out = out .. SPC .. "end\n"
+    end
 
-print(T)
+    out = out .. "\n" .. SPC .. "-- variants (unions)\n\n"
+    for _, x in ipairs(NS.variants) do
+        if x.doc then out = out .. SPC .. "-- " .. x.doc .. "\n" end
+        out = out .. SPC .. "type " .. x.name .. " =\n"
+        local line = ""
+        for i, o in ipairs(x.options) do
+            local option_type = TypeMaps[o.type] and TypeMaps[o.type]["tl"] or NS.name .. "." .. o.type -- "object" .. "/*" .. o.type .."*/"
+            -- local option_type = TypeMaps[o.type] and TypeMaps[o.type]["tl"] or "object" .. "/*" .. o.type .."*/"
+            local before = "| "
+            local after = ""
+            if i == 1 then before = "  " end
+            -- if i == #x.options then after = ";" end
+            line = line .. SPC2 .. before ..  option_type .. after .. "\n"
+        end
+        out = out .. line
+    end
 
-return T
+    out = out .. "\n" .. SPC .. "-- lists\n\n"
+    for _, x in ipairs(NS.lists) do
+        if x.doc then out = out .. SPC .. "-- " .. x.doc .. "\n" end
+        local item_type = TypeMaps[x.item_type]["tl"] or NS.name .. "." ..  x.item_type -- "object" .. "/*" .. x.item_type .."*/"
+        -- local item_type = TypeMaps[x.item_type]["tl"] or  "object" .. "/*" .. x.item_type .."*/"
+        out = out .. SPC .. "type " .. x.name .. " = {" .. item_type .. "}"
+        out = out .. "\n"
+    end
 
-----------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------
+    out = out .. "\n" .. SPC .. "-- dicts\n\n"
+    for _, x in ipairs(NS.dicts) do
+        if x.doc then out = out .. SPC .. "-- " .. x.doc .. "\n" end
+        local key_type = TypeMaps[x.key_type] and TypeMaps[x.key_type]["tl"] or  x.key_type -- "object" .. "/*" .. x.key_type .."*/"
+        -- local key_type = TypeMaps[x.key_type] and TypeMaps[x.key_type]["tl"] or  "object" .. "/*" .. x.key_type .."*/"
+        local value_type = TypeMaps[x.value_type] and TypeMaps[x.value_type]["tl"] or NS.name .. "." .. x.value_type -- "object" .. "/*" .. x.value_type .."*/"
+        -- local value_type = TypeMaps[x.value_type] and TypeMaps[x.value_type]["tl"] or "object" .. "/*" .. x.value_type .."*/"
+        out = out .. SPC .. "type " .. x.name .. " = {" .. key_type .. ": " .. value_type .. "}"
+        out = out .. "\n"
+    end
+
+    out = out .. "\n" .. SPC .. "-- enums\n\n"
+    for _, x in ipairs(NS.enums) do
+        if x.doc then out = out .. SPC .. "-- " .. x.doc .. "\n" end
+        out = out .. SPC .. "enum " .. x.name .. "\n"
+        local line = ""
+        for i, e in ipairs(x.values) do
+            local before = "  "
+            local after = ""
+            if i == 1 then before = "  " end
+            -- if i == #x.values then after = ";" end
+            if e == "\\" then e = "\\\\" end
+            line = line .. SPC2 .. before .. "\"" ..  e .. "\"" .. after .. "\n"
+        end
+        line = line .. SPC .. "end\n"
+        out = out .. line
+    end
+
+    out = out .. "end\n"
+
+    return out
+end

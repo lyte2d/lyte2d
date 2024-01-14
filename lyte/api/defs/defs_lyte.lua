@@ -2,942 +2,790 @@
 -- LYTE API -- source of truth for the API
 ---------------------------------------------------------------------------------------------
 
-local apidef = require "lib.apidef"
-
-local String = apidef.String
-local Integer = apidef.Integer
-local Float = apidef.Float
-local Number = apidef.Number
-local Boolean = apidef.Boolean
-local Pointer = apidef.Pointer
-local Nil = apidef.Nil
-local Defined = apidef.Defined
-local Record = apidef.Record
-local Namespace = apidef.Namespace
-local Field = apidef.Field
-local Variant = apidef.Variant
-local Option = apidef.Option
-local Enum = apidef.Enum
-local Dict = apidef.Dict
-local List = apidef.List
-local Tuple = apidef.Tuple
-local Function = apidef.Function
-local Method = apidef.Method
-local Arg = apidef.Arg
-local Ret = apidef.Ret
-
----------------------------------------------------------------------------------------------
--- Definitions
----------------------------------------------------------------------------------------------
-
-local lyte_namespace = Namespace("lyte", {
-
-
-    --------------------
-    -- Tuple("TF4", Float(), 4, {d="Tuple of floats"}),
-    -- List("VF8", Float(), {d="List of floats", max_count=8}),
-    -- Function("testtest", {
-    --     -- Arg("test1arg", Defined("VF8")),
-    --     Arg("test2arg", Defined("TF4")),
-    -- }, {
-    --     -- Ret("test1ret", Defined("VF8")),
-    --     -- Ret("test2ret", Defined("TF4")),
-    -- }, {d="apidef test func. remove"}),
-    --------------------
-
-    Function("tick", {
-        Arg("delta_time", Number(), {optional=true, default=0.0}),
-        Arg("window_width", Integer(), {optional=true, default=0.0}),
-        Arg("window_height", Integer(), {optional=true, default=0.0}),
-        Arg("window_resized", Boolean(), {optional=true, default=false}),
-    }, nil, {d="Tick function. Should be created by the user.", c_api_skip=true, callback=true}),
-
-    Function("quit", nil, nil, {d="Quit the application by closing the window."}),
-
-    Function("cls", {
-        Arg("r", Number()),
-        Arg("g", Number()),
-        Arg("b", Number()),
-        Arg("a", Number()),
-    }, nil, {d="Clear the screen or current canvas if one is used."}),
-
-    Function("set_color", {
-        Arg("r", Number()),
-        Arg("g", Number()),
-        Arg("b", Number()),
-        Arg("a", Number()),
-    }, nil, {d="Set the foreground color to be used in the drawing operations."}),
-
-    Function("reset_color", nil, nil, {d="Reset the foreground color to its default value."}),
-
-    Function("draw_point", {
-        Arg("x", Number()),
-        Arg("y", Number()),
-    }, nil, {d="Draw a point."}),
-
-    Function("draw_line", {
-        Arg("x1", Number()),
-        Arg("y1", Number()),
-        Arg("x2", Number()),
-        Arg("y2", Number()),
-    }, nil, {d="Draw a line"}),
-
-    Function("draw_triangle", {
-        Arg("ax", Number()),
-        Arg("ay", Number()),
-        Arg("bx", Number()),
-        Arg("by", Number()),
-        Arg("cx", Number()),
-        Arg("cy", Number()),
-    }, nil, {d="Draw a filled triangle"}),
-
-    Function("draw_triangle_line", {
-        Arg("ax", Number()),
-        Arg("ay", Number()),
-        Arg("bx", Number()),
-        Arg("by", Number()),
-        Arg("cx", Number()),
-        Arg("cy", Number()),
-    }, nil, {d="Draw a triangle border"}),
-
-    Function("draw_rect", {
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("rect_width", Number()),
-        Arg("rect_height", Number()),
-    }, nil, {d="Draw a filled rectangle."}),
-
-    Function("draw_rect_line", {
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("rect_width", Number()),
-        Arg("rect_height", Number()),
-    }, nil, {d="Draw a rectangle border."}),
-
-    Function("draw_circle", {
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("radius", Number()),
-    }, nil, {d="Draw a filled circle."}),
-
-    Function("draw_circle_line", {
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("radius", Number()),
-    }, nil, {d="Draw a circle border."}),
-
-    Function("draw_ellipse", {
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("radius_x", Number()),
-        Arg("radius_y", Number()),
-    }, nil, {d="Draw a filled ellipse."}),
-
-    Function("draw_ellipse_line", {
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("radius_x", Number()),
-        Arg("radius_y", Number()),
-    }, nil, {d="Draw an ellipse border."}),
-
-
-    Function("load_image", {
-        Arg("image_path", String()),
-    },{
-        Ret("val", Defined("Image")),
-    }, {d="Load the image specified in the path.", ctor=true}),
-
-    Function("draw_image", {
-        Arg("image", Defined("Image")),
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-    }, nil, {d="Draw an image."}),
-
-    Function("draw_image_rect", {
-        Arg("image", Defined("Image")),
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("src_x", Number()),
-        Arg("src_y", Number()),
-        Arg("rect_width", Number()),
-        Arg("rect_height", Number()),
-    }, nil, {d="Draw a rectangular area from the image."}),
-
-    Function("get_image_width", {
-        Arg("image", Defined("Image")),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the width of the image."}),
-
-    Function("get_image_height",  {
-        Arg("image", Defined("Image")),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the height of the image."}),
-
-    Function("new_canvas", {
-        Arg("width", Integer()),
-        Arg("height", Integer()),
-    },{
-        Ret("val", Defined("Image")),
-    }, {d="Create a canvas image with given width and height.", ctor=true}),
-
-    Function("set_canvas", {
-        Arg("canvas_image", Defined("Image"), {save_to_registry=true}),
-    }, nil, {d="Set the effective canvas image. All draw operations will go to this canvas until it's reset."}),
-
-    Function("reset_canvas", nil, nil, {d="Reset the drawing target, back to screen."}),
-
-    Function("is_image_canvas",  {
-        Arg("image", Defined("Image")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the image was created as a canvas."}),
-
-    Function("new_imagebatch", {
-        Arg("image", Defined("Image")),
-    }, {
-        Ret("val", Defined("ImageBatch")),
-    }, {d="Create an image batch", ctor=true}),
-
-    Function("reset_imagebatch", {
-        Arg("imagebatch", Defined("ImageBatch")),
-    }, nil, {d="Reset the image batch, remove all added rects."}),
-
-    Function("add_imagebatch_rect", {
-        Arg("imagebatch", Defined("ImageBatch")),
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-        Arg("dest_width", Number()),
-        Arg("dest_height", Number()),
-        Arg("src_x", Number()),
-        Arg("src_y", Number()),
-        Arg("src_width", Number()),
-        Arg("src_height", Number()),
-    }, nil, {d="Add a recta to the image batch (from it's initial image)."}),
-
-    Function("get_imagebatch_rect_count", {
-        Arg("imagebatch", Defined("ImageBatch")),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the number of rects in the image batch."}),
-
-    Function("draw_imagebatch", {
-        Arg("imagebatch", Defined("ImageBatch")),
-    }, nil, {d="Draw the image batch."}) ,
-
-    Function("load_font", {
-        Arg("font_path", String()),
-        Arg("size", Number()),
-    },{
-        Ret("val", Defined("Font")),
-    }, {d="Load the font specified in the path, and set the initial size.", ctor=true}),
-
-    Function("set_font", {
-        Arg("font", Defined("Font"), {nativetype="udata", save_to_registry=true}),
-    }, nil, {d="Set the effective font to be used in the drawing operations."}),
-
-    Function("reset_font", nil, nil, {d="Reset the font to its default value.", c_api_skip=true}),
-
-    Function("draw_text", {
-        Arg("text", String()),
-        Arg("dest_x", Number()),
-        Arg("dest_y", Number()),
-    }, nil, {d="Draw a text line."}),
-
-    Function("get_text_width", {
-        Arg("text", String()),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the width of the given text line."}),
-
-    Function("get_text_height", {
-        Arg("text", String()),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the height of the given text line."}),
-
-    Function("get_monitor_count", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the number of currently connected monitors."}),
-
-    Function("get_monitor_name", {
-        Arg("index", Integer()),
-    }, {
-        Ret("val", String()),
-    }, {d="Get the name of the monitor at the index"}),
-
-    Function("get_monitor_width", {
-        Arg("index", Integer()),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the width of the monitor at the index"}),
-
-    Function("get_monitor_height", {
-        Arg("index", Integer()),
-    }, {
-        Ret("val", Integer()),
-    }, {d="Get the height of the monitor at the index"}),
-
-    Function("set_window_monitor", {
-        Arg("index", Integer()),
-    }, nil, {d=[[ Set the window's initial monitor to the indexed value.
- Must be set before the window is opened.]]}),
-
-    Function("set_window_resizable", {
-        Arg("resizable", Boolean()),
-    }, nil, {d=[[ Set the window resizable flag to the given value.
- Must be set before the window is opened.]]}),
-
-    Function("set_window_minsize", {
-        Arg("width", Integer()),
-        Arg("height", Integer()),
-    }, nil, {d="Set the window's minimum possible size."}),
-
-    Function("set_window_size", {
-        Arg("width", Integer()),
-        Arg("height", Integer()),
-    }, nil, {d="Set the window's size."}),
-
-    Function("get_window_width", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the width of the window."}),
-
-    Function("get_window_height", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the height of the window."}),
-
-    Function("set_window_position", {
-        Arg("x", Integer()),
-        Arg("y", Integer()),
-    }, nil, {d="Set the window's position."}),
-
-    Function("set_fullscreen", {
-        Arg("fullscreen", Boolean()),
-    }, nil, {d="Set the window to fullscreen, or windowed mode."}),
-
-    Function("is_fullscreen", nil, {
-        Ret("val", Boolean()),
-    }, {d="Check if the window is set to fullscreen."}),
-
-    Function("set_window_title", {
-        Arg("title", String()),
-    }, nil, {d="Set the window's title."}),
-
-    Function("set_window_vsync", {
-        Arg("vsync", Boolean()),
-    }, nil, {d="Set the window vsync flag to the given value."}),
-
-    Function("is_window_vsync", nil , {
-        Ret("val", Boolean()),
-    }, {d="Check if the window vsync flag is set."}),
-
-    Function("set_window_icon_file", {
-        Arg("icon_path", String()),
-    }, nil, {d="Set the window icon."}),
-
-    Function("set_window_margins", {
-        Arg("left", Integer()),
-        Arg("right", Integer()),
-        Arg("top", Integer()),
-        Arg("bottom", Integer()),
-    }, nil, {d="Set the window margins. Margins are ignored and no drawing can be made there.."}),
-
-    Function("set_window_paddings", {
-        Arg("left", Integer()),
-        Arg("right", Integer()),
-        Arg("top", Integer()),
-        Arg("bottom", Integer()),
-    }, nil, {d="Set the window paddings. Paddings are can be drawn on."}),
-
-    Function("is_key_down", {
-        Arg("key", Defined("KeyboardKey")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given key is down."}),
-
-    Function("is_key_pressed", {
-        Arg("key", Defined("KeyboardKey")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given key is pressed."}),
-
-    Function("is_key_released", {
-        Arg("key", Defined("KeyboardKey")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given key is released."}),
-
-    Function("is_key_repeat", {
-        Arg("key", Defined("KeyboardKey")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given key is repeated."}),
-
-    Function("is_mouse_down", {
-        Arg("mouse_button", Defined("MouseButton")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given mouse button is down."}),
-
-    Function("is_mouse_pressed", {
-        Arg("mouse_button", Defined("MouseButton")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given mouse button is pressed."}),
-
-    Function("is_mouse_released", {
-        Arg("mouse_button", Defined("MouseButton")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given mouse button is released."}),
-
-    Function("get_mouse_x", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the mouse x position."}),
-
-    Function("get_mouse_y", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the mouse y position."}),
-
-    Function("get_gamepad_count", nil, {
-        Ret("val", Integer()),
-    }, {d="Get the number of gamepads."}),
-
-    Function("get_gamepad_name", {
-        Arg("index", Integer()),
-    }, {
-        Ret("val", String()),
-    }, {d="Get the name of the gamepad at the given index."}),
-
-    Function("is_gamepad_down", {
-        Arg("index", Integer()),
-        Arg("gamepad_button", Defined("GamepadButton")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given button of the gamepad at the given index is down."}),
-
-    Function("is_gamepad_pressed", {
-        Arg("index", Integer()),
-        Arg("gamepad_button", Defined("GamepadButton")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given button of the gamepad at the given index is pressed."}),
-
-    Function("is_gamepad_released", {
-        Arg("index", Integer()),
-        Arg("gamepad_button", Defined("GamepadButton")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given button of the gamepad at the given index is released."}),
-
-    Function("get_gamepad_axis", {
-        Arg("index", Integer()),
-        Arg("gamepad_axis", Defined("GamepadAxis")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the given axis of the gamepad at the given index."}),
-
-    Function("set_mastervolume", {
-        Arg("mastervolume", Number()),
-    }, nil, {d="Set the master volume."}),
-
-    Function("get_mastervolume", nil, {
-        Ret("val", Number()),
-    }, {d="Get the master volume."}),
-
-    Function("load_music", {
-        Arg("music_path", String()),
-    },{
-        Ret("val", Defined("Music")),
-    }, {d="Load the music specified in the path.", ctor=true}),
-
-    Function("play_music", {
-        Arg("music", Defined("Music"), {save_to_registry=true}),
-    }, nil, {d="Play the music."}),
-
-    Function("pause_music", {
-        Arg("music", Defined("Music")),
-    }, nil, {d="Pause the music."}),
-
-    Function("resume_music", {
-        Arg("music", Defined("Music")),
-    }, nil, {d="Resume the music."}),
-
-    Function("stop_music", {
-        Arg("music", Defined("Music")),
-    }, nil, {d="Stop the music."}),
-
-    Function("is_music_playing", {
-        Arg("music", Defined("Music")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given music is playing."}),
-
-    Function("get_music_length", {
-        Arg("music", Defined("Music")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the length of the given music object in seconds."}),
-
-    Function("get_music_length_played", {
-        Arg("music", Defined("Music")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the already played length of the given music object in seconds."}),
-
-    Function("seek_music", {
-        Arg("music", Defined("Music")),
-        Arg("secs", Number()),
-    }, nil, {d="Move the music time played to the given value."}),
-
-    Function("set_music_volume", {
-        Arg("music", Defined("Music")),
-        Arg("volume", Number()),
-    }, nil, {d="Set the volume of the given music object."}),
-
-    Function("set_music_pan", {
-        Arg("music", Defined("Music")),
-        Arg("pan", Number()),
-    }, nil, {d="Set the pan of the given music object."}),
-
-    Function("set_music_pitch", {
-        Arg("music", Defined("Music")),
-        Arg("pitch", Number()),
-    }, nil, {d="Set the pitch of the given music object."}),
-
-    Function("get_music_volume", {
-        Arg("music", Defined("Music")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the volume of the given music object."}),
-
-    Function("get_music_pan", {
-        Arg("music", Defined("Music")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pan of the given music object."}),
-
-    Function("get_music_pitch", {
-        Arg("music", Defined("Music")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pitch of the given music object."}),
-
-    Function("load_sound", {
-        Arg("sound_path", String()),
-    },{
-        Ret("val", Defined("Sound")),
-    }, {d="Load the sound specified in the path.", ctor=true}),
-
-    Function("clone_sound", {
-        Arg("orig", Defined("Sound")),
-    },{
-        Ret("val", Defined("Sound")),
-    }, {d="Clone the sound specified in the path.", ctor=true}),
-
-    Function("play_sound", {
-        Arg("sound", Defined("Sound")),
-    }, nil, {d="Play the sound."}),
-
-    Function("pause_sound", {
-        Arg("sound", Defined("Sound")),
-    }, nil, {d="Pause the sound."}),
-
-    Function("resume_sound", {
-        Arg("sound", Defined("Sound")),
-    }, nil, {d="Resume the sound."}),
-
-    Function("stop_sound", {
-        Arg("sound", Defined("Sound")),
-    }, nil, {d="Stop the sound."}),
-
-    Function("is_sound_playing", {
-        Arg("sound", Defined("Sound")),
-    }, {
-        Ret("val", Boolean()),
-    }, {d="Check if the given sound is playing."}),
-
-    Function("set_sound_volume", {
-        Arg("sound", Defined("Sound")),
-        Arg("volume", Number()),
-    }, nil, {d="Set the volume of the given sound object."}),
-
-    Function("set_sound_pan", {
-        Arg("sound", Defined("Sound")),
-        Arg("pan", Number()),
-    }, nil, {d="Set the pan of the given sound object."}),
-
-    Function("set_sound_pitch", {
-        Arg("sound", Defined("Sound")),
-        Arg("pitch", Number()),
-    }, nil, {d="Set the pitch of the given sound object."}),
-
-    Function("get_sound_volume", {
-        Arg("sound", Defined("Sound")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the volume of the given sound object."}),
-
-    Function("get_sound_pan", {
-        Arg("sound", Defined("Sound")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pan of the given sound object."}),
-
-    Function("get_sound_pitch", {
-        Arg("sound", Defined("Sound")),
-    }, {
-        Ret("val", Number()),
-    }, {d="Get the pitch of the given sound object."}),
-
-    Function("load_textfile", {
-        Arg("file_path", String()),
-    },{
-        Ret("val", String()),
-    },{ d="Load the file in the path."}),
-
-    Function("save_textfile", {
-        Arg("file_path", String()),
-        Arg("data", String()),
-    }, nil, {d="Append the text to the file in the path. Override if the file exists. Create if it doesn't exist."}),
-
-    Function("save_textfile_append", {
-        Arg("file_path", String()),
-        Arg("data", String()),
-    }, nil, {d="Append the text to the file in the path. Append at the end if the file exists. Create if it doesn't exist."}),
-
-    Function("push_matrix", nil, nil, {d="Push the transform matrix."}),
-
-    Function("pop_matrix", nil, nil, {d="Pop the transform matrix."}),
-
-    Function("reset_matrix", nil, nil, {d="Reset the transformation matrix (load identity matrix.)"}),
-
-    Function("translate", {
-        Arg("delta_x", Number()),
-        Arg("delta_y", Number()),
-    }, nil, {d="Apply translation (changes transform matrix.)"}),
-
-    Function("rotate", {
-        Arg("angle", Number()),
-    }, nil, {d="Apply rotation (changes transform matrix.)"}),
-
-    Function("rotate_at", {
-        Arg("angle", Number()),
-        Arg("x", Number()),
-        Arg("y", Number()),
-    }, nil, {d="Apply rotation at the given location (changes transform matrix.)"}),
-
-    Function("scale", {
-        Arg("scale_x", Number()),
-        Arg("scale_y", Number()),
-    }, nil, {d="Apply scaling (changes transform matrix.)"}),
-
-    Function("scale_at", {
-        Arg("scale_x", Number()),
-        Arg("scale_y", Number()),
-        Arg("x", Number()),
-        Arg("y", Number()),
-    }, nil, {d="Apply scaling at the given location (changes transform matrix.)"}),
-
-    Function("set_default_blendmode", {
-        Arg("blendmode", Defined("BlendMode")),
-    }, nil, {d="Set the default blendmode."}),
-
-    Function("set_blendmode", {
-        Arg("blendmode", Defined("BlendMode")),
-    }, nil, {d="Set the effective blendmode."}),
-
-    Function("reset_blendmode", nil, nil, {d="Reset the blendmode value to its default value."}),
-
-    Function("set_default_filtermode", {
-        Arg("filtermode", Defined("FilterMode")),
-    }, nil, {d="Set the default filtermode."}),
-
-    Function("set_filtermode", {
-        Arg("filtermode", Defined("FilterMode")),
-    }, nil, {d="Set the effective filtermode."}),
-
-    Function("reset_filtermode", nil, nil, {d="Reset the filtermode value to its default value."}),
-
-    Function("new_shader", {
-        Arg("shaderdef", Defined("ShaderDef")),
-    },{
-        Ret("val", Defined("Shader")),
-    }, {d="Create a shader with given specification.", ctor=true, c_api_skip=true}),
-
-    Function("set_shader", {
-        Arg("shader", Defined("Shader")),
-    }, nil, {d="Set the custom shader and use it for consequent calls."}),
-
-    Function("reset_shader", nil, nil, {d="Reset the shader, back to framework defaults."}),
-
-    Function("set_shader_uniform", {
-        Arg("shader", Defined("Shader")),
-        Arg("uniform_name", String()),
-        Arg("uniform_value", Defined("ShaderUniformValue")),
-    }, nil, {d="Set the specified uniform."}),
-
-    Function("reset_shader_uniform", {
-        Arg("shader", Defined("Shader")),
-        Arg("uniform_name", String()),
-    }, nil, {d="Reset the specified uniform."}),
-
-    Function("new_shaderbuilder", nil, {
-        Ret("val", Defined("ShaderBuilder")),
-    }, {d="Create a ShaderBuilder object.", ctor=true}),
-
-    Function("shaderbuilder_uniform", {
-        Arg("shaderbuilder", Defined("ShaderBuilder")),
-        Arg("uniform_name", String()),
-        Arg("uniform_type", Defined("UniformType")),
-    }, nil, {d="Add uniform definition to the shaderbuilder"}),
-
-    Function("shaderbuilder_vertex", {
-        Arg("shaderbuilder", Defined("ShaderBuilder")),
-        Arg("vertex_code", String()),
-    }, nil, {d="Add vertex code to the shaderbuilder"}),
-
-    Function("shaderbuilder_fragment", {
-        Arg("shaderbuilder", Defined("ShaderBuilder")),
-        Arg("fragment_code", String()),
-    }, nil, {d="Add fragment to the shaderbuilder"}),
-
-    Function("shaderbuilder_build", {
-        Arg("shaderbuilder", Defined("ShaderBuilder")),
-    }, {
-        Ret("shader", Defined("Shader"))
-    }, {d="Add fragment to the shaderbuilder", ctor="true"}),
-
-    Record("Image", {
-        Field("width", Integer(), {map_read = "get_image_width"}),
-        Field("height", Integer(), {map_read = "get_image_height"}),
-        Field("is_canvas", Boolean(), {map_read = "is_image_canvas"}),
-    }, nil, {d="Image type"}),
-
-    Record("ImageBatch", {
-        Field("rect_count", Integer(), {map_read = "get_imagebatch_rect_count"}),
-    }, {
-        Method("add_rect", {map_to = "add_imagebatch_rect"}),
-        Method("draw", {map_to = "draw_imagebatch"}),
-        Method("reset", {map_to = "reset_imagebatch"}),
-    }, {d="ImageBatch type."}),
-
-    Record("Font", nil, nil, {d="Font type."}),
-
-    Record("Music", {
-        Field("playing", Boolean(), {map_read = "is_music_playing"}),
-        Field("length", Number(), {map_read = "get_music_length"}),
-        Field("length_played", Number(), {map_read = "get_music_length_played"}),
-        Field("pan", Number(), {map_read = "get_music_pan", map_write = "set_music_pan"}),
-        Field("pitch", Number(), {map_read = "get_music_pitch", map_write = "set_music_pitch"}),
-        Field("volume", Number(), {map_read = "get_music_volume", map_write = "set_music_volume"}),
-    }, {
-        Method("play", {map_to = "play_music"}),
-        Method("pause", {map_to = "pause_music"}),
-        Method("resume", {map_to = "resume_music"}),
-        Method("stop", {map_to = "stop_music"}),
-        Method("seek", {map_to = "seek_music"}),
-    }, {d="Music type."}),
-
-    Record("Sound", {
-        Field("pan", Number(), {map_read = "get_sound_pan", map_write = "set_sound_pan"}),
-        Field("pitch", Number(), {map_read = "get_sound_pitch", map_write = "set_sound_pitch"}),
-        Field("volume", Number(), {map_read = "get_sound_volume", map_write = "set_sound_volume"}),
-    }, {
-        Method("clone", {map_to = "clone_sound"}),
-        Method("pause", {map_to = "pause_sound"}),
-        Method("play", {map_to = "play_sound"}),
-        Method("resume", {map_to = "resume_sound"}),
-        Method("stop", {map_to = "stop_sound"}),
-    }, {d="Sound type."}),
-
-    Tuple("FloatVec4", Float(), 4, {d="Tuple of floats"}),
-
-    Variant("ShaderUniformValue", {
-        Option("float_val", Float(), {d="Note: Used for single numbers, int or float"}),
-        Option("vec_val", Defined("FloatVec4")),
-        Option("sampler2D_val", Defined("Image")),
-    }, {d="Shader uniform value"}),
-
-    Record("Shader", nil, {
-        Method("set", {map_to = "set_shader_uniform"}),
-        Method("reset", {map_to = "reset_shader_uniform"}),
-    }, {d="Shader type"}),
-
-    Dict("UniformNamesToTypes",String(), Defined("UniformType"), {c_api_skip=true}),
-
-    Record("ShaderDef", {
-        Field("frag", String()),
-        Field("vert", String()),
-        Field("uniforms", Defined("UniformNamesToTypes")),
-    }, nil, {d="Shader definition: uniforms declaration, vertex and fragment shader code.", c_api_skip=true}),
-
-    Record("ShaderBuilder", nil, {
-        Method("uniform", {map_to = "shaderbuilder_uniform"}),
-        Method("vertex", {map_to = "shaderbuilder_vertex"}),
-        Method("fragment", {map_to = "shaderbuilder_fragment"}),
-        Method("build", {map_to = "shaderbuilder_build"}),
-    }, {d="ShaderBuilder type"}),
-
-    Enum("UniformType", {
-        '_invalid', 'float', 'vec2', 'vec3', 'vec4', 'int', 'ivec2',
-        'ivec3', 'ivec4', 'mat4', 'sampler2D',
-    }, {d="Acceptable uniformtype values."}),
-
-    Enum("BlendMode", {
-        'none' , 'blend' , 'add' , 'mod' , 'mul' ,
-    }, {d="Acceptable blendmode values."}),
-
-    Enum("FilterMode", {
-        '_invalid', 'nearest', 'linear',
-    }, {d="Acceptable filtermode values."}),
-
-    Enum("GamepadAxis", {
-        'left_x', 'left_y', 'right_x', 'right_y', 'left_trigger', 'right_trigger',
-    }, {d="Acceptable gamepadaxis values."}),
-
-    Enum("GamepadButton", {
-        'pad_a', 'pad_b', 'pad_x', 'pad_y', 'left_bumper', 'right_bumper',
-        'back', 'start', 'guide', 'left_thumb', 'right_thumb', 'dpad_up',
-        'dpad_right', 'dpad_down', 'dpad_left',
-    }, {d="Acceptable gamepadbutton values."}),
-
-    Enum("MouseButton", {
-        'mb1', 'mb2', 'mb3', 'mb4', 'mb5', 'mb6',
-        'mb7', 'mb8',
-    }, {d="Acceptable mousebutton values."}),
-
-    Enum("KeyboardKey", {
-        'space', "'", ',', '-', '.', '/',
-        '0', '1', '2', '3', '4', '5',
-        '6', '7', '8', '9', ';', '=',
-        'a', 'b', 'c', 'd', 'e', 'f',
-        'g', 'h', 'i', 'j', 'k', 'l',
-        'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x',
-        'y', 'z', '[', '\\', ']', '`',
-        'world_1', 'world_2', 'escape', 'enter', 'tab', 'backspace',
-        'insert', 'delete', 'right', 'left', 'down', 'up',
-        'page_up', 'page_down', 'home', 'end', 'caps_lock', 'scroll_lock',
-        'num_lock', 'print_screen', 'pause', 'f1', 'f2', 'f3',
-        'f4', 'f5', 'f6', 'f7', 'f8', 'f9',
-        'f10', 'f11', 'f12', 'f13', 'f14', 'f15',
-        'f16', 'f17', 'f18', 'f19', 'f20', 'f21',
-        'f22', 'f23', 'f24', 'f25', 'kp_0', 'kp_1',
-        'kp_2', 'kp_3', 'kp_4', 'kp_5', 'kp_6', 'kp_7',
-        'kp_8', 'kp_9', 'kp_decimal', 'kp_divide', 'kp_multiply', 'kp_subtract',
-        'kp_add', 'kp_enter', 'kp_equal', 'left_shift', 'left_control', 'left_alt',
-        'left_super', 'right_shift', 'right_control', 'right_alt', 'right_super', 'menu',
-    }, {d="Acceptable keyboardkey values."}),
-
-
-
-    -- ------------------------------------------------------------------------------------------------------------------------------------------------------
-    -- ------------------------------------------------------------------------------------------------------------------------------------------------------
-    -- ------------------------------------------------------------------------------------------------------------------------------------------------------
-    -- -- BEGIN: PHYSICS ------------------------------
-    -- Record("MY_TEST_REC", {
-    --     Field("mehptr", Pointer(), {map_read = "MY_TEST"}),
-    -- }, nil, {d="my test rec"}),
-
-    -- Function("MY_TEST", {
-    --     Arg("bla", String()),
-    --     Arg("myptr", Pointer()),
-    -- }, {
-    --     Ret("hehptr", Pointer()),
-    -- }, {d="my test"}),
-
-    -- Function("set_physics_engine", {
-    --     Arg("state", Defined("PhysicsState")),
-    -- }, nil, {d="Set the physics engine state."});
-
-    -- Function("reset_physics_engine", nil, nil, {d="Reset the physics engine state."});
-
-    -- Function("set_physics_config", {
-    --     Arg("name", Defined("PhysicsConfig"), {nativetype="udata"}),
-    --     Arg("value", Number()),
-    -- }, nil, {d="Set the given physics engine/world config."});
-
-    -- Function("reset_physics_config", {
-    --     Arg("name", Defined("PhysicsConfig"), {nativetype="udata"}),
-    -- }, nil, {d="Reset the given physics engine/world config."});
-
-    -- Function("get_physics_config", {
-    --     Arg("name", Defined("PhysicsConfig"), {nativetype="udata"}),
-    -- }, {
-    --     Ret("val", Number()),
-    -- }, {d="Gets the given physics engine/world config."});
-
-    -- Function("add_body_geom", {
-    --     Arg("body", Defined("Body"), {nativetype="udata"}),
-    --     Arg("geom", Defined("Geom"), {nativetype="union"}),
-    --     Arg("mmmm", List("_Mmm", Float(), {max_count=4})),
-    -- }, {
-    -- }, {d=""}),
-
-
-    -- -- Function("get_body_geom", {
-    -- --     Arg("body", Defined("Body"), {nativetype="udata"}),
-    -- --     Arg("key", String()),
-    -- -- }, {
-    -- --     Ret("val", Defined("Geom"), {nativetype="union"}),
-    -- -- }, {d=""}),
-
-    -- Record("Body", {
-    --     Field("x", Number(), {map_read="get_body_x", map_write="set_body_x"}),
-    --     Field("y", Number(), {map_read="get_body_y", map_write="set_body_y"}),
-    --     Field("angle", Number(), {map_read="get_body_angle", map_write="set_body_angle"}),
-    --     Field("vel_x", Number(), {map_read="get_body_vel_x", map_write="set_body_vel_x"}),
-    --     Field("vel_y", Number(), {map_read="get_body_vel_y", map_write="set_body_vel_y"}),
-    --     Field("angular_vel_x", Number(), {map_read="get_body_angular_vel_x", map_write="set_body_angular_vel_x"}),
-    --     Field("angular_vel_y", Number(), {map_read="get_body_angular_vel_y", map_write="set_body_angular_vel_y"}),
-    --     Field("rotation_enabled", Boolean(), {map_read="is_body_rotation_enabled", map_write="set_body_rotation_enabled"}),
-    --     Field("mass", Number(), {map_read="get_body_mass", map_write="set_body_mass"}),
-
-    --     --   methods:
-    --     -- set_body_location
-    --     -- set_body_linearvelocity
-    --     -- set_body_angularvelocity
-    --     --
-    -- }, {d="Physics body."}),
-
-    -- -- Record("Joint", {
-    -- --     -- Field(),
-    -- -- }, {d="Physics joint."}),
-
-
-    -- Record("CircleGeom", {
-    --     Field("radius", Number(), {map_read="get_circle_geom_radius", map_write="set_circle_geom_radius"}),
-    -- }, {d="Circle geom type."}),
-
-    -- Record("RectGeom", {
-    --     Field("width", Number(), {map_read="get_rect_geom_width", map_write="set_rect_geom_width"}),
-    --     Field("height", Number(), {map_read="get_rect_geom_height", map_write="set_rect_geom_height"}),
-    -- }, {d="Rectangle geom type."}),
-
-    -- Variant("Geom", {
-    --     Option("circle_geom", Defined("CircleGeom","udata"),
-    --     Option("rect_geom", Defined("RectGeom"),
-    -- }, {d="Physics collision geometry object."}),
-
-
-    -- Enum("GeomType", {"circle", "rect"}, {d="Physics Geom types"}),
-
-    -- -- Enum("JointType", {"mmm", "hinge"}, {d="Physics Joint types"}),
-
-    -- Enum("PhysicsConfig", {"num_dimensions", "gravity_x", "gravity_y", "gravity_z", "ERP", "CFM", }), -- there's a lot more
-
-    -- Enum("PhysicsState", {"off", "on", "paused"}, {d="Physics engine state.", dd={["off"]="Physics engine off", ["on"]="Physics engine on", ["paused"]="Physics engine paused"}}), -- dd: testing enum docs
-
-
-    -- END:   PHYSICS ------------------------------
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-    ------------------------------------------------------------------------------------------------------------------------------------------------------
-
-})
-
-local summary = apidef.process(lyte_namespace)
-
-return summary, lyte_namespace
+require "lib.apidef"
+
+return process_def_tree(Namespace("lyte",
+    Doc"lyte namespace.",
+    Require("defs_lyte_core"),
+
+    Function("tick",
+        Arg("delta_time", Double),
+        Arg("window_width", Int),
+        Arg("window_height", Int),
+        Arg("window_resized", Bool),
+        Arg("is_fullscreen", Bool),
+        Doc"Tick function. Should be created by the user.",
+        UserImpl
+    ),
+
+    Function("quit", MapTo("lyte_core.quit")),
+
+    Function("cls", MapTo("lyte_core.cls")),
+
+    Function("set_color", MapTo("lyte_core.set_color")),
+
+    Function("reset_color", MapTo("lyte_core.reset_color")),
+
+    Function("draw_point", MapTo("lyte_core.draw_point")),
+
+    Function("draw_line", MapTo("lyte_core.draw_line")),
+
+    Function("draw_triangle", MapTo("lyte_core.draw_triangle")),
+
+    Function("draw_triangle_line", MapTo("lyte_core.draw_triangle_line")),
+
+    Function("draw_rect", MapTo("lyte_core.draw_rect")),
+
+    Function("draw_rect_line", MapTo("lyte_core.draw_rect_line")),
+
+    Function("draw_circle", MapTo("lyte_core.draw_circle")),
+
+    Function("draw_circle_line", MapTo("lyte_core.draw_circle_line")),
+
+    Function("draw_ellipse", MapTo("lyte_core.draw_ellipse")),
+
+    Function("draw_ellipse_line", MapTo("lyte_core.draw_ellipse_line")),
+
+   Function("cleanup_image",
+        Arg("image", Wrap("Image")),
+        Doc("Free Image resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.image_cleanup"),
+        LuaImpl
+    ),
+
+    Function("load_image",
+        Arg("image_path", String),
+        Ret("val", Wrap("Image")),
+        Doc"Load the image specified in the path.",
+        -- ctor=true
+        MapWrapTo("lyte_core.image_load"),
+        LuaImpl
+    ),
+
+    Function("draw_image",
+        Arg("image", Wrap("Image")),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Doc"Draw an image.",
+        MapWrapTo("lyte_core.image_draw"),
+        LuaImpl
+    ),
+
+    Function("draw_image_rect",
+        Arg("image", Wrap("Image")),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Arg("src_x", Double),
+        Arg("src_y", Double),
+        Arg("rect_width", Double),
+        Arg("rect_height", Double),
+        Doc"Draw a rectangular area from the image.",
+        MapWrapTo("lyte_core.image_draw_rect"),
+        LuaImpl
+    ),
+
+    Function("get_image_width",
+        Arg("image", Wrap("Image")),
+        Ret("val", Int),
+        Doc"Get the width of the image.",
+        MapWrapTo("lyte_core.image_get_width"),
+        LuaImpl
+    ),
+
+    Function("get_image_height",
+        Arg("image", Wrap("Image")),
+        Ret("val", Int),
+        Doc"Get the height of the image.",
+        MapWrapTo("lyte_core.image_get_height"),
+        LuaImpl
+    ),
+
+    Function("new_canvas",
+        Arg("width", Int),
+        Arg("height", Int),
+        Ret("val", Wrap("Image")),
+        Doc"Create a canvas image with given width and height.",
+        -- ctor=true
+        MapWrapTo("lyte_core.image_new_canvas"),
+        LuaImpl
+    ),
+
+    Function("set_canvas",
+        Arg("canvas_image", Wrap("Image")),
+        Doc"Set the effective canvas image. All draw operations will go to this canvas until it's reset.",
+        MapWrapTo("lyte_core.image_set_canvas"),
+        LuaImpl
+    ),
+
+    Function("reset_canvas", MapTo("lyte_core.reset_canvas")),
+
+    Function("is_image_canvas",
+        Arg("image", Wrap("Image")),
+        Ret("val", Bool),
+        Doc"Check if the image was created as a canvas.",
+        MapWrapTo("lyte_core.image_is_canvas"),
+        LuaImpl
+    ),
+
+    Function("cleanup_imagebatch",
+        Arg("imagebatch", Wrap("ImageBatch")),
+        Doc("Free ImageBatch resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.imagebatch_cleanup"),
+        LuaImpl
+    ),
+
+    Function("new_imagebatch",
+        Arg("image", Wrap("Image")),
+        Ret("val", Wrap("ImageBatch")),
+        Doc"Create an image batch",
+        -- ctor=true
+        MapWrapTo("lyte_core.imagebatch_new"),
+        LuaImpl
+    ),
+
+    Function("reset_imagebatch",
+        Arg("imagebatch", Wrap("ImageBatch")),
+        Doc"Reset the image batch, remove all added rects.",
+        MapWrapTo("lyte_core.imagebatch_reset"),
+        LuaImpl
+    ),
+
+    Function("add_imagebatch_rect",
+        Arg("imagebatch", Wrap("ImageBatch")),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Arg("dest_width", Double),
+        Arg("dest_height", Double),
+        Arg("src_x", Double),
+        Arg("src_y", Double),
+        Arg("src_width", Double),
+        Arg("src_height", Double),
+        Doc"Add a recta to the image batch (from it's initial image).",
+        MapWrapTo("lyte_core.imagebatch_add_rect"),
+        LuaImpl
+    ),
+
+    Function("get_imagebatch_rect_count",
+        Arg("imagebatch", Wrap("ImageBatch")),
+        Ret("val", Int),
+        Doc"Get the number of rects in the image batch.",
+        MapWrapTo("lyte_core.imagebatch_get_rect_count"),
+        LuaImpl
+    ),
+
+    Function("draw_imagebatch",
+        Arg("imagebatch", Wrap("ImageBatch")),
+        Doc"Draw the image batch.",
+        MapWrapTo("lyte_core.imagebatch_draw"),
+        LuaImpl
+    ),
+
+    Function("cleanup_font",
+        Arg("font", Wrap("Font")),
+        Doc("Free Font resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.font_cleanup"),
+        LuaImpl
+    ),
+
+    Function("load_font",
+        Arg("font_path", String),
+        Arg("size", Double),
+        Ret("val", Wrap("Font")),
+        Doc"Load the font specified in the path, and set the initial size.",
+        -- ctor=true
+        MapWrapTo("lyte_core.font_load"),
+        LuaImpl
+    ),
+
+    Function("set_font",
+        Arg("font", Wrap("Font")),
+        Doc"Set the effective font to be used in the drawing operations.",
+        MapWrapTo("lyte_core.font_set"),
+        LuaImpl
+    ),
+
+    Function("reset_font",
+        Doc"Reset the font to its default value.",
+        LuaImpl,
+        Code[[function()
+    lyte.set_font(lyte._default_font) -- lyte._default_font set in lyte_boot
+end
+]]
+    ),
+
+    Function("draw_text", MapTo("lyte_core.draw_text")),
+
+    Function("get_text_width", MapTo("lyte_core.get_text_width")),
+
+    Function("get_text_height", MapTo("lyte_core.get_text_height")),
+
+    Function("get_monitor_count", MapTo("lyte_core.get_monitor_count")),
+
+    Function("get_monitor_name", MapTo("lyte_core.get_monitor_name")),
+
+    Function("get_monitor_width", MapTo("lyte_core.get_monitor_width")),
+
+    Function("get_monitor_height", MapTo("lyte_core.get_monitor_height")),
+
+    Function("set_window_monitor", MapTo("lyte_core.set_window_monitor")),
+
+    Function("set_window_resizable", MapTo("lyte_core.set_window_resizable")),
+
+    Function("set_window_minsize", MapTo("lyte_core.set_window_minsize")),
+
+    Function("set_window_size", MapTo("lyte_core.set_window_size")),
+
+    Function("get_window_width", MapTo("lyte_core.get_window_width")),
+
+    Function("get_window_height", MapTo("lyte_core.get_window_height")),
+
+    Function("set_window_position", MapTo("lyte_core.set_window_position")),
+
+    Function("set_fullscreen", MapTo("lyte_core.set_fullscreen")),
+
+    Function("is_fullscreen", MapTo("lyte_core.is_fullscreen")),
+
+    Function("set_window_title", MapTo("lyte_core.set_window_title")),
+
+    Function("set_window_vsync", MapTo("lyte_core.set_window_vsync")),
+
+    Function("is_window_vsync", MapTo("lyte_core.is_window_vsync")),
+
+    Function("set_window_icon_file", MapTo("lyte_core.set_window_icon_file")),
+
+    Function("set_window_margins", MapTo("lyte_core.set_window_margins")),
+
+    Function("set_window_paddings", MapTo("lyte_core.set_window_paddings")),
+
+    Function("is_key_down", MapTo("lyte_core.is_key_down")),
+
+    Function("is_key_pressed", MapTo("lyte_core.is_key_pressed")),
+
+    Function("is_key_released", MapTo("lyte_core.is_key_released")),
+
+    Function("is_key_repeat", MapTo("lyte_core.is_key_repeat")),
+
+    Function("is_mouse_down", MapTo("lyte_core.is_mouse_down")),
+
+    Function("is_mouse_pressed", MapTo("lyte_core.is_mouse_pressed")),
+
+    Function("is_mouse_released", MapTo("lyte_core.is_mouse_released")),
+
+    Function("get_mouse_x", MapTo("lyte_core.get_mouse_x")),
+
+    Function("get_mouse_y", MapTo("lyte_core.get_mouse_y")),
+
+    Function("get_gamepad_count", MapTo("lyte_core.get_gamepad_count")),
+
+    Function("get_gamepad_name", MapTo("lyte_core.get_gamepad_name")),
+
+    Function("is_gamepad_down", MapTo("lyte_core.is_gamepad_down")),
+
+    Function("is_gamepad_pressed", MapTo("lyte_core.is_gamepad_pressed")),
+
+    Function("is_gamepad_released", MapTo("lyte_core.is_gamepad_released")),
+
+    Function("get_gamepad_axis", MapTo("lyte_core.get_gamepad_axis")),
+
+    Function("set_mastervolume", MapTo("lyte_core.set_mastervolume")),
+
+    Function("get_mastervolume", MapTo("lyte_core.get_mastervolume")),
+
+    Function("cleanup_music",
+        Arg("music", Wrap("Music")),
+        Doc("Free Music resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.music_cleanup"),
+        LuaImpl
+    ),
+
+    Function("load_music",
+        Arg("music_path", String),
+        Ret("val", Wrap("Music")),
+        Doc"Load the music specified in the path.",
+        -- ctor=true
+        MapWrapTo("lyte_core.music_load"),
+        LuaImpl
+    ),
+
+    Function("play_music",
+        Arg("music", Wrap("Music")),
+        Doc"Play the music.",
+        MapWrapTo("lyte_core.music_play"),
+        LuaImpl
+    ),
+
+    Function("pause_music",
+        Arg("music", Wrap("Music")),
+        Doc"Pause the music.",
+        MapWrapTo("lyte_core.music_pause"),
+        LuaImpl
+    ),
+
+    Function("resume_music",
+        Arg("music", Wrap("Music")),
+        Doc"Resume the music.",
+        MapWrapTo("lyte_core.music_resume"),
+        LuaImpl
+    ),
+
+    Function("stop_music",
+        Arg("music", Wrap("Music")),
+        Doc"Stop the music.",
+        MapWrapTo("lyte_core.music_resume"),
+        LuaImpl
+    ),
+
+    Function("is_music_playing",
+        Arg("music", Wrap("Music")),
+        Ret("val", Bool),
+        Doc"Check if the given music is playing.",
+        MapWrapTo("lyte_core.music_is_playing"),
+        LuaImpl
+    ),
+
+    Function("get_music_length",
+        Arg("music", Wrap("Music")),
+        Ret("val", Double),
+        Doc"Get the length of the given music object in seconds.",
+        MapWrapTo("lyte_core.music_get_length"),
+        LuaImpl
+    ),
+
+    Function("get_music_length_played",
+        Arg("music", Wrap("Music")),
+        Ret("val", Double),
+        Doc"Get the already played length of the given music object in seconds.",
+        MapWrapTo("lyte_core.music_get_length_played"),
+        LuaImpl
+    ),
+
+    Function("seek_music",
+        Arg("music", Wrap("Music")),
+        Arg("secs", Double),
+        Doc"Move the music time played to the given value.",
+        MapWrapTo("lyte_core.music_seek"),
+        LuaImpl
+    ),
+
+    Function("set_music_volume",
+        Arg("music", Wrap("Music")),
+        Arg("volume", Double),
+        Doc"Set the volume of the given music object.",
+        MapWrapTo("lyte_core.music_set_volume"),
+        LuaImpl
+    ),
+
+    Function("set_music_pan",
+        Arg("music", Wrap("Music")),
+        Arg("pan", Double),
+        Doc"Set the pan of the given music object.",
+        MapWrapTo("lyte_core.music_set_volume"),
+        LuaImpl
+    ),
+
+    Function("set_music_pitch",
+        Arg("music", Wrap("Music")),
+        Arg("pitch", Double),
+        Doc"Set the pitch of the given music object.",
+        MapWrapTo("lyte_core.music_set_pitch"),
+        LuaImpl
+    ),
+
+    Function("get_music_volume",
+        Arg("music", Wrap("Music")),
+        Ret("val", Double),
+        Doc"Get the volume of the given music object.",
+        MapWrapTo("lyte_core.music_get_volume"),
+        LuaImpl
+    ),
+
+    Function("get_music_pan",
+        Arg("music", Wrap("Music")),
+        Ret("val", Double),
+        Doc"Get the pan of the given music object.",
+        MapWrapTo("lyte_core.music_get_pan"),
+        LuaImpl
+    ),
+
+    Function("get_music_pitch",
+        Arg("music", Wrap("Music")),
+        Ret("val", Double),
+        Doc"Get the pitch of the given music object.",
+        MapWrapTo("lyte_core.music_get_pitch"),
+        LuaImpl
+    ),
+
+    Function("cleanup_sound",
+        Arg("sound", Wrap("Sound")),
+        Doc("Free Sound resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.sound_cleanup"),
+        LuaImpl
+    ),
+
+    Function("load_sound",
+        Arg("sound_path", String),
+        Ret("val", Wrap("Sound")),
+        Doc"Load the sound specified in the path.",
+        -- ctor=true,
+        MapWrapTo("lyte_core.sound_load"),
+        LuaImpl
+    ),
+
+    Function("clone_sound",
+        Arg("orig", Wrap("Sound")),
+        Ret("val", Wrap("Sound")),
+        Doc"Clone the sound specified in the path.",
+        -- ctor=true,
+        MapWrapTo("lyte_core.sound_clone"),
+        LuaImpl
+    ),
+
+    Function("play_sound",
+        Arg("sound", Wrap("Sound")),
+        Doc"Play the sound.",
+        MapWrapTo("lyte_core.sound_play"),
+        LuaImpl
+    ),
+
+    Function("pause_sound",
+        Arg("sound", Wrap("Sound")),
+        Doc"Pause the sound.",
+        MapWrapTo("lyte_core.sound_pause"),
+        LuaImpl
+    ),
+
+    Function("resume_sound",
+        Arg("sound", Wrap("Sound")),
+        Doc"Resume the sound.",
+        MapWrapTo("lyte_core.sound_resume"),
+        LuaImpl
+    ),
+
+    Function("stop_sound",
+        Arg("sound", Wrap("Sound")),
+        Doc"Stop the sound.",
+        MapWrapTo("lyte_core.sound_stop"),
+        LuaImpl
+    ),
+
+    Function("is_sound_playing",
+        Arg("sound", Wrap("Sound")),
+        Ret("val", Bool),
+        Doc"Check if the given sound is playing.",
+        MapWrapTo("lyte_core.sound_is_playing"),
+        LuaImpl
+    ),
+
+    Function("set_sound_volume",
+        Arg("sound", Wrap("Sound")),
+        Arg("volume", Double),
+        Doc"Set the volume of the given sound object.",
+        MapWrapTo("lyte_core.sound_set_volume"),
+        LuaImpl
+    ),
+
+    Function("set_sound_pan",
+        Arg("sound", Wrap("Sound")),
+        Arg("pan", Double),
+        Doc"Set the pan of the given sound object.",
+        MapWrapTo("lyte_core.sound_set_pan"),
+        LuaImpl
+    ),
+
+    Function("set_sound_pitch",
+        Arg("sound", Wrap("Sound")),
+        Arg("pitch", Double),
+        Doc"Set the pitch of the given sound object.",
+        MapWrapTo("lyte_core.sound_set_pitch"),
+        LuaImpl
+    ),
+
+    Function("get_sound_volume",
+        Arg("sound", Wrap("Sound")),
+        Ret("val", Double),
+        Doc"Get the volume of the given sound object.",
+        MapWrapTo("lyte_core.sound_get_volume"),
+        LuaImpl
+    ),
+
+    Function("get_sound_pan",
+        Arg("sound", Wrap("Sound")),
+        Ret("val", Double),
+        Doc"Get the pan of the given sound object.",
+        MapWrapTo("lyte_core.sound_get_pan"),
+        LuaImpl
+    ),
+
+    Function("get_sound_pitch",
+        Arg("sound", Wrap("Sound")),
+        Ret("val", Double),
+        Doc"Get the pitch of the given sound object.",
+        MapWrapTo("lyte_core.sound_get_pitch"),
+        LuaImpl
+    ),
+
+    Function("load_textfile", MapTo("lyte_core.load_textfile")),
+
+    Function("save_textfile", MapTo("lyte_core.save_textfile")),
+
+    Function("save_textfile_append", MapTo("lyte_core.save_textfile_append")),
+
+    Function("push_matrix", MapTo("lyte_core.push_matrix")),
+
+    Function("pop_matrix", MapTo("lyte_core.pop_matrix")),
+
+    Function("reset_matrix", MapTo("lyte_core.reset_matrix")),
+
+    Function("translate", MapTo("lyte_core.translate")),
+
+    Function("rotate", MapTo("lyte_core.rotate")),
+
+    Function("rotate_at", MapTo("lyte_core.rotate_at")),
+
+    Function("scale", MapTo("lyte_core.scale")),
+
+    Function("scale_at", MapTo("lyte_core.scale_at")),
+
+    Function("set_default_blendmode", MapTo("lyte_core.set_default_blendmode")),
+
+    Function("set_blendmode", MapTo("lyte_core.set_blendmode")),
+
+    Function("reset_blendmode", MapTo("lyte_core.reset_blendmode")),
+
+    Function("set_default_filtermode", MapTo("lyte_core.set_default_filtermode")),
+
+    Function("set_filtermode", MapTo("lyte_core.set_filtermode")),
+
+    Function("reset_filtermode", MapTo("lyte_core.reset_filtermode")),
+
+
+    Dict("UniformNamesToTypes",
+        String,
+        T("UniformType")
+        -- c_api_skip=true
+    ),
+
+    Function("cleanup_shaderbuilder",
+        Arg("shaderbuilder", Wrap("ShaderBuilder")),
+        Doc("Free ShaderBuilder resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.shaderbuilder_cleanup"),
+        LuaImpl
+    ),
+
+    Function("new_shaderbuilder",
+        Ret("val", Wrap("ShaderBuilder")),
+        Doc"Create a ShaderBuilder object.",
+        -- ctor=true,
+        MapWrapTo("lyte_core.shaderbuilder_new"),
+        LuaImpl
+    ),
+
+    -- wrapping a "enum" UniformType" is possibly an issue
+    Function("shaderbuilder_uniform",
+        Arg("shaderbuilder", Wrap("ShaderBuilder")),
+        Arg("uniform_name", String),
+        Arg("uniform_type", T("UniformType")),
+        Doc"Add uniform definition to the shaderbuilder",
+        MapWrapTo("lyte_core.shaderbuilder_uniform"),
+        LuaImpl
+    ),
+
+    Function("shaderbuilder_vertex",
+        Arg("shaderbuilder", Wrap("ShaderBuilder")),
+        Arg("vertex_code", String),
+        Doc"Add vertex code to the shaderbuilder",
+        MapWrapTo("lyte_core.shaderbuilder_vertex"),
+        LuaImpl
+    ),
+
+    Function("shaderbuilder_fragment",
+        Arg("shaderbuilder", Wrap("ShaderBuilder")),
+        Arg("fragment_code", String),
+        Doc"Add fragment to the shaderbuilder",
+        MapWrapTo("lyte_core.shaderbuilder_fragment"),
+        LuaImpl
+    ),
+
+    Function("shaderbuilder_build",
+        Arg("shaderbuilder", Wrap("ShaderBuilder")),
+        Ret("shader", Wrap("Shader")),
+        Doc"Add fragment to the shaderbuilder",
+        -- ctor="true"
+        MapWrapTo("lyte_core.shaderbuilder_build"),
+        LuaImpl
+    ),
+
+    Function("cleanup_shader",
+        Arg("shader", Wrap("Shader")),
+        Doc("Free Shader resources"),
+        -- dtor=true
+        MapWrapTo("lyte_core.shader_cleanup"),
+        LuaImpl
+    ),
+
+    Record("ShaderDef",
+        Field("frag", String),
+        Field("vert", String),
+        Field("uniforms", T("UniformNamesToTypes")),
+        Doc"Shader definition: uniforms declaration, vertex and fragment shader code."
+    ),
+
+    Function("new_shader",
+        Arg("shaderdef", Wrap("ShaderDef")),
+        Ret("val", Wrap("Shader")),
+        Doc"Create a shader with given specification.",
+        -- ctor=true,
+        LuaImpl,
+        Code[[function(def)
+    assert(def.uniforms)
+    assert(def.vert)
+    assert(def.frag)
+    local sb = lyte.new_shaderbuilder()
+    for k,v in pairs(def.uniforms) do
+        sb:uniform(k, v)
+    end
+    sb:vertex(def.vert)
+    sb:fragment(def.frag)
+    local shader = sb:build()
+    return shader;
+end
+]]
+    ),
+
+    Function("set_shader",
+        Arg("shader", Wrap("Shader")),
+        Doc"Set the custom shader and use it for consequent calls.",
+        MapWrapTo("lyte_core.shader_set"),
+        LuaImpl
+    ),
+
+    Function("reset_shader", MapTo("lyte_core.reset_shader")),
+
+    Function("set_shader_uniform",
+        Arg("shader", Wrap("Shader")),
+        Arg("uniform_name", String),
+        Arg("uniform_value", T("ShaderUniformValue")),
+        Doc"Set the specified uniform.",
+        -- MapWrapTo("lyte_core.shader_set_uniform"),
+        LuaImpl,
+        Code[[function (shader, uniform_name, uniform_value)
+    -- check the value type for one of the following, and call the "right" func
+      -- shader_set_uniform_float
+      -- shader_set_uniform_floatvec4
+      -- shader_set_uniform_image
+    local vt = type(uniform_value)
+    if vt == "number" then
+        -- send float
+        lyte_core.shader_set_uniform_float(shader.id, uniform_name, uniform_value)
+    elseif vt == "table" then
+        -- number table? or "data" table? check metatable for "Image" and also check count "#"
+        if #uniform_value > 0 then
+            lyte_core.shader_set_uniform_floatvec4(shader.id, uniform_name, uniform_value)
+        elseif getmetatable(uniform_value) == lyte.Image then
+            local img_id = uniform_value.id
+            lyte_core.shader_set_uniform_image(shader.id, uniform_name, img_id)
+        else
+            error("Unknown type for uniform_value in set_shader_uniform. Expected: float, float list or lyte.Image")
+        end
+    else
+        error("Unknown value type for uniform_value in set_shader_uniform")
+    end
+end
+]]
+    ),
+
+    Function("reset_shader_uniform",
+        Arg("shader", Wrap("Shader")),
+        Arg("uniform_name", String),
+        Doc"Reset the specified uniform.",
+        MapWrapTo("lyte_core.shader_reset_uniform"),
+        LuaImpl
+    ),
+
+    Record("Image",
+        Field("width", Int, MapRead("get_image_width")),
+        Field("height", Int, MapRead("get_image_height")),
+        Field("is_canvas", Bool, MapRead("is_image_canvas")),
+        Method("__gc", MapTo("cleanup_image")),
+        Doc"Image type"
+    ),
+
+    Record("ImageBatch",
+        Field("rect_count", Int, MapRead("get_imagebatch_rect_count")),
+        Method("add_rect", MapTo("add_imagebatch_rect")),
+        Method("draw", MapTo("draw_imagebatch")),
+        Method("reset", MapTo("reset_imagebatch")),
+        Method("__gc", MapTo("cleanup_imagebatch")),
+        Doc"ImageBatch type."
+    ),
+
+    Record("Font",
+        Method("__gc", MapTo("cleanup_font")),
+        Doc"Font type."
+    ),
+
+    Record("Music",
+        Field("playing", Bool, MapRead("is_music_playing")),
+        Field("length", Double, MapRead("get_music_length")),
+        Field("length_played", Double, MapRead("get_music_length_played")),
+        Field("pan", Double, MapRead("get_music_pan"), MapWrite("set_music_pan")),
+        Field("pitch", Double, MapRead("get_music_pitch"), MapWrite("set_music_pitch")),
+        Field("volume", Double, MapRead("get_music_volume"), MapWrite("set_music_volume")),
+        Method("play", MapTo("play_music")),
+        Method("pause", MapTo("pause_music")),
+        Method("resume", MapTo("resume_music")),
+        Method("stop", MapTo("stop_music")),
+        Method("seek", MapTo("seek_music")),
+        Method("__gc", MapTo("cleanup_music")),
+        Doc"Music type."
+    ),
+
+    Record("Sound",
+        Field("pan", Double, MapRead("get_sound_pan"), MapWrite("set_sound_pan")),
+        Field("pitch", Double, MapRead("get_sound_pitch"), MapWrite("set_sound_pitch")),
+        Field("volume", Double, MapRead("get_sound_volume"), MapWrite("set_sound_volume")),
+        Method("clone", MapTo("clone_sound")),
+        Method("pause", MapTo("pause_sound")),
+        Method("play", MapTo("play_sound")),
+        Method("resume", MapTo("resume_sound")),
+        Method("stop", MapTo("stop_sound")),
+        Method("__gc", MapTo("cleanup_sound")),
+        Doc"Sound type."
+    ),
+
+    List("FloatVec4",
+        Float,
+        MaxCount(4),
+        Doc"Float values"
+    ),
+
+    Variant("ShaderUniformValue",
+        Option("float_val", Float, Doc"Note: Used for single numbers, int or float"),
+        Option("vec_val", T("FloatVec4")),
+        Option("sampler2D_val", T("Image")),
+        Doc"Shader uniform value"
+    ),
+
+    Record("Shader",
+        Method("set", MapTo("set_shader_uniform")),
+        Method("reset", MapTo("reset_shader_uniform")),
+        Method("__gc", MapTo("cleanup_shader")),
+        Doc"Shader type"
+    ),
+
+    Record("ShaderBuilder",
+        Method("uniform", MapTo("shaderbuilder_uniform")),
+        Method("vertex", MapTo("shaderbuilder_vertex")),
+        Method("fragment", MapTo("shaderbuilder_fragment")),
+        Method("build", MapTo("shaderbuilder_build")),
+        Method("__gc", MapTo("cleanup_shaderbuilder")),
+        Doc"ShaderBuilder type"
+    )
+
+))

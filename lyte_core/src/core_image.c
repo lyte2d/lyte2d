@@ -85,7 +85,8 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     ii->is_canvas = false;
     ii->ref = 1;
 
-    img->ptr = ii;
+    // img = (lyte_Image *)&ii;
+    *img = ii;
     free(buf);
     PHYSFS_close(file);
     return 0;
@@ -139,7 +140,8 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
     c->id_pass = fb_pass.id;
     c->ref = 1;
 
-    img->ptr = c;
+    // img = (lyte_Image *)&c;
+    *img = c;
     return 0;
 }
 
@@ -162,14 +164,14 @@ static inline void _free_imageitem(ImageItem *imageitem) {
 }
 
 int lyte_Image_cleanup(lyte_Image image) {
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     _free_imageitem(imageitem);
-    image.ptr = NULL;
+    // image.ptr = NULL;
     return 0;
 }
 
 int lyte_get_image_width(lyte_Image image, int *val) {
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
@@ -179,7 +181,7 @@ int lyte_get_image_width(lyte_Image image, int *val) {
 }
 
 int lyte_get_image_height(lyte_Image image, int *val) {
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
@@ -189,7 +191,7 @@ int lyte_get_image_height(lyte_Image image, int *val) {
 }
 
 int lyte_is_image_canvas(lyte_Image image, bool *val) {
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
@@ -199,7 +201,7 @@ int lyte_is_image_canvas(lyte_Image image, bool *val) {
 }
 
 int lyte_draw_image(lyte_Image image, double x, double y) {
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
@@ -220,7 +222,7 @@ int lyte_draw_image(lyte_Image image, double x, double y) {
 }
 
 int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, double src_y, double w, double h) {
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
@@ -240,7 +242,7 @@ int lyte_set_canvas(lyte_Image image) {
         fprintf(stderr, "Canvas was already set.");
             return 1;
     }
-    ImageItem *imageitem = image.ptr;
+    ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
@@ -299,29 +301,30 @@ int lyte_new_imagebatch(lyte_Image image, lyte_ImageBatch *val) {
     ibi->capacity = 0;
     ibi->count = 0;
     ibi->rects = NULL;
-    ImageItem *imageitem = ibi->image.ptr;
+    ImageItem *imageitem = ibi->image;
     imageitem->ref += 1;
 
-    val->ptr = ibi;
+    // val = (lyte_Image *)&ibi;
+    *val = ibi;
     return 0;
 }
 
 int lyte_ImageBatch_cleanup(lyte_ImageBatch imagebatch) {
-    ImageBatchItem *ibi = imagebatch.ptr;
+    ImageBatchItem *ibi = imagebatch;
     if (ibi->rects != NULL) {
         free(ibi->rects);
         ibi->rects = NULL;
         ibi->capacity = 0;
         ibi->count = 0;
     }
-    ImageItem *imageitem = ibi->image.ptr;
+    ImageItem *imageitem = ibi->image;
     _free_imageitem(imageitem);
-    ibi->image.ptr = NULL;
+    ibi->image = NULL;
     return 0;
 }
 
 int lyte_reset_imagebatch(lyte_ImageBatch imagebatch) {
-    ImageBatchItem *ibi = imagebatch.ptr;
+    ImageBatchItem *ibi = imagebatch;
     if (ibi->rects) {
         memset(ibi->rects, 0, sizeof(sgp_textured_rect)*ibi->capacity);
         ibi->count = 0;
@@ -329,7 +332,7 @@ int lyte_reset_imagebatch(lyte_ImageBatch imagebatch) {
     return 0;
 }
 int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, double dest_x, double dest_y, double dest_width, double dest_height, double src_x, double src_y, double src_width, double src_height) {
-    ImageBatchItem *ibi = imagebatch.ptr;
+    ImageBatchItem *ibi = imagebatch;
     if (!ibi->rects) {
         // initial allocation
         ibi->count = 0;
@@ -350,15 +353,15 @@ int lyte_add_imagebatch_rect(lyte_ImageBatch imagebatch, double dest_x, double d
 }
 
 int lyte_get_imagebatch_rect_count(lyte_ImageBatch imagebatch, int *val) {
-    ImageBatchItem *ibi = imagebatch.ptr;
+    ImageBatchItem *ibi = imagebatch;
     *val = ibi->count;
     return 0;
 }
 
 int lyte_draw_imagebatch(lyte_ImageBatch imagebatch) {
-    ImageBatchItem *ibi = imagebatch.ptr;
+    ImageBatchItem *ibi = imagebatch;
     if (ibi->rects) {
-        ImageItem *imageitem = ibi->image.ptr;
+        ImageItem *imageitem = ibi->image;
         sg_image sgimage = (sg_image){ .id = imageitem->handle };
         sgp_set_image(0, sgimage);
         sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };

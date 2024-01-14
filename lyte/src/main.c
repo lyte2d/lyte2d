@@ -11,9 +11,12 @@
 #include <signal.h>
 
 #include "repl.h"
-#include "lyte_api.h"
+// #include "lyte_api.h"
+#include "api_lyte_core_gen.h"
+
 #include "lyte_core.h"
-// #include "lyte_physics.h"
+
+
 
 #include "_boot_zip_generated.c"
 
@@ -207,7 +210,8 @@ static int _try_load(lua_State *L) {
     char path_with_at[4096] = {0};
     sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepath and not part of code
     // err = luaL_loadbuffer(L, (const char *)module_file_buf, strlen(module_file_buf), (const char *)path_with_at);
-    err = luaL_loadbuffer(L, (const char *)file_content, strlen(file_content), (const char *)path_with_at);
+    size_t fc_len = strlen(file_content);
+    err = luaL_loadbuffer(L, (const char *)file_content,fc_len , (const char *)path_with_at);
     if (err == 0) {
         // err = lua_pcall(L, 0, LUA_MULTRET, 0);
         //lua_call(L, 0, LUA_MULTRET);
@@ -479,7 +483,10 @@ static int init(void) {
     lua_atpanic(L, _lua_panic_fn);
     _global_L = L;
     luaL_openlibs(L);
-    register_lyte(L);
+
+    // register_lyte(L);
+    register_lyte_core_api(L);
+
     lua_gc(L, LUA_GCCOLLECT, 0);
 
     _need_to_load_archives = true;

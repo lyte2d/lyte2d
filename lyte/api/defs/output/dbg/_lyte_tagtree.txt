@@ -1,0 +1,804 @@
+Namespace lyte: 
+    Doc lyte namespace.
+    Require defs_lyte_core
+    Function tick: 
+        Arg delta_time: 
+            Type double
+        Arg window_width: 
+            Type int
+        Arg window_height: 
+            Type int
+        Arg window_resized: 
+            Type bool
+        Arg is_fullscreen: 
+            Type bool
+        Doc Tick function. Should be created by the user.
+        Impl user
+    Function quit: 
+        MapTo lyte_core.quit
+    Function cls: 
+        MapTo lyte_core.cls
+    Function set_color: 
+        MapTo lyte_core.set_color
+    Function reset_color: 
+        MapTo lyte_core.reset_color
+    Function draw_point: 
+        MapTo lyte_core.draw_point
+    Function draw_line: 
+        MapTo lyte_core.draw_line
+    Function draw_triangle: 
+        MapTo lyte_core.draw_triangle
+    Function draw_triangle_line: 
+        MapTo lyte_core.draw_triangle_line
+    Function draw_rect: 
+        MapTo lyte_core.draw_rect
+    Function draw_rect_line: 
+        MapTo lyte_core.draw_rect_line
+    Function draw_circle: 
+        MapTo lyte_core.draw_circle
+    Function draw_circle_line: 
+        MapTo lyte_core.draw_circle_line
+    Function draw_ellipse: 
+        MapTo lyte_core.draw_ellipse
+    Function draw_ellipse_line: 
+        MapTo lyte_core.draw_ellipse_line
+    Function cleanup_image: 
+        Arg image: 
+            Wrap Image
+        Doc Free Image resources
+        MapWrapTo lyte_core.image_cleanup
+        Impl lua
+    Function load_image: 
+        Arg image_path: 
+            Type string
+        Ret val: 
+            Wrap Image
+        Doc Load the image specified in the path.
+        MapWrapTo lyte_core.image_load
+        Impl lua
+    Function draw_image: 
+        Arg image: 
+            Wrap Image
+        Arg dest_x: 
+            Type double
+        Arg dest_y: 
+            Type double
+        Doc Draw an image.
+        MapWrapTo lyte_core.image_draw
+        Impl lua
+    Function draw_image_rect: 
+        Arg image: 
+            Wrap Image
+        Arg dest_x: 
+            Type double
+        Arg dest_y: 
+            Type double
+        Arg src_x: 
+            Type double
+        Arg src_y: 
+            Type double
+        Arg rect_width: 
+            Type double
+        Arg rect_height: 
+            Type double
+        Doc Draw a rectangular area from the image.
+        MapWrapTo lyte_core.image_draw_rect
+        Impl lua
+    Function get_image_width: 
+        Arg image: 
+            Wrap Image
+        Ret val: 
+            Type int
+        Doc Get the width of the image.
+        MapWrapTo lyte_core.image_get_width
+        Impl lua
+    Function get_image_height: 
+        Arg image: 
+            Wrap Image
+        Ret val: 
+            Type int
+        Doc Get the height of the image.
+        MapWrapTo lyte_core.image_get_height
+        Impl lua
+    Function new_canvas: 
+        Arg width: 
+            Type int
+        Arg height: 
+            Type int
+        Ret val: 
+            Wrap Image
+        Doc Create a canvas image with given width and height.
+        MapWrapTo lyte_core.image_new_canvas
+        Impl lua
+    Function set_canvas: 
+        Arg canvas_image: 
+            Wrap Image
+        Doc Set the effective canvas image. All draw operations will go to this canvas until it's reset.
+        MapWrapTo lyte_core.image_set_canvas
+        Impl lua
+    Function reset_canvas: 
+        MapTo lyte_core.reset_canvas
+    Function is_image_canvas: 
+        Arg image: 
+            Wrap Image
+        Ret val: 
+            Type bool
+        Doc Check if the image was created as a canvas.
+        MapWrapTo lyte_core.image_is_canvas
+        Impl lua
+    Function cleanup_imagebatch: 
+        Arg imagebatch: 
+            Wrap ImageBatch
+        Doc Free ImageBatch resources
+        MapWrapTo lyte_core.imagebatch_cleanup
+        Impl lua
+    Function new_imagebatch: 
+        Arg image: 
+            Wrap Image
+        Ret val: 
+            Wrap ImageBatch
+        Doc Create an image batch
+        MapWrapTo lyte_core.imagebatch_new
+        Impl lua
+    Function reset_imagebatch: 
+        Arg imagebatch: 
+            Wrap ImageBatch
+        Doc Reset the image batch, remove all added rects.
+        MapWrapTo lyte_core.imagebatch_reset
+        Impl lua
+    Function add_imagebatch_rect: 
+        Arg imagebatch: 
+            Wrap ImageBatch
+        Arg dest_x: 
+            Type double
+        Arg dest_y: 
+            Type double
+        Arg dest_width: 
+            Type double
+        Arg dest_height: 
+            Type double
+        Arg src_x: 
+            Type double
+        Arg src_y: 
+            Type double
+        Arg src_width: 
+            Type double
+        Arg src_height: 
+            Type double
+        Doc Add a recta to the image batch (from it's initial image).
+        MapWrapTo lyte_core.imagebatch_add_rect
+        Impl lua
+    Function get_imagebatch_rect_count: 
+        Arg imagebatch: 
+            Wrap ImageBatch
+        Ret val: 
+            Type int
+        Doc Get the number of rects in the image batch.
+        MapWrapTo lyte_core.imagebatch_get_rect_count
+        Impl lua
+    Function draw_imagebatch: 
+        Arg imagebatch: 
+            Wrap ImageBatch
+        Doc Draw the image batch.
+        MapWrapTo lyte_core.imagebatch_draw
+        Impl lua
+    Function cleanup_font: 
+        Arg font: 
+            Wrap Font
+        Doc Free Font resources
+        MapWrapTo lyte_core.font_cleanup
+        Impl lua
+    Function load_font: 
+        Arg font_path: 
+            Type string
+        Arg size: 
+            Type double
+        Ret val: 
+            Wrap Font
+        Doc Load the font specified in the path, and set the initial size.
+        MapWrapTo lyte_core.font_load
+        Impl lua
+    Function set_font: 
+        Arg font: 
+            Wrap Font
+        Doc Set the effective font to be used in the drawing operations.
+        MapWrapTo lyte_core.font_set
+        Impl lua
+    Function reset_font: 
+        Doc Reset the font to its default value.
+        Impl lua
+        Code function()
+    lyte.set_font(lyte._default_font) -- lyte._default_font set in lyte_boot
+end
+
+    Function draw_text: 
+        MapTo lyte_core.draw_text
+    Function get_text_width: 
+        MapTo lyte_core.get_text_width
+    Function get_text_height: 
+        MapTo lyte_core.get_text_height
+    Function get_monitor_count: 
+        MapTo lyte_core.get_monitor_count
+    Function get_monitor_name: 
+        MapTo lyte_core.get_monitor_name
+    Function get_monitor_width: 
+        MapTo lyte_core.get_monitor_width
+    Function get_monitor_height: 
+        MapTo lyte_core.get_monitor_height
+    Function set_window_monitor: 
+        MapTo lyte_core.set_window_monitor
+    Function set_window_resizable: 
+        MapTo lyte_core.set_window_resizable
+    Function set_window_minsize: 
+        MapTo lyte_core.set_window_minsize
+    Function set_window_size: 
+        MapTo lyte_core.set_window_size
+    Function get_window_width: 
+        MapTo lyte_core.get_window_width
+    Function get_window_height: 
+        MapTo lyte_core.get_window_height
+    Function set_window_position: 
+        MapTo lyte_core.set_window_position
+    Function set_fullscreen: 
+        MapTo lyte_core.set_fullscreen
+    Function is_fullscreen: 
+        MapTo lyte_core.is_fullscreen
+    Function set_window_title: 
+        MapTo lyte_core.set_window_title
+    Function set_window_vsync: 
+        MapTo lyte_core.set_window_vsync
+    Function is_window_vsync: 
+        MapTo lyte_core.is_window_vsync
+    Function set_window_icon_file: 
+        MapTo lyte_core.set_window_icon_file
+    Function set_window_margins: 
+        MapTo lyte_core.set_window_margins
+    Function set_window_paddings: 
+        MapTo lyte_core.set_window_paddings
+    Function is_key_down: 
+        MapTo lyte_core.is_key_down
+    Function is_key_pressed: 
+        MapTo lyte_core.is_key_pressed
+    Function is_key_released: 
+        MapTo lyte_core.is_key_released
+    Function is_key_repeat: 
+        MapTo lyte_core.is_key_repeat
+    Function is_mouse_down: 
+        MapTo lyte_core.is_mouse_down
+    Function is_mouse_pressed: 
+        MapTo lyte_core.is_mouse_pressed
+    Function is_mouse_released: 
+        MapTo lyte_core.is_mouse_released
+    Function get_mouse_x: 
+        MapTo lyte_core.get_mouse_x
+    Function get_mouse_y: 
+        MapTo lyte_core.get_mouse_y
+    Function get_gamepad_count: 
+        MapTo lyte_core.get_gamepad_count
+    Function get_gamepad_name: 
+        MapTo lyte_core.get_gamepad_name
+    Function is_gamepad_down: 
+        MapTo lyte_core.is_gamepad_down
+    Function is_gamepad_pressed: 
+        MapTo lyte_core.is_gamepad_pressed
+    Function is_gamepad_released: 
+        MapTo lyte_core.is_gamepad_released
+    Function get_gamepad_axis: 
+        MapTo lyte_core.get_gamepad_axis
+    Function set_mastervolume: 
+        MapTo lyte_core.set_mastervolume
+    Function get_mastervolume: 
+        MapTo lyte_core.get_mastervolume
+    Function cleanup_music: 
+        Arg music: 
+            Wrap Music
+        Doc Free Music resources
+        MapWrapTo lyte_core.music_cleanup
+        Impl lua
+    Function load_music: 
+        Arg music_path: 
+            Type string
+        Ret val: 
+            Wrap Music
+        Doc Load the music specified in the path.
+        MapWrapTo lyte_core.music_load
+        Impl lua
+    Function play_music: 
+        Arg music: 
+            Wrap Music
+        Doc Play the music.
+        MapWrapTo lyte_core.music_play
+        Impl lua
+    Function pause_music: 
+        Arg music: 
+            Wrap Music
+        Doc Pause the music.
+        MapWrapTo lyte_core.music_pause
+        Impl lua
+    Function resume_music: 
+        Arg music: 
+            Wrap Music
+        Doc Resume the music.
+        MapWrapTo lyte_core.music_resume
+        Impl lua
+    Function stop_music: 
+        Arg music: 
+            Wrap Music
+        Doc Stop the music.
+        MapWrapTo lyte_core.music_resume
+        Impl lua
+    Function is_music_playing: 
+        Arg music: 
+            Wrap Music
+        Ret val: 
+            Type bool
+        Doc Check if the given music is playing.
+        MapWrapTo lyte_core.music_is_playing
+        Impl lua
+    Function get_music_length: 
+        Arg music: 
+            Wrap Music
+        Ret val: 
+            Type double
+        Doc Get the length of the given music object in seconds.
+        MapWrapTo lyte_core.music_get_length
+        Impl lua
+    Function get_music_length_played: 
+        Arg music: 
+            Wrap Music
+        Ret val: 
+            Type double
+        Doc Get the already played length of the given music object in seconds.
+        MapWrapTo lyte_core.music_get_length_played
+        Impl lua
+    Function seek_music: 
+        Arg music: 
+            Wrap Music
+        Arg secs: 
+            Type double
+        Doc Move the music time played to the given value.
+        MapWrapTo lyte_core.music_seek
+        Impl lua
+    Function set_music_volume: 
+        Arg music: 
+            Wrap Music
+        Arg volume: 
+            Type double
+        Doc Set the volume of the given music object.
+        MapWrapTo lyte_core.music_set_volume
+        Impl lua
+    Function set_music_pan: 
+        Arg music: 
+            Wrap Music
+        Arg pan: 
+            Type double
+        Doc Set the pan of the given music object.
+        MapWrapTo lyte_core.music_set_volume
+        Impl lua
+    Function set_music_pitch: 
+        Arg music: 
+            Wrap Music
+        Arg pitch: 
+            Type double
+        Doc Set the pitch of the given music object.
+        MapWrapTo lyte_core.music_set_pitch
+        Impl lua
+    Function get_music_volume: 
+        Arg music: 
+            Wrap Music
+        Ret val: 
+            Type double
+        Doc Get the volume of the given music object.
+        MapWrapTo lyte_core.music_get_volume
+        Impl lua
+    Function get_music_pan: 
+        Arg music: 
+            Wrap Music
+        Ret val: 
+            Type double
+        Doc Get the pan of the given music object.
+        MapWrapTo lyte_core.music_get_pan
+        Impl lua
+    Function get_music_pitch: 
+        Arg music: 
+            Wrap Music
+        Ret val: 
+            Type double
+        Doc Get the pitch of the given music object.
+        MapWrapTo lyte_core.music_get_pitch
+        Impl lua
+    Function cleanup_sound: 
+        Arg sound: 
+            Wrap Sound
+        Doc Free Sound resources
+        MapWrapTo lyte_core.sound_cleanup
+        Impl lua
+    Function load_sound: 
+        Arg sound_path: 
+            Type string
+        Ret val: 
+            Wrap Sound
+        Doc Load the sound specified in the path.
+        MapWrapTo lyte_core.sound_load
+        Impl lua
+    Function clone_sound: 
+        Arg orig: 
+            Wrap Sound
+        Ret val: 
+            Wrap Sound
+        Doc Clone the sound specified in the path.
+        MapWrapTo lyte_core.sound_clone
+        Impl lua
+    Function play_sound: 
+        Arg sound: 
+            Wrap Sound
+        Doc Play the sound.
+        MapWrapTo lyte_core.sound_play
+        Impl lua
+    Function pause_sound: 
+        Arg sound: 
+            Wrap Sound
+        Doc Pause the sound.
+        MapWrapTo lyte_core.sound_pause
+        Impl lua
+    Function resume_sound: 
+        Arg sound: 
+            Wrap Sound
+        Doc Resume the sound.
+        MapWrapTo lyte_core.sound_resume
+        Impl lua
+    Function stop_sound: 
+        Arg sound: 
+            Wrap Sound
+        Doc Stop the sound.
+        MapWrapTo lyte_core.sound_stop
+        Impl lua
+    Function is_sound_playing: 
+        Arg sound: 
+            Wrap Sound
+        Ret val: 
+            Type bool
+        Doc Check if the given sound is playing.
+        MapWrapTo lyte_core.sound_is_playing
+        Impl lua
+    Function set_sound_volume: 
+        Arg sound: 
+            Wrap Sound
+        Arg volume: 
+            Type double
+        Doc Set the volume of the given sound object.
+        MapWrapTo lyte_core.sound_set_volume
+        Impl lua
+    Function set_sound_pan: 
+        Arg sound: 
+            Wrap Sound
+        Arg pan: 
+            Type double
+        Doc Set the pan of the given sound object.
+        MapWrapTo lyte_core.sound_set_pan
+        Impl lua
+    Function set_sound_pitch: 
+        Arg sound: 
+            Wrap Sound
+        Arg pitch: 
+            Type double
+        Doc Set the pitch of the given sound object.
+        MapWrapTo lyte_core.sound_set_pitch
+        Impl lua
+    Function get_sound_volume: 
+        Arg sound: 
+            Wrap Sound
+        Ret val: 
+            Type double
+        Doc Get the volume of the given sound object.
+        MapWrapTo lyte_core.sound_get_volume
+        Impl lua
+    Function get_sound_pan: 
+        Arg sound: 
+            Wrap Sound
+        Ret val: 
+            Type double
+        Doc Get the pan of the given sound object.
+        MapWrapTo lyte_core.sound_get_pan
+        Impl lua
+    Function get_sound_pitch: 
+        Arg sound: 
+            Wrap Sound
+        Ret val: 
+            Type double
+        Doc Get the pitch of the given sound object.
+        MapWrapTo lyte_core.sound_get_pitch
+        Impl lua
+    Function load_textfile: 
+        MapTo lyte_core.load_textfile
+    Function save_textfile: 
+        MapTo lyte_core.save_textfile
+    Function save_textfile_append: 
+        MapTo lyte_core.save_textfile_append
+    Function push_matrix: 
+        MapTo lyte_core.push_matrix
+    Function pop_matrix: 
+        MapTo lyte_core.pop_matrix
+    Function reset_matrix: 
+        MapTo lyte_core.reset_matrix
+    Function translate: 
+        MapTo lyte_core.translate
+    Function rotate: 
+        MapTo lyte_core.rotate
+    Function rotate_at: 
+        MapTo lyte_core.rotate_at
+    Function scale: 
+        MapTo lyte_core.scale
+    Function scale_at: 
+        MapTo lyte_core.scale_at
+    Function set_default_blendmode: 
+        MapTo lyte_core.set_default_blendmode
+    Function set_blendmode: 
+        MapTo lyte_core.set_blendmode
+    Function reset_blendmode: 
+        MapTo lyte_core.reset_blendmode
+    Function set_default_filtermode: 
+        MapTo lyte_core.set_default_filtermode
+    Function set_filtermode: 
+        MapTo lyte_core.set_filtermode
+    Function reset_filtermode: 
+        MapTo lyte_core.reset_filtermode
+    Dict UniformNamesToTypes: 
+        Type string
+        Type UniformType
+    Function cleanup_shaderbuilder: 
+        Arg shaderbuilder: 
+            Wrap ShaderBuilder
+        Doc Free ShaderBuilder resources
+        MapWrapTo lyte_core.shaderbuilder_cleanup
+        Impl lua
+    Function new_shaderbuilder: 
+        Ret val: 
+            Wrap ShaderBuilder
+        Doc Create a ShaderBuilder object.
+        MapWrapTo lyte_core.shaderbuilder_new
+        Impl lua
+    Function shaderbuilder_uniform: 
+        Arg shaderbuilder: 
+            Wrap ShaderBuilder
+        Arg uniform_name: 
+            Type string
+        Arg uniform_type: 
+            Type UniformType
+        Doc Add uniform definition to the shaderbuilder
+        MapWrapTo lyte_core.shaderbuilder_uniform
+        Impl lua
+    Function shaderbuilder_vertex: 
+        Arg shaderbuilder: 
+            Wrap ShaderBuilder
+        Arg vertex_code: 
+            Type string
+        Doc Add vertex code to the shaderbuilder
+        MapWrapTo lyte_core.shaderbuilder_vertex
+        Impl lua
+    Function shaderbuilder_fragment: 
+        Arg shaderbuilder: 
+            Wrap ShaderBuilder
+        Arg fragment_code: 
+            Type string
+        Doc Add fragment to the shaderbuilder
+        MapWrapTo lyte_core.shaderbuilder_fragment
+        Impl lua
+    Function shaderbuilder_build: 
+        Arg shaderbuilder: 
+            Wrap ShaderBuilder
+        Ret shader: 
+            Wrap Shader
+        Doc Add fragment to the shaderbuilder
+        MapWrapTo lyte_core.shaderbuilder_build
+        Impl lua
+    Function cleanup_shader: 
+        Arg shader: 
+            Wrap Shader
+        Doc Free Shader resources
+        MapWrapTo lyte_core.shader_cleanup
+        Impl lua
+    Record ShaderDef: 
+        Field frag: 
+            Type string
+        Field vert: 
+            Type string
+        Field uniforms: 
+            Type UniformNamesToTypes
+        Doc Shader definition: uniforms declaration, vertex and fragment shader code.
+    Function new_shader: 
+        Arg shaderdef: 
+            Wrap ShaderDef
+        Ret val: 
+            Wrap Shader
+        Doc Create a shader with given specification.
+        Impl lua
+        Code function(def)
+    assert(def.uniforms)
+    assert(def.vert)
+    assert(def.frag)
+    local sb = lyte.new_shaderbuilder()
+    for k,v in pairs(def.uniforms) do
+        sb:uniform(k, v)
+    end
+    sb:vertex(def.vert)
+    sb:fragment(def.frag)
+    local shader = sb:build()
+    return shader;
+end
+
+    Function set_shader: 
+        Arg shader: 
+            Wrap Shader
+        Doc Set the custom shader and use it for consequent calls.
+        MapWrapTo lyte_core.shader_set
+        Impl lua
+    Function reset_shader: 
+        MapTo lyte_core.reset_shader
+    Function set_shader_uniform: 
+        Arg shader: 
+            Wrap Shader
+        Arg uniform_name: 
+            Type string
+        Arg uniform_value: 
+            Type ShaderUniformValue
+        Doc Set the specified uniform.
+        Impl lua
+        Code function (shader, uniform_name, uniform_value)
+    -- check the value type for one of the following, and call the "right" func
+      -- shader_set_uniform_float
+      -- shader_set_uniform_floatvec4
+      -- shader_set_uniform_image
+    local vt = type(uniform_value)
+    if vt == "number" then
+        -- send float
+        lyte_core.shader_set_uniform_float(shader.id, uniform_name, uniform_value)
+    elseif vt == "table" then
+        -- number table? or "data" table? check metatable for "Image" and also check count "#"
+        if #uniform_value > 0 then
+            lyte_core.shader_set_uniform_floatvec4(shader.id, uniform_name, uniform_value)
+        elseif getmetatable(uniform_value) == lyte.Image then
+            local img_id = uniform_value.id
+            lyte_core.shader_set_uniform_image(shader.id, uniform_name, img_id)
+        else
+            error("Unknown type for uniform_value in set_shader_uniform. Expected: float, float list or lyte.Image")
+        end
+    else
+        error("Unknown value type for uniform_value in set_shader_uniform")
+    end
+end
+
+    Function reset_shader_uniform: 
+        Arg shader: 
+            Wrap Shader
+        Arg uniform_name: 
+            Type string
+        Doc Reset the specified uniform.
+        MapWrapTo lyte_core.shader_reset_uniform
+        Impl lua
+    Record Image: 
+        Field width: 
+            Type int
+            MapRead get_image_width
+        Field height: 
+            Type int
+            MapRead get_image_height
+        Field is_canvas: 
+            Type bool
+            MapRead is_image_canvas
+        Method __gc: 
+            MapTo cleanup_image
+        Doc Image type
+    Record ImageBatch: 
+        Field rect_count: 
+            Type int
+            MapRead get_imagebatch_rect_count
+        Method add_rect: 
+            MapTo add_imagebatch_rect
+        Method draw: 
+            MapTo draw_imagebatch
+        Method reset: 
+            MapTo reset_imagebatch
+        Method __gc: 
+            MapTo cleanup_imagebatch
+        Doc ImageBatch type.
+    Record Font: 
+        Method __gc: 
+            MapTo cleanup_font
+        Doc Font type.
+    Record Music: 
+        Field playing: 
+            Type bool
+            MapRead is_music_playing
+        Field length: 
+            Type double
+            MapRead get_music_length
+        Field length_played: 
+            Type double
+            MapRead get_music_length_played
+        Field pan: 
+            Type double
+            MapRead get_music_pan
+            MapWrite set_music_pan
+        Field pitch: 
+            Type double
+            MapRead get_music_pitch
+            MapWrite set_music_pitch
+        Field volume: 
+            Type double
+            MapRead get_music_volume
+            MapWrite set_music_volume
+        Method play: 
+            MapTo play_music
+        Method pause: 
+            MapTo pause_music
+        Method resume: 
+            MapTo resume_music
+        Method stop: 
+            MapTo stop_music
+        Method seek: 
+            MapTo seek_music
+        Method __gc: 
+            MapTo cleanup_music
+        Doc Music type.
+    Record Sound: 
+        Field pan: 
+            Type double
+            MapRead get_sound_pan
+            MapWrite set_sound_pan
+        Field pitch: 
+            Type double
+            MapRead get_sound_pitch
+            MapWrite set_sound_pitch
+        Field volume: 
+            Type double
+            MapRead get_sound_volume
+            MapWrite set_sound_volume
+        Method clone: 
+            MapTo clone_sound
+        Method pause: 
+            MapTo pause_sound
+        Method play: 
+            MapTo play_sound
+        Method resume: 
+            MapTo resume_sound
+        Method stop: 
+            MapTo stop_sound
+        Method __gc: 
+            MapTo cleanup_sound
+        Doc Sound type.
+    List FloatVec4: 
+        Type float
+        MaxCount 4
+        Doc Float values
+    Variant ShaderUniformValue: 
+        Option float_val: 
+            Type float
+            Doc Note: Used for single numbers, int or float
+        Option vec_val: 
+            Type FloatVec4
+        Option sampler2D_val: 
+            Type Image
+        Doc Shader uniform value
+    Record Shader: 
+        Method set: 
+            MapTo set_shader_uniform
+        Method reset: 
+            MapTo reset_shader_uniform
+        Method __gc: 
+            MapTo cleanup_shader
+        Doc Shader type
+    Record ShaderBuilder: 
+        Method uniform: 
+            MapTo shaderbuilder_uniform
+        Method vertex: 
+            MapTo shaderbuilder_vertex
+        Method fragment: 
+            MapTo shaderbuilder_fragment
+        Method build: 
+            MapTo shaderbuilder_build
+        Method __gc: 
+            MapTo cleanup_shaderbuilder
+        Doc ShaderBuilder type
+
+

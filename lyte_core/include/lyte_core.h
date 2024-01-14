@@ -3,8 +3,9 @@
 #ifndef LYTE_CORE_H_INCLUDED
 #define LYTE_CORE_H_INCLUDED
 
+#include "lyte_enums.h"
+#include "lyte_types.h"
 
-#include "api_generated.h" // types and enums
 
 #if defined(__EMSCRIPTEN__)
 #include <emscripten/emscripten.h>

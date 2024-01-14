@@ -125,13 +125,14 @@ int lyte_load_music(const char *path, lyte_Music *mus) {
     mi->music.looping = true;
 
 
-    mus->ptr = mi;
+    // mus = (lyte_Music *)&mi;
+    *mus = mi;
     PHYSFS_close(file);
     return 0;
 }
 
 int lyte_Music_cleanup(lyte_Music mus) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (musicitem == NULL) {
         return 0;
     }
@@ -143,7 +144,7 @@ int lyte_Music_cleanup(lyte_Music mus) {
 }
 
 int lyte_play_music(lyte_Music mus) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -157,7 +158,7 @@ int lyte_play_music(lyte_Music mus) {
 }
 
 int lyte_pause_music(lyte_Music mus) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -167,7 +168,7 @@ int lyte_pause_music(lyte_Music mus) {
 }
 
 int lyte_resume_music(lyte_Music mus) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -177,7 +178,7 @@ int lyte_resume_music(lyte_Music mus) {
 }
 
 int lyte_stop_music(lyte_Music mus) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -188,7 +189,7 @@ int lyte_stop_music(lyte_Music mus) {
 }
 
 int lyte_is_music_playing(lyte_Music mus, bool *val) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -198,7 +199,7 @@ int lyte_is_music_playing(lyte_Music mus, bool *val) {
 }
 
 int lyte_get_music_volume(lyte_Music mus, double *val) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -208,7 +209,7 @@ int lyte_get_music_volume(lyte_Music mus, double *val) {
 }
 
 int lyte_get_music_pan(lyte_Music mus, double *val) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -218,7 +219,7 @@ int lyte_get_music_pan(lyte_Music mus, double *val) {
 }
 
 int lyte_get_music_pitch(lyte_Music mus, double *val) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -228,7 +229,7 @@ int lyte_get_music_pitch(lyte_Music mus, double *val) {
 }
 
 int lyte_get_music_length(lyte_Music mus, double *secs) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -238,7 +239,7 @@ int lyte_get_music_length(lyte_Music mus, double *secs) {
 }
 
 int lyte_get_music_length_played(lyte_Music mus, double *secs) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -248,7 +249,7 @@ int lyte_get_music_length_played(lyte_Music mus, double *secs) {
 }
 
 int lyte_set_music_volume(lyte_Music mus, double vol) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -259,7 +260,7 @@ int lyte_set_music_volume(lyte_Music mus, double vol) {
 }
 
 int lyte_set_music_pan(lyte_Music mus, double pan) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -270,7 +271,7 @@ int lyte_set_music_pan(lyte_Music mus, double pan) {
 }
 
 int lyte_set_music_pitch(lyte_Music mus, double pitch) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -281,7 +282,7 @@ int lyte_set_music_pitch(lyte_Music mus, double pitch) {
 }
 
 int lyte_seek_music(lyte_Music mus, double secs) {
-    MusicItem *musicitem = mus.ptr;
+    MusicItem *musicitem = mus;
     if (!musicitem) {
         fprintf(stderr, "Music not found\n");
         return -1;
@@ -322,13 +323,14 @@ int lyte_load_sound(const char * path, lyte_Sound *val) {
     SetSoundPan(si->sound, si->pan);
     SetSoundPitch(si->sound, si->pitch);
 
-    val->ptr = si;
+    // val = (lyte_Sound *)&si;
+    *val = si;
     PHYSFS_close(file);
     return 0;
 }
 
 int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
-    SoundItem *si = orig.ptr;
+    SoundItem *si = orig;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -348,12 +350,13 @@ int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
     SetSoundVolume(nsi->sound, nsi->volume);
     SetSoundPan(nsi->sound, nsi->pan);
     SetSoundPitch(nsi->sound, nsi->pitch);
-    val->ptr = nsi;
+    // val = (lyte_Sound*)&nsi;
+    *val = nsi;
     return 0;
 }
 
 int lyte_Sound_cleanup(lyte_Sound sound) {
-    SoundItem *si = sound.ptr;
+    SoundItem *si = sound;
     if (si == NULL) {
         return 0;
     }
@@ -374,7 +377,7 @@ int lyte_Sound_cleanup(lyte_Sound sound) {
 }
 
 int lyte_play_sound(lyte_Sound snd) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -384,7 +387,7 @@ int lyte_play_sound(lyte_Sound snd) {
 }
 
 int lyte_pause_sound(lyte_Sound snd) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -394,7 +397,7 @@ int lyte_pause_sound(lyte_Sound snd) {
 }
 
 int lyte_resume_sound(lyte_Sound snd) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -404,7 +407,7 @@ int lyte_resume_sound(lyte_Sound snd) {
 }
 
 int lyte_stop_sound(lyte_Sound snd) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -414,7 +417,7 @@ int lyte_stop_sound(lyte_Sound snd) {
 }
 
 int lyte_is_sound_playing(lyte_Sound snd, bool *val) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -424,7 +427,7 @@ int lyte_is_sound_playing(lyte_Sound snd, bool *val) {
 }
 
 int lyte_get_sound_volume(lyte_Sound snd, double *val) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -434,7 +437,7 @@ int lyte_get_sound_volume(lyte_Sound snd, double *val) {
 }
 
 int lyte_get_sound_pan(lyte_Sound snd, double *val) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -444,7 +447,7 @@ int lyte_get_sound_pan(lyte_Sound snd, double *val) {
 }
 
 int lyte_get_sound_pitch(lyte_Sound snd, double *val) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -454,7 +457,7 @@ int lyte_get_sound_pitch(lyte_Sound snd, double *val) {
 }
 
 int lyte_set_sound_volume(lyte_Sound snd, double volume) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -465,7 +468,7 @@ int lyte_set_sound_volume(lyte_Sound snd, double volume) {
 }
 
 int lyte_set_sound_pan(lyte_Sound snd, double pan) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;
@@ -476,7 +479,7 @@ int lyte_set_sound_pan(lyte_Sound snd, double pan) {
 }
 
 int lyte_set_sound_pitch(lyte_Sound snd, double pitch) {
-    SoundItem *si = snd.ptr;
+    SoundItem *si = snd;
     if (si == NULL) {
         fprintf(stderr, "Sound not found\n");
         return -1;

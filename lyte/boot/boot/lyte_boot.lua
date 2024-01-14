@@ -1,4 +1,42 @@
---[[ (c) mg ]]
+-- mg
+
+-- TODO: cleanup globals
+
+local function classnew_ctor(ctor_method_name)
+    ctor_method_name = ctor_method_name or "__new"
+    assert(type(ctor_method_name == "string"))
+
+    local classnew = function(tbl, ...)
+        tbl.__index = tbl.__index or tbl
+        local inst = setmetatable({}, tbl)
+        -- ctor (with the given name. __new if nothing given)
+        if tbl[ctor_method_name] then
+            local ok, err = pcall(tbl[ctor_method_name], inst, ...)
+            if  not ok then
+                print(err)
+                error(err)
+            end
+        end
+        -- dtor (with the name __gc)
+        -- this works with types defined in lua tables in 5.1 via "newproxy(true)" hack
+        if tbl[__gc] then
+            local proxy_for_gc = newproxy(true)
+            getmetatable(proxy_for_gc).__gc = function()
+                local ok, err = pcall(tbl.__gc, inst)
+                if  not ok then
+                    print(err)
+                end
+            end
+        end
+        return inst
+    end
+
+    return classnew
+end
+
+
+classnew = classnew_ctor("__new")
+
 
 local TAB_WIDTH = 4
 local TAB_WHITESPACE = (" "):rep(TAB_WIDTH)
@@ -21,16 +59,12 @@ lyte = lyte or {}
 table.unpack = table.unpack or unpack
 unpack = unpack or table.unpack
 
---
-
-
 
 local error_title = "Error"
 
 -- TODO: global or under lyte
 -- this will be used to help dev time
 -- errors will be visible on the window instead of crashing/cmdline
-
 
 -- _G.LYTE_TEAL_LAX_MODE = true
 _G.LYTE_TEAL_LAX_MODE = false
@@ -105,7 +139,7 @@ local function get_error_line(text)
 
     line_num = tonumber(line_num)
 
-    local file = lyte.load_textfile(path)
+    local file = lyte_core.load_textfile(path)
     local line_i = 1
     for line in file:gmatch(LINES_PATTERN) do
         if line_i == line_num then
@@ -137,25 +171,6 @@ if not lyte.tick then
 end
 
 
-
-
--- shader helper (ShaderDef interface)
-
-lyte.new_shader = function(def)
-    assert(def.uniforms)
-    assert(def.vert)
-    assert(def.frag)
-    local sb = lyte.new_shaderbuilder()
-    for k,v in pairs(def.uniforms) do
-        sb:uniform(k, v)
-    end
-    sb:vertex(def.vert)
-    sb:fragment(def.frag)
-    local shader = sb:build()
-    return shader;
-end
-
-
 local function run_many(codestr, filename, ...)
     local x,y,a,b,c,d,e,f,g
     x,y,a,b,c,d,e,f,g = pcall(loadstring(codestr, "@"..filename), ...)
@@ -170,30 +185,28 @@ local function run_many(codestr, filename, ...)
 end
 
 
--- loaders (note: lua loader is also here!)
--- BOTH LUA AND FENNEL LUADERS HERE
-
 local fnl_file = "/lyte_boot_libs/fennel_lib.lua"
-local fnl_src = lyte.load_textfile(fnl_file)
+local fnl_src = lyte_core.load_textfile(fnl_file)
 _G.fennel = loadstring(fnl_src, fnl_file)()
 
 local lulpeg_file = "/lyte_boot_libs/lulpeg.lua"
-local lulpeg_src = lyte.load_textfile(lulpeg_file)
+local lulpeg_src = lyte_core.load_textfile(lulpeg_file)
 _G.lpeg = loadstring(lulpeg_src, lulpeg_file)()
 
 local tl_file = "/lyte_boot_libs/tl.lua"
-local tl_src = lyte.load_textfile(tl_file)
+local tl_src = lyte_core.load_textfile(tl_file)
 _G.tl = loadstring(tl_src, tl_file)()
 
 
--- TODO: lyte.file_exists() API to get rid of file not exists warnings
+-- TODO/Consider: lyte.file_exists() API to get rid of file not exists warnings
+--   not visible in gui version of windows build (which is the "production" build) so lower priority
 local function load_lua_file_or_dir_module(modulename, ext)
     local filename = modulename:gsub("%.", "/")  .. "." .. ext
-    local code_str = lyte.load_textfile(filename)
+    local code_str = lyte_core.load_textfile(filename)
     if not code_str then
         -- try "dir/init.lua" variation
         filename = modulename:gsub("%.", "/")  .. "/init." .. ext
-        code_str = lyte.load_textfile(filename)
+        code_str = lyte_core.load_textfile(filename)
     end
     return code_str, filename
 end
@@ -203,7 +216,7 @@ local function lyte_lua_loader(modulename)
     local code_str = nil
     code_str, filename = load_lua_file_or_dir_module(modulename, "lua")
     -- filename = modulename:gsub("%.", "/")  .. ".lua"
-    -- code_str = lyte.load_textfile(filename)
+    -- code_str = lyte_core.load_textfile(filename)
     if code_str then
         return function(...)
             return run_many(code_str, filename, ...)
@@ -221,7 +234,7 @@ local function make_lyte_searcher(env)
 
         for _, ext in ipairs(languages) do
             -- filename = modulename:gsub("%.", "/")  .. "." .. ext
-            -- code_str = lyte.load_textfile(filename)
+            -- code_str = lyte_core.load_textfile(filename)
             code_str, filename = load_lua_file_or_dir_module(modulename, ext)
             if code_str then
                 lang = ext
@@ -239,7 +252,7 @@ local function make_lyte_searcher(env)
             return function(...)
                 -- macro loader vs function loader
                 if env == "_COMPILER" then
-                    -- macro loadewr
+                    -- macro loader
                     return fennel.eval(code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename}, ...)
                 else
                     local x, y = pcall(fennel.compileString, code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename})
@@ -273,12 +286,18 @@ local function make_lyte_searcher(env)
     return loader_lyte
 end
 
+
 table.insert(package.loaders, 2, lyte_lua_loader)
 
 table.insert(package.loaders, 3, make_lyte_searcher(nil))
 table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
 
 
+-- load  generated APIs
+local req_gen_code, err_gen_code = pcall(require, "api_lyte_gen") -- Lua part of the generated API code
+if not req_gen_code then
+    print("Internal error: " .. err_gen_code)
+end
 
 -- REPL helpers
 
@@ -317,34 +336,18 @@ end
 if LYTE_REPL_REQUESTED == "fennel" or LYTE_REPL_REQUESTED == "fnl" then
     _G.LYTE_SET_REPL_FENNEL()
 else
-    -- tl (teal) based repl doesn't make much sense
+    -- Note: Teal based repl doesn't make much sense
     _G.LYTE_SET_REPL_LUA()
 end
 
--- APP LOADER
-
--- if not LYTE_APP_MODULENAME then
---     error("Internal error: Expecting LYTE_APP_MODULENAME. Not found")
--- end
-
--- require(LYTE_APP_MODULENAME)
-
-
-
-
-
-
+-- this function can be overridden (carefully) in conf
 local tick_loading = function(dt, w, h)
-    -- this can be overridden (carefully) in conf
-    -- lyte.cls(1, 1, 0, 1)
     lyte.set_color(1, 1, 1, 1)
     lyte.draw_text("loading", w/2-10, h/2-5)
 end
 
 
--- try to see if a "config.lua/fnl" file exists here.. it may set up window before everything else
 local loaded_cfg, _cfg = pcall(require, "config")
--- local _cfg = require("config")
 
 -- DEFAULTS
 local _def = {
@@ -363,8 +366,11 @@ if not lyte.tick_loading then
     lyte.tick_loading = tick_loading
 end
 
+
 -- before window opens
-lyte.set_window_resizable(_def.resizable)
+lyte_core.set_window_resizable(false)
+lyte_core.set_window_resizable(_def.resizable)
+
 -- window opens below
 lyte.set_window_size(_def.W, _def.H)
 lyte.set_window_title(_def.title)
@@ -372,14 +378,7 @@ lyte.set_window_vsync(_def.vsync)
 lyte.set_default_filtermode(_def.default_filtermode)
 lyte.set_default_blendmode(_def.default_blendmode)
 lyte.set_fullscreen(_def.fullscreen)
-
 lyte.set_window_icon_file("lyte_boot_assets/icon.png")
 
-local default_font = lyte.load_font("/lyte_boot_assets/monogram-extended.ttf", 26)
-
-function lyte.reset_font()
-    lyte.set_font(default_font)
-end
-
-
+lyte._default_font = lyte._default_font or lyte.load_font("/lyte_boot_assets/monogram-extended.ttf", 13 * 2)
 lyte.reset_font()

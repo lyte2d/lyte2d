@@ -1,476 +1,378 @@
----------------------------------------------------------------------------------------------
--- API definition helpers
----------------------------------------------------------------------------------------------
+Tag = require "lib.tag.tag"
 
-local M = {}
 
-do
+String = Tag"String"
+Integer = Tag"Integer"
+Float = Tag"Float"
+Double = Tag"double"
+Boolean = Tag"Boolean"
+Pointer = Tag"Pointer"
+Nil = Tag"Nil"
 
-    local function _basetype(luatype, nativetype, typename)
-        return {
-            _kind = "_UNKNOWN_basetype_TBD_",
-            luatype = luatype or "_UNKNOWN_TBD_",  -- number, boolean, string, table, userdata ...
-            nativetype = nativetype or "_UNKNOWN_TBD_", -- int32_t, double, bool, const char *, enum, ...
-            typename = typename or "PRIMITIVE"
-        }
+Record = Tag"Record"
+Namespace = Tag"Namespace"
+Field = Tag"Field"
+Variant = Tag"Variant"
+Option = Tag"Option"
+Enum = Tag"Enum"
+Dict = Tag"Dict"
+List = Tag"List"
+Function = Tag"Function"
+Method = Tag"Method"
+Arg = Tag"Arg"
+Ret = Tag"Ret"
+
+-- Records: field and method mappings
+MapTo = Tag"MapTo"
+MapRead = Tag"MapRead"
+MapWrite = Tag"MapWrite"
+
+Wrap = Tag"Wrap"
+MapWrapTo = Tag"MapWrapTo"
+
+Require = Tag"Require"
+
+Doc = Tag"Doc"
+T = Tag"Type"
+Impl = Tag"Impl"
+Code = Tag"Code"
+MaxCount = Tag"MaxCount"
+
+Bool = T"bool"
+Int = T"int"
+Float = T"float"
+Double = T"double"
+String = T"string"
+
+Pointer = T"pointer"
+
+LuaImpl = Impl"lua" -- Functions in lyte library impemented in lua instead of C (default)
+UserImpl = Impl"user" -- Functions implemented by the user, like "tick"
+
+local function check_tag(tag, kind)
+    assert (tag)
+    assert (type(tag) == "table")
+    assert (getmetatable(tag))
+    assert (getmetatable(tag).is_tag)
+    if kind then
+        assert (tag._kind == kind)
+        assert (tag._name)
+        assert (type(tag._name) == "string")
     end
-
-
-
-    -- BASE TYPES
-    function M.String()
-        return _basetype("string", "const char *")
-    end
-
-    function M.Integer()
-        return _basetype("number", "int")
-    end
-
-    function M.Float()
-        return _basetype("number", "float")
-    end
-
-    function M.Number()
-        return _basetype("number", "double")
-    end
-
-    function M.Boolean()
-        return _basetype("boolean", "bool")
-    end
-
-    function M.Pointer() -- for usage with light userdata
-        return _basetype("userdata", "void *")
-    end
-
-    function M.Nil()
-        return _basetype("nil", "void")
-    end
-
-    -- use this to specify any named type (that you defined as a record or something)
-    function M.Defined(typename) -- Image, Font etc considered "Native"
-        return _basetype(nil, nil, typename)
-    end
-
+    return true
 end
 
--- dicts have key and value types
-function M.Dict(name, key_type, value_type, _tags)
-    local ret = {}
-    ret._kind = "dict"
-    ret._tags = _tags
-    ret._name = name
-    ret.key_type = key_type
-    ret.value_type = value_type
-    return ret;
-end
-
-
--- lists have value type
-function M.List(name, value_type, _tags)
-    local ret = {}
-    ret._kind = "list"
-    ret._name = name
-    ret._tags = _tags
-    ret.value_type = value_type
-    return ret;
-end
-
-
--- tuples have value type, and a max count
-function M.Tuple(name, value_type, max_count, _tags)
-    local ret = {}
-    ret._kind = "tuple"
-    ret._name = name
-    ret._tags = _tags
-    ret.value_type = value_type
-    ret.max_count = max_count
-    return ret;
+local function get_full_function_list(ns)
+    local functions = {}
+    local function_list = ns.functions
+    for _, fn in ipairs(function_list) do
+        functions[fn.name] = fn
+    end
+    for _, req in ipairs(ns.requires) do
+        for _, fn in ipairs(req.functions) do
+            local fullname = fn.namespace .. "." .. fn.name
+            functions[fullname] = fn
+        end
+    end
+    return functions
 end
 
 
+-- collect from raw definitions to structured object
+local function to_function_obj(def, ns)
+    check_tag(def, "Function")
+    local fn = {}
+    fn.name = def._name
+    fn.namespace = ns.name
+    fn.doc = ""
+
+    fn.args = {}
+    fn.rets = {}
+    fn.impl = "native"
+    fn.code = nil
+    fn.mapto = nil
+
+    local functions = get_full_function_list(ns)
+
+    assert(#def.items > 0)
+
+    for _i, x in ipairs(def.items) do
+        check_tag(x)
+        if x._kind == "Arg" then
+            assert(#x.items > 0)
+            check_tag(x.items[1])
+            assert(x.items[1]._kind == "Type" or x.items[1]._kind == "Wrap")
+            local typename = x.items[1]._name
+            local iswrapped = x.items[1]._kind == "Wrap" or nil
+            local doc = nil
+            if #x.items >= 2 and x.items[2]._kind == "Doc" then doc = x.items[2]._name end
+            table.insert(fn.args, { name = x._name, type = typename, wrapped = iswrapped, doc = doc })
+        elseif x._kind == "Ret" then
+            assert(#x.items > 0)
+            check_tag(x.items[1])
+            assert(x.items[1]._kind == "Type" or x.items[1]._kind == "Wrap")
+            local typename = x.items[1]._name
+            local iswrapped = x.items[1]._kind == "Wrap" or nil
+            local doc = nil
+            if #x.items >= 2 and x.items[2]._kind == "Doc" then doc = x.items[2]._name end
+            table.insert(fn.rets, { name = x._name, type = typename, wrapped = iswrapped, doc = doc })
+        elseif x._kind == "Doc" then fn.doc = fn.doc .. x._name .. " "
+        elseif x._kind == "Code" then fn.code =  x._name
+        elseif x._kind == "MapTo" then fn.mapto = functions[x._name]; fn.doc = fn.doc .. fn.mapto.doc
+        elseif x._kind == "MapWrapTo" then fn.mapwrapto = functions[x._name]; -- fn.doc = fn.doc .. fn.mapto.doc
+        elseif x._kind == "Impl" then
+            assert(fn.impl == "native") -- impl can only defined once per function
+            fn.impl = x._name
+        else error("Unknown kind: " .. x._kind .. " -> " .. x._name)
+        end
+    end
+
+    return fn
+end
 
 
--- namespaces have items
--- note: namespaces can only be top level!
-function M.Namespace(name, items, _tags)
-    assert(type(name) == "string")
-    assert(type(items) == "table")
+-- collect from raw definitions to structured object
+local function to_record_obj(def, ns)
+    check_tag(def, "Record")
     local rec = {}
-    rec._kind = "namespace"
-    rec._name = name
-    rec._tags = _tags
-    rec.items = items
+    rec.name = def._name
+    rec.namespace = ns.name
+    rec.doc = ""
+    rec.fields = {}
+    rec.methods = {}
+
+    local functions = get_full_function_list(ns)
+
+    for _i, x in ipairs(def.items) do
+        check_tag(x)
+        if x._kind == "Field" then
+            assert(#x.items > 0)
+            check_tag(x.items[1])
+            local typename = x.items[1]._name
+            local mapread = nil
+            local mapwrite = nil
+            if #x.items >=2 then
+                if #x.items == 2 then
+                    check_tag(x.items[2])
+                    if (x.items[2]._kind == "MapRead") then
+                        mapread = functions[x.items[2]._name]
+                    elseif (x.items[2]._kind == "MapWrite") then
+                        mapwrite = functions[x.items[2]._name]
+                    else error("Unsupported number of parts in MapWrite def:: " .. x._kind .. " -> ." .. x._name)
+                    end
+                elseif #x.items == 3 then
+                    check_tag(x.items[2])
+                    check_tag(x.items[3])
+                    if x.items[2]._kind == "MapRead" and x.items[3]._kind == "MapWrite" then
+                        mapread = functions[x.items[2]._name]
+                        mapwrite = functions[x.items[3]._name]
+                    else error("Unsupported number of parts in MapWrite def:: " .. x._kind .. " -> ." .. x._name)
+                    end
+                else error("Unsupported number of parts in definition: " .. x._kind .. " -> ." .. x._name)
+                end
+            end
+            -- TODO: verify that field type matches with mapped read and write functions
+            -- local mreadname = mapread and mapread.name
+            -- local mwritename = mapwrite and mapwrite.name
+            table.insert(rec.fields, { name = x._name, type = typename, mapread = mapread, mapwrite = mapwrite })
+        elseif x._kind == "Method" then
+            assert(#x.items > 0)
+            check_tag(x.items[1])
+            local mapto = functions[x.items[1]._name]
+            -- table.insert(rec.methods, { name = x._name, mapto = mapto, maptoname = mapto.name })
+            table.insert(rec.methods, { name = x._name, mapto = mapto })
+        elseif x._kind == "Doc" then rec.doc = rec.doc .. x._name .. " "
+        else error("Unknown kind: " .. x._kind .. " -> " .. x._name)
+        end
+    end
+
     return rec
 end
 
+-- collect from raw definitions to structured object
+local function to_list_obj(def, nsname)
+    check_tag(def, "List")
+    local ls = {}
+    ls.name = def._name
+    ls.namespace = nsname
+    ls.doc = ""
+    ls.item_type = nil
+    ls.max_count = 0
+
+    assert(#def.items > 1)
+
+    check_tag(def.items[1])
+    if def.items[1]._kind ~= "Type" then error "List definition needs to specify item(element) type as the first item" end
+    ls.item_type = def.items[1]._name
+
+    check_tag(def.items[2])
+    if def.items[2]._kind ~= "MaxCount" then error("List definition needs to specify a max count as the second item" .. def.items[2]._kind) end
+    ls.max_count = def.items[2]._name
 
 
+    if(#def.items > 2) then
+        check_tag(def.items[3])
+        if def.items[3]._kind ~= "Doc" then error "List definition's thirt item needs to be a Doc if it exists" end
+        ls.doc = def.items[3]._name
+    end
 
--- records have fields nad methods
-function M.Record(name, fields, methods, _tags)
-    assert(type(name) == "string")
-    fields = fields or {}
-    methods = methods or {}
-    assert(type(fields) == "table")
-    assert(type(methods) == "table")
-    local rec = {}
-    rec._kind = "record"
-    rec._name = name
-    rec._tags = _tags
-    rec.fields = fields
-    rec.methods = methods
-    return rec
-end
-
--- Helper to define an Field for record or namespaces
--- Namespace and Record types have named items
-function M.Field(name, itemdef, _tags)
-    assert(type(name) == "string")
-    local ret = {}
-    ret._kind = "field"
-    ret._name = name
-    ret._tags = _tags
-    ret.value_type = itemdef
-    return ret
-end
-
-
-function M.Method(name, _tags)
-    assert(type(name) == "string")
-    local ret = {}
-    ret._kind = "method"
-    ret._name = name
-    ret._tags = _tags
-    return ret
+    return ls
 end
 
 
+-- collect from raw definitions to structured object
+local function to_dict_obj(def, nsname)
+    check_tag(def, "Dict")
+    local dict = {}
+    dict.name = def._name
+    dict.namespace = nsname
+    dict.doc = ""
+    -- should have 2 values key types, value type  (plus maybe Doc)
+    dict.key_type = nil
+    dict.value_type = nil
 
--- variants have options (themselves types)
-function M.Variant(name, options, _tags)
-    assert(type(options) == "table")
-    local rec = {}
-    rec._kind = "variant"
-    rec._name = name
-    rec._tags = _tags
-    rec.options = options
-    return rec
+    assert(#def.items > 1)
+
+    check_tag(def.items[1])
+    if def.items[1]._kind ~= "Type" then error "Dict definition needs to specify key type as the first item" end
+    dict.key_type = def.items[1]._name
+    check_tag(def.items[2])
+    if def.items[2]._kind ~= "Type" then error "Dict definition needs to specify value type as the second item" end
+    dict.value_type = def.items[2]._name
+
+    if(#def.items > 2) then
+        check_tag(def.items[3])
+        if def.items[2]._kind ~= "Doc" then error "Dict definition's third item needs to be a Doc if it exists" end
+        dict.doc = def.items[3]._name
+    end
+
+    return dict
 end
 
--- Helper to define an Option for Variant types
-function M.Option(name, itemdef, _tags)
-    local ret = {}
-    ret._kind = "option"
-    ret._name = name
-    ret._tags = _tags
-    ret.value_type = itemdef
-    return ret
+-- collect from raw definitions to structured object
+local function to_variant_obj(def, nsname)
+    check_tag(def, "Variant")
+    local variant = {}
+    variant.name = def._name
+    variant.namespace = nsname
+    variant.doc = ""
+    variant.options = {}
+
+    for _i, x in ipairs(def.items) do
+        check_tag(x)
+        if x._kind == "Option" then
+            assert(#x.items > 0)
+            check_tag(x.items[1])
+            local typename = x.items[1]._name
+            local doc = nil
+            if #x.items >= 2 and x.items[2]._kind == "Doc" then doc = x.items[2]._name end
+            table.insert(variant.options, { name = x._name, type = typename, doc = doc })
+        elseif x._kind == "Doc" then variant.doc = variant.doc .. x._name .. " "
+        else error("Unknown kind: " .. x._kind .. " -> " .. x._name)
+        end
+    end
+
+
+    return variant
 end
 
+-- collect from raw definitions to structured object
+local function to_enum_obj(def, nsname)
+    check_tag(def, "Enum")
+    local _enum = {}
+    _enum.name = def._name
+    _enum.namespace = nsname
+    _enum.doc = ""
 
-
--- enums have choices (which are strings)
-function M.Enum(name, choices, _tags)
-    assert(type(name) == "string", "name: " .. type(name))
-    local ret = {}
-    ret._kind = "enum"
-    ret._name = name
-    ret._tags = _tags
-    ret.choices = choices
-    return ret;
-end
-
-
--- functions have arg and return types specified in arrays of arg or ret values
-function M.Function(name, args, rets, _tags)
-    args = args or {}
-    rets = rets or {}
-    assert(type(args) == "table")
-    assert(type(rets) == "table")
-    assert(type(name) == "string", "name: " .. type(name))
-    local ret = {}
-    ret._kind = "function"
-    ret._name = name
-    ret._tags = _tags
-    ret.args = args
-    ret.rets = rets
-    return ret
-end
-
--- helper to define function args
-function M.Arg(name, itemdef, _tags)
-    assert(type(name) == "string")
-    local ret = {}
-    ret._kind = "arg"
-    ret._name = name
-    ret._tags = _tags
-    ret.value_type = itemdef
-    return ret
-end
-
--- helper to define function rets
-function M.Ret(name, itemdef, _tags)
-    local ret  = {}
-    ret._kind = "ret"
-    ret._name = name
-    ret._tags = _tags
-    ret.value_type = itemdef
-    return ret
-end
-
-
-
-
-
-
-function M.process(ns)
-    local ret = {}
-    ret._name = ns._name
-    assert(ns._kind == "namespace", "top level should be a 'namespace' but is '" ..  ns._kind or "nil" .. "'")
-
-    local items = ns.items
-
-    ret.enums = {}
-    ret.records = {}
-    ret.variants = {}
-    ret.lists = {}
-    ret.tuples = {}
-    ret.dicts = {}
-    ret.functions = {}
-
-    -- name -> kind mapping
-    local defined_types = {}
-    -- name -> args * rets mapping
-    local function_args_rets = {}
-
-    -- identify defined types to help with filling in information below
-    -- also function name to argument/return info mappings
-    -- also add namespaced "nativename" field to each toplevel
-    for i=1,#items do
-        local item = items[i]
-        defined_types[item._name] = item._kind
-        if item._kind == "function" then
-            function_args_rets[item._name] = {
-                args = item.args,
-                rets = item.rets,
-            }
-        end
-        item._nativename = ns._name .. "_" .. item._name
-        if item._tags and item._tags.ctor then
-            item._nativename = item._nativename .. "_ctor"
-        end
-        if item._tags and item._tags.c_api_skip then
-            item._nativename = "_c_skip_" .. item._nativename
+    _enum.values = {}
+    for _, x in ipairs(def.items) do
+        if type(x) == "string" then table.insert(_enum.values, x)
+        elseif check_tag(x) and x._kind == "Doc" then _enum.doc = _enum.doc .. x._name
+        else error("Unknown kind: " .. x._kind .. " -> " .. x._name)
         end
     end
-
-    local function kind_to_nativetype(kind, typename)
-        if kind == "function" then return "C_UNKNOWN__fn"
-        elseif kind == "record" then return ret._name .. "_" .. typename
-        elseif kind == "variant" then return ret._name .. "_" .. typename
-        elseif kind == "enum" then return ret._name .. "_" .. typename
-        elseif kind == "list" then return ret._name .. "_" .. typename
-        elseif kind == "tuple" then return ret._name .. "_" .. typename
-        elseif kind == "dict" then return ret._name .. "_" .. typename
-        else error("Unknown kind: " .. kind) end
-    end
-
-    local function kind_to_luatype(kind)
-        if kind == "function" then return "function"
-        elseif kind == "record" then return "userdata"
-        elseif kind == "variant" then return "__UNKNOWN_one_of_" .. ret._name .. "__"
-        elseif kind == "enum" then return "string"
-        elseif kind == "list" then return "table"
-        elseif kind == "tuple" then return "table"
-        elseif kind == "dict" then return "table"
-        else error("Unknown kind" .. kind) end
-    end
-
-    local function kind_to_lua_metatable(kind, typename)
-        if kind == "record" then
-            return ret._name .. "." .. typename
-        end
-        return nil
-    end
-
-    -- enums
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "enum" then
-            table.insert(ret.enums, item)
-        end
-    end
-
-
-    -- records
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "record" then
-            for j=1,#item.fields do
-                local field = item.fields[j]
-                -- field
-                if field.value_type.typename ~= "PRIMITIVE" then
-                    local kind = defined_types[field.value_type.typename]
-                    field.value_type.luatype = kind_to_luatype(kind)
-                    field.value_type.nativetype = kind_to_nativetype(kind, field.value_type.typename)
-                    field.value_type.metatable = kind_to_lua_metatable(kind, field.value_type.typename)
-                    field.value_type._kind = kind
-                else
-                    field.value_type._kind = "primitive"
-                    field.value_type.typename = nil
-                end
-            end
-
-            -- arg and ret info for this method, from the mapped function
-            for j=1,#item.methods do
-                local method = item.methods[j]
-                local mapped_fn = function_args_rets[method._tags.map_to]
-                if mapped_fn then
-                    method.args = mapped_fn.args
-                    method.rets = mapped_fn.rets
-                else
-                    error("No fn mapping found for the method: " .. method._name .. " from record: " .. item._name)
-                    method.args = "_UNKNOWN_METHOD_ARGS"
-                    method.rets = "_UNKNOWN_METHOD_RETS"
-                end
-            end
-
-            table.insert(ret.records, item)
-        end
-    end
-
-    -- variants
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "variant" then
-            for j=1,#item.options do
-                local opt = item.options[j]
-                -- opt
-                if opt.value_type.typename ~= "PRIMITIVE" then
-                    local kind = defined_types[opt.value_type.typename]
-                    opt.value_type.luatype = kind_to_luatype(kind)
-                    opt.value_type.nativetype = kind_to_nativetype(kind, opt.value_type.typename)
-                    opt.value_type.metatable = kind_to_lua_metatable(kind, opt.value_type.typename)
-                    opt.value_type._kind = kind
-                else
-                    opt.value_type._kind = "primitive"
-                    opt.value_type.typename = nil
-
-                end
-            end
-            table.insert(ret.variants, item)
-        end
-    end
-
-
-    -- lists
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "list" then
-            -- list key
-            if item.value_type.typename ~= "PRIMITIVE" then
-                local kind = defined_types[item.value_type.typename]
-                item.value_type.luatype = kind_to_luatype(kind)
-                item.value_type.nativetype = kind_to_nativetype(kind, item.value_type.typename)
-                item.value_type.metatable = kind_to_lua_metatable(kind, item.value_type.typename)
-                item.value_type._kind = kind
-            else
-                item.value_type._kind = "primitive"
-                item.value_type.typename = nil
-            end
-            table.insert(ret.lists, item)
-        end
-    end
-
-    -- tuples
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "tuple" then
-            -- list key
-            if item.value_type.typename ~= "PRIMITIVE" then
-                local kind = defined_types[item.value_type.typename]
-                item.value_type.luatype = kind_to_luatype(kind)
-                item.value_type.nativetype = kind_to_nativetype(kind, item.value_type.typename)
-                item.value_type.metatable = kind_to_lua_metatable(kind, item.value_type.typename)
-                item.value_type._kind = kind
-            else
-                item.value_type._kind = "primitive"
-                item.value_type.typename = nil
-            end
-            table.insert(ret.tuples, item)
-        end
-    end
-
-    -- dicts
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "dict" then
-            -- dict key
-            if item.key_type.typename ~= "PRIMITIVE" then
-                local kind = defined_types[item.key_type.typename]
-                item.key_type.luatype = kind_to_luatype(kind)
-                item.key_type.nativetype = kind_to_nativetype(kind, item.key_type.typename)
-                item.key_type.metatable = kind_to_lua_metatable(kind, item.key_type.typename)
-                item.key_type._kind = kind
-            else
-                item.key_type._kind = "primitive"
-                item.key_type.typename = nil
-            end
-            -- dict val
-            if item.value_type.typename ~= "PRIMITIVE" then
-                local kind = defined_types[item.value_type.typename]
-                item.value_type.luatype = kind_to_luatype(kind)
-                item.value_type.nativetype = kind_to_nativetype(kind, item.value_type.typename)
-                item.value_type.metatable = kind_to_lua_metatable(kind, item.value_type.typename)
-                item.value_type._kind = kind
-            else
-                item.value_type._kind = "primitive"
-                item.value_type.typename = nil
-            end
-            table.insert(ret.dicts, item)
-        end
-    end
-
-    -- functions
-    for i=1,#items do
-        local item = items[i]
-        if item._kind == "function" then
-            for j=1,#item.args do
-                local arg = item.args[j]
-                -- arg
-                if arg.value_type.typename ~= "PRIMITIVE" then
-                    local kind = defined_types[arg.value_type.typename]
-                    arg.value_type.luatype = kind_to_luatype(kind)
-                    arg.value_type.nativetype = kind_to_nativetype(kind, arg.value_type.typename)
-                    arg.value_type.metatable = kind_to_lua_metatable(kind, arg.value_type.typename)
-                    arg.value_type._kind = kind;
-                else
-                    arg.value_type._kind = "primitive"
-                    arg.value_type.typename = nil
-                end
-            end
-            for j=1,#item.rets do
-                local ret = item.rets[j]
-                -- ret
-                if ret.value_type.typename ~= "PRIMITIVE" then
-                    local kind = defined_types[ret.value_type.typename]
-                    ret.value_type.luatype = kind_to_luatype(kind)
-                    ret.value_type.nativetype = kind_to_nativetype(kind, ret.value_type.typename)
-                    ret.value_type.metatable = kind_to_lua_metatable(kind, ret.value_type.typename)
-                    ret.value_type._kind = kind
-                else
-                    ret.value_type._kind = "primitive"
-                    ret.value_type.typename = nil
-                end
-            end
-
-            table.insert(ret.functions, item)
-        end
-    end
-
-
-    return ret
+    return _enum
 end
 
 
-return M
+-- collect from raw definitions to structured object
+local function to_namespace_obj(def, parent_ns_name)
+    check_tag(def, "Namespace")
+    parent_ns_name = parent_ns_name or nil
+    local NS = {}
+    NS.name = def._name
+    NS.namespaces = parent_ns_name
+    NS.doc = ""
+    NS.requires = {}
+    NS.functions = {}
+    NS.records = {}
+    NS.lists = {}
+    NS.dicts = {}
+    NS.variants = {}
+    NS.enums = {}
+    NS.namespaces = {}
+
+    -- seperate loops: anything can have dependencies on "Required" libraries. thus handle all those first
+    for _i, x in ipairs(def.items) do
+        check_tag(x)
+        if x._kind == "Require" then
+            local req = require(x._name).tree
+            -- local req_ns = req.name
+            -- -- update names to be "namespaced" names
+            -- for _i, x in ipairs(req.functions) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- for _i, x in ipairs(req.records) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- for _i, x in ipairs(req.lists) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- for _i, x in ipairs(req.dicts) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- for _i, x in ipairs(req.variants) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- for _i, x in ipairs(req.enums) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- for _i, x in ipairs(req.namespaces) do if x.name then x.name = req_ns .. "." .. x.name end end
+            -- -- Note: this doesn't handle a child's require's. Not needed for Lyte's current API shape
+            -- Enums are shared between lyte and lyte_core namespaces. copy them over
+            for _i, e in ipairs(req.enums) do table.insert(NS.enums, e) end
+
+
+            table.insert(NS.requires, req)
+        end
+        --
+    end
+
+    -- seperate loops: record methods can have deps on functions. thus handle all the functions first
+    for _i, x in ipairs(def.items) do
+        check_tag(x)
+        if x._kind == "Function" then table.insert(NS.functions, to_function_obj(x, NS))
+        end
+    end
+
+    -- seperate loops: non requires and non functions are handled here
+    for _i, x in ipairs(def.items) do
+        check_tag(x)
+        if x._kind == "Function" then -- HANDLED ABOVE
+        elseif x._kind == "Require" then -- HANDLED ABOVE
+        elseif x._kind == "Namespace" then table.insert(NS.namespaces, to_namespace_obj(x, NS.name))
+        elseif x._kind == "Record" then table.insert(NS.records, to_record_obj(x, NS))
+        elseif x._kind == "List" then table.insert(NS.lists, to_list_obj(x, NS.name))
+        elseif x._kind == "Dict" then table.insert(NS.dicts, to_dict_obj(x, NS.name))
+        elseif x._kind == "Variant" then table.insert(NS.variants, to_variant_obj(x, NS.name))
+        elseif x._kind == "Enum" then table.insert(NS.enums, to_enum_obj(x, NS.name))
+        elseif x._kind == "Doc" then NS.doc = NS.doc .. "\n" .. x._name
+        else error("Unknown kind: " .. x._kind .. " -> " .. x._name)
+        end
+    end
+    return NS
+end
+
+-- keep in sync with gen_api_native.lua variable CTypeMaps
+TypeMaps = {
+    ["bool"] =    {   lua = "boolean",   tl = "boolean",    ts = "boolean" },
+    ["int"] =     {   lua = "number",    tl = "int",        ts = "number" },
+    ["float"] =   {   lua = "number",    tl = "number",     ts = "number" },
+    ["double"] =  {   lua = "number",    tl = "number",     ts = "number" },
+    ["string"] =  {   lua = "string",    tl = "string",     ts = "string" },
+    ["pointer"] = {   lua = "userdata",  tl = "userdata",   ts = "object" },
+}
+
+
+function process_def_tree(def)
+    local NS = to_namespace_obj(def, nil)
+    return { tree = NS, raw_tree = def }
+end
