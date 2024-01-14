@@ -19,7 +19,7 @@
 
 
 
-static lua_State *_global_L = NULL;
+static lua_State *globalL = NULL;
 
 static const char *progname = LUA_PROGNAME;
 
@@ -35,7 +35,7 @@ static void lstop (lua_State *L, lua_Debug *ar) {
 static void laction (int i) {
   signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
                               terminate process (default action) */
-  lua_sethook(_global_L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
+  lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
 
@@ -242,14 +242,14 @@ static int handle_script (lua_State *L, char **argv, int n) {
   int narg = getargs(L, argv, n);  /* collect arguments */
   lua_setglobal(L, "arg");
   fname = argv[n];
-  if (strcmp(fname, "-") == 0 && strcmp(argv[n-1], "--") != 0)
+  if (strcmp(fname, "-") == 0 && strcmp(argv[n-1], "--") != 0) 
     fname = NULL;  /* stdin */
   status = luaL_loadfile(L, fname);
   lua_insert(L, -(narg+1));
   if (status == 0)
     status = docall(L, narg, 0);
   else
-    lua_pop(L, narg);
+    lua_pop(L, narg);      
   return report(L, status);
 }
 
@@ -342,7 +342,7 @@ static int pmain (lua_State *L) {
   char **argv = s->argv;
   int script;
   int has_i = 0, has_v = 0, has_e = 0;
-  _global_L = L;
+  globalL = L;
   if (argv[0] && argv[0][0]) progname = argv[0];
   lua_gc(L, LUA_GCSTOP, 0);  /* stop collector during initialization */
   luaL_openlibs(L);  /* open libraries */
