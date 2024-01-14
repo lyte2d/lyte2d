@@ -373,7 +373,7 @@ end
         Arg pan: 
             Type double
         Doc Set the pan of the given music object.
-        MapWrapTo lyte_core.music_set_volume
+        MapWrapTo lyte_core.music_set_pan
         Impl lua
     Function set_music_pitch: 
         Arg music: 

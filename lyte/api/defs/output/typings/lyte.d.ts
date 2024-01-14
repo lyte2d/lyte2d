@@ -419,6 +419,8 @@ declare namespace lyte {
         | "mb6"
         | "mb7"
         | "mb8"
+        | "scrollup"
+        | "scrolldown"
     // Acceptable keyboardkey values.
     type KeyboardKey =
           "space"
@@ -889,6 +891,8 @@ declare namespace lyte_core {
         | "mb6"
         | "mb7"
         | "mb8"
+        | "scrollup"
+        | "scrolldown"
     // Acceptable keyboardkey values.
     type KeyboardKey =
           "space"

@@ -906,6 +906,8 @@ Namespace lyte_core:
         (string) mb6
         (string) mb7
         (string) mb8
+        (string) scrollup
+        (string) scrolldown
         Doc Acceptable mousebutton values.
     Enum KeyboardKey: 
         (string) space

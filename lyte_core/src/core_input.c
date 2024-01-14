@@ -54,6 +54,21 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     }
 }
 
+static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    if (yoffset > 0) {
+        inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLUP] = true;
+    } else if (yoffset < 0) {
+        inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = true;
+    }
+}
+
+static void mouse_scroll_reset(void) {
+    // mouse scroll is handled like any other button from an API point of view. is_down won't work but pressed/released will
+    // however glfw does not send "release" events for scroll, so approaching it a bit differently here
+    inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLUP] = false;
+    inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = false;
+}
+
 static void joystick_callback(int jid, int event) {
     if (event == GLFW_CONNECTED) {
         inputstate.joystick_connected[jid] = true;
@@ -99,6 +114,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 int lyte_core_input_init(void) {
     glfwSetCursorPosCallback(lytecore_state.window, cursor_position_callback);
     glfwSetMouseButtonCallback(lytecore_state.window, mouse_button_callback);
+    glfwSetScrollCallback(lytecore_state.window, mouse_scroll_callback);
     glfwSetKeyCallback(lytecore_state.window, key_callback);
     glfwSetJoystickCallback(joystick_callback);
 
@@ -154,6 +170,8 @@ int lyte_core_input_update_state(void) {
 
 #endif
     }
+    // reset mouse scroll values
+    mouse_scroll_reset();
     return 0;
 }
 

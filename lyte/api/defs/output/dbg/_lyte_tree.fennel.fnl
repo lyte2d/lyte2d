@@ -57,7 +57,16 @@ lyte namespace."
          {:doc "Acceptable mousebutton values."
           :name "MouseButton"
           :namespace "lyte_core"
-          :values ["mb1" "mb2" "mb3" "mb4" "mb5" "mb6" "mb7" "mb8"]}
+          :values ["mb1"
+                   "mb2"
+                   "mb3"
+                   "mb4"
+                   "mb5"
+                   "mb6"
+                   "mb7"
+                   "mb8"
+                   "scrollup"
+                   "scrolldown"]}
          {:doc "Acceptable keyboardkey values."
           :name "KeyboardKey"
           :namespace "lyte_core"
@@ -1295,10 +1304,10 @@ end
               :doc "Set the pan of the given music object. "
               :impl "lua"
               :mapwrapto {:args [{:name "music" :type "pointer"}
-                                 {:name "volume" :type "double"}]
-                          :doc "Set the volume of the given music object. "
+                                 {:name "pan" :type "double"}]
+                          :doc "Set the pan of the given music object. "
                           :impl "lua"
-                          :name "music_set_volume"
+                          :name "music_set_pan"
                           :namespace "lyte_core"
                           :rets {}}
               :name "set_music_pan"
@@ -2218,11 +2227,11 @@ end
                                  :impl "lua"
                                  :mapwrapto {:args [{:name "music"
                                                      :type "pointer"}
-                                                    {:name "volume"
+                                                    {:name "pan"
                                                      :type "double"}]
-                                             :doc "Set the volume of the given music object. "
+                                             :doc "Set the pan of the given music object. "
                                              :impl "lua"
-                                             :name "music_set_volume"
+                                             :name "music_set_pan"
                                              :namespace "lyte_core"
                                              :rets {}}
                                  :name "set_music_pan"
@@ -2834,7 +2843,16 @@ lyte_core namespace. Direct API mappings to C library."
                      {:doc "Acceptable mousebutton values."
                       :name "MouseButton"
                       :namespace "lyte_core"
-                      :values ["mb1" "mb2" "mb3" "mb4" "mb5" "mb6" "mb7" "mb8"]}
+                      :values ["mb1"
+                               "mb2"
+                               "mb3"
+                               "mb4"
+                               "mb5"
+                               "mb6"
+                               "mb7"
+                               "mb8"
+                               "scrollup"
+                               "scrolldown"]}
                      {:doc "Acceptable keyboardkey values."
                       :name "KeyboardKey"
                       :namespace "lyte_core"

@@ -424,6 +424,8 @@ global record lyte
           "mb6"
           "mb7"
           "mb8"
+          "scrollup"
+          "scrolldown"
     end
     -- Acceptable keyboardkey values.
     enum KeyboardKey
@@ -901,6 +903,8 @@ global record lyte_core
           "mb6"
           "mb7"
           "mb8"
+          "scrollup"
+          "scrolldown"
     end
     -- Acceptable keyboardkey values.
     enum KeyboardKey

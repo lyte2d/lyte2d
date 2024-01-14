@@ -754,6 +754,9 @@ enum {
     _MOUSEBUTTON_MB6 = LYTE_MOUSEBUTTON_MB6, /* order: 5 string: 'mb6' */
     _MOUSEBUTTON_MB7 = LYTE_MOUSEBUTTON_MB7, /* order: 6 string: 'mb7' */
     _MOUSEBUTTON_MB8 = LYTE_MOUSEBUTTON_MB8, /* order: 7 string: 'mb8' */
+    _MOUSEBUTTON_SCROLLUP = LYTE_MOUSEBUTTON_SCROLLUP, /* order: 8 string: 'scrollup' */
+    _MOUSEBUTTON_SCROLLDOWN = LYTE_MOUSEBUTTON_SCROLLDOWN, /* order: 9 string: 'scrolldown' */
+
 };
 enum {
     _KEYBOARDKEY_SPACE = LYTE_KEYBOARDKEY_SPACE, /* order: 0 string: 'space' */

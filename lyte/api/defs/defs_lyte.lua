@@ -383,7 +383,7 @@ end
         Arg("music", Wrap("Music")),
         Arg("pan", Double),
         Doc"Set the pan of the given music object.",
-        MapWrapTo("lyte_core.music_set_volume"),
+        MapWrapTo("lyte_core.music_set_pan"),
         LuaImpl
     ),
 

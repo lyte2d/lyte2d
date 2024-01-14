@@ -742,6 +742,8 @@ enum {
     _MOUSEBUTTON_MB6 = NATIVEENUM_MOUSEBUTTON_MB6, /* order: 5 string: 'mb6' */
     _MOUSEBUTTON_MB7 = NATIVEENUM_MOUSEBUTTON_MB7, /* order: 6 string: 'mb7' */
     _MOUSEBUTTON_MB8 = NATIVEENUM_MOUSEBUTTON_MB8, /* order: 7 string: 'mb8' */
+    _MOUSEBUTTON_SCROLLUP = NATIVEENUM_MOUSEBUTTON_SCROLLUP, /* order: 8 string: 'scrollup' */
+    _MOUSEBUTTON_SCROLLDOWN = NATIVEENUM_MOUSEBUTTON_SCROLLDOWN, /* order: 9 string: 'scrolldown' */
 };
 enum {
     _KEYBOARDKEY_SPACE = NATIVEENUM_KEYBOARDKEY_SPACE, /* order: 0 string: 'space' */

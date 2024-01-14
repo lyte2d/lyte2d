@@ -30,7 +30,7 @@ return {
             doc = "Acceptable mousebutton values.",
             name = "MouseButton",
             namespace = "lyte_core",
-            values = { "mb1", "mb2", "mb3", "mb4", "mb5", "mb6", "mb7", "mb8" }
+            values = { "mb1", "mb2", "mb3", "mb4", "mb5", "mb6", "mb7", "mb8", "scrollup", "scrolldown" }
         }, {
             doc = "Acceptable keyboardkey values.",
             name = "KeyboardKey",

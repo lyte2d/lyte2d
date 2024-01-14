@@ -99,6 +99,8 @@ EnumStrInt lyte_core_MouseButton_strings[] = {
     {"mb6", _MOUSEBUTTON_MB6},
     {"mb7", _MOUSEBUTTON_MB7},
     {"mb8", _MOUSEBUTTON_MB8},
+    {"scrollup", _MOUSEBUTTON_SCROLLUP},
+    {"scrolldown", _MOUSEBUTTON_SCROLLDOWN},
     {NULL, -1},
 };
 EnumStrInt lyte_core_KeyboardKey_strings[] = {

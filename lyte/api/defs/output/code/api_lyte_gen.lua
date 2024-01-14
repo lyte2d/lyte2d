@@ -345,7 +345,7 @@ lyte.set_music_volume = function(music_wrapped, volume)
 end
 lyte.set_music_pan = function(music_wrapped, pan)
     local music = music_wrapped.id
-    lyte_core.music_set_volume(music, pan)
+    lyte_core.music_set_pan(music, pan)
 end
 lyte.set_music_pitch = function(music_wrapped, pitch)
     local music = music_wrapped.id

@@ -1005,7 +1005,7 @@ return process_def_tree(Namespace("lyte_core",
 
     Enum("MouseButton",
         'mb1', 'mb2', 'mb3', 'mb4', 'mb5', 'mb6',
-        'mb7', 'mb8',
+        'mb7', 'mb8', 'scrollup', 'scrolldown',
         Doc"Acceptable mousebutton values."
     ),
 
