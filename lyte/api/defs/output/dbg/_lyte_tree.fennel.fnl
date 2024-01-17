@@ -506,14 +506,14 @@ lyte namespace."
               :namespace "lyte"
               :rets [{:name "val" :type "Image" :wrapped true}]}
              {:args [{:name "canvas_image" :type "Image" :wrapped true}]
+              :code "function(canvas_image_wrapped)
+    local canvas_image = canvas_image_wrapped.id
+    lyte_core.image_set_canvas(canvas_image)
+    lyte._current_canvas_save = canvas_image_wrapped
+end
+"
               :doc "Set the effective canvas image. All draw operations will go to this canvas until it's reset. "
               :impl "lua"
-              :mapwrapto {:args [{:name "canvas_image" :type "pointer"}]
-                          :doc "Set the effective canvas image. All draw operations will go to this canvas until it's reset. "
-                          :impl "lua"
-                          :name "image_set_canvas"
-                          :namespace "lyte_core"
-                          :rets {}}
               :name "set_canvas"
               :namespace "lyte"
               :rets {}}
@@ -656,14 +656,14 @@ lyte namespace."
               :namespace "lyte"
               :rets [{:name "val" :type "Font" :wrapped true}]}
              {:args [{:name "font" :type "Font" :wrapped true}]
+              :code "function(font_wrapped)
+    local font = font_wrapped.id
+    lyte_core.font_set(font)
+    lyte._current_font_save = font_wrapped
+end
+"
               :doc "Set the effective font to be used in the drawing operations. "
               :impl "lua"
-              :mapwrapto {:args [{:name "font" :type "pointer"}]
-                          :doc "Set the effective font to be used in the drawing operations. "
-                          :impl "lua"
-                          :name "font_set"
-                          :namespace "lyte_core"
-                          :rets {}}
               :name "set_font"
               :namespace "lyte"
               :rets {}}
@@ -1188,14 +1188,14 @@ end
               :namespace "lyte"
               :rets [{:name "val" :type "Music" :wrapped true}]}
              {:args [{:name "music" :type "Music" :wrapped true}]
+              :code "function(music_wrapped)
+    local music = music_wrapped.id
+    lyte_core.music_play(music)
+    lyte._current_music_save = music_wrapped
+end
+"
               :doc "Play the music. "
               :impl "lua"
-              :mapwrapto {:args [{:name "music" :type "pointer"}]
-                          :doc "Play the music. "
-                          :impl "lua"
-                          :name "music_play"
-                          :namespace "lyte_core"
-                          :rets {}}
               :name "play_music"
               :namespace "lyte"
               :rets {}}
@@ -1873,14 +1873,14 @@ end
               :namespace "lyte"
               :rets [{:name "val" :type "Shader" :wrapped true}]}
              {:args [{:name "shader" :type "Shader" :wrapped true}]
+              :code "function(shader_wrapped)
+    local shader = shader_wrapped.id
+    lyte_core.shader_set(shader)
+    lyte._current_shader_save = shader_wrapped
+end
+"
               :doc "Set the custom shader and use it for consequent calls. "
               :impl "lua"
-              :mapwrapto {:args [{:name "shader" :type "pointer"}]
-                          :doc "Set the custom shader and use it for consequent calls. "
-                          :impl "lua"
-                          :name "shader_set"
-                          :namespace "lyte_core"
-                          :rets {}}
               :name "set_shader"
               :namespace "lyte"
               :rets {}}
@@ -2312,15 +2312,14 @@ end
             :methods [{:mapto {:args [{:name "music"
                                        :type "Music"
                                        :wrapped true}]
+                               :code "function(music_wrapped)
+    local music = music_wrapped.id
+    lyte_core.music_play(music)
+    lyte._current_music_save = music_wrapped
+end
+"
                                :doc "Play the music. "
                                :impl "lua"
-                               :mapwrapto {:args [{:name "music"
-                                                   :type "pointer"}]
-                                           :doc "Play the music. "
-                                           :impl "lua"
-                                           :name "music_play"
-                                           :namespace "lyte_core"
-                                           :rets {}}
                                :name "play_music"
                                :namespace "lyte"
                                :rets {}}

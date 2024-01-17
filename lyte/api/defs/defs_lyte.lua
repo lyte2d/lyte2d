@@ -46,7 +46,7 @@ return process_def_tree(Namespace("lyte",
 
     Function("draw_ellipse_line", MapTo("lyte_core.draw_ellipse_line")),
 
-   Function("cleanup_image",
+    Function("cleanup_image",
         Arg("image", Wrap("Image")),
         Doc("Free Image resources"),
         -- dtor=true
@@ -114,8 +114,14 @@ return process_def_tree(Namespace("lyte",
     Function("set_canvas",
         Arg("canvas_image", Wrap("Image")),
         Doc"Set the effective canvas image. All draw operations will go to this canvas until it's reset.",
-        MapWrapTo("lyte_core.image_set_canvas"),
-        LuaImpl
+        -- MapWrapTo("lyte_core.image_set_canvas"),
+        LuaImpl,
+        Code[[function(canvas_image_wrapped)
+    local canvas_image = canvas_image_wrapped.id
+    lyte_core.image_set_canvas(canvas_image)
+    lyte._current_canvas_save = canvas_image_wrapped
+end
+]]
     ),
 
     Function("reset_canvas", MapTo("lyte_core.reset_canvas")),
@@ -203,8 +209,14 @@ return process_def_tree(Namespace("lyte",
     Function("set_font",
         Arg("font", Wrap("Font")),
         Doc"Set the effective font to be used in the drawing operations.",
-        MapWrapTo("lyte_core.font_set"),
-        LuaImpl
+        -- MapWrapTo("lyte_core.font_set"),
+        LuaImpl,
+        Code[[function(font_wrapped)
+    local font = font_wrapped.id
+    lyte_core.font_set(font)
+    lyte._current_font_save = font_wrapped
+end
+]]
     ),
 
     Function("reset_font",
@@ -314,8 +326,14 @@ end
     Function("play_music",
         Arg("music", Wrap("Music")),
         Doc"Play the music.",
-        MapWrapTo("lyte_core.music_play"),
-        LuaImpl
+        -- MapWrapTo("lyte_core.music_play"),
+        LuaImpl,
+        Code[[function(music_wrapped)
+    local music = music_wrapped.id
+    lyte_core.music_play(music)
+    lyte._current_music_save = music_wrapped
+end
+]]
     ),
 
     Function("pause_music",
@@ -661,8 +679,14 @@ end
     Function("set_shader",
         Arg("shader", Wrap("Shader")),
         Doc"Set the custom shader and use it for consequent calls.",
-        MapWrapTo("lyte_core.shader_set"),
-        LuaImpl
+        -- MapWrapTo("lyte_core.shader_set"),
+        LuaImpl,
+        Code[[function(shader_wrapped)
+    local shader = shader_wrapped.id
+    lyte_core.shader_set(shader)
+    lyte._current_shader_save = shader_wrapped
+end
+]]
     ),
 
     Function("reset_shader", MapTo("lyte_core.reset_shader")),

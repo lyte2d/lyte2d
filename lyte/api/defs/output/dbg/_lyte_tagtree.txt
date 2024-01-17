@@ -114,8 +114,13 @@ Namespace lyte:
         Arg canvas_image: 
             Wrap Image
         Doc Set the effective canvas image. All draw operations will go to this canvas until it's reset.
-        MapWrapTo lyte_core.image_set_canvas
         Impl lua
+        Code function(canvas_image_wrapped)
+    local canvas_image = canvas_image_wrapped.id
+    lyte_core.image_set_canvas(canvas_image)
+    lyte._current_canvas_save = canvas_image_wrapped
+end
+
     Function reset_canvas: 
         MapTo lyte_core.reset_canvas
     Function is_image_canvas: 
@@ -202,8 +207,13 @@ Namespace lyte:
         Arg font: 
             Wrap Font
         Doc Set the effective font to be used in the drawing operations.
-        MapWrapTo lyte_core.font_set
         Impl lua
+        Code function(font_wrapped)
+    local font = font_wrapped.id
+    lyte_core.font_set(font)
+    lyte._current_font_save = font_wrapped
+end
+
     Function reset_font: 
         Doc Reset the font to its default value.
         Impl lua
@@ -307,8 +317,13 @@ end
         Arg music: 
             Wrap Music
         Doc Play the music.
-        MapWrapTo lyte_core.music_play
         Impl lua
+        Code function(music_wrapped)
+    local music = music_wrapped.id
+    lyte_core.music_play(music)
+    lyte._current_music_save = music_wrapped
+end
+
     Function pause_music: 
         Arg music: 
             Wrap Music
@@ -631,8 +646,13 @@ end
         Arg shader: 
             Wrap Shader
         Doc Set the custom shader and use it for consequent calls.
-        MapWrapTo lyte_core.shader_set
         Impl lua
+        Code function(shader_wrapped)
+    local shader = shader_wrapped.id
+    lyte_core.shader_set(shader)
+    lyte._current_shader_save = shader_wrapped
+end
+
     Function reset_shader: 
         MapTo lyte_core.reset_shader
     Function set_shader_uniform: 

@@ -2,13 +2,26 @@
 
 -- TODO: cleanup globals
 
-local function classnew_ctor(ctor_method_name)
+function classnew_ctor(ctor_method_name)
     ctor_method_name = ctor_method_name or "__new"
     assert(type(ctor_method_name == "string"))
 
     local classnew = function(tbl, ...)
         tbl.__index = tbl.__index or tbl
-        local inst = setmetatable({}, tbl)
+        local inst = {}
+        -- dtor (with the name __gc)
+        -- this works with types defined in lua tables in 5.1 via "newproxy(true)" hack
+        if tbl["__gc"] then
+            local proxy_for_gc = newproxy(true)
+            getmetatable(proxy_for_gc).__gc = function()
+                local ok, err = pcall(tbl.__gc, inst)
+                if  not ok then
+                    print(err)
+                end
+            end
+            inst[proxy_for_gc] = true
+        end
+        inst = setmetatable(inst, tbl)
         -- ctor (with the given name. __new if nothing given)
         if tbl[ctor_method_name] then
             local ok, err = pcall(tbl[ctor_method_name], inst, ...)
@@ -17,23 +30,11 @@ local function classnew_ctor(ctor_method_name)
                 error(err)
             end
         end
-        -- dtor (with the name __gc)
-        -- this works with types defined in lua tables in 5.1 via "newproxy(true)" hack
-        if tbl[__gc] then
-            local proxy_for_gc = newproxy(true)
-            getmetatable(proxy_for_gc).__gc = function()
-                local ok, err = pcall(tbl.__gc, inst)
-                if  not ok then
-                    print(err)
-                end
-            end
-        end
         return inst
     end
 
     return classnew
 end
-
 
 classnew = classnew_ctor("__new")
 

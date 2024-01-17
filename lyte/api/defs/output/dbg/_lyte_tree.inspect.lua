@@ -657,19 +657,9 @@ return {
                     type = "Image",
                     wrapped = true
                 } },
+            code = "function(canvas_image_wrapped)\n    local canvas_image = canvas_image_wrapped.id\n    lyte_core.image_set_canvas(canvas_image)\n    lyte._current_canvas_save = canvas_image_wrapped\nend\n",
             doc = "Set the effective canvas image. All draw operations will go to this canvas until it's reset. ",
             impl = "lua",
-            mapwrapto = <32>{
-                args = { {
-                        name = "canvas_image",
-                        type = "pointer"
-                    } },
-                doc = "Set the effective canvas image. All draw operations will go to this canvas until it's reset. ",
-                impl = "lua",
-                name = "image_set_canvas",
-                namespace = "lyte_core",
-                rets = {}
-            },
             name = "set_canvas",
             namespace = "lyte",
             rets = {}
@@ -677,7 +667,7 @@ return {
             args = {},
             doc = "Reset the drawing target, back to screen. ",
             impl = "native",
-            mapto = <33>{
+            mapto = <32>{
                 args = {},
                 doc = "Reset the drawing target, back to screen. ",
                 impl = "native",
@@ -688,7 +678,7 @@ return {
             name = "reset_canvas",
             namespace = "lyte",
             rets = {}
-        }, <34>{
+        }, <33>{
             args = { {
                     name = "image",
                     type = "Image",
@@ -696,7 +686,7 @@ return {
                 } },
             doc = "Check if the image was created as a canvas. ",
             impl = "lua",
-            mapwrapto = <35>{
+            mapwrapto = <34>{
                 args = { {
                         name = "image",
                         type = "pointer"
@@ -716,7 +706,7 @@ return {
                     name = "val",
                     type = "bool"
                 } }
-        }, <36>{
+        }, <35>{
             args = { {
                     name = "imagebatch",
                     type = "ImageBatch",
@@ -724,7 +714,7 @@ return {
                 } },
             doc = "Free ImageBatch resources ",
             impl = "lua",
-            mapwrapto = <37>{
+            mapwrapto = <36>{
                 args = { {
                         name = "imagebatch",
                         type = "pointer"
@@ -746,7 +736,7 @@ return {
                 } },
             doc = "Create an image batch ",
             impl = "lua",
-            mapwrapto = <38>{
+            mapwrapto = <37>{
                 args = { {
                         name = "image",
                         type = "pointer"
@@ -767,7 +757,7 @@ return {
                     type = "ImageBatch",
                     wrapped = true
                 } }
-        }, <39>{
+        }, <38>{
             args = { {
                     name = "imagebatch",
                     type = "ImageBatch",
@@ -775,7 +765,7 @@ return {
                 } },
             doc = "Reset the image batch, remove all added rects. ",
             impl = "lua",
-            mapwrapto = <40>{
+            mapwrapto = <39>{
                 args = { {
                         name = "imagebatch",
                         type = "pointer"
@@ -789,7 +779,7 @@ return {
             name = "reset_imagebatch",
             namespace = "lyte",
             rets = {}
-        }, <41>{
+        }, <40>{
             args = { {
                     name = "imagebatch",
                     type = "ImageBatch",
@@ -821,7 +811,7 @@ return {
                 } },
             doc = "Add a recta to the image batch (from it's initial image). ",
             impl = "lua",
-            mapwrapto = <42>{
+            mapwrapto = <41>{
                 args = { {
                         name = "imagebatch",
                         type = "pointer"
@@ -859,7 +849,7 @@ return {
             name = "add_imagebatch_rect",
             namespace = "lyte",
             rets = {}
-        }, <43>{
+        }, <42>{
             args = { {
                     name = "imagebatch",
                     type = "ImageBatch",
@@ -867,7 +857,7 @@ return {
                 } },
             doc = "Get the number of rects in the image batch. ",
             impl = "lua",
-            mapwrapto = <44>{
+            mapwrapto = <43>{
                 args = { {
                         name = "imagebatch",
                         type = "pointer"
@@ -887,7 +877,7 @@ return {
                     name = "val",
                     type = "int"
                 } }
-        }, <45>{
+        }, <44>{
             args = { {
                     name = "imagebatch",
                     type = "ImageBatch",
@@ -895,7 +885,7 @@ return {
                 } },
             doc = "Draw the image batch. ",
             impl = "lua",
-            mapwrapto = <46>{
+            mapwrapto = <45>{
                 args = { {
                         name = "imagebatch",
                         type = "pointer"
@@ -909,7 +899,7 @@ return {
             name = "draw_imagebatch",
             namespace = "lyte",
             rets = {}
-        }, <47>{
+        }, <46>{
             args = { {
                     name = "font",
                     type = "Font",
@@ -917,7 +907,7 @@ return {
                 } },
             doc = "Free Font resources ",
             impl = "lua",
-            mapwrapto = <48>{
+            mapwrapto = <47>{
                 args = { {
                         name = "font",
                         type = "pointer"
@@ -941,7 +931,7 @@ return {
                 } },
             doc = "Load the font specified in the path, and set the initial size. ",
             impl = "lua",
-            mapwrapto = <49>{
+            mapwrapto = <48>{
                 args = { {
                         name = "font_path",
                         type = "string"
@@ -971,19 +961,9 @@ return {
                     type = "Font",
                     wrapped = true
                 } },
+            code = "function(font_wrapped)\n    local font = font_wrapped.id\n    lyte_core.font_set(font)\n    lyte._current_font_save = font_wrapped\nend\n",
             doc = "Set the effective font to be used in the drawing operations. ",
             impl = "lua",
-            mapwrapto = <50>{
-                args = { {
-                        name = "font",
-                        type = "pointer"
-                    } },
-                doc = "Set the effective font to be used in the drawing operations. ",
-                impl = "lua",
-                name = "font_set",
-                namespace = "lyte_core",
-                rets = {}
-            },
             name = "set_font",
             namespace = "lyte",
             rets = {}
@@ -999,7 +979,7 @@ return {
             args = {},
             doc = "Draw a text line. ",
             impl = "native",
-            mapto = <51>{
+            mapto = <49>{
                 args = { {
                         name = "text",
                         type = "string"
@@ -1023,7 +1003,7 @@ return {
             args = {},
             doc = "Get the width of the given text line. ",
             impl = "native",
-            mapto = <52>{
+            mapto = <50>{
                 args = { {
                         name = "text",
                         type = "string"
@@ -1044,7 +1024,7 @@ return {
             args = {},
             doc = "Get the height of the given text line. ",
             impl = "native",
-            mapto = <53>{
+            mapto = <51>{
                 args = { {
                         name = "text",
                         type = "string"
@@ -1065,7 +1045,7 @@ return {
             args = {},
             doc = "Get the number of currently connected monitors. ",
             impl = "native",
-            mapto = <54>{
+            mapto = <52>{
                 args = {},
                 doc = "Get the number of currently connected monitors. ",
                 impl = "native",
@@ -1083,7 +1063,7 @@ return {
             args = {},
             doc = "Get the name of the monitor at the index ",
             impl = "native",
-            mapto = <55>{
+            mapto = <53>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1104,7 +1084,7 @@ return {
             args = {},
             doc = "Get the width of the monitor at the index ",
             impl = "native",
-            mapto = <56>{
+            mapto = <54>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1125,7 +1105,7 @@ return {
             args = {},
             doc = "Get the height of the monitor at the index ",
             impl = "native",
-            mapto = <57>{
+            mapto = <55>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1146,7 +1126,7 @@ return {
             args = {},
             doc = " Set the window's initial monitor to the indexed value. Must be set before the window is opened. ",
             impl = "native",
-            mapto = <58>{
+            mapto = <56>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1164,7 +1144,7 @@ return {
             args = {},
             doc = " Set the window resizable flag to the given value. Must be set before the window is opened. ",
             impl = "native",
-            mapto = <59>{
+            mapto = <57>{
                 args = { {
                         name = "resizable",
                         type = "bool"
@@ -1182,7 +1162,7 @@ return {
             args = {},
             doc = "Set the window's minimum possible size. ",
             impl = "native",
-            mapto = <60>{
+            mapto = <58>{
                 args = { {
                         name = "width",
                         type = "int"
@@ -1203,7 +1183,7 @@ return {
             args = {},
             doc = "Set the window's size. ",
             impl = "native",
-            mapto = <61>{
+            mapto = <59>{
                 args = { {
                         name = "width",
                         type = "int"
@@ -1224,7 +1204,7 @@ return {
             args = {},
             doc = "Get the width of the window. ",
             impl = "native",
-            mapto = <62>{
+            mapto = <60>{
                 args = {},
                 doc = "Get the width of the window. ",
                 impl = "native",
@@ -1243,7 +1223,7 @@ return {
             args = {},
             doc = "Get the height of the window. ",
             impl = "native",
-            mapto = <63>{
+            mapto = <61>{
                 args = {},
                 doc = "Get the height of the window. ",
                 impl = "native",
@@ -1262,7 +1242,7 @@ return {
             args = {},
             doc = "Set the window's position. ",
             impl = "native",
-            mapto = <64>{
+            mapto = <62>{
                 args = { {
                         name = "x",
                         type = "int"
@@ -1283,7 +1263,7 @@ return {
             args = {},
             doc = "Set the window to fullscreen, or windowed mode. ",
             impl = "native",
-            mapto = <65>{
+            mapto = <63>{
                 args = { {
                         name = "fullscreen",
                         type = "bool"
@@ -1301,7 +1281,7 @@ return {
             args = {},
             doc = "Check if the window is set to fullscreen. ",
             impl = "native",
-            mapto = <66>{
+            mapto = <64>{
                 args = {},
                 doc = "Check if the window is set to fullscreen. ",
                 impl = "native",
@@ -1319,7 +1299,7 @@ return {
             args = {},
             doc = "Set the window's title. ",
             impl = "native",
-            mapto = <67>{
+            mapto = <65>{
                 args = { {
                         name = "title",
                         type = "string"
@@ -1337,7 +1317,7 @@ return {
             args = {},
             doc = "Set the window vsync flag to the given value. ",
             impl = "native",
-            mapto = <68>{
+            mapto = <66>{
                 args = { {
                         name = "vsync",
                         type = "bool"
@@ -1355,7 +1335,7 @@ return {
             args = {},
             doc = "Check if the window vsync flag is set. ",
             impl = "native",
-            mapto = <69>{
+            mapto = <67>{
                 args = {},
                 doc = "Check if the window vsync flag is set. ",
                 impl = "native",
@@ -1373,7 +1353,7 @@ return {
             args = {},
             doc = "Set the window icon. ",
             impl = "native",
-            mapto = <70>{
+            mapto = <68>{
                 args = { {
                         name = "icon_path",
                         type = "string"
@@ -1391,7 +1371,7 @@ return {
             args = {},
             doc = "Set the window margins. Margins are ignored and no drawing can be made there.. ",
             impl = "native",
-            mapto = <71>{
+            mapto = <69>{
                 args = { {
                         name = "left",
                         type = "int"
@@ -1418,7 +1398,7 @@ return {
             args = {},
             doc = "Set the window paddings. Paddings are can be drawn on. ",
             impl = "native",
-            mapto = <72>{
+            mapto = <70>{
                 args = { {
                         name = "left",
                         type = "int"
@@ -1445,7 +1425,7 @@ return {
             args = {},
             doc = "Check if the given key is down. ",
             impl = "native",
-            mapto = <73>{
+            mapto = <71>{
                 args = { {
                         name = "key",
                         type = "KeyboardKey"
@@ -1466,7 +1446,7 @@ return {
             args = {},
             doc = "Check if the given key is pressed. ",
             impl = "native",
-            mapto = <74>{
+            mapto = <72>{
                 args = { {
                         name = "key",
                         type = "KeyboardKey"
@@ -1487,7 +1467,7 @@ return {
             args = {},
             doc = "Check if the given key is released. ",
             impl = "native",
-            mapto = <75>{
+            mapto = <73>{
                 args = { {
                         name = "key",
                         type = "KeyboardKey"
@@ -1508,7 +1488,7 @@ return {
             args = {},
             doc = "Check if the given key is repeated. ",
             impl = "native",
-            mapto = <76>{
+            mapto = <74>{
                 args = { {
                         name = "key",
                         type = "KeyboardKey"
@@ -1529,7 +1509,7 @@ return {
             args = {},
             doc = "Check if the given mouse button is down. ",
             impl = "native",
-            mapto = <77>{
+            mapto = <75>{
                 args = { {
                         name = "mouse_button",
                         type = "MouseButton"
@@ -1550,7 +1530,7 @@ return {
             args = {},
             doc = "Check if the given mouse button is pressed. ",
             impl = "native",
-            mapto = <78>{
+            mapto = <76>{
                 args = { {
                         name = "mouse_button",
                         type = "MouseButton"
@@ -1571,7 +1551,7 @@ return {
             args = {},
             doc = "Check if the given mouse button is released. ",
             impl = "native",
-            mapto = <79>{
+            mapto = <77>{
                 args = { {
                         name = "mouse_button",
                         type = "MouseButton"
@@ -1592,7 +1572,7 @@ return {
             args = {},
             doc = "Get the mouse x position. ",
             impl = "native",
-            mapto = <80>{
+            mapto = <78>{
                 args = {},
                 doc = "Get the mouse x position. ",
                 impl = "native",
@@ -1610,7 +1590,7 @@ return {
             args = {},
             doc = "Get the mouse y position. ",
             impl = "native",
-            mapto = <81>{
+            mapto = <79>{
                 args = {},
                 doc = "Get the mouse y position. ",
                 impl = "native",
@@ -1628,7 +1608,7 @@ return {
             args = {},
             doc = "Get the number of gamepads. ",
             impl = "native",
-            mapto = <82>{
+            mapto = <80>{
                 args = {},
                 doc = "Get the number of gamepads. ",
                 impl = "native",
@@ -1646,7 +1626,7 @@ return {
             args = {},
             doc = "Get the name of the gamepad at the given index. ",
             impl = "native",
-            mapto = <83>{
+            mapto = <81>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1667,7 +1647,7 @@ return {
             args = {},
             doc = "Check if the given button of the gamepad at the given index is down. ",
             impl = "native",
-            mapto = <84>{
+            mapto = <82>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1691,7 +1671,7 @@ return {
             args = {},
             doc = "Check if the given button of the gamepad at the given index is pressed. ",
             impl = "native",
-            mapto = <85>{
+            mapto = <83>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1715,7 +1695,7 @@ return {
             args = {},
             doc = "Check if the given button of the gamepad at the given index is released. ",
             impl = "native",
-            mapto = <86>{
+            mapto = <84>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1739,7 +1719,7 @@ return {
             args = {},
             doc = "Get the given axis of the gamepad at the given index. ",
             impl = "native",
-            mapto = <87>{
+            mapto = <85>{
                 args = { {
                         name = "index",
                         type = "int"
@@ -1763,7 +1743,7 @@ return {
             args = {},
             doc = "Set the master volume. ",
             impl = "native",
-            mapto = <88>{
+            mapto = <86>{
                 args = { {
                         name = "mastervolume",
                         type = "double"
@@ -1781,7 +1761,7 @@ return {
             args = {},
             doc = "Get the master volume. ",
             impl = "native",
-            mapto = <89>{
+            mapto = <87>{
                 args = {},
                 doc = "Get the master volume. ",
                 impl = "native",
@@ -1795,7 +1775,7 @@ return {
             name = "get_mastervolume",
             namespace = "lyte",
             rets = {}
-        }, <90>{
+        }, <88>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1803,7 +1783,7 @@ return {
                 } },
             doc = "Free Music resources ",
             impl = "lua",
-            mapwrapto = <91>{
+            mapwrapto = <89>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -1824,7 +1804,7 @@ return {
                 } },
             doc = "Load the music specified in the path. ",
             impl = "lua",
-            mapwrapto = <92>{
+            mapwrapto = <90>{
                 args = { {
                         name = "music_path",
                         type = "string"
@@ -1845,29 +1825,19 @@ return {
                     type = "Music",
                     wrapped = true
                 } }
-        }, <93>{
+        }, <91>{
             args = { {
                     name = "music",
                     type = "Music",
                     wrapped = true
                 } },
+            code = "function(music_wrapped)\n    local music = music_wrapped.id\n    lyte_core.music_play(music)\n    lyte._current_music_save = music_wrapped\nend\n",
             doc = "Play the music. ",
             impl = "lua",
-            mapwrapto = <94>{
-                args = { {
-                        name = "music",
-                        type = "pointer"
-                    } },
-                doc = "Play the music. ",
-                impl = "lua",
-                name = "music_play",
-                namespace = "lyte_core",
-                rets = {}
-            },
             name = "play_music",
             namespace = "lyte",
             rets = {}
-        }, <95>{
+        }, <92>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1875,7 +1845,7 @@ return {
                 } },
             doc = "Pause the music. ",
             impl = "lua",
-            mapwrapto = <96>{
+            mapwrapto = <93>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -1889,7 +1859,7 @@ return {
             name = "pause_music",
             namespace = "lyte",
             rets = {}
-        }, <97>{
+        }, <94>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1897,7 +1867,7 @@ return {
                 } },
             doc = "Resume the music. ",
             impl = "lua",
-            mapwrapto = <98>{
+            mapwrapto = <95>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -1911,7 +1881,7 @@ return {
             name = "resume_music",
             namespace = "lyte",
             rets = {}
-        }, <99>{
+        }, <96>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1919,11 +1889,11 @@ return {
                 } },
             doc = "Stop the music. ",
             impl = "lua",
-            mapwrapto = <table 98>,
+            mapwrapto = <table 95>,
             name = "stop_music",
             namespace = "lyte",
             rets = {}
-        }, <100>{
+        }, <97>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1931,7 +1901,7 @@ return {
                 } },
             doc = "Check if the given music is playing. ",
             impl = "lua",
-            mapwrapto = <101>{
+            mapwrapto = <98>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -1951,7 +1921,7 @@ return {
                     name = "val",
                     type = "bool"
                 } }
-        }, <102>{
+        }, <99>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1959,7 +1929,7 @@ return {
                 } },
             doc = "Get the length of the given music object in seconds. ",
             impl = "lua",
-            mapwrapto = <103>{
+            mapwrapto = <100>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -1979,7 +1949,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <104>{
+        }, <101>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -1987,7 +1957,7 @@ return {
                 } },
             doc = "Get the already played length of the given music object in seconds. ",
             impl = "lua",
-            mapwrapto = <105>{
+            mapwrapto = <102>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2007,7 +1977,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <106>{
+        }, <103>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2018,7 +1988,7 @@ return {
                 } },
             doc = "Move the music time played to the given value. ",
             impl = "lua",
-            mapwrapto = <107>{
+            mapwrapto = <104>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2035,7 +2005,7 @@ return {
             name = "seek_music",
             namespace = "lyte",
             rets = {}
-        }, <108>{
+        }, <105>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2046,7 +2016,7 @@ return {
                 } },
             doc = "Set the volume of the given music object. ",
             impl = "lua",
-            mapwrapto = <109>{
+            mapwrapto = <106>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2063,7 +2033,7 @@ return {
             name = "set_music_volume",
             namespace = "lyte",
             rets = {}
-        }, <110>{
+        }, <107>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2074,7 +2044,7 @@ return {
                 } },
             doc = "Set the pan of the given music object. ",
             impl = "lua",
-            mapwrapto = <111>{
+            mapwrapto = <108>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2091,7 +2061,7 @@ return {
             name = "set_music_pan",
             namespace = "lyte",
             rets = {}
-        }, <112>{
+        }, <109>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2102,7 +2072,7 @@ return {
                 } },
             doc = "Set the pitch of the given music object. ",
             impl = "lua",
-            mapwrapto = <113>{
+            mapwrapto = <110>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2119,7 +2089,7 @@ return {
             name = "set_music_pitch",
             namespace = "lyte",
             rets = {}
-        }, <114>{
+        }, <111>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2127,7 +2097,7 @@ return {
                 } },
             doc = "Get the volume of the given music object. ",
             impl = "lua",
-            mapwrapto = <115>{
+            mapwrapto = <112>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2147,7 +2117,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <116>{
+        }, <113>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2155,7 +2125,7 @@ return {
                 } },
             doc = "Get the pan of the given music object. ",
             impl = "lua",
-            mapwrapto = <117>{
+            mapwrapto = <114>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2175,7 +2145,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <118>{
+        }, <115>{
             args = { {
                     name = "music",
                     type = "Music",
@@ -2183,7 +2153,7 @@ return {
                 } },
             doc = "Get the pitch of the given music object. ",
             impl = "lua",
-            mapwrapto = <119>{
+            mapwrapto = <116>{
                 args = { {
                         name = "music",
                         type = "pointer"
@@ -2203,7 +2173,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <120>{
+        }, <117>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2211,7 +2181,7 @@ return {
                 } },
             doc = "Free Sound resources ",
             impl = "lua",
-            mapwrapto = <121>{
+            mapwrapto = <118>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2232,7 +2202,7 @@ return {
                 } },
             doc = "Load the sound specified in the path. ",
             impl = "lua",
-            mapwrapto = <122>{
+            mapwrapto = <119>{
                 args = { {
                         name = "sound_path",
                         type = "string"
@@ -2253,7 +2223,7 @@ return {
                     type = "Sound",
                     wrapped = true
                 } }
-        }, <123>{
+        }, <120>{
             args = { {
                     name = "orig",
                     type = "Sound",
@@ -2261,7 +2231,7 @@ return {
                 } },
             doc = "Clone the sound specified in the path. ",
             impl = "lua",
-            mapwrapto = <124>{
+            mapwrapto = <121>{
                 args = { {
                         name = "orig",
                         type = "pointer"
@@ -2282,7 +2252,7 @@ return {
                     type = "Sound",
                     wrapped = true
                 } }
-        }, <125>{
+        }, <122>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2290,7 +2260,7 @@ return {
                 } },
             doc = "Play the sound. ",
             impl = "lua",
-            mapwrapto = <126>{
+            mapwrapto = <123>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2304,7 +2274,7 @@ return {
             name = "play_sound",
             namespace = "lyte",
             rets = {}
-        }, <127>{
+        }, <124>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2312,7 +2282,7 @@ return {
                 } },
             doc = "Pause the sound. ",
             impl = "lua",
-            mapwrapto = <128>{
+            mapwrapto = <125>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2326,7 +2296,7 @@ return {
             name = "pause_sound",
             namespace = "lyte",
             rets = {}
-        }, <129>{
+        }, <126>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2334,7 +2304,7 @@ return {
                 } },
             doc = "Resume the sound. ",
             impl = "lua",
-            mapwrapto = <130>{
+            mapwrapto = <127>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2348,7 +2318,7 @@ return {
             name = "resume_sound",
             namespace = "lyte",
             rets = {}
-        }, <131>{
+        }, <128>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2356,7 +2326,7 @@ return {
                 } },
             doc = "Stop the sound. ",
             impl = "lua",
-            mapwrapto = <132>{
+            mapwrapto = <129>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2378,7 +2348,7 @@ return {
                 } },
             doc = "Check if the given sound is playing. ",
             impl = "lua",
-            mapwrapto = <133>{
+            mapwrapto = <130>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2398,7 +2368,7 @@ return {
                     name = "val",
                     type = "bool"
                 } }
-        }, <134>{
+        }, <131>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2409,7 +2379,7 @@ return {
                 } },
             doc = "Set the volume of the given sound object. ",
             impl = "lua",
-            mapwrapto = <135>{
+            mapwrapto = <132>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2426,7 +2396,7 @@ return {
             name = "set_sound_volume",
             namespace = "lyte",
             rets = {}
-        }, <136>{
+        }, <133>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2437,7 +2407,7 @@ return {
                 } },
             doc = "Set the pan of the given sound object. ",
             impl = "lua",
-            mapwrapto = <137>{
+            mapwrapto = <134>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2454,7 +2424,7 @@ return {
             name = "set_sound_pan",
             namespace = "lyte",
             rets = {}
-        }, <138>{
+        }, <135>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2465,7 +2435,7 @@ return {
                 } },
             doc = "Set the pitch of the given sound object. ",
             impl = "lua",
-            mapwrapto = <139>{
+            mapwrapto = <136>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2482,7 +2452,7 @@ return {
             name = "set_sound_pitch",
             namespace = "lyte",
             rets = {}
-        }, <140>{
+        }, <137>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2490,7 +2460,7 @@ return {
                 } },
             doc = "Get the volume of the given sound object. ",
             impl = "lua",
-            mapwrapto = <141>{
+            mapwrapto = <138>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2510,7 +2480,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <142>{
+        }, <139>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2518,7 +2488,7 @@ return {
                 } },
             doc = "Get the pan of the given sound object. ",
             impl = "lua",
-            mapwrapto = <143>{
+            mapwrapto = <140>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2538,7 +2508,7 @@ return {
                     name = "val",
                     type = "double"
                 } }
-        }, <144>{
+        }, <141>{
             args = { {
                     name = "sound",
                     type = "Sound",
@@ -2546,7 +2516,7 @@ return {
                 } },
             doc = "Get the pitch of the given sound object. ",
             impl = "lua",
-            mapwrapto = <145>{
+            mapwrapto = <142>{
                 args = { {
                         name = "sound",
                         type = "pointer"
@@ -2570,7 +2540,7 @@ return {
             args = {},
             doc = "Load the file in the path. ",
             impl = "native",
-            mapto = <146>{
+            mapto = <143>{
                 args = { {
                         name = "file_path",
                         type = "string"
@@ -2591,7 +2561,7 @@ return {
             args = {},
             doc = "Append the text to the file in the path. Override if the file exists. Create if it doesn't exist. ",
             impl = "native",
-            mapto = <147>{
+            mapto = <144>{
                 args = { {
                         name = "file_path",
                         type = "string"
@@ -2612,7 +2582,7 @@ return {
             args = {},
             doc = "Append the text to the file in the path. Append at the end if the file exists. Create if it doesn't exist. ",
             impl = "native",
-            mapto = <148>{
+            mapto = <145>{
                 args = { {
                         name = "file_path",
                         type = "string"
@@ -2633,7 +2603,7 @@ return {
             args = {},
             doc = "Push the transform matrix. ",
             impl = "native",
-            mapto = <149>{
+            mapto = <146>{
                 args = {},
                 doc = "Push the transform matrix. ",
                 impl = "native",
@@ -2648,7 +2618,7 @@ return {
             args = {},
             doc = "Pop the transform matrix. ",
             impl = "native",
-            mapto = <150>{
+            mapto = <147>{
                 args = {},
                 doc = "Pop the transform matrix. ",
                 impl = "native",
@@ -2663,7 +2633,7 @@ return {
             args = {},
             doc = "Reset the transformation matrix (load identity matrix.) ",
             impl = "native",
-            mapto = <151>{
+            mapto = <148>{
                 args = {},
                 doc = "Reset the transformation matrix (load identity matrix.) ",
                 impl = "native",
@@ -2678,7 +2648,7 @@ return {
             args = {},
             doc = "Apply translation (changes transform matrix.) ",
             impl = "native",
-            mapto = <152>{
+            mapto = <149>{
                 args = { {
                         name = "delta_x",
                         type = "double"
@@ -2699,7 +2669,7 @@ return {
             args = {},
             doc = "Apply rotation (changes transform matrix.) ",
             impl = "native",
-            mapto = <153>{
+            mapto = <150>{
                 args = { {
                         name = "angle",
                         type = "double"
@@ -2717,7 +2687,7 @@ return {
             args = {},
             doc = "Apply rotation at the given location (changes transform matrix.) ",
             impl = "native",
-            mapto = <154>{
+            mapto = <151>{
                 args = { {
                         name = "angle",
                         type = "double"
@@ -2741,7 +2711,7 @@ return {
             args = {},
             doc = "Apply scaling (changes transform matrix.) ",
             impl = "native",
-            mapto = <155>{
+            mapto = <152>{
                 args = { {
                         name = "scale_x",
                         type = "double"
@@ -2762,7 +2732,7 @@ return {
             args = {},
             doc = "Apply scaling at the given location (changes transform matrix.) ",
             impl = "native",
-            mapto = <156>{
+            mapto = <153>{
                 args = { {
                         name = "scale_x",
                         type = "double"
@@ -2789,7 +2759,7 @@ return {
             args = {},
             doc = "Set the default blendmode. ",
             impl = "native",
-            mapto = <157>{
+            mapto = <154>{
                 args = { {
                         name = "blendmode",
                         type = "BlendMode"
@@ -2807,7 +2777,7 @@ return {
             args = {},
             doc = "Set the effective blendmode. ",
             impl = "native",
-            mapto = <158>{
+            mapto = <155>{
                 args = { {
                         name = "blendmode",
                         type = "BlendMode"
@@ -2825,7 +2795,7 @@ return {
             args = {},
             doc = "Reset the blendmode value to its default value. ",
             impl = "native",
-            mapto = <159>{
+            mapto = <156>{
                 args = {},
                 doc = "Reset the blendmode value to its default value. ",
                 impl = "native",
@@ -2840,7 +2810,7 @@ return {
             args = {},
             doc = "Set the default filtermode. ",
             impl = "native",
-            mapto = <160>{
+            mapto = <157>{
                 args = { {
                         name = "filtermode",
                         type = "FilterMode"
@@ -2858,7 +2828,7 @@ return {
             args = {},
             doc = "Set the effective filtermode. ",
             impl = "native",
-            mapto = <161>{
+            mapto = <158>{
                 args = { {
                         name = "filtermode",
                         type = "FilterMode"
@@ -2876,7 +2846,7 @@ return {
             args = {},
             doc = "Reset the filtermode value to its default value. ",
             impl = "native",
-            mapto = <162>{
+            mapto = <159>{
                 args = {},
                 doc = "Reset the filtermode value to its default value. ",
                 impl = "native",
@@ -2887,7 +2857,7 @@ return {
             name = "reset_filtermode",
             namespace = "lyte",
             rets = {}
-        }, <163>{
+        }, <160>{
             args = { {
                     name = "shaderbuilder",
                     type = "ShaderBuilder",
@@ -2895,7 +2865,7 @@ return {
                 } },
             doc = "Free ShaderBuilder resources ",
             impl = "lua",
-            mapwrapto = <164>{
+            mapwrapto = <161>{
                 args = { {
                         name = "shaderbuilder",
                         type = "pointer"
@@ -2913,7 +2883,7 @@ return {
             args = {},
             doc = "Create a ShaderBuilder object. ",
             impl = "lua",
-            mapwrapto = <165>{
+            mapwrapto = <162>{
                 args = {},
                 doc = "Create a ShaderBuilder object. ",
                 impl = "lua",
@@ -2931,7 +2901,7 @@ return {
                     type = "ShaderBuilder",
                     wrapped = true
                 } }
-        }, <166>{
+        }, <163>{
             args = { {
                     name = "shaderbuilder",
                     type = "ShaderBuilder",
@@ -2945,7 +2915,7 @@ return {
                 } },
             doc = "Add uniform definition to the shaderbuilder ",
             impl = "lua",
-            mapwrapto = <167>{
+            mapwrapto = <164>{
                 args = { {
                         name = "shaderbuilder",
                         type = "pointer"
@@ -2965,7 +2935,7 @@ return {
             name = "shaderbuilder_uniform",
             namespace = "lyte",
             rets = {}
-        }, <168>{
+        }, <165>{
             args = { {
                     name = "shaderbuilder",
                     type = "ShaderBuilder",
@@ -2976,7 +2946,7 @@ return {
                 } },
             doc = "Add vertex code to the shaderbuilder ",
             impl = "lua",
-            mapwrapto = <169>{
+            mapwrapto = <166>{
                 args = { {
                         name = "shaderbuilder",
                         type = "pointer"
@@ -2993,7 +2963,7 @@ return {
             name = "shaderbuilder_vertex",
             namespace = "lyte",
             rets = {}
-        }, <170>{
+        }, <167>{
             args = { {
                     name = "shaderbuilder",
                     type = "ShaderBuilder",
@@ -3004,7 +2974,7 @@ return {
                 } },
             doc = "Add fragment to the shaderbuilder ",
             impl = "lua",
-            mapwrapto = <171>{
+            mapwrapto = <168>{
                 args = { {
                         name = "shaderbuilder",
                         type = "pointer"
@@ -3021,7 +2991,7 @@ return {
             name = "shaderbuilder_fragment",
             namespace = "lyte",
             rets = {}
-        }, <172>{
+        }, <169>{
             args = { {
                     name = "shaderbuilder",
                     type = "ShaderBuilder",
@@ -3029,7 +2999,7 @@ return {
                 } },
             doc = "Add fragment to the shaderbuilder ",
             impl = "lua",
-            mapwrapto = <173>{
+            mapwrapto = <170>{
                 args = { {
                         name = "shaderbuilder",
                         type = "pointer"
@@ -3050,7 +3020,7 @@ return {
                     type = "Shader",
                     wrapped = true
                 } }
-        }, <174>{
+        }, <171>{
             args = { {
                     name = "shader",
                     type = "Shader",
@@ -3058,7 +3028,7 @@ return {
                 } },
             doc = "Free Shader resources ",
             impl = "lua",
-            mapwrapto = <175>{
+            mapwrapto = <172>{
                 args = { {
                         name = "shader",
                         type = "pointer"
@@ -3094,19 +3064,9 @@ return {
                     type = "Shader",
                     wrapped = true
                 } },
+            code = "function(shader_wrapped)\n    local shader = shader_wrapped.id\n    lyte_core.shader_set(shader)\n    lyte._current_shader_save = shader_wrapped\nend\n",
             doc = "Set the custom shader and use it for consequent calls. ",
             impl = "lua",
-            mapwrapto = <176>{
-                args = { {
-                        name = "shader",
-                        type = "pointer"
-                    } },
-                doc = "Set the custom shader and use it for consequent calls. ",
-                impl = "lua",
-                name = "shader_set",
-                namespace = "lyte_core",
-                rets = {}
-            },
             name = "set_shader",
             namespace = "lyte",
             rets = {}
@@ -3114,7 +3074,7 @@ return {
             args = {},
             doc = "Reset the shader, back to framework defaults. ",
             impl = "native",
-            mapto = <177>{
+            mapto = <173>{
                 args = {},
                 doc = "Reset the shader, back to framework defaults. ",
                 impl = "native",
@@ -3125,7 +3085,7 @@ return {
             name = "reset_shader",
             namespace = "lyte",
             rets = {}
-        }, <178>{
+        }, <174>{
             args = { {
                     name = "shader",
                     type = "Shader",
@@ -3143,7 +3103,7 @@ return {
             name = "set_shader_uniform",
             namespace = "lyte",
             rets = {}
-        }, <179>{
+        }, <175>{
             args = { {
                     name = "shader",
                     type = "Shader",
@@ -3154,7 +3114,7 @@ return {
                 } },
             doc = "Reset the specified uniform. ",
             impl = "lua",
-            mapwrapto = <180>{
+            mapwrapto = <176>{
                 args = { {
                         name = "shader",
                         type = "pointer"
@@ -3207,7 +3167,7 @@ return {
                     name = "height",
                     type = "int"
                 }, {
-                    mapread = <table 34>,
+                    mapread = <table 33>,
                     name = "is_canvas",
                     type = "bool"
                 } },
@@ -3220,21 +3180,21 @@ return {
         }, {
             doc = "ImageBatch type. ",
             fields = { {
-                    mapread = <table 43>,
+                    mapread = <table 42>,
                     name = "rect_count",
                     type = "int"
                 } },
             methods = { {
-                    mapto = <table 41>,
+                    mapto = <table 40>,
                     name = "add_rect"
                 }, {
-                    mapto = <table 45>,
+                    mapto = <table 44>,
                     name = "draw"
                 }, {
-                    mapto = <table 39>,
+                    mapto = <table 38>,
                     name = "reset"
                 }, {
-                    mapto = <table 36>,
+                    mapto = <table 35>,
                     name = "__gc"
                 } },
             name = "ImageBatch",
@@ -3243,7 +3203,7 @@ return {
             doc = "Font type. ",
             fields = {},
             methods = { {
-                    mapto = <table 47>,
+                    mapto = <table 46>,
                     name = "__gc"
                 } },
             name = "Font",
@@ -3251,50 +3211,50 @@ return {
         }, {
             doc = "Music type. ",
             fields = { {
-                    mapread = <table 100>,
+                    mapread = <table 97>,
                     name = "playing",
                     type = "bool"
                 }, {
-                    mapread = <table 102>,
+                    mapread = <table 99>,
                     name = "length",
                     type = "double"
                 }, {
-                    mapread = <table 104>,
+                    mapread = <table 101>,
                     name = "length_played",
                     type = "double"
                 }, {
-                    mapread = <table 116>,
-                    mapwrite = <table 110>,
+                    mapread = <table 113>,
+                    mapwrite = <table 107>,
                     name = "pan",
                     type = "double"
                 }, {
-                    mapread = <table 118>,
-                    mapwrite = <table 112>,
+                    mapread = <table 115>,
+                    mapwrite = <table 109>,
                     name = "pitch",
                     type = "double"
                 }, {
-                    mapread = <table 114>,
-                    mapwrite = <table 108>,
+                    mapread = <table 111>,
+                    mapwrite = <table 105>,
                     name = "volume",
                     type = "double"
                 } },
             methods = { {
-                    mapto = <table 93>,
+                    mapto = <table 91>,
                     name = "play"
                 }, {
-                    mapto = <table 95>,
+                    mapto = <table 92>,
                     name = "pause"
                 }, {
-                    mapto = <table 97>,
+                    mapto = <table 94>,
                     name = "resume"
                 }, {
-                    mapto = <table 99>,
+                    mapto = <table 96>,
                     name = "stop"
                 }, {
-                    mapto = <table 106>,
+                    mapto = <table 103>,
                     name = "seek"
                 }, {
-                    mapto = <table 90>,
+                    mapto = <table 88>,
                     name = "__gc"
                 } },
             name = "Music",
@@ -3302,38 +3262,38 @@ return {
         }, {
             doc = "Sound type. ",
             fields = { {
-                    mapread = <table 142>,
-                    mapwrite = <table 136>,
+                    mapread = <table 139>,
+                    mapwrite = <table 133>,
                     name = "pan",
                     type = "double"
                 }, {
-                    mapread = <table 144>,
-                    mapwrite = <table 138>,
+                    mapread = <table 141>,
+                    mapwrite = <table 135>,
                     name = "pitch",
                     type = "double"
                 }, {
-                    mapread = <table 140>,
-                    mapwrite = <table 134>,
+                    mapread = <table 137>,
+                    mapwrite = <table 131>,
                     name = "volume",
                     type = "double"
                 } },
             methods = { {
-                    mapto = <table 123>,
+                    mapto = <table 120>,
                     name = "clone"
                 }, {
-                    mapto = <table 127>,
+                    mapto = <table 124>,
                     name = "pause"
                 }, {
-                    mapto = <table 125>,
+                    mapto = <table 122>,
                     name = "play"
                 }, {
-                    mapto = <table 129>,
+                    mapto = <table 126>,
                     name = "resume"
                 }, {
-                    mapto = <table 131>,
+                    mapto = <table 128>,
                     name = "stop"
                 }, {
-                    mapto = <table 120>,
+                    mapto = <table 117>,
                     name = "__gc"
                 } },
             name = "Sound",
@@ -3342,13 +3302,13 @@ return {
             doc = "Shader type ",
             fields = {},
             methods = { {
-                    mapto = <table 178>,
+                    mapto = <table 174>,
                     name = "set"
                 }, {
-                    mapto = <table 179>,
+                    mapto = <table 175>,
                     name = "reset"
                 }, {
-                    mapto = <table 174>,
+                    mapto = <table 171>,
                     name = "__gc"
                 } },
             name = "Shader",
@@ -3357,19 +3317,19 @@ return {
             doc = "ShaderBuilder type ",
             fields = {},
             methods = { {
-                    mapto = <table 166>,
+                    mapto = <table 163>,
                     name = "uniform"
                 }, {
-                    mapto = <table 168>,
+                    mapto = <table 165>,
                     name = "vertex"
                 }, {
-                    mapto = <table 170>,
+                    mapto = <table 167>,
                     name = "fragment"
                 }, {
-                    mapto = <table 172>,
+                    mapto = <table 169>,
                     name = "build"
                 }, {
-                    mapto = <table 163>,
+                    mapto = <table 160>,
                     name = "__gc"
                 } },
             name = "ShaderBuilder",
@@ -3379,7 +3339,37 @@ return {
             dicts = {},
             doc = "\nlyte_core namespace. Direct API mappings to C library.",
             enums = { <table 1>, <table 2>, <table 3>, <table 4>, <table 5>, <table 6>, <table 7> },
-            functions = { <table 8>, <table 9>, <table 10>, <table 11>, <table 12>, <table 13>, <table 14>, <table 15>, <table 16>, <table 17>, <table 18>, <table 19>, <table 20>, <table 21>, <table 23>, <table 24>, <table 25>, <table 26>, <table 28>, <table 30>, <table 31>, <table 32>, <table 33>, <table 35>, <table 37>, <table 38>, <table 40>, <table 42>, <table 44>, <table 46>, <table 48>, <table 49>, <table 50>, <table 51>, <table 52>, <table 53>, <table 54>, <table 55>, <table 56>, <table 57>, <table 58>, <table 59>, <table 60>, <table 61>, <table 62>, <table 63>, <table 64>, <table 65>, <table 66>, <table 67>, <table 68>, <table 69>, <table 70>, <table 71>, <table 72>, <table 73>, <table 74>, <table 75>, <table 76>, <table 77>, <table 78>, <table 79>, <table 80>, <table 81>, <table 82>, <table 83>, <table 84>, <table 85>, <table 86>, <table 87>, <table 88>, <table 89>, <table 91>, <table 92>, <table 94>, <table 96>, <table 98>, {
+            functions = { <table 8>, <table 9>, <table 10>, <table 11>, <table 12>, <table 13>, <table 14>, <table 15>, <table 16>, <table 17>, <table 18>, <table 19>, <table 20>, <table 21>, <table 23>, <table 24>, <table 25>, <table 26>, <table 28>, <table 30>, <table 31>, {
+                    args = { {
+                            name = "canvas_image",
+                            type = "pointer"
+                        } },
+                    doc = "Set the effective canvas image. All draw operations will go to this canvas until it's reset. ",
+                    impl = "lua",
+                    name = "image_set_canvas",
+                    namespace = "lyte_core",
+                    rets = {}
+                }, <table 32>, <table 34>, <table 36>, <table 37>, <table 39>, <table 41>, <table 43>, <table 45>, <table 47>, <table 48>, {
+                    args = { {
+                            name = "font",
+                            type = "pointer"
+                        } },
+                    doc = "Set the effective font to be used in the drawing operations. ",
+                    impl = "lua",
+                    name = "font_set",
+                    namespace = "lyte_core",
+                    rets = {}
+                }, <table 49>, <table 50>, <table 51>, <table 52>, <table 53>, <table 54>, <table 55>, <table 56>, <table 57>, <table 58>, <table 59>, <table 60>, <table 61>, <table 62>, <table 63>, <table 64>, <table 65>, <table 66>, <table 67>, <table 68>, <table 69>, <table 70>, <table 71>, <table 72>, <table 73>, <table 74>, <table 75>, <table 76>, <table 77>, <table 78>, <table 79>, <table 80>, <table 81>, <table 82>, <table 83>, <table 84>, <table 85>, <table 86>, <table 87>, <table 89>, <table 90>, {
+                    args = { {
+                            name = "music",
+                            type = "pointer"
+                        } },
+                    doc = "Play the music. ",
+                    impl = "lua",
+                    name = "music_play",
+                    namespace = "lyte_core",
+                    rets = {}
+                }, <table 93>, <table 95>, {
                     args = { {
                             name = "music",
                             type = "pointer"
@@ -3389,7 +3379,17 @@ return {
                     name = "music_stop",
                     namespace = "lyte_core",
                     rets = {}
-                }, <table 101>, <table 103>, <table 105>, <table 107>, <table 109>, <table 111>, <table 113>, <table 115>, <table 117>, <table 119>, <table 121>, <table 122>, <table 124>, <table 126>, <table 128>, <table 130>, <table 132>, <table 133>, <table 135>, <table 137>, <table 139>, <table 141>, <table 143>, <table 145>, <table 146>, <table 147>, <table 148>, <table 149>, <table 150>, <table 151>, <table 152>, <table 153>, <table 154>, <table 155>, <table 156>, <table 157>, <table 158>, <table 159>, <table 160>, <table 161>, <table 162>, <table 164>, <table 165>, <table 167>, <table 169>, <table 171>, <table 173>, <table 175>, <table 176>, <table 177>, {
+                }, <table 98>, <table 100>, <table 102>, <table 104>, <table 106>, <table 108>, <table 110>, <table 112>, <table 114>, <table 116>, <table 118>, <table 119>, <table 121>, <table 123>, <table 125>, <table 127>, <table 129>, <table 130>, <table 132>, <table 134>, <table 136>, <table 138>, <table 140>, <table 142>, <table 143>, <table 144>, <table 145>, <table 146>, <table 147>, <table 148>, <table 149>, <table 150>, <table 151>, <table 152>, <table 153>, <table 154>, <table 155>, <table 156>, <table 157>, <table 158>, <table 159>, <table 161>, <table 162>, <table 164>, <table 166>, <table 168>, <table 170>, <table 172>, {
+                    args = { {
+                            name = "shader",
+                            type = "pointer"
+                        } },
+                    doc = "Set the custom shader and use it for consequent calls. ",
+                    impl = "lua",
+                    name = "shader_set",
+                    namespace = "lyte_core",
+                    rets = {}
+                }, <table 173>, {
                     args = { {
                             name = "shader",
                             type = "pointer"
@@ -3437,7 +3437,7 @@ return {
                     name = "shader_set_uniform_image",
                     namespace = "lyte_core",
                     rets = {}
-                }, <table 180> },
+                }, <table 176> },
             lists = { {
                     doc = "Float values",
                     item_type = "float",

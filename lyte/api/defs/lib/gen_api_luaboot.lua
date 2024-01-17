@@ -22,56 +22,6 @@ local function generate_api_luaboot(NS)
     end
     out = out .. "\n"
 
-    out = out .. "-- records \n"
-    for _i, rec in ipairs(NS.records) do
-        out = out .. NS.name .. "." .. rec.name .. " = {\n"
-        out = out .. SPC .. "id=nil;\n"
-        out = out .. SPC .. "__new=function(self, id) rawset(self, 'id', id) end;\n"
-        -- fields: gets
-        out = out .. SPC .. "__index=function(self, k)\n"
-        for _i, f in ipairs(rec.fields) do
-            if f.mapread then
-                out = out .. SPC2 .. "if k=='" .. f.name .. "' then return " .. NS.name .. "." .. f.mapread.name .. "(self, k) end\n"
-            end
-        end
-        -- non "meta" methods
-        for _i, m in ipairs(rec.methods) do
-            if m.name:sub(1,2) ~= "__" then
-                out = out .. SPC2 .. "if k=='" .. m.name .. "' then return " .. NS.name .. "." ..  m.mapto.name .. " end\n"
-            end
-        end
-        out = out .. SPC2 .. "return rawget(self, k)\n"
-        out = out .. SPC .. "end;\n"
-        -- fields: sets
-        out = out .. SPC .. "__newindex=function(self, k, v)\n"
-        local begin = true
-        local if_mapwrite_exists = false
-        for _i, f in ipairs(rec.fields) do
-            if f.mapwrite then
-                out = out .. SPC2
-                if begin then
-                    if_mapwrite_exists = true
-                    out = out .. "if "
-                    begin = false
-                else
-                    out = out .. "elseif "
-                end
-                out = out .. "k=='" .. f.name .. "' then " .. NS.name .. "." .. f.mapwrite.name .. "(self, v)\n"
-            end
-        end
-        if if_mapwrite_exists then out = out .. SPC2 .. "end\n" end
-        out = out .. SPC .. "end;\n"
-        -- "meta" methods
-        for _i, m in ipairs(rec.methods) do
-            if m.name:sub(1,2) == "__" then
-                out = out .. SPC .. m.name .. "=" .. NS.name .. "." .. m.mapto.name .. ";\n"
-            end
-        end
-        out = out .. SPC .. "__tostring=function(self) return '(obj type = " .. NS.name .. "." .. rec.name .. ")' end;\n"
-        out = out .. "}\n"
-    end
-    out = out .. "\n"
-
     out = out .. "-- lua 'wrapping' functions\n"
     for _i, fn in ipairs(NS.functions) do
         if fn.mapwrapto then
@@ -122,6 +72,56 @@ local function generate_api_luaboot(NS)
             end
             out = out .. "end\n"
         end
+    end
+    out = out .. "\n"
+
+    out = out .. "-- records \n"
+    for _i, rec in ipairs(NS.records) do
+        out = out .. NS.name .. "." .. rec.name .. " = {\n"
+        out = out .. SPC .. "id=nil;\n"
+        out = out .. SPC .. "__new=function(self, id) rawset(self, 'id', id) end;\n"
+        -- fields: gets
+        out = out .. SPC .. "__index=function(self, k)\n"
+        for _i, f in ipairs(rec.fields) do
+            if f.mapread then
+                out = out .. SPC2 .. "if k=='" .. f.name .. "' then return " .. NS.name .. "." .. f.mapread.name .. "(self, k) end\n"
+            end
+        end
+        -- non "meta" methods
+        for _i, m in ipairs(rec.methods) do
+            if m.name:sub(1,2) ~= "__" then
+                out = out .. SPC2 .. "if k=='" .. m.name .. "' then return " .. NS.name .. "." ..  m.mapto.name .. " end\n"
+            end
+        end
+        out = out .. SPC2 .. "return rawget(self, k)\n"
+        out = out .. SPC .. "end;\n"
+        -- fields: sets
+        out = out .. SPC .. "__newindex=function(self, k, v)\n"
+        local begin = true
+        local if_mapwrite_exists = false
+        for _i, f in ipairs(rec.fields) do
+            if f.mapwrite then
+                out = out .. SPC2
+                if begin then
+                    if_mapwrite_exists = true
+                    out = out .. "if "
+                    begin = false
+                else
+                    out = out .. "elseif "
+                end
+                out = out .. "k=='" .. f.name .. "' then " .. NS.name .. "." .. f.mapwrite.name .. "(self, v)\n"
+            end
+        end
+        if if_mapwrite_exists then out = out .. SPC2 .. "end\n" end
+        out = out .. SPC .. "end;\n"
+        -- "meta" methods
+        for _i, m in ipairs(rec.methods) do
+            if m.name:sub(1,2) == "__" then
+                out = out .. SPC .. m.name .. "=" .. NS.name .. "." .. m.mapto.name .. ";\n"
+            end
+        end
+        out = out .. SPC .. "__tostring=function(self) return '(obj type = " .. NS.name .. "." .. rec.name .. ")' end;\n"
+        out = out .. "}\n"
     end
     out = out .. "\n"
 
