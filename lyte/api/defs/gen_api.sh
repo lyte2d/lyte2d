@@ -1,3 +1,8 @@
+mkdir output
+mkdir output/dbg
+mkdir output/code
+mkdir output/typings
+
 echo "Debug output: tag raw tree. this is before being it's processed"
 lua -e "print((require 'lib.tag.tag_pp')(require 'defs_lyte'.raw_tree) .. '\n')" > output/dbg/_lyte_tagtree.txt
 lua -e "print((require 'lib.tag.tag_pp')(require 'defs_lyte_core'.raw_tree) .. '\n')" > output/dbg/_lyte_core_tagtree.txt
