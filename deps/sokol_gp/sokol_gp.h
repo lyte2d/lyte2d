@@ -500,6 +500,11 @@ typedef struct sgp_textures_uniform {
     sg_sampler samplers[SGP_TEXTURE_SLOTS];
 } sgp_textures_uniform;
 
+typedef struct sgp_pipeline {
+    sg_pipeline pipeline;
+    sg_shader shader;
+} sgp_pipeline;
+
 /* SGP draw state. */
 typedef struct sgp_state {
     sgp_isize frame_size;
@@ -543,8 +548,9 @@ SOKOL_GP_API_DECL bool sgp_is_valid(void);                              /* Check
 SOKOL_GP_API_DECL sgp_error sgp_get_last_error(void);                   /* Returns last SGP error. */
 SOKOL_GP_API_DECL const char* sgp_get_error_message(sgp_error error);   /* Returns a message with SGP error description. */
 
-/* Custom pipeline creation. */
-SOKOL_GP_API_DECL sg_pipeline sgp_make_pipeline(const sgp_pipeline_desc* desc); /* Creates a custom shader pipeline to be used with SGP. */
+/* Custom pipeline creation and destruction. */
+SOKOL_GP_API_DECL sgp_pipeline sgp_make_pipeline(const sgp_pipeline_desc* desc); /* Creates a custom shader pipeline to be used with SGP. */
+SOKOL_GP_API_DECL void sgp_destroy_pipeline(sgp_pipeline pip); /* Destroys a custom shader pipeline created by `sgp_make_pipeline`. */
 
 /* Draw command queue management. */
 SOKOL_GP_API_DECL void sgp_begin(int width, int height);    /* Begins a new SGP draw command queue. */
@@ -1755,15 +1761,20 @@ const char* sgp_get_error_message(sgp_error error_code) {
     }
 }
 
-sg_pipeline sgp_make_pipeline(const sgp_pipeline_desc* desc) {
-    sg_pipeline pip = {SG_INVALID_ID};
-    sg_shader shader = sg_make_shader(&desc->shader);
+sgp_pipeline sgp_make_pipeline(const sgp_pipeline_desc* desc) {
+    sgp_pipeline pip = {SG_INVALID_ID, SG_INVALID_ID};
+    pip.shader = sg_make_shader(&desc->shader);
     sg_pixel_format pixel_format = _sg_def(desc->pixel_format, _sgp.desc.pixel_format);
-    if(sg_query_shader_state(shader) == SG_RESOURCESTATE_VALID)
-        pip = _sgp_make_pipeline(desc->primitive_type, desc->blend_mode, pixel_format, shader);
-    else if(shader.id != SG_INVALID_ID)
-        sg_destroy_shader(shader);
+    if(sg_query_shader_state(pip.shader) == SG_RESOURCESTATE_VALID)
+        pip.pipeline = _sgp_make_pipeline(desc->primitive_type, desc->blend_mode, pixel_format, pip.shader);
+    else if(pip.shader.id != SG_INVALID_ID)
+        sg_destroy_shader(pip.shader);
     return pip;
+}
+
+void sgp_destroy_pipeline(sgp_pipeline pip) {
+    sg_destroy_pipeline(pip.pipeline);
+    sg_destroy_shader(pip.shader);
 }
 
 static inline sgp_mat2x3 _sgp_default_proj(int width, int height) {
