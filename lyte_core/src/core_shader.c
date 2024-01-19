@@ -325,21 +325,23 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 
     shader_desc.fs.uniform_blocks[0].size = shd->num_uniform_floats * 4;
 
+    // sg_shader
+    sg_shader sgshd= sg_make_shader(&shader_desc);
     // sgp pipeline
     sgp_pipeline_desc pip_desc = {0};
     pip_desc.blend_mode = (sgp_blend_mode)lytecore_state.blendmode;
-    pip_desc.shader = shader_desc;
+    pip_desc.shader = sgshd;
     //pip_desc.primitive_type = SG_PRIMITIVETYPE_ ; // TODO: do we need to set this?
-    sgp_pipeline pip = sgp_make_pipeline(&pip_desc);
-    sg_resource_state state = sg_query_pipeline_state(pip.pipeline);
+    sg_pipeline pip = sgp_make_pipeline(&pip_desc);
+    sg_resource_state state = sg_query_pipeline_state(pip);
     if (state != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Failed to make custom pipeline: %d\n ", state);
         return 5;
     }
 
     // associate sgp pipeline with the shaderitem
-    shd->pip_id = pip.pipeline.id;
-    shd->shd_id = pip.shader.id;
+    shd->pip_id = pip.id;
+    shd->shd_id = sgshd.id;
 
     *shader = shd;
 
@@ -357,10 +359,8 @@ int lyte_Shader_cleanup(lyte_Shader shader) {
         free(shd->uniform_definitions);
         free(shd->uniform_floats);
         free(shd->images);
-        sgp_destroy_pipeline((sgp_pipeline){
-            .pipeline = (sg_pipeline){.id = shd->pip_id},
-            .shader = (sg_shader){.id = shd->shd_id},
-        });
+        sg_destroy_pipeline((sg_pipeline){ .id = shd->pip_id });
+        sg_destroy_shader((sg_shader){.id = shd->shd_id});
         free(shd);
     }
     return 0;

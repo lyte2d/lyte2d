@@ -16,6 +16,7 @@ Sokol GP, or in short SGP, stands for Sokol Graphics Painter.
 * D3D11/OpenGL 3.3/Metal/WebGPU graphics backends (through Sokol GFX).
 * **Automatic batching** (merge recent draw calls into batches automatically).
 * **Batch optimizer** (rearranges the ordering of draw calls to batch more).
+* Batch draw calls even when using different color states. **\*NEW\***
 * Uses preallocated memory (no allocations at runtime).
 * Supports drawing basic 2D primitives (rectangles, triangles, lines and points).
 * Supports the classic 2D color blending modes (color blend, add, modulate, multiply).
@@ -189,7 +190,7 @@ static void init(void) {
         .logger.func = slog_func
     };
     sg_setup(&sgdesc);
-    if(!sg_isvalid()) {
+    if (!sg_isvalid()) {
         fprintf(stderr, "Failed to create Sokol GFX context!\n");
         exit(-1);
     }
@@ -197,7 +198,7 @@ static void init(void) {
     // Initialize Sokol GP, adjust the size of command buffers for your own use.
     sgp_desc sgpdesc = {0};
     sgp_setup(&sgpdesc);
-    if(!sgp_is_valid()) {
+    if (!sgp_is_valid()) {
         fprintf(stderr, "Failed to create Sokol GP context: %s\n", sgp_get_error_message(sgp_get_last_error()));
         exit(-1);
     }
@@ -350,19 +351,6 @@ MIT, see LICENSE file or the end of `sokol_gp.h` file.
 Here is a quick list of all library functions for quick reference:
 
 ```c
-/* Structure that defines SGP setup parameters. */
-typedef struct sgp_desc {
-    uint32_t max_vertices;
-    uint32_t max_commands;
-} sgp_desc;
-
-/* Structure that defines SGP custom pipeline creation parameters. */
-typedef struct sgp_pipeline_desc {
-    sg_shader_desc shader;              /* Sokol shader description. */
-    sg_primitive_type primitive_type;   /* Draw primitive type (triangles, lines, points, etc). Default is triangles. */
-    sgp_blend_mode blend_mode;          /* Color blend mode. Default is no blend. */
-} sgp_pipeline_desc;
-
 /* Initialization and de-initialization. */
 void sgp_setup(const sgp_desc* desc);                 /* Initializes the SGP context, and should be called after `sg_setup`. */
 void sgp_shutdown(void);                              /* Destroys the SGP context. */
@@ -421,6 +409,7 @@ void sgp_reset_state(void);                               /* Reset all state to 
 
 /* Drawing functions. */
 void sgp_clear(void);                                                                         /* Clears the current viewport using the current state color. */
+void sgp_draw(sg_primitive_type primitive_type, const sgp_vertex* vertices, uint32_t count);  /* Low level drawing function, capable of drawing any primitive. */
 void sgp_draw_points(const sgp_point* points, uint32_t count);                                /* Draws points in a batch. */
 void sgp_draw_point(float x, float y);                                                        /* Draws a single point. */
 void sgp_draw_lines(const sgp_line* lines, uint32_t count);                                   /* Draws lines in a batch. */
@@ -449,6 +438,8 @@ and has proved to be stable.
 This library has been originally sponsored by the MMORPG game [Medivia Online](https://medivia.online/),
 I would like to thank them for supporting my work.
 
+Thanks @kkukshtel for sponsoring batching draw calls with different colors feature.
+
 ## Related projects
 
 Make sure to checkout the excellent [Sokol](https://github.com/floooh/sokol) project by @floooh,
@@ -461,20 +452,14 @@ very useful for simplifying finite state machines in game devlopment.
 
 ## Updates
 
+* **18-Jan-2024**: Fix shader leaking when creating custom SGP pipelines.
+* **07-Jan-2024**: Make possible to set custom depth format and sample count in pipelines, batch draw calls even when using different colors, introduce low level primitive drawing function, format source files.
 * **31-Oct-2023**: Update to latest Sokol, introduced new WebGPU backend.
 * **30-Sep-2023**: Update to latest Sokol, deprecated GLES2 backend, add image sampler APIs, changes in draw textured APIs.
 * **31-Dec-2021**: The library was open sourced.
 * **05-Aug-2020**: Added support for custom shaders.
 * **03-Jun-2020**: Added the batch optimizer.
 * **29-May-2020**: The library was created.
-
-## Future features planned
-
-These are features I would like to implement someday in the future
-(if there is enough interest).
-
-* Draw textured triangles
-* Support drawing primitives with colored vertices
 
 ## Screenshots
 
