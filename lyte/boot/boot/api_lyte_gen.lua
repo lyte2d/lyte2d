@@ -87,14 +87,6 @@ lyte.load_image = function(image_path)
     local _ret_val = classnew(lyte.Image, val)
     return _ret_val
 end
-lyte.draw_image = function(image_wrapped, dest_x, dest_y)
-    local image = image_wrapped.id
-    lyte_core.image_draw(image, dest_x, dest_y)
-end
-lyte.draw_image_rect = function(image_wrapped, dest_x, dest_y, src_x, src_y, rect_width, rect_height)
-    local image = image_wrapped.id
-    lyte_core.image_draw_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height)
-end
 lyte.get_image_width = function(image_wrapped)
     local image = image_wrapped.id
     local val = lyte_core.image_get_width(image)
@@ -131,10 +123,6 @@ end
 lyte.reset_imagebatch = function(imagebatch_wrapped)
     local imagebatch = imagebatch_wrapped.id
     lyte_core.imagebatch_reset(imagebatch)
-end
-lyte.add_imagebatch_rect = function(imagebatch_wrapped, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)
-    local imagebatch = imagebatch_wrapped.id
-    lyte_core.imagebatch_add_rect(imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)
 end
 lyte.get_imagebatch_rect_count = function(imagebatch_wrapped)
     local imagebatch = imagebatch_wrapped.id
@@ -461,10 +449,42 @@ lyte.ShaderBuilder = {
 }
 
 -- manually handled functions in current namespace
+lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, angle, scale_x, scale_y, origin_x, origin_y)
+    local image = image_wrapped.id
+    if not angle then
+        lyte_core.image_draw(image, dest_x, dest_y)
+    else
+        angle = angle or 0
+        scale_x = scale_x or 1
+        scale_y = scale_y or 1
+        origin_x = origin_x or 0
+        origin_y = origin_y or 0
+        lyte_core.image_draw_ex(image, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y)
+    end
+end
+lyte.draw_image_rect = function(image_wrapped, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, scale_x, scale_y, origin_x, origin_y)
+    local image = image_wrapped.id
+    if not angle then
+        lyte_core.image_draw_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height)
+    else
+        angle = angle or 0
+        scale_x = scale_x or 1
+        scale_y = scale_y or 1
+        origin_x = origin_x or 0
+        origin_y = origin_y or 0
+        lyte_core.image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, scale_x, scale_y, origin_x, origin_y)
+    end
+end
 lyte.set_canvas = function(canvas_image_wrapped)
     local canvas_image = canvas_image_wrapped.id
     lyte_core.image_set_canvas(canvas_image)
     lyte._current_canvas_save = canvas_image_wrapped
+end
+lyte.add_imagebatch_rect = function(imagebatch_wrapped, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)
+    local imagebatch = imagebatch_wrapped.id
+    src_width = src_width or dest_width
+    src_height = src_height or dest_height
+    lyte_core.imagebatch_add_rect(imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)
 end
 lyte.set_font = function(font_wrapped)
     local font = font_wrapped.id

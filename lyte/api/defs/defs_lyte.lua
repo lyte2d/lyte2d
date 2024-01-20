@@ -67,9 +67,28 @@ return process_def_tree(Namespace("lyte",
         Arg("image", Wrap("Image")),
         Arg("dest_x", Double),
         Arg("dest_y", Double),
-        Doc"Draw an image.",
-        MapWrapTo("lyte_core.image_draw"),
-        LuaImpl
+        Arg("angle", Double),
+        Arg("scale_x", Double),
+        Arg("scale_y", Double),
+        Arg("origin_x", Double),
+        Arg("origin_y", Double),
+        Doc"Draw an image. Angle, scale and origin values are all optional.",
+        -- MapWrapTo("lyte_core.image_draw"),
+        LuaImpl,
+        Code[[function(image_wrapped, dest_x, dest_y, angle, angle, scale_x, scale_y, origin_x, origin_y)
+    local image = image_wrapped.id
+    if not angle then
+        lyte_core.image_draw(image, dest_x, dest_y)
+    else
+        angle = angle or 0
+        scale_x = scale_x or 1
+        scale_y = scale_y or 1
+        origin_x = origin_x or 0
+        origin_y = origin_y or 0
+        lyte_core.image_draw_ex(image, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y)
+    end
+end
+]]
     ),
 
     Function("draw_image_rect",
@@ -80,9 +99,28 @@ return process_def_tree(Namespace("lyte",
         Arg("src_y", Double),
         Arg("rect_width", Double),
         Arg("rect_height", Double),
-        Doc"Draw a rectangular area from the image.",
-        MapWrapTo("lyte_core.image_draw_rect"),
-        LuaImpl
+        Arg("angle", Double),
+        Arg("scale_x", Double),
+        Arg("scale_y", Double),
+        Arg("origin_x", Double),
+        Arg("origin_y", Double),
+        Doc"Draw a rectangular area from the image. Angle, scale and origin values are all optional.",
+        -- MapWrapTo("lyte_core.image_draw_rect"),
+        LuaImpl,
+        Code[[function(image_wrapped, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, scale_x, scale_y, origin_x, origin_y)
+    local image = image_wrapped.id
+    if not angle then
+        lyte_core.image_draw_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height)
+    else
+        angle = angle or 0
+        scale_x = scale_x or 1
+        scale_y = scale_y or 1
+        origin_x = origin_x or 0
+        origin_y = origin_y or 0
+        lyte_core.image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, scale_x, scale_y, origin_x, origin_y)
+    end
+end
+]]
     ),
 
     Function("get_image_width",
@@ -168,9 +206,17 @@ end
         Arg("src_y", Double),
         Arg("src_width", Double),
         Arg("src_height", Double),
-        Doc"Add a recta to the image batch (from it's initial image).",
-        MapWrapTo("lyte_core.imagebatch_add_rect"),
-        LuaImpl
+        Doc"Add a recta to the image batch (from it's initial image). `src_width` and `src_height` are optional and will default to the corresponding `dest_` values.",
+        -- MapWrapTo("lyte_core.imagebatch_add_rect"),
+        LuaImpl,
+        Code[[function(imagebatch_wrapped, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)
+    local imagebatch = imagebatch_wrapped.id
+    src_width = src_width or dest_width
+    src_height = src_height or dest_height
+    lyte_core.imagebatch_add_rect(imagebatch, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)
+end
+]]
+
     ),
 
     Function("get_imagebatch_rect_count",

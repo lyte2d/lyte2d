@@ -56,11 +56,11 @@
 --- Load the image specified in the path. 
 --- @type fun(image_path: string): lyte.Image
     lyte.load_image = lyte.load_image and lyte.load_image or function() end
---- Draw an image. 
---- @type fun(image: lyte.Image, dest_x: number, dest_y: number)
+--- Draw an image. Angle, scale and origin values are all optional. 
+--- @type fun(image: lyte.Image, dest_x: number, dest_y: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number)
     lyte.draw_image = lyte.draw_image and lyte.draw_image or function() end
---- Draw a rectangular area from the image. 
---- @type fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)
+--- Draw a rectangular area from the image. Angle, scale and origin values are all optional. 
+--- @type fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number)
     lyte.draw_image_rect = lyte.draw_image_rect and lyte.draw_image_rect or function() end
 --- Get the width of the image. 
 --- @type fun(image: lyte.Image): int
@@ -89,7 +89,7 @@
 --- Reset the image batch, remove all added rects. 
 --- @type fun(imagebatch: lyte.ImageBatch)
     lyte.reset_imagebatch = lyte.reset_imagebatch and lyte.reset_imagebatch or function() end
---- Add a recta to the image batch (from it's initial image). 
+--- Add a recta to the image batch (from it's initial image). `src_width` and `src_height` are optional and will default to the corresponding `dest_` values. 
 --- @type fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     lyte.add_imagebatch_rect = lyte.add_imagebatch_rect and lyte.add_imagebatch_rect or function() end
 --- Get the number of rects in the image batch. 
@@ -565,9 +565,15 @@
 --- Draw an image. 
 --- @type fun(image: userdata, dest_x: number, dest_y: number)
     lyte_core.image_draw = lyte_core.image_draw and lyte_core.image_draw or function() end
+--- Draw an image. 
+--- @type fun(image: userdata, dest_x: number, dest_y: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number)
+    lyte_core.image_draw_ex = lyte_core.image_draw_ex and lyte_core.image_draw_ex or function() end
 --- Draw a rectangular area from the image. 
---- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)
+--- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, src_width: number, src_height: number)
     lyte_core.image_draw_rect = lyte_core.image_draw_rect and lyte_core.image_draw_rect or function() end
+--- Draw a rectangular area from the image. 
+--- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, src_width: number, src_height: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number)
+    lyte_core.image_draw_rect_ex = lyte_core.image_draw_rect_ex and lyte_core.image_draw_rect_ex or function() end
 --- Get the width of the image. 
 --- @type fun(image: userdata): int
     lyte_core.image_get_width = lyte_core.image_get_width and lyte_core.image_get_width or function() end

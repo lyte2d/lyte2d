@@ -160,14 +160,46 @@ return process_def_tree(Namespace("lyte_core",
     ),
 
     -- RENAMED
+    Function("image_draw_ex",
+        Arg("image", Image_Ptr),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Arg("angle", Double),
+        Arg("scale_x", Double),
+        Arg("scale_y", Double),
+        Arg("origin_x", Double),
+        Arg("origin_y", Double),
+        Doc"Draw an image.",
+        LuaImpl
+    ),
+
+    -- RENAMED
     Function("image_draw_rect",
         Arg("image", Image_Ptr),
         Arg("dest_x", Double),
         Arg("dest_y", Double),
         Arg("src_x", Double),
         Arg("src_y", Double),
-        Arg("rect_width", Double),
-        Arg("rect_height", Double),
+        Arg("src_width", Double),
+        Arg("src_height", Double),
+        Doc"Draw a rectangular area from the image.",
+        LuaImpl
+    ),
+
+    -- RENAMED
+    Function("image_draw_rect_ex",
+        Arg("image", Image_Ptr),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Arg("src_x", Double),
+        Arg("src_y", Double),
+        Arg("src_width", Double),
+        Arg("src_height", Double),
+        Arg("angle", Double),
+        Arg("scale_x", Double),
+        Arg("scale_y", Double),
+        Arg("origin_x", Double),
+        Arg("origin_y", Double),
         Doc"Draw a rectangular area from the image.",
         LuaImpl
     ),

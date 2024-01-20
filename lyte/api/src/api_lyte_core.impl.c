@@ -102,9 +102,19 @@ static inline int _image_draw(void *image, double dest_x, double dest_y) {
     err = lyte_draw_image(image, dest_x, dest_y); // edit
     return err;
 }
-static inline int _image_draw_rect(void *image, double dest_x, double dest_y, double src_x, double src_y, double rect_width, double rect_height) {
-    (void)image; (void)dest_x; (void)dest_y; (void)src_x; (void)src_y; (void)rect_width; (void)rect_height; int err = 0;
-    err = lyte_draw_image_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height); // edit
+static inline int _image_draw_ex(void *image, double dest_x, double dest_y, double angle, double scale_x, double scale_y, double origin_x, double origin_y) {
+    (void)image; (void)dest_x; (void)dest_y; (void)angle; (void)scale_x; (void)scale_y; (void)origin_x; (void)origin_y; int err = 0;
+    err = lyte_draw_image_ex(image, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y);
+    return err;
+}
+static inline int _image_draw_rect(void *image, double dest_x, double dest_y, double src_x, double src_y, double src_width, double src_height) {
+    (void)image; (void)dest_x; (void)dest_y; (void)src_x; (void)src_y; (void)src_width; (void)src_height; int err = 0;
+    err = lyte_draw_image_rect(image, dest_x, dest_y, src_x, src_y, src_width, src_height); // edit
+    return err;
+}
+static inline int _image_draw_rect_ex(void *image, double dest_x, double dest_y, double src_x, double src_y, double src_width, double src_height, double angle, double scale_x, double scale_y, double origin_x, double origin_y) {
+    (void)image; (void)dest_x; (void)dest_y; (void)src_x; (void)src_y; (void)src_width; (void)src_height; (void)angle; (void)scale_x; (void)scale_y; (void)origin_x; (void)origin_y; int err = 0;
+    err = lyte_draw_image_rect_ex(image, dest_x, dest_y, src_x, src_y, src_width, src_height, angle, scale_x, scale_y, origin_x, origin_y);
     return err;
 }
 static inline int _image_get_width(void *image, int *val) {

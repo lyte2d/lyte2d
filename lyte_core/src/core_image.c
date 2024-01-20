@@ -200,6 +200,7 @@ int lyte_is_image_canvas(lyte_Image image, bool *val) {
     return 0;
 }
 
+
 int lyte_draw_image(lyte_Image image, double x, double y) {
     ImageItem *imageitem = image;
     if (!imageitem) {
@@ -207,13 +208,9 @@ int lyte_draw_image(lyte_Image image, double x, double y) {
         return -1;
     }
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
-    // TODO: blendmode?
     sgp_set_image(0, sgimage);
     sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
     sgp_set_sampler(0, sgsampler);
-
-    // BUGBUG: potential bug. see test2.lua for segfault repro
-    // sgp_draw_textured_rect(x, y, imageitem->width, imageitem->height);
 
     sgp_draw_textured_rect(0, (sgp_rect){x, y, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
 
@@ -221,18 +218,65 @@ int lyte_draw_image(lyte_Image image, double x, double y) {
     return 0;
 }
 
-int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, double src_y, double w, double h) {
+int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, double sx, double sy, double ox, double oy) {
     ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
         return -1;
     }
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
-    // TODO: blendmode?
     sgp_set_image(0, sgimage);
     sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
     sgp_set_sampler(0, sgsampler);
-    sgp_draw_textured_rect(0, (sgp_rect){x, y, w, h}, (sgp_rect){src_x, src_y, w, h});
+
+    sgp_push_transform();
+    sgp_translate(x + ox, y + oy);
+    sgp_rotate(angle);
+    sgp_scale(sx, sy);
+    sgp_translate(-ox, -oy);
+    sgp_draw_textured_rect(0, (sgp_rect){0, 0, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
+    sgp_pop_transform();
+
+    sgp_reset_image(0);
+    return 0;
+
+    return 0;
+}
+
+int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h) {
+    ImageItem *imageitem = image;
+    if (!imageitem) {
+        fprintf(stderr, "Image not found\n");
+        return -1;
+    }
+    sg_image sgimage = (sg_image){ .id = imageitem->handle };
+    sgp_set_image(0, sgimage);
+    sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
+    sgp_set_sampler(0, sgsampler);
+    sgp_draw_textured_rect(0, (sgp_rect){x, y, src_w, src_h}, (sgp_rect){src_x, src_y, src_w, src_h});
+    sgp_reset_image(0);
+    return 0;
+}
+
+int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h, double angle, double sx, double sy, double ox, double oy) {
+    ImageItem *imageitem = image;
+    if (!imageitem) {
+        fprintf(stderr, "Image not found\n");
+        return -1;
+    }
+    sg_image sgimage = (sg_image){ .id = imageitem->handle };
+    sgp_set_image(0, sgimage);
+    sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
+    sgp_set_sampler(0, sgsampler);
+
+    sgp_push_transform();
+    sgp_translate(x + ox, y + oy);
+    sgp_rotate(angle);
+    sgp_scale(sx, sy);
+    sgp_translate(-ox, -oy);
+    sgp_draw_textured_rect(0, (sgp_rect){0, 0, src_w, src_h}, (sgp_rect){src_x, src_y, src_w, src_h});
+    sgp_pop_transform();
+
     sgp_reset_image(0);
     return 0;
 }
