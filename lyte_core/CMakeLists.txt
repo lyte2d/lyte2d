@@ -86,6 +86,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_sources(${PROJECT_NAME} PRIVATE
     ./src/map.c
+    ./src/utf8encode.c
     ./src/core_lib_impls.c
     ./src/core_audio.c
     ./src/core_filesystem.c

@@ -322,6 +322,11 @@ static inline int _is_key_repeat(int key, bool *val) {
     err = lyte_is_key_repeat(key, val);
     return err;
 }
+static inline int _get_textinput(const char **val) {
+int err = 0;
+    err = lyte_get_textinput(val);
+    return err;
+}
 static inline int _is_mouse_down(int mouse_button, bool *val) {
     (void)mouse_button; int err = 0;
     err = lyte_is_mouse_down(mouse_button, val);

@@ -188,6 +188,9 @@
 --- Check if the given key is repeated. 
 --- @type fun(key: lyte.KeyboardKey): boolean
     lyte.is_key_repeat = lyte.is_key_repeat and lyte.is_key_repeat or function() end
+--- Get all keyboard text input from last frame. Output is utf8 encoded. 
+--- @type fun(): string
+    lyte.get_textinput = lyte.get_textinput and lyte.get_textinput or function() end
 --- Check if the given mouse button is down. 
 --- @type fun(mouse_button: lyte.MouseButton): boolean
     lyte.is_mouse_down = lyte.is_mouse_down and lyte.is_mouse_down or function() end
@@ -697,6 +700,9 @@
 --- Check if the given key is repeated. 
 --- @type fun(key: lyte_core.KeyboardKey): boolean
     lyte_core.is_key_repeat = lyte_core.is_key_repeat and lyte_core.is_key_repeat or function() end
+--- Get all keyboard text input from last frame. Output is utf8 encoded. 
+--- @type fun(): string
+    lyte_core.get_textinput = lyte_core.get_textinput and lyte_core.get_textinput or function() end
 --- Check if the given mouse button is down. 
 --- @type fun(mouse_button: lyte_core.MouseButton): boolean
     lyte_core.is_mouse_down = lyte_core.is_mouse_down and lyte_core.is_mouse_down or function() end

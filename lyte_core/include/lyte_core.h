@@ -167,6 +167,7 @@ int lyte_is_key_down(lyte_KeyboardKey key, bool *val);
 int lyte_is_key_pressed(lyte_KeyboardKey key, bool *val);
 int lyte_is_key_released(lyte_KeyboardKey key, bool *val);
 int lyte_is_key_repeat(lyte_KeyboardKey key, bool *val);
+int lyte_get_textinput(const char **val);
 int lyte_is_mouse_down(lyte_MouseButton mouse_button, bool *val);
 int lyte_is_mouse_pressed(lyte_MouseButton mouse_button, bool *val);
 int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val);

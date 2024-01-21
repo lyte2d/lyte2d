@@ -813,6 +813,14 @@ static int api_is_key_repeat(lua_State *L) { // arity: 1 => 1
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
+static int api_get_textinput(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    const char *val = {0};
+    err = _get_textinput(&val);
+    lua_pushstring(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
 static int api_is_mouse_down(lua_State *L) { // arity: 1 => 1
     (void)L; int err = 0;
     const char *mouse_button_str; int mouse_button; bool val;
@@ -1524,6 +1532,7 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"is_key_pressed", api_is_key_pressed},
     {"is_key_released", api_is_key_released},
     {"is_key_repeat", api_is_key_repeat},
+    {"get_textinput", api_get_textinput},
     {"is_mouse_down", api_is_mouse_down},
     {"is_mouse_pressed", api_is_mouse_pressed},
     {"is_mouse_released", api_is_mouse_released},

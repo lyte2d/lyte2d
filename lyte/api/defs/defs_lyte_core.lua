@@ -483,6 +483,11 @@ return process_def_tree(Namespace("lyte_core",
         Doc"Check if the given key is repeated."
     ),
 
+    Function("get_textinput",
+        Ret("val", String),
+        Doc"Get all keyboard text input from last frame. Output is utf8 encoded."
+    ),
+
     Function("is_mouse_down",
         Arg("mouse_button", MouseButton),
         Ret("val", Bool),
