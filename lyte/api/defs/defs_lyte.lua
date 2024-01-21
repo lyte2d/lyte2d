@@ -75,7 +75,7 @@ return process_def_tree(Namespace("lyte",
         Doc"Draw an image. Angle, scale and origin values are all optional.",
         -- MapWrapTo("lyte_core.image_draw"),
         LuaImpl,
-        Code[[function(image_wrapped, dest_x, dest_y, angle, angle, scale_x, scale_y, origin_x, origin_y)
+        Code[[function(image_wrapped, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y)
     local image = image_wrapped.id
     if not angle then
         lyte_core.image_draw(image, dest_x, dest_y)

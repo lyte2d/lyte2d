@@ -449,7 +449,7 @@ lyte.ShaderBuilder = {
 }
 
 -- manually handled functions in current namespace
-lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, angle, scale_x, scale_y, origin_x, origin_y)
+lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y)
     local image = image_wrapped.id
     if not angle then
         lyte_core.image_draw(image, dest_x, dest_y)
