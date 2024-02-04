@@ -33,6 +33,10 @@ static int enumstring_to_int(EnumStrInt *vals, const char *str) {
     while (vals->str && (strcmp(str, vals->str)!=0)) vals++;
     return vals->value;
 }
+static const char *int_to_enumstring(EnumStrInt *vals, int ival) {
+    while (vals->str && vals->value != ival) vals++;
+    return vals->str;
+}
 ]]
 
 local impl_c_top = [[
@@ -115,6 +119,7 @@ local function get_list_item_type(NS, name)
     for _, v in ipairs(NS.lists) do
         if v.name == name then ret = v.item_type end
     end
+    if is_type_enum(NS, ret) then ret = "int" end
     return ret
 end
 
@@ -127,7 +132,7 @@ local function get_list_item_max_count(NS, name)
     return ret
 end
 
-local function get_c_typed_var(NS, t, varname, is_ptr, is_arglist)
+local function get_c_typed_var(NS, t, varname, is_ptr, is_arglist, is_ret)
     local ret
 
     local is_enum =  is_type_enum(NS, t)
@@ -143,10 +148,18 @@ local function get_c_typed_var(NS, t, varname, is_ptr, is_arglist)
         end
     elseif is_list then
         if is_arglist then
-            ret =  get_list_item_type(NS, t) .. " *"  .. varname ..", " .. "size_t " .. varname .. "_count"
+            if not is_ret then
+                ret =  get_list_item_type(NS, t) .. " *"  .. varname ..", " .. "size_t " .. varname .. "_count"
+            else
+                ret =  get_list_item_type(NS, t) .. " **"  .. varname ..", " .. "size_t *" .. varname .. "_count"
+            end
         else
             -- ret =  get_list_item_type(NS, t) .. " *"  .. varname .."; " .. "size_t " .. varname .. "_count"
-            ret = get_list_item_type(NS, t) .. " " .. varname .. "[" .. get_list_item_max_count(NS, t) .. "] = {0}" .."; " .. "size_t " .. varname .. "_count"
+            if not is_ret then
+                ret = get_list_item_type(NS, t) .. " " .. varname .. "[" .. get_list_item_max_count(NS, t) .. "] = {0}" .."; " .. "size_t " .. varname .. "_count"
+            else
+                ret = get_list_item_type(NS, t) .. " *" .. varname .. "; " .. "size_t " .. varname .. "_count"
+            end
         end
     else
         --ret =  "__" .. t .. "_UNKNOWN_";
@@ -180,7 +193,7 @@ local function get_c_typed_args_and_rets(NS, fn, out_kind)
     if #fn.args > 0  or #fn.rets > 0 then
         -- args
         for _i, a in ipairs(fn.args) do
-            out = out .. get_c_typed_var(NS, a.type, a.name, false, out_kind=="arglist")
+            out = out .. get_c_typed_var(NS, a.type, a.name, false, out_kind=="arglist", false)
             -- ? set pointers to null
             -- if a.type == "string" and  out_kind=="declare" then
             --     out = out .. " = {0};"
@@ -189,7 +202,7 @@ local function get_c_typed_args_and_rets(NS, fn, out_kind)
         end
         -- rets
         for _i, r in ipairs(fn.rets) do
-            out = out .. get_c_typed_var(NS, r.type, r.name, ret_is_ptr, out_kind=="arglist")
+            out = out .. get_c_typed_var(NS, r.type, r.name, ret_is_ptr, out_kind=="arglist", true)
             -- ? set pointers to null
             if r.type == "string" and  out_kind=="declare" then
                 out = out .. " = {0}"
@@ -226,10 +239,11 @@ local function  get_gen_func_base(NS, fn)
             local item_type = get_list_item_type(NS, a.type)
             -- out = out .. SPC .. "// BEGIN LIST : " .. item_type .. "\n"
             out = out .. SPC .. a.name .. "_count = " .. "_checktable_getcount(L, " .. _i .. ");\n"
+
             -- out = out .. SPC .. item_type .. " *" .. a.name .. " = alloca(sizeof(" .. item_type ..") * " .. a.name .. "_count);\n"
             -- out = out .. SPC .. a.name  .. " = {0};\n"
             out = out .. SPC .. "if (" .. a.name .. "_count > " ..  get_list_item_max_count(NS, a.type) .. ") {\n"
-            out = out .. SPC2 .. 'fprintf(stderr, "Exceeded max count for list: expected: %d but got: %d\\n", ' .. get_list_item_max_count(NS, a.type) .. ', (int)' ..  a.name .. "_count"  .. '); \n'
+            out = out .. SPC2 .. 'fprintf(stderr, "Exceeded max count for list: expected: %d but got: %d\\n", ' .. get_list_item_max_count(NS, a.type) .. ', (int)' ..  a.name .. "_count"  .. ');\n'
             out = out .. SPC2 .. "lua_error(L);\n"
             out = out .. SPC .. "}\n"
             out = out .. SPC .. "for (size_t i=1; i<=" .. a.name .. "_count; i++) {\n"
@@ -265,6 +279,9 @@ local function  get_gen_func_base(NS, fn)
     for _i, r in ipairs(fn.rets) do
         -- Note: return values are returned in the param list with a pointer
         out = out .. "&" .. r.name
+        if is_type_list(NS, r.type) then -- add count variable in list special case
+            out = out .. ", &" .. r.name .. "_count"
+        end
         if _i < #fn.rets then out = out .. ", " end
     end
     out = out .. ");\n"
@@ -272,10 +289,41 @@ local function  get_gen_func_base(NS, fn)
 
     ------ out = out .. SPC .. "// PUT RETS INTO THE STACK\n"
     for _i, r in ipairs(fn.rets) do
-        if not CTypeMaps[r.type] then
-            error("Unknown return type: " .. r.type)
+        if CTypeMaps[r.type] then
+            out = out .. SPC .. CTypeMaps[r.type].push_fn .. "(L, " .. r.name .. ");\n"
+        else
+            local handled = false
+            -- is it a list?
+            for _j, lst in ipairs(NS.lists) do
+                if lst.name == r.type then
+                    local item_type = lst.item_type
+                    local push_fn = "PUSHFN___UNKNOWN___"
+                    if CTypeMaps[item_type] or is_type_enum(NS, item_type) then
+                        if CTypeMaps[item_type] then
+                            push_fn = CTypeMaps[item_type].push_fn .. "(L, " .. r.name .. "[i]" .. ");\n"
+                        else
+                            local map_name = NS.name .. "_" .. item_type .. "_strings"
+                            push_fn = CTypeMaps["string"].push_fn .. "(L, int_to_enumstring(" .. map_name .. ", " .. r.name .. "[i]" .. "));\n"
+                        end
+
+                        out = out .. SPC .. "lua_newtable(L);\n"
+                        out = out .. SPC .. "for (size_t i=0; i<" .. r.name .. "_count; i++) {\n"
+                        out = out .. SPC2 .. "lua_pushinteger(L, i+1);\n"
+                        out = out .. SPC2 .. push_fn
+                        out = out .. SPC2 .. "lua_settable(L, -3)" .. ";\n"
+                        out = out .. SPC .. "}\n"
+
+                        handled = true
+                        break
+                    else
+                        error("Unknown list itemtype: " .. item_type)
+                    end
+                end
+            end
+            if not handled then
+                error("Unknown return type: " .. r.type .. ", " .. r.name)
+            end
         end
-        out = out .. SPC .. CTypeMaps[r.type].push_fn .. "(L, " .. r.name .. ");\n"
     end
 
     out = out .. SPC .. "(void)err; // TODO: handle when err is not 0\n"
@@ -318,6 +366,9 @@ local function get_gen_func_impl(NS, fn)
     end
     for _i, r in ipairs(fn.rets) do
         out = out .. r.name
+        if is_type_list(NS, r.type) then -- add count variable in list special case
+            out = out .. ", " .. r.name .. "_count"
+        end
         if _i < #fn.rets then out = out .. ", " end
     end
     out = out .. ");\n"
@@ -380,7 +431,7 @@ local function gen_api_base(NS, filename, header_file_name, impl_file_name)
     out = out .. SPC .. 'luaL_register(L, "' .. NS.name .. '", ' ..  NS.name .. "_api_functions);\n"
     out = out .. SPC .. "lua_settop(L, 0);\n"
     out = out .. SPC .. "return 0;\n"
-    out = out .. "} \n"
+    out = out .. "}\n"
 
     ---------------------------------------------------------------------------------------------------
     out = out .. "\n// ==== end: " .. filename .. " ====\n"

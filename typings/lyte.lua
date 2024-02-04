@@ -56,11 +56,11 @@
 --- Load the image specified in the path. 
 --- @type fun(image_path: string): lyte.Image
     lyte.load_image = lyte.load_image and lyte.load_image or function() end
---- Draw an image. 
---- @type fun(image: lyte.Image, dest_x: number, dest_y: number)
+--- Draw an image. Angle, scale and origin values are all optional. 
+--- @type fun(image: lyte.Image, dest_x: number, dest_y: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     lyte.draw_image = lyte.draw_image and lyte.draw_image or function() end
---- Draw a rectangular area from the image. 
---- @type fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)
+--- Draw a rectangular area from the image. Angle, scale and origin values are all optional. 
+--- @type fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     lyte.draw_image_rect = lyte.draw_image_rect and lyte.draw_image_rect or function() end
 --- Get the width of the image. 
 --- @type fun(image: lyte.Image): int
@@ -89,7 +89,7 @@
 --- Reset the image batch, remove all added rects. 
 --- @type fun(imagebatch: lyte.ImageBatch)
     lyte.reset_imagebatch = lyte.reset_imagebatch and lyte.reset_imagebatch or function() end
---- Add a recta to the image batch (from it's initial image). 
+--- Add a recta to the image batch (from it's initial image). `src_width` and `src_height` are optional and will default to the corresponding `dest_` values. 
 --- @type fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     lyte.add_imagebatch_rect = lyte.add_imagebatch_rect and lyte.add_imagebatch_rect or function() end
 --- Get the number of rects in the image batch. 
@@ -188,6 +188,12 @@
 --- Check if the given key is repeated. 
 --- @type fun(key: lyte.KeyboardKey): boolean
     lyte.is_key_repeat = lyte.is_key_repeat and lyte.is_key_repeat or function() end
+--- Get the list of pressed keys. 
+--- @type fun(): lyte.KeyList
+    lyte.get_pressed_keys = lyte.get_pressed_keys and lyte.get_pressed_keys or function() end
+--- Get all keyboard text input from last frame. Output is utf8 encoded. 
+--- @type fun(): string
+    lyte.get_textinput = lyte.get_textinput and lyte.get_textinput or function() end
 --- Check if the given mouse button is down. 
 --- @type fun(mouse_button: lyte.MouseButton): boolean
     lyte.is_mouse_down = lyte.is_mouse_down and lyte.is_mouse_down or function() end
@@ -502,7 +508,7 @@
 --- Acceptable gamepadbutton values.
 --- @alias lyte.GamepadButton "pad_a" | "pad_b" | "pad_x" | "pad_y" | "left_bumper" | "right_bumper" | "back" | "start" | "guide" | "left_thumb" | "right_thumb" | "dpad_up" | "dpad_right" | "dpad_down" | "dpad_left"
 --- Acceptable mousebutton values.
---- @alias lyte.MouseButton "mb1" | "mb2" | "mb3" | "mb4" | "mb5" | "mb6" | "mb7" | "mb8"
+--- @alias lyte.MouseButton "mb1" | "mb2" | "mb3" | "mb4" | "mb5" | "mb6" | "mb7" | "mb8" | "scrollup" | "scrolldown"
 --- Acceptable keyboardkey values.
 --- @alias lyte.KeyboardKey "space" | "'" | "," | "-" | "." | "/" | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | ";" | "=" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "[" | "\\" | "]" | "`" | "world_1" | "world_2" | "escape" | "enter" | "tab" | "backspace" | "insert" | "delete" | "right" | "left" | "down" | "up" | "page_up" | "page_down" | "home" | "end" | "caps_lock" | "scroll_lock" | "num_lock" | "print_screen" | "pause" | "f1" | "f2" | "f3" | "f4" | "f5" | "f6" | "f7" | "f8" | "f9" | "f10" | "f11" | "f12" | "f13" | "f14" | "f15" | "f16" | "f17" | "f18" | "f19" | "f20" | "f21" | "f22" | "f23" | "f24" | "f25" | "kp_0" | "kp_1" | "kp_2" | "kp_3" | "kp_4" | "kp_5" | "kp_6" | "kp_7" | "kp_8" | "kp_9" | "kp_decimal" | "kp_divide" | "kp_multiply" | "kp_subtract" | "kp_add" | "kp_enter" | "kp_equal" | "left_shift" | "left_control" | "left_alt" | "left_super" | "right_shift" | "right_control" | "right_alt" | "right_super" | "menu"
 
@@ -565,9 +571,15 @@
 --- Draw an image. 
 --- @type fun(image: userdata, dest_x: number, dest_y: number)
     lyte_core.image_draw = lyte_core.image_draw and lyte_core.image_draw or function() end
+--- Draw an image. 
+--- @type fun(image: userdata, dest_x: number, dest_y: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
+    lyte_core.image_draw_ex = lyte_core.image_draw_ex and lyte_core.image_draw_ex or function() end
 --- Draw a rectangular area from the image. 
---- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number)
+--- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, src_width: number, src_height: number)
     lyte_core.image_draw_rect = lyte_core.image_draw_rect and lyte_core.image_draw_rect or function() end
+--- Draw a rectangular area from the image. 
+--- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, src_width: number, src_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
+    lyte_core.image_draw_rect_ex = lyte_core.image_draw_rect_ex and lyte_core.image_draw_rect_ex or function() end
 --- Get the width of the image. 
 --- @type fun(image: userdata): int
     lyte_core.image_get_width = lyte_core.image_get_width and lyte_core.image_get_width or function() end
@@ -691,6 +703,12 @@
 --- Check if the given key is repeated. 
 --- @type fun(key: lyte_core.KeyboardKey): boolean
     lyte_core.is_key_repeat = lyte_core.is_key_repeat and lyte_core.is_key_repeat or function() end
+--- Get the list of pressed keys. 
+--- @type fun(): lyte_core.KeyList
+    lyte_core.get_pressed_keys = lyte_core.get_pressed_keys and lyte_core.get_pressed_keys or function() end
+--- Get all keyboard text input from last frame. Output is utf8 encoded. 
+--- @type fun(): string
+    lyte_core.get_textinput = lyte_core.get_textinput and lyte_core.get_textinput or function() end
 --- Check if the given mouse button is down. 
 --- @type fun(mouse_button: lyte_core.MouseButton): boolean
     lyte_core.is_mouse_down = lyte_core.is_mouse_down and lyte_core.is_mouse_down or function() end
@@ -921,6 +939,8 @@
 
 --- Float values
 --- @alias lyte_core.FloatVec4 number[]
+--- List of keys
+--- @alias lyte_core.KeyList lyte_core.KeyboardKey[]
 
 -- dicts
 
@@ -938,7 +958,7 @@
 --- Acceptable gamepadbutton values.
 --- @alias lyte_core.GamepadButton "pad_a" | "pad_b" | "pad_x" | "pad_y" | "left_bumper" | "right_bumper" | "back" | "start" | "guide" | "left_thumb" | "right_thumb" | "dpad_up" | "dpad_right" | "dpad_down" | "dpad_left"
 --- Acceptable mousebutton values.
---- @alias lyte_core.MouseButton "mb1" | "mb2" | "mb3" | "mb4" | "mb5" | "mb6" | "mb7" | "mb8"
+--- @alias lyte_core.MouseButton "mb1" | "mb2" | "mb3" | "mb4" | "mb5" | "mb6" | "mb7" | "mb8" | "scrollup" | "scrolldown"
 --- Acceptable keyboardkey values.
 --- @alias lyte_core.KeyboardKey "space" | "'" | "," | "-" | "." | "/" | "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | ";" | "=" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "[" | "\\" | "]" | "`" | "world_1" | "world_2" | "escape" | "enter" | "tab" | "backspace" | "insert" | "delete" | "right" | "left" | "down" | "up" | "page_up" | "page_down" | "home" | "end" | "caps_lock" | "scroll_lock" | "num_lock" | "print_screen" | "pause" | "f1" | "f2" | "f3" | "f4" | "f5" | "f6" | "f7" | "f8" | "f9" | "f10" | "f11" | "f12" | "f13" | "f14" | "f15" | "f16" | "f17" | "f18" | "f19" | "f20" | "f21" | "f22" | "f23" | "f24" | "f25" | "kp_0" | "kp_1" | "kp_2" | "kp_3" | "kp_4" | "kp_5" | "kp_6" | "kp_7" | "kp_8" | "kp_9" | "kp_decimal" | "kp_divide" | "kp_multiply" | "kp_subtract" | "kp_add" | "kp_enter" | "kp_equal" | "left_shift" | "left_control" | "left_alt" | "left_super" | "right_shift" | "right_control" | "right_alt" | "right_super" | "menu"
 

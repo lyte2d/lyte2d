@@ -102,9 +102,19 @@ static inline int _image_draw(void *image, double dest_x, double dest_y) {
     err = lyte_draw_image(image, dest_x, dest_y); // edit
     return err;
 }
-static inline int _image_draw_rect(void *image, double dest_x, double dest_y, double src_x, double src_y, double rect_width, double rect_height) {
-    (void)image; (void)dest_x; (void)dest_y; (void)src_x; (void)src_y; (void)rect_width; (void)rect_height; int err = 0;
-    err = lyte_draw_image_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height); // edit
+static inline int _image_draw_ex(void *image, double dest_x, double dest_y, double angle, double origin_x, double origin_y, double scale_x, double scale_y) {
+    (void)image; (void)dest_x; (void)dest_y; (void)angle; (void)origin_x; (void)origin_y; (void)scale_x; (void)scale_y; int err = 0;
+    err = lyte_draw_image_ex(image, dest_x, dest_y, angle, origin_x, origin_y, scale_x, scale_y);
+    return err;
+}
+static inline int _image_draw_rect(void *image, double dest_x, double dest_y, double src_x, double src_y, double src_width, double src_height) {
+    (void)image; (void)dest_x; (void)dest_y; (void)src_x; (void)src_y; (void)src_width; (void)src_height; int err = 0;
+    err = lyte_draw_image_rect(image, dest_x, dest_y, src_x, src_y, src_width, src_height); // edit
+    return err;
+}
+static inline int _image_draw_rect_ex(void *image, double dest_x, double dest_y, double src_x, double src_y, double src_width, double src_height, double angle, double origin_x, double origin_y, double scale_x, double scale_y) {
+    (void)image; (void)dest_x; (void)dest_y; (void)src_x; (void)src_y; (void)src_width; (void)src_height; (void)angle; (void)origin_x; (void)origin_y; (void)scale_x; (void)scale_y; int err = 0;
+    err = lyte_draw_image_rect_ex(image, dest_x, dest_y, src_x, src_y, src_width, src_height, angle, origin_x, origin_y, scale_x, scale_y);
     return err;
 }
 static inline int _image_get_width(void *image, int *val) {
@@ -310,6 +320,16 @@ static inline int _is_key_released(int key, bool *val) {
 static inline int _is_key_repeat(int key, bool *val) {
     (void)key; int err = 0;
     err = lyte_is_key_repeat(key, val);
+    return err;
+}
+static inline int _get_pressed_keys(int **val, size_t *val_count) {
+int err = 0;
+    err = lyte_get_pressed_keys(val, val_count);
+    return err;
+}
+static inline int _get_textinput(const char **val) {
+int err = 0;
+    err = lyte_get_textinput(val);
     return err;
 }
 static inline int _is_mouse_down(int mouse_button, bool *val) {
@@ -754,6 +774,9 @@ enum {
     _MOUSEBUTTON_MB6 = LYTE_MOUSEBUTTON_MB6, /* order: 5 string: 'mb6' */
     _MOUSEBUTTON_MB7 = LYTE_MOUSEBUTTON_MB7, /* order: 6 string: 'mb7' */
     _MOUSEBUTTON_MB8 = LYTE_MOUSEBUTTON_MB8, /* order: 7 string: 'mb8' */
+    _MOUSEBUTTON_SCROLLUP = LYTE_MOUSEBUTTON_SCROLLUP, /* order: 8 string: 'scrollup' */
+    _MOUSEBUTTON_SCROLLDOWN = LYTE_MOUSEBUTTON_SCROLLDOWN, /* order: 9 string: 'scrolldown' */
+
 };
 enum {
     _KEYBOARDKEY_SPACE = LYTE_KEYBOARDKEY_SPACE, /* order: 0 string: 'space' */

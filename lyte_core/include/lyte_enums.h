@@ -116,7 +116,9 @@ typedef enum lyte_MouseButton {
     LYTE_MOUSEBUTTON_MB6 = 5,// order: 5, str: 'mb6'
     LYTE_MOUSEBUTTON_MB7 = 6,// order: 6, str: 'mb7'
     LYTE_MOUSEBUTTON_MB8 = 7,// order: 7, str: 'mb8'
-    LYTE_MOUSEBUTTON_COUNT = 8,
+    LYTE_MOUSEBUTTON_SCROLLUP = 8,// order: 8, str: 'scrollup'
+    LYTE_MOUSEBUTTON_SCROLLDOWN = 9,// order: 9, str: 'scrolldown'
+    LYTE_MOUSEBUTTON_COUNT = 10,
     LYTE_MOUSEBUTTON_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 } lyte_MouseButton;
 

@@ -13,9 +13,9 @@ function lyte.tick(dt, width, height)
     total_time = total_time + dt
 
     -- up/down keys to change the pitch
-    if lyte.is_key_pressed("up") then
+    if lyte.is_key_pressed("up") or lyte.is_mouse_pressed("scrollup") then
         music_1.pitch = (music_1.pitch + 0.01)
-    elseif lyte.is_key_pressed("down") then
+    elseif lyte.is_key_pressed("down") or lyte.is_mouse_pressed("scrolldown")then
         music_1.pitch = (music_1.pitch - 0.01)
     end
     -- left/right keys to change the pan

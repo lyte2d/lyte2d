@@ -21,6 +21,9 @@
 #include "_boot_zip_generated.c"
 
 
+// luautf8 library doesn't have a header file...
+int luaopen_utf8 (lua_State *L);
+
 // TODO: file/line info
 #define CHK_STACK(n)                                                                         \
     if (lua_gettop(L) != (n)) {                                                              \
@@ -483,6 +486,9 @@ static int init(void) {
     lua_atpanic(L, _lua_panic_fn);
     _global_L = L;
     luaL_openlibs(L);
+    // load utf8 library (5.1 doesn't normally have it)
+    luaopen_utf8(L);
+
 
     // register_lyte(L);
     register_lyte_core_api(L);

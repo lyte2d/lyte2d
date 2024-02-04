@@ -50,6 +50,7 @@ typedef struct ShaderItem {
     size_t num_images;
 
     uint32_t pip_id;
+    uint32_t shd_id;
 } ShaderItem;
 
 
@@ -324,10 +325,12 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 
     shader_desc.fs.uniform_blocks[0].size = shd->num_uniform_floats * 4;
 
+    // sg_shader
+    sg_shader sgshd= sg_make_shader(&shader_desc);
     // sgp pipeline
     sgp_pipeline_desc pip_desc = {0};
     pip_desc.blend_mode = (sgp_blend_mode)lytecore_state.blendmode;
-    pip_desc.shader = shader_desc;
+    pip_desc.shader = sgshd;
     //pip_desc.primitive_type = SG_PRIMITIVETYPE_ ; // TODO: do we need to set this?
     sg_pipeline pip = sgp_make_pipeline(&pip_desc);
     sg_resource_state state = sg_query_pipeline_state(pip);
@@ -338,6 +341,7 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
 
     // associate sgp pipeline with the shaderitem
     shd->pip_id = pip.id;
+    shd->shd_id = sgshd.id;
 
     *shader = shd;
 
@@ -355,7 +359,8 @@ int lyte_Shader_cleanup(lyte_Shader shader) {
         free(shd->uniform_definitions);
         free(shd->uniform_floats);
         free(shd->images);
-        sg_destroy_pipeline((sg_pipeline){.id=shd->pip_id});
+        sg_destroy_pipeline((sg_pipeline){ .id = shd->pip_id });
+        sg_destroy_shader((sg_shader){.id = shd->shd_id});
         free(shd);
     }
     return 0;

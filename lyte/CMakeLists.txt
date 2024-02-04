@@ -86,6 +86,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ./src
     ${CMAKE_CURRENT_SOURCE_DIR}/api/include
     ${CMAKE_CURRENT_SOURCE_DIR}/boot/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/luautf8
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
@@ -93,5 +94,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/api/src/api_lyte_core_gen.c
     ./src/nbchar.c
     ./src/repl.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/luautf8/lutf8lib.c
 )
 

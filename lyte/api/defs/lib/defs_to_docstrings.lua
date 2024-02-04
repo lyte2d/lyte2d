@@ -136,7 +136,7 @@ return function(NS)
     out = out .. "\n" .. SPC .. "-- lists\n\n"
     for _, x in ipairs(NS.lists) do
         if x.doc then out = out .. SPC .. "--- " .. x.doc .. "\n" end
-        local item_type = TypeMaps[x.item_type]["tl"] or NS.name .. "." ..  x.item_type -- "object" .. "/*" .. x.item_type .."*/"
+        local item_type = TypeMaps[x.item_type] and TypeMaps[x.item_type]["tl"] or NS.name .. "." ..  x.item_type -- "object" .. "/*" .. x.item_type .."*/"
         -- local item_type = TypeMaps[x.item_type]["tl"] or  "object" .. "/*" .. x.item_type .."*/"
         out = out .. SPC .. "--- @alias " .. fullname(x.name) .. " " .. item_type .. "[]"
         out = out .. "\n"

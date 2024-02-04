@@ -160,14 +160,46 @@ return process_def_tree(Namespace("lyte_core",
     ),
 
     -- RENAMED
+    Function("image_draw_ex",
+        Arg("image", Image_Ptr),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Arg("angle", Double),
+        Arg("origin_x", Double),
+        Arg("origin_y", Double),
+        Arg("scale_x", Double),
+        Arg("scale_y", Double),
+        Doc"Draw an image.",
+        LuaImpl
+    ),
+
+    -- RENAMED
     Function("image_draw_rect",
         Arg("image", Image_Ptr),
         Arg("dest_x", Double),
         Arg("dest_y", Double),
         Arg("src_x", Double),
         Arg("src_y", Double),
-        Arg("rect_width", Double),
-        Arg("rect_height", Double),
+        Arg("src_width", Double),
+        Arg("src_height", Double),
+        Doc"Draw a rectangular area from the image.",
+        LuaImpl
+    ),
+
+    -- RENAMED
+    Function("image_draw_rect_ex",
+        Arg("image", Image_Ptr),
+        Arg("dest_x", Double),
+        Arg("dest_y", Double),
+        Arg("src_x", Double),
+        Arg("src_y", Double),
+        Arg("src_width", Double),
+        Arg("src_height", Double),
+        Arg("angle", Double),
+        Arg("origin_x", Double),
+        Arg("origin_y", Double),
+        Arg("scale_x", Double),
+        Arg("scale_y", Double),
         Doc"Draw a rectangular area from the image.",
         LuaImpl
     ),
@@ -449,6 +481,16 @@ return process_def_tree(Namespace("lyte_core",
         Arg("key", KeyboardKey),
         Ret("val", Bool),
         Doc"Check if the given key is repeated."
+    ),
+
+    Function("get_pressed_keys",
+        Ret("val", T("KeyList")),
+        Doc"Get the list of pressed keys."
+    ),
+
+    Function("get_textinput",
+        Ret("val", String),
+        Doc"Get all keyboard text input from last frame. Output is utf8 encoded."
     ),
 
     Function("is_mouse_down",
@@ -975,6 +1017,12 @@ return process_def_tree(Namespace("lyte_core",
         Doc"Float values"
     ),
 
+    List("KeyList",
+        T("KeyboardKey"),
+        MaxCount(16),
+        Doc"List of keys"
+    ),
+
     Enum("UniformType",
         '_invalid', 'float', 'vec2', 'vec3', 'vec4', 'int', 'ivec2',
         'ivec3', 'ivec4', 'mat4', 'sampler2D',
@@ -1005,7 +1053,7 @@ return process_def_tree(Namespace("lyte_core",
 
     Enum("MouseButton",
         'mb1', 'mb2', 'mb3', 'mb4', 'mb5', 'mb6',
-        'mb7', 'mb8',
+        'mb7', 'mb8', 'scrollup', 'scrolldown',
         Doc"Acceptable mousebutton values."
     ),
 

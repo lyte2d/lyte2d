@@ -35,6 +35,10 @@ static int enumstring_to_int(EnumStrInt *vals, const char *str) {
     while (vals->str && (strcmp(str, vals->str)!=0)) vals++;
     return vals->value;
 }
+static const char *int_to_enumstring(EnumStrInt *vals, int ival) {
+    while (vals->str && vals->value != ival) vals++;
+    return vals->str;
+}
 EnumStrInt lyte_core_UniformType_strings[] = {
     {"_invalid", _UNIFORMTYPE__INVALID},
     {"float", _UNIFORMTYPE_FLOAT},
@@ -99,6 +103,8 @@ EnumStrInt lyte_core_MouseButton_strings[] = {
     {"mb6", _MOUSEBUTTON_MB6},
     {"mb7", _MOUSEBUTTON_MB7},
     {"mb8", _MOUSEBUTTON_MB8},
+    {"scrollup", _MOUSEBUTTON_SCROLLUP},
+    {"scrolldown", _MOUSEBUTTON_SCROLLDOWN},
     {NULL, -1},
 };
 EnumStrInt lyte_core_KeyboardKey_strings[] = {
@@ -396,17 +402,51 @@ static int api_image_draw(lua_State *L) { // arity: 3 => 0
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
+static int api_image_draw_ex(lua_State *L) { // arity: 8 => 0
+    (void)L; int err = 0;
+    void *image; double dest_x; double dest_y; double angle; double origin_x; double origin_y; double scale_x; double scale_y;
+    image = _checklightuserdata(L, 1);
+    dest_x = luaL_checknumber(L, 2);
+    dest_y = luaL_checknumber(L, 3);
+    angle = luaL_checknumber(L, 4);
+    origin_x = luaL_checknumber(L, 5);
+    origin_y = luaL_checknumber(L, 6);
+    scale_x = luaL_checknumber(L, 7);
+    scale_y = luaL_checknumber(L, 8);
+    err = _image_draw_ex(image, dest_x, dest_y, angle, origin_x, origin_y, scale_x, scale_y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
 static int api_image_draw_rect(lua_State *L) { // arity: 7 => 0
     (void)L; int err = 0;
-    void *image; double dest_x; double dest_y; double src_x; double src_y; double rect_width; double rect_height;
+    void *image; double dest_x; double dest_y; double src_x; double src_y; double src_width; double src_height;
     image = _checklightuserdata(L, 1);
     dest_x = luaL_checknumber(L, 2);
     dest_y = luaL_checknumber(L, 3);
     src_x = luaL_checknumber(L, 4);
     src_y = luaL_checknumber(L, 5);
-    rect_width = luaL_checknumber(L, 6);
-    rect_height = luaL_checknumber(L, 7);
-    err = _image_draw_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height);
+    src_width = luaL_checknumber(L, 6);
+    src_height = luaL_checknumber(L, 7);
+    err = _image_draw_rect(image, dest_x, dest_y, src_x, src_y, src_width, src_height);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_image_draw_rect_ex(lua_State *L) { // arity: 12 => 0
+    (void)L; int err = 0;
+    void *image; double dest_x; double dest_y; double src_x; double src_y; double src_width; double src_height; double angle; double origin_x; double origin_y; double scale_x; double scale_y;
+    image = _checklightuserdata(L, 1);
+    dest_x = luaL_checknumber(L, 2);
+    dest_y = luaL_checknumber(L, 3);
+    src_x = luaL_checknumber(L, 4);
+    src_y = luaL_checknumber(L, 5);
+    src_width = luaL_checknumber(L, 6);
+    src_height = luaL_checknumber(L, 7);
+    angle = luaL_checknumber(L, 8);
+    origin_x = luaL_checknumber(L, 9);
+    origin_y = luaL_checknumber(L, 10);
+    scale_x = luaL_checknumber(L, 11);
+    scale_y = luaL_checknumber(L, 12);
+    err = _image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, src_width, src_height, angle, origin_x, origin_y, scale_x, scale_y);
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
@@ -774,6 +814,27 @@ static int api_is_key_repeat(lua_State *L) { // arity: 1 => 1
     key = enumstring_to_int(lyte_core_KeyboardKey_strings, key_str);
     err = _is_key_repeat(key, &val);
     lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_get_pressed_keys(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    int *val; size_t val_count;
+    err = _get_pressed_keys(&val, &val_count);
+    lua_newtable(L);
+    for (size_t i=0; i<val_count; i++) {
+        lua_pushinteger(L, i+1);
+        lua_pushstring(L, int_to_enumstring(lyte_core_KeyboardKey_strings, val[i]));
+        lua_settable(L, -3);
+    }
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_get_textinput(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    const char *val = {0};
+    err = _get_textinput(&val);
+    lua_pushstring(L, val);
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
@@ -1393,7 +1454,7 @@ static int api_shader_set_uniform_floatvec4(lua_State *L) { // arity: 3 => 0
     uniform_name = luaL_checkstring(L, 2);
     uniform_value_count = _checktable_getcount(L, 3);
     if (uniform_value_count > 4) {
-        fprintf(stderr, "Exceeded max count for list: expected: %d but got: %d\n", 4, (int)uniform_value_count); 
+        fprintf(stderr, "Exceeded max count for list: expected: %d but got: %d\n", 4, (int)uniform_value_count);
         lua_error(L);
     }
     for (size_t i=1; i<=uniform_value_count; i++) {
@@ -1444,7 +1505,9 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"image_cleanup", api_image_cleanup},
     {"image_load", api_image_load},
     {"image_draw", api_image_draw},
+    {"image_draw_ex", api_image_draw_ex},
     {"image_draw_rect", api_image_draw_rect},
+    {"image_draw_rect_ex", api_image_draw_rect_ex},
     {"image_get_width", api_image_get_width},
     {"image_get_height", api_image_get_height},
     {"image_new_canvas", api_image_new_canvas},
@@ -1486,6 +1549,8 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"is_key_pressed", api_is_key_pressed},
     {"is_key_released", api_is_key_released},
     {"is_key_repeat", api_is_key_repeat},
+    {"get_pressed_keys", api_get_pressed_keys},
+    {"get_textinput", api_get_textinput},
     {"is_mouse_down", api_is_mouse_down},
     {"is_mouse_pressed", api_is_mouse_pressed},
     {"is_mouse_released", api_is_mouse_released},
@@ -1566,6 +1631,6 @@ int register_lyte_core_api(lua_State *L) {
     luaL_register(L, "lyte_core", lyte_core_api_functions);
     lua_settop(L, 0);
     return 0;
-} 
+}
 
 // ==== end: api_lyte_core_gen.c ====
