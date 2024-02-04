@@ -451,7 +451,7 @@ lyte.ShaderBuilder = {
 }
 
 -- manually handled functions in current namespace
-lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y)
+lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, origin_x, origin_y, scale_x, scale_y)
     local image = image_wrapped.id
     if not angle then
         lyte_core.image_draw(image, dest_x, dest_y)
@@ -461,10 +461,10 @@ lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, scale_x, scale_
         scale_y = scale_y or 1
         origin_x = origin_x or 0
         origin_y = origin_y or 0
-        lyte_core.image_draw_ex(image, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y)
+        lyte_core.image_draw_ex(image, dest_x, dest_y, angle, origin_x, origin_y, scale_x, scale_y)
     end
 end
-lyte.draw_image_rect = function(image_wrapped, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, scale_x, scale_y, origin_x, origin_y)
+lyte.draw_image_rect = function(image_wrapped, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, origin_x, origin_y, scale_x, scale_y)
     local image = image_wrapped.id
     if not angle then
         lyte_core.image_draw_rect(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height)
@@ -474,7 +474,7 @@ lyte.draw_image_rect = function(image_wrapped, dest_x, dest_y, src_x, src_y, rec
         scale_y = scale_y or 1
         origin_x = origin_x or 0
         origin_y = origin_y or 0
-        lyte_core.image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, scale_x, scale_y, origin_x, origin_y)
+        lyte_core.image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, origin_x, origin_y, scale_x, scale_y)
     end
 end
 lyte.set_canvas = function(canvas_image_wrapped)

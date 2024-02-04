@@ -218,7 +218,7 @@ int lyte_draw_image(lyte_Image image, double x, double y) {
     return 0;
 }
 
-int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, double sx, double sy, double ox, double oy) {
+int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, double ox, double oy, double sx, double sy) {
     ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");
@@ -258,7 +258,7 @@ int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, dou
     return 0;
 }
 
-int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h, double angle, double sx, double sy, double ox, double oy) {
+int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h, double angle, double ox, double oy, double sx, double sy) {
     ImageItem *imageitem = image;
     if (!imageitem) {
         fprintf(stderr, "Image not found\n");

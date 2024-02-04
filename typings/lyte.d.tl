@@ -38,9 +38,9 @@ global record lyte
     -- Load the image specified in the path. 
     load_image: function(image_path: string): lyte.Image
     -- Draw an image. Angle, scale and origin values are all optional. 
-    draw_image: function(image: lyte.Image, dest_x: number, dest_y: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number)
+    draw_image: function(image: lyte.Image, dest_x: number, dest_y: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     -- Draw a rectangular area from the image. Angle, scale and origin values are all optional. 
-    draw_image_rect: function(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number)
+    draw_image_rect: function(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     -- Get the width of the image. 
     get_image_width: function(image: lyte.Image): int
     -- Get the height of the image. 

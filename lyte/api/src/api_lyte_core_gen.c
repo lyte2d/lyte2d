@@ -404,16 +404,16 @@ static int api_image_draw(lua_State *L) { // arity: 3 => 0
 }
 static int api_image_draw_ex(lua_State *L) { // arity: 8 => 0
     (void)L; int err = 0;
-    void *image; double dest_x; double dest_y; double angle; double scale_x; double scale_y; double origin_x; double origin_y;
+    void *image; double dest_x; double dest_y; double angle; double origin_x; double origin_y; double scale_x; double scale_y;
     image = _checklightuserdata(L, 1);
     dest_x = luaL_checknumber(L, 2);
     dest_y = luaL_checknumber(L, 3);
     angle = luaL_checknumber(L, 4);
-    scale_x = luaL_checknumber(L, 5);
-    scale_y = luaL_checknumber(L, 6);
-    origin_x = luaL_checknumber(L, 7);
-    origin_y = luaL_checknumber(L, 8);
-    err = _image_draw_ex(image, dest_x, dest_y, angle, scale_x, scale_y, origin_x, origin_y);
+    origin_x = luaL_checknumber(L, 5);
+    origin_y = luaL_checknumber(L, 6);
+    scale_x = luaL_checknumber(L, 7);
+    scale_y = luaL_checknumber(L, 8);
+    err = _image_draw_ex(image, dest_x, dest_y, angle, origin_x, origin_y, scale_x, scale_y);
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
@@ -433,7 +433,7 @@ static int api_image_draw_rect(lua_State *L) { // arity: 7 => 0
 }
 static int api_image_draw_rect_ex(lua_State *L) { // arity: 12 => 0
     (void)L; int err = 0;
-    void *image; double dest_x; double dest_y; double src_x; double src_y; double src_width; double src_height; double angle; double scale_x; double scale_y; double origin_x; double origin_y;
+    void *image; double dest_x; double dest_y; double src_x; double src_y; double src_width; double src_height; double angle; double origin_x; double origin_y; double scale_x; double scale_y;
     image = _checklightuserdata(L, 1);
     dest_x = luaL_checknumber(L, 2);
     dest_y = luaL_checknumber(L, 3);
@@ -442,11 +442,11 @@ static int api_image_draw_rect_ex(lua_State *L) { // arity: 12 => 0
     src_width = luaL_checknumber(L, 6);
     src_height = luaL_checknumber(L, 7);
     angle = luaL_checknumber(L, 8);
-    scale_x = luaL_checknumber(L, 9);
-    scale_y = luaL_checknumber(L, 10);
-    origin_x = luaL_checknumber(L, 11);
-    origin_y = luaL_checknumber(L, 12);
-    err = _image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, src_width, src_height, angle, scale_x, scale_y, origin_x, origin_y);
+    origin_x = luaL_checknumber(L, 9);
+    origin_y = luaL_checknumber(L, 10);
+    scale_x = luaL_checknumber(L, 11);
+    scale_y = luaL_checknumber(L, 12);
+    err = _image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, src_width, src_height, angle, origin_x, origin_y, scale_x, scale_y);
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }

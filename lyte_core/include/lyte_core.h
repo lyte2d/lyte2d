@@ -226,9 +226,9 @@ int lyte_get_image_width(lyte_Image image, int *val);
 int lyte_get_image_height(lyte_Image image, int *val);
 
 int lyte_draw_image(lyte_Image image, double x, double y);
-int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, double sx, double sy, double ox, double oy);
+int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, double ox, double oy, double sx, double sy);
 int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h);
-int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h, double angle, double sx, double sy, double ox, double oy);
+int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, double src_y, double src_w, double src_h, double angle, double ox, double oy, double sx, double sy);
 
 int lyte_set_canvas(lyte_Image image);
 int lyte_reset_canvas(void);

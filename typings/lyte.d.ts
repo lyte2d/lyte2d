@@ -38,9 +38,9 @@ declare namespace lyte {
     // Load the image specified in the path. 
     function load_image(image_path: string): lyte.Image
     // Draw an image. Angle, scale and origin values are all optional. 
-    function draw_image(image: lyte.Image, dest_x: number, dest_y: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number): void
+    function draw_image(image: lyte.Image, dest_x: number, dest_y: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number): void
     // Draw a rectangular area from the image. Angle, scale and origin values are all optional. 
-    function draw_image_rect(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, scale_x: number, scale_y: number, origin_x: number, origin_y: number): void
+    function draw_image_rect(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number): void
     // Get the width of the image. 
     function get_image_width(image: lyte.Image): number
     // Get the height of the image. 
