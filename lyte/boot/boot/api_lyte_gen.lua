@@ -45,6 +45,7 @@ lyte.is_key_down =  lyte_core.is_key_down
 lyte.is_key_pressed =  lyte_core.is_key_pressed
 lyte.is_key_released =  lyte_core.is_key_released
 lyte.is_key_repeat =  lyte_core.is_key_repeat
+lyte.get_pressed_keys =  lyte_core.get_pressed_keys
 lyte.get_textinput =  lyte_core.get_textinput
 lyte.is_mouse_down =  lyte_core.is_mouse_down
 lyte.is_mouse_pressed =  lyte_core.is_mouse_pressed

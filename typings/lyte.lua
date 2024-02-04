@@ -188,6 +188,9 @@
 --- Check if the given key is repeated. 
 --- @type fun(key: lyte.KeyboardKey): boolean
     lyte.is_key_repeat = lyte.is_key_repeat and lyte.is_key_repeat or function() end
+--- Get the list of pressed keys. 
+--- @type fun(): lyte.KeyList
+    lyte.get_pressed_keys = lyte.get_pressed_keys and lyte.get_pressed_keys or function() end
 --- Get all keyboard text input from last frame. Output is utf8 encoded. 
 --- @type fun(): string
     lyte.get_textinput = lyte.get_textinput and lyte.get_textinput or function() end
@@ -700,6 +703,9 @@
 --- Check if the given key is repeated. 
 --- @type fun(key: lyte_core.KeyboardKey): boolean
     lyte_core.is_key_repeat = lyte_core.is_key_repeat and lyte_core.is_key_repeat or function() end
+--- Get the list of pressed keys. 
+--- @type fun(): lyte_core.KeyList
+    lyte_core.get_pressed_keys = lyte_core.get_pressed_keys and lyte_core.get_pressed_keys or function() end
 --- Get all keyboard text input from last frame. Output is utf8 encoded. 
 --- @type fun(): string
     lyte_core.get_textinput = lyte_core.get_textinput and lyte_core.get_textinput or function() end
@@ -933,6 +939,8 @@
 
 --- Float values
 --- @alias lyte_core.FloatVec4 number[]
+--- List of keys
+--- @alias lyte_core.KeyList lyte_core.KeyboardKey[]
 
 -- dicts
 

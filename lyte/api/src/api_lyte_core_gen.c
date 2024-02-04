@@ -35,6 +35,10 @@ static int enumstring_to_int(EnumStrInt *vals, const char *str) {
     while (vals->str && (strcmp(str, vals->str)!=0)) vals++;
     return vals->value;
 }
+static const char *int_to_enumstring(EnumStrInt *vals, int ival) {
+    while (vals->str && vals->value != ival) vals++;
+    return vals->str;
+}
 EnumStrInt lyte_core_UniformType_strings[] = {
     {"_invalid", _UNIFORMTYPE__INVALID},
     {"float", _UNIFORMTYPE_FLOAT},
@@ -813,6 +817,19 @@ static int api_is_key_repeat(lua_State *L) { // arity: 1 => 1
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
+static int api_get_pressed_keys(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    int *val; size_t val_count;
+    err = _get_pressed_keys(&val, &val_count);
+    lua_newtable(L);
+    for (size_t i=0; i<val_count; i++) {
+        lua_pushinteger(L, i+1);
+        lua_pushstring(L, int_to_enumstring(lyte_core_KeyboardKey_strings, val[i]));
+        lua_settable(L, -3);
+    }
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
 static int api_get_textinput(lua_State *L) { // arity: 0 => 1
     (void)L; int err = 0;
     const char *val = {0};
@@ -1532,6 +1549,7 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"is_key_pressed", api_is_key_pressed},
     {"is_key_released", api_is_key_released},
     {"is_key_repeat", api_is_key_repeat},
+    {"get_pressed_keys", api_get_pressed_keys},
     {"get_textinput", api_get_textinput},
     {"is_mouse_down", api_is_mouse_down},
     {"is_mouse_pressed", api_is_mouse_pressed},

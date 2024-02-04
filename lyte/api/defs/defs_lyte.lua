@@ -326,6 +326,8 @@ end
 
     Function("is_key_repeat", MapTo("lyte_core.is_key_repeat")),
 
+    Function("get_pressed_keys", MapTo("lyte_core.get_pressed_keys")),
+
     Function("get_textinput", MapTo("lyte_core.get_textinput")),
 
     Function("is_mouse_down", MapTo("lyte_core.is_mouse_down")),

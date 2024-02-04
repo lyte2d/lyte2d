@@ -125,6 +125,8 @@ declare namespace lyte {
     function is_key_released(key: lyte.KeyboardKey): boolean
     // Check if the given key is repeated. 
     function is_key_repeat(key: lyte.KeyboardKey): boolean
+    // Get the list of pressed keys. 
+    function get_pressed_keys(): lyte.KeyList
     // Get all keyboard text input from last frame. Output is utf8 encoded. 
     function get_textinput(): string
     // Check if the given mouse button is down. 

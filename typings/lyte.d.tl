@@ -125,6 +125,8 @@ global record lyte
     is_key_released: function(key: lyte.KeyboardKey): boolean
     -- Check if the given key is repeated. 
     is_key_repeat: function(key: lyte.KeyboardKey): boolean
+    -- Get the list of pressed keys. 
+    get_pressed_keys: function(): lyte.KeyList
     -- Get all keyboard text input from last frame. Output is utf8 encoded. 
     get_textinput: function(): string
     -- Check if the given mouse button is down. 

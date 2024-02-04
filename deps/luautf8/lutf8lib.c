@@ -1838,7 +1838,7 @@ static int Lutf8_isnfc(lua_State *L) {
 
 static int Lutf8_normalize_nfc(lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e), *p = s, *starter_p = s;
-  utfint starter = 0, ch;
+  utfint starter = 0, ch=0;
   unsigned int prev_canon_cls = 0;
 
   /* First scan to see if we can find any problems... if not, we may just return the
@@ -1962,7 +1962,7 @@ static int iterate_grapheme_indices(lua_State *L) {
         /* The 2nd codepoint has property Grapheme_Extend, or is an Emoji_Modifier codepoint */
         if (next_p < e && find_in_range(pictographic_table, table_size(pictographic_table), ch)) {
           /* Consume any number of 'extend' codepoints, one ZWJ, and following Extended_Pictographic codepoint */
-          utfint probed_ch;
+          utfint probed_ch = 0;
           const char *probe = next_p;
           while (probe < e) {
             probe = utf8_safe_decode(L, probe, &probed_ch);

@@ -483,6 +483,11 @@ return process_def_tree(Namespace("lyte_core",
         Doc"Check if the given key is repeated."
     ),
 
+    Function("get_pressed_keys",
+        Ret("val", T("KeyList")),
+        Doc"Get the list of pressed keys."
+    ),
+
     Function("get_textinput",
         Ret("val", String),
         Doc"Get all keyboard text input from last frame. Output is utf8 encoded."
@@ -1010,6 +1015,12 @@ return process_def_tree(Namespace("lyte_core",
         Float,
         MaxCount(4),
         Doc"Float values"
+    ),
+
+    List("KeyList",
+        T("KeyboardKey"),
+        MaxCount(16),
+        Doc"List of keys"
     ),
 
     Enum("UniformType",

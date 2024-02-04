@@ -14,6 +14,7 @@
 #define LYTE_MAX_JOYSTICKS 16
 #define LYTE_MAX_KEYBOARD_KEYS (LYTE_KEYBOARDKEY_MENU+1)
 #define LYTE_MAX_MOUSEBUTTONS LYTE_MOUSEBUTTON_COUNT
+#define LYTE_MAX_KEYLIST 16
 #define LYTE_MAX_CHARINPUT_CODEPOINTS 16    // per frame
 #define LYTE_TEXTINPUT_BUF_SIZE  (LYTE_MAX_CHARINPUT_CODEPOINTS * 4 + 1)
 
@@ -212,6 +213,22 @@ int lyte_is_key_released(lyte_KeyboardKey key, bool *val) {
 
 int lyte_is_key_repeat(lyte_KeyboardKey key, bool *val) {
     *val = inputstate.keys_rep[key];
+    return 0;
+}
+
+int lyte_get_pressed_keys(int **keys, size_t *num_keys) {
+    static int pressed_keys[LYTE_MAX_KEYLIST];
+    memset(pressed_keys, 0, sizeof(int)*LYTE_MAX_KEYLIST);
+    int cnt = 0;
+    for (int i=0; i < sizeof(inputstate.keys_cur); i++) {
+        if(inputstate.keys_cur[i] && !inputstate.keys_prev[i]) {
+            pressed_keys[cnt] = i;
+            cnt++;
+        }
+        if (cnt == LYTE_MAX_KEYLIST) { break; }
+    }
+    *keys = pressed_keys;
+    *num_keys = cnt;
     return 0;
 }
 

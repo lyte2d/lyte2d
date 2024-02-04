@@ -322,6 +322,11 @@ static inline int _is_key_repeat(int key, bool *val) {
     err = lyte_is_key_repeat(key, val);
     return err;
 }
+static inline int _get_pressed_keys(int **val, size_t *val_count) {
+int err = 0;
+    err = lyte_get_pressed_keys(val, val_count);
+    return err;
+}
 static inline int _get_textinput(const char **val) {
 int err = 0;
     err = lyte_get_textinput(val);
