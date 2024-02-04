@@ -441,9 +441,9 @@ static void string_to_nfc (lua_State *L, luaL_Buffer *buff, const char *s, const
    * If it is, we memcpy the bytes verbatim into the output buffer. If it is not, then we
    * convert the codepoints to NFC and then emit those codepoints as UTF-8 bytes. */
 
-  utfint starter = -1, ch; /* 'starter' is last starter codepoint seen */
+  utfint starter = -1, ch = 0; /* 'starter' is last starter codepoint seen */
   const char *to_copy = s; /* pointer to next bytes we might need to memcpy into output buffer */
-  unsigned int prev_canon_cls = 0, canon_cls = 0;
+  unsigned int prev_canon_cls = 0; // , canon_cls = 0;
   int fixedup = 0; /* has the sequence currently under consideration been modified to make it NFC? */
 
   /* Temporary storage for a sequence of consecutive combining marks
@@ -533,7 +533,7 @@ process_combining_marks:
         if (fixedup) {
           /* The preceding starter/combining mark sequence was bad; convert fixed-up codepoints
            * to UTF-8 bytes */
-          if (starter != -1)
+          if ((int)starter != -1)
             add_utf8char(buff, starter);
           for (unsigned int i = 0; i < vec_size; i++)
             add_utf8char(buff, vector[i] >> 8);
@@ -550,7 +550,7 @@ process_combining_marks:
         }
         vec_size = 0; /* Clear vector of combining marks in readiness for next such sequence */
         fixedup = 0;
-      } else if (starter != -1) {
+      } else if ((int)starter != -1) {
         /* This starter was preceded immediately by another starter
          * Check if this one should combine with it */
         fixedup = 0;
@@ -609,7 +609,7 @@ process_combining_marks:
 
   if (vec_size)
     goto process_combining_marks; /* Finish processing trailing combining marks */
-  if (starter != -1)
+  if ((int)starter != -1)
     add_utf8char(buff, starter);
 
   if (vector != onstack)
@@ -850,7 +850,7 @@ static int Lutf8_char (lua_State *L) {
   luaL_buffinit(L, &b);
   for (i = 1; i <= n; ++i) {
     lua_Integer code = luaL_checkinteger(L, i);
-    luaL_argcheck(L, code <= UTF8_MAXCP, i, "value out of range");
+    luaL_argcheck(L, (unsigned int)code <= UTF8_MAXCP, i, "value out of range");
     add_utf8char(&b, CAST(utfint, code));
   }
   luaL_pushresult(&b);
@@ -1799,7 +1799,7 @@ static int Lutf8_clean(lua_State *L) {
 
 static int Lutf8_isnfc(lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e);
-  utfint starter = 0, ch;
+  utfint starter = 0, ch = 0;
   unsigned int prev_canon_cls = 0;
 
   while (s < e) {
@@ -1873,6 +1873,7 @@ static int Lutf8_normalize_nfc(lua_State *L) {
   return 2;
 
 build_string:
+;
   /* We will need to build a new string, this one is not NFC */
   luaL_Buffer buff;
   luaL_buffinit(L, &buff);
@@ -1896,7 +1897,7 @@ static int iterate_grapheme_indices(lua_State *L) {
   }
   const char *e = s + end;
 
-  utfint ch, next_ch;
+  utfint ch=0, next_ch=0;
   const char *p = utf8_safe_decode(L, s + pos - 1, &ch);
 
   while (1) {
@@ -1920,7 +1921,7 @@ static int iterate_grapheme_indices(lua_State *L) {
       /* U+200D is ZERO WIDTH JOINER, it always binds to preceding char */
       if (next_p < e && find_in_range(pictographic_table, table_size(pictographic_table), ch)) {
         /* After an Extended_Pictographic codepoint and ZWJ, we bind to a following Extended_Pictographic */
-        utfint nextnext_ch;
+        utfint nextnext_ch = 0;
         const char *probe_ep = utf8_safe_decode(L, next_p, &nextnext_ch);
         if (find_in_range(pictographic_table, table_size(pictographic_table), nextnext_ch)) {
           p = probe_ep;
@@ -2032,6 +2033,7 @@ next_iteration: ;
 static int Lutf8_grapheme_indices(lua_State *L) {
   size_t len;
   const char *s = luaL_checklstring(L, 1, &len);
+  if (s==NULL) { }
   lua_Integer start = byte_relat(luaL_optinteger(L, 2, 1), len);
   lua_Integer end = byte_relat(luaL_optinteger(L, 3, len), len);
   luaL_argcheck(L, start >= 1, 2, "out of range");
