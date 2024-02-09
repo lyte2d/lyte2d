@@ -130,9 +130,9 @@ static void _fons_render_update(void *user_ptr, int *rect, const uint8_t *data) 
             ww++;
             int i = ix + iy*width;
             uint8_t val = data[i];
-            mydata[i*4] = val;
-            mydata[i*4+1] = val;
-            mydata[i*4+2] = val;
+            mydata[i*4] = (uint8_t)255;
+            mydata[i*4+1] = (uint8_t)255;
+            mydata[i*4+2] = (uint8_t)255;
             mydata[i*4+3] = val;
         }
     }
