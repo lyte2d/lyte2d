@@ -248,4 +248,22 @@ typedef enum lyte_KeyboardKey {
     LYTE_KEYBOARDKEY_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 } lyte_KeyboardKey;
 
+typedef enum lyte_GeomClass {
+    // MG: values map to ODE
+    LYTE_GEOMCLASS_CIRCLE = 0,
+    LYTE_GEOMCLASS_RECT = 1,
+    // .. capsule is 2.. cylinder is 3, plane is 4, ray is 5...
+    // count is not needed
+    LYTE_GEOMCLASS_FORCE_UINT32 =  0x7FFFFFFF, // inspired by sokol_gfx enums
+} lyte_GeomClass;
+
+typedef enum lyte_JointClass {
+    // MG: values map to ODE (dJointType)
+    LYTE_JOINTCLASS_HINGE = 2,
+    LYTE_JOINTCLASS_SLIDER = 3,
+    LYTE_JOINTCLASS_FIXED = 7,
+    // count is not needed
+    LYTE_JOINTCLASS_FORCE_UINT32 =  0x7FFFFFFF, // inspired by sokol_gfx enums
+} lyte_JointClass;
+
 #endif  // API_ENUMS_H_INCLUDED

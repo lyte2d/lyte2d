@@ -713,7 +713,356 @@ static inline int _shader_reset_uniform(void *shader, const char *uniform_name) 
     err = lyte_reset_shader_uniform(shader, uniform_name);
     return err;
 }
-
+static inline int _world_new(void **val) {
+int err = 0;
+    err = lyte_new_world(val);
+    return err;
+}
+static inline int _world_cleanup(void *world) {
+    (void)world; int err = 0;
+    err = lyte_World_cleanup(world);
+    return err;
+}
+static inline int _world_set_gravity(void *world, double x, double y) {
+    (void)world; (void)x; (void)y; int err = 0;
+    err = lyte_world_set_gravity(world, x, y);
+    return err;
+}
+static inline int _world_update(void *world, double step_size) {
+    (void)world; (void)step_size; int err = 0;
+    err = lyte_world_update_fast(world, step_size);
+    return err;
+}
+static inline int _body_new(void *world, void **val) {
+    (void)world; int err = 0;
+    err = lyte_new_body(world, val);
+    return err;
+}
+static inline int _body_cleanup(void *body) {
+    (void)body; int err = 0;
+    err = lyte_Body_cleanup(body);
+    return err;
+}
+static inline int _body_set_position(void *body, double x, double y) {
+    (void)body; (void)x; (void)y; int err = 0;
+    err = lyte_body_set_position(body, x, y);
+    return err;
+}
+static inline int _body_get_position(void *body, double *x, double *y) {
+    (void)body; int err = 0;
+    err = lyte_body_get_position(body, x, y);
+    return err;
+}
+static inline int _body_set_rotation(void *body, double angle) {
+    (void)body; (void)angle; int err = 0;
+    err = lyte_body_set_rotation(body, angle);
+    return err;
+}
+static inline int _body_get_rotation(void *body, double *angle) {
+    (void)body; int err = 0;
+    err = lyte_body_get_rotation(body, angle);
+    return err;
+}
+static inline int _body_set_linear_vel(void *body, double x, double y) {
+    (void)body; (void)x; (void)y; int err = 0;
+    err = lyte_body_set_linear_velocity(body, x, y);
+    return err;
+}
+static inline int _body_get_linear_vel(void *body, double *x, double *y) {
+    (void)body; int err = 0;
+    err = lyte_body_get_linear_velocity(body, x, y);
+    return err;
+}
+static inline int _body_set_angular_vel(void *body, double z) {
+    (void)body; (void)z; int err = 0;
+    err = lyte_body_set_angular_velocity(body, z);
+    return err;
+}
+static inline int _body_get_angular_vel(void *body, double *z) {
+    (void)body; int err = 0;
+    err = lyte_body_get_angular_velocity(body, z);
+    return err;
+}
+static inline int _body_set_mass_circle(void *body, double mass, double radius) {
+    (void)body; (void)mass; (void)radius; int err = 0;
+    err = lyte_body_set_mass_circle(body, mass, radius);
+    return err;
+}
+static inline int _body_set_mass_rect(void *body, double mass, double width, double height) {
+    (void)body; (void)mass; (void)width; (void)height; int err = 0;
+    err = lyte_body_set_mass_rect(body, mass, width, height);
+    return err;
+}
+static inline int _body_add_force(void *body, double fx, double fy) {
+    (void)body; (void)fx; (void)fy; int err = 0;
+    err = lyte_body_add_force(body, fx, fy);
+    return err;
+}
+static inline int _body_get_force(void *body, double *fx, double *fy) {
+    (void)body; int err = 0;
+    err = lyte_body_get_force(body, fx, fy);
+    return err;
+}
+static inline int _body_add_torque(void *body, double fz) {
+    (void)body; (void)fz; int err = 0;
+    err = lyte_body_add_torque(body, fz);
+    return err;
+}
+static inline int _body_get_torque(void *body, double *fz) {
+    (void)body; int err = 0;
+    err = lyte_body_get_torque(body, fz);
+    return err;
+}
+static inline int _body_set_kinematic(void *body, bool val) {
+    (void)body; (void)val; int err = 0;
+    err = lyte_body_set_kinematic(body, val);
+    return err;
+}
+static inline int _body_is_kinematic(void *body, bool *val) {
+    (void)body; int err = 0;
+    err = lyte_body_is_kinematic(body, val);
+    return err;
+}
+static inline int _space_new(void **val) {
+int err = 0;
+    err = lyte_new_space_simple(val);
+    return err;
+}
+static inline int _space_cleanup(void *space) {
+    (void)space; int err = 0;
+    err = lyte_Space_cleanup(space);
+    return err;
+}
+static inline int _jointgroup_new(void **val) {
+int err = 0;
+    err = lyte_new_jointgroup(val);
+    return err;
+}
+static inline int _jointgroup_cleanup(void *jointgroup) {
+    (void)jointgroup; int err = 0;
+    err = lyte_JointGroup_cleanup(jointgroup);
+    return err;
+}
+static inline int _coll_update_check(void *world, void *space, void *jointgroup) {
+    (void)world; (void)space; (void)jointgroup; int err = 0;
+    err = lyte_coll_update_check_collisions(world, space, jointgroup);
+    return err;
+}
+static inline int _coll_update_correct(void *space) {
+    (void)space; int err = 0;
+    err = lyte_coll_update_correct_drifts(space);
+    return err;
+}
+static inline int _body_get_collision_count(void *body, int *count) {
+    (void)body; int err = 0;
+    err = lyte_body_get_coll_count(body, count);
+    return err;
+}
+static inline int _body_get_collision_data_at(void *body, int index, void **body2, double *pos_x, double *pos_y, double *depth) {
+    (void)body; (void)index; int err = 0;
+    err = lyte_body_get_coll_data_at(body, index, body2, pos_x, pos_y, depth);
+    return err;
+}
+static inline int _joint_cleanup(void *joint) {
+    (void)joint; int err = 0;
+    err = lyte_Joint_cleanup(joint);
+    return err;
+}
+static inline int _joint_is_hinge(void *joint, bool *val) {
+    (void)joint; int err = 0;
+    (void)err;
+    lyte_JointClass cls = {0};
+    lyte_joint_get_class(joint, &cls);
+    *val = cls == LYTE_JOINTCLASS_HINGE;
+    return err;
+}
+static inline int _joint_is_slider(void *joint, bool *val) {
+    (void)joint; int err = 0;
+    (void)err;
+    lyte_JointClass cls = {0};
+    lyte_joint_get_class(joint, &cls);
+    *val = cls == LYTE_JOINTCLASS_SLIDER;
+    return err;
+}
+static inline int _joint_is_fixed(void *joint, bool *val) {
+    (void)joint; int err = 0;
+    (void)err;
+    lyte_JointClass cls = {0};
+    lyte_joint_get_class(joint, &cls);
+    *val = cls == LYTE_JOINTCLASS_FIXED;
+    return err;
+}
+static inline int _joint_get_body(void *joint, int index, void **body) {
+    (void)joint; (void)index; int err = 0;
+    err = lyte_joint_get_body(joint, index, body);
+    return err;
+}
+static inline int _joint_attach(void *joint, void *body1, void *body2) {
+    (void)joint; (void)body1; (void)body2; int err = 0;
+    err = lyte_joint_attach(joint, body1, body2);
+    return err;
+}
+static inline int _joint_new_hinge(void *world, void *jointgroup, void **joint) {
+    (void)world; (void)jointgroup; int err = 0;
+    err = lyte_joint_new_hinge(world, jointgroup, joint);
+    return err;
+}
+static inline int _joint_new_slider(void *world, void *jointgroup, void **joint) {
+    (void)world; (void)jointgroup; int err = 0;
+    err = lyte_joint_new_slider(world, jointgroup, joint);
+    return err;
+}
+static inline int _joint_new_fixed(void *world, void *jointgroup, void **joint) {
+    (void)world; (void)jointgroup; int err = 0;
+    err = lyte_joint_new_fixed(world, jointgroup, joint);
+    return err;
+}
+static inline int _joint_set_hinge_anchor(void *joint, double x, double y) {
+    (void)joint; (void)x; (void)y; int err = 0;
+    err = lyte_joint_set_hinge_anchor(joint, x, y);
+    return err;
+}
+static inline int _joint_get_hinge_anchor1(void *joint, double *x, double *y) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_hinge_anchor1(joint, x, y);
+    return err;
+}
+static inline int _joint_get_hinge_anchor2(void *joint, double *x, double *y) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_hinge_anchor2(joint, x, y);
+    return err;
+}
+static inline int _joint_get_hinge_angle(void *joint, double *angle) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_hinge_angle(joint, angle);
+    return err;
+}
+static inline int _joint_get_hinge_angle_rate(void *joint, double *anglerate) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_hinge_angle_rate(joint, anglerate);
+    return err;
+}
+static inline int _joint_set_slider_axis(void *joint, double x, double y) {
+    (void)joint; (void)x; (void)y; int err = 0;
+    err = lyte_joint_set_slider_axis(joint, x, y);
+    return err;
+}
+static inline int _joint_get_slider_axis(void *joint, double *x, double *y) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_slider_axis(joint, x, y);
+    return err;
+}
+static inline int _joint_get_slider_position(void *joint, double *pos) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_slider_position(joint, pos);
+    return err;
+}
+static inline int _joint_get_slider_position_rate(void *joint, double *posrate) {
+    (void)joint; int err = 0;
+    err = lyte_joint_get_slider_position_rate(joint, posrate);
+    return err;
+}
+static inline int _joint_set_fixed(void *joint) {
+    (void)joint; int err = 0;
+    err = lyte_joint_set_fixed(joint);
+    return err;
+}
+static inline int _geom_cleanup(void *geom) {
+    (void)geom; int err = 0;
+    err = lyte_Geom_cleanup(geom);
+    return err;
+}
+static inline int _geom_new_circle(void *space, double radius, void **geom) {
+    (void)radius; int err = 0;
+    err = lyte_new_geom_circle(space, radius, geom);
+    return err;
+}
+static inline int _geom_new_rect(void *space, double width, double height, void **geom) {
+    (void)width; (void)height; int err = 0;
+    err = lyte_new_geom_rect(space, width, height, geom);
+    return err;
+}
+static inline int _geom_is_circle(void *geom, bool *val) {
+    (void)geom; int err = 0;
+    (void)err;
+    lyte_GeomClass cls = {0};
+    lyte_geom_get_class(geom, &cls);
+    *val = cls == LYTE_GEOMCLASS_CIRCLE;
+    return err;
+}
+static inline int _geom_is_rect(void *geom, bool *val) {
+    (void)geom; int err = 0;
+    (void)err;
+    lyte_GeomClass cls = {0};
+    lyte_geom_get_class(geom, &cls);
+    *val = cls == LYTE_GEOMCLASS_RECT;
+    return err;
+}
+static inline int _geom_set_circle_radius(void *geom, double radius) {
+    (void)geom; (void)radius; int err = 0;
+    err = lyte_geom_circle_set_radius(geom, radius);
+    return err;
+}
+static inline int _geom_get_circle_radius(void *geom, double *radius) {
+    (void)geom; int err = 0;
+    err = lyte_geom_circle_get_radius(geom, radius);
+    return err;
+}
+static inline int _geom_set_rect_size(void *geom, double width, double height) {
+    (void)geom; (void)width; (void)height; int err = 0;
+    err = lyte_geom_rect_set_size(geom, width, height);
+    return err;
+}
+static inline int _geom_get_rect_size(void *geom, double *width, double *height) {
+    (void)geom; int err = 0;
+    err = lyte_geom_rect_get_size(geom, width, height);
+    return err;
+}
+static inline int _geom_get_circle_point_depth(void *geom, double x, double y, double *depth) {
+    (void)geom; (void)x; (void)y; int err = 0;
+    err = lyte_geom_circle_get_point_depth(geom, x, y, depth);
+    return err;
+}
+static inline int _geom_get_rect_point_depth(void *geom, double x, double y, double *depth) {
+    (void)geom; (void)x; (void)y; int err = 0;
+    err = lyte_geom_rect_get_point_depth(geom, x, y, depth);
+    return err;
+}
+static inline int _geom_get_AABB(void *geom, double *minx, double *miny, double *maxx, double *maxy) {
+    (void)geom; int err = 0;
+    err = lyte_geom_get_AABB(geom, minx, miny, maxx, maxy);
+    return err;
+}
+static inline int _geom_set_body(void *geom, void *body) {
+    (void)geom; (void)body; int err = 0;
+    err = lyte_geom_set_body(geom, body);
+    return err;
+}
+static inline int _geom_get_body(void *geom, void **body) {
+    (void)geom; int err = 0;
+    err = lyte_geom_get_body(geom, body);
+    return err;
+}
+static inline int _geom_set_category_bit(void *geom, int category_bit) {
+    (void)geom; (void)category_bit; int err = 0;
+    err = lyte_geom_set_category_bit(geom, category_bit);
+    return err;
+}
+static inline int _geom_is_category_bit_set(void *geom, int category_bit, bool *val) {
+    (void)geom; (void)category_bit; int err = 0;
+    err = lyte_geom_is_category_bit_set(geom, category_bit, val);
+    return err;
+}
+static inline int _geom_set_collide_bit(void *geom, int collide_bit) {
+    (void)geom; (void)collide_bit; int err = 0;
+    err = lyte_geom_set_collide_bit(geom, collide_bit);
+    return err;
+}
+static inline int _geom_is_collide_bit_set(void *geom, int collide_bit, bool *val) {
+    (void)geom; (void)collide_bit; int err = 0;
+    err = lyte_geom_is_collide_bit_set(geom, collide_bit, val);
+    return err;
+}
 // LOCAL ENUMS. Edit values to map from local names to actual native impl values
 enum {
     _UNIFORMTYPE__INVALID = LYTE_UNIFORMTYPE__INVALID, /* order: 0 string: '_invalid' */

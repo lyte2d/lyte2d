@@ -1486,6 +1486,637 @@ static int api_shader_reset_uniform(lua_State *L) { // arity: 2 => 0
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
+static int api_world_new(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    void *val;
+    err = _world_new(&val);
+    lua_pushlightuserdata(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_world_cleanup(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *world;
+    world = _checklightuserdata(L, 1);
+    err = _world_cleanup(world);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_world_set_gravity(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *world; double x; double y;
+    world = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _world_set_gravity(world, x, y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_world_update(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *world; double step_size;
+    world = _checklightuserdata(L, 1);
+    step_size = luaL_checknumber(L, 2);
+    err = _world_update(world, step_size);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_new(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *world; void *val;
+    world = _checklightuserdata(L, 1);
+    err = _body_new(world, &val);
+    lua_pushlightuserdata(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_body_cleanup(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *body;
+    body = _checklightuserdata(L, 1);
+    err = _body_cleanup(body);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_set_position(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *body; double x; double y;
+    body = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _body_set_position(body, x, y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_position(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *body; double x; double y;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_position(body, &x, &y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_body_set_rotation(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *body; double angle;
+    body = _checklightuserdata(L, 1);
+    angle = luaL_checknumber(L, 2);
+    err = _body_set_rotation(body, angle);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_rotation(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *body; double angle;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_rotation(body, &angle);
+    lua_pushnumber(L, angle);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_body_set_linear_vel(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *body; double x; double y;
+    body = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _body_set_linear_vel(body, x, y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_linear_vel(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *body; double x; double y;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_linear_vel(body, &x, &y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_body_set_angular_vel(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *body; double z;
+    body = _checklightuserdata(L, 1);
+    z = luaL_checknumber(L, 2);
+    err = _body_set_angular_vel(body, z);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_angular_vel(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *body; double z;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_angular_vel(body, &z);
+    lua_pushnumber(L, z);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_body_set_mass_circle(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *body; double mass; double radius;
+    body = _checklightuserdata(L, 1);
+    mass = luaL_checknumber(L, 2);
+    radius = luaL_checknumber(L, 3);
+    err = _body_set_mass_circle(body, mass, radius);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_set_mass_rect(lua_State *L) { // arity: 4 => 0
+    (void)L; int err = 0;
+    void *body; double mass; double width; double height;
+    body = _checklightuserdata(L, 1);
+    mass = luaL_checknumber(L, 2);
+    width = luaL_checknumber(L, 3);
+    height = luaL_checknumber(L, 4);
+    err = _body_set_mass_rect(body, mass, width, height);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_add_force(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *body; double fx; double fy;
+    body = _checklightuserdata(L, 1);
+    fx = luaL_checknumber(L, 2);
+    fy = luaL_checknumber(L, 3);
+    err = _body_add_force(body, fx, fy);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_force(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *body; double fx; double fy;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_force(body, &fx, &fy);
+    lua_pushnumber(L, fx);
+    lua_pushnumber(L, fy);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_body_add_torque(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *body; double fz;
+    body = _checklightuserdata(L, 1);
+    fz = luaL_checknumber(L, 2);
+    err = _body_add_torque(body, fz);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_torque(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *body; double fz;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_torque(body, &fz);
+    lua_pushnumber(L, fz);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_body_set_kinematic(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *body; bool val;
+    body = _checklightuserdata(L, 1);
+    val = lua_toboolean(L, 2);
+    err = _body_set_kinematic(body, val);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_is_kinematic(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *body; bool val;
+    body = _checklightuserdata(L, 1);
+    err = _body_is_kinematic(body, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_space_new(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    void *val;
+    err = _space_new(&val);
+    lua_pushlightuserdata(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_space_cleanup(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *space;
+    space = _checklightuserdata(L, 1);
+    err = _space_cleanup(space);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_jointgroup_new(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    void *val;
+    err = _jointgroup_new(&val);
+    lua_pushlightuserdata(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_jointgroup_cleanup(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *jointgroup;
+    jointgroup = _checklightuserdata(L, 1);
+    err = _jointgroup_cleanup(jointgroup);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_coll_update_check(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *world; void *space; void *jointgroup;
+    world = _checklightuserdata(L, 1);
+    space = _checklightuserdata(L, 2);
+    jointgroup = _checklightuserdata(L, 3);
+    err = _coll_update_check(world, space, jointgroup);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_coll_update_correct(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *space;
+    space = _checklightuserdata(L, 1);
+    err = _coll_update_correct(space);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_body_get_collision_count(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *body; int count;
+    body = _checklightuserdata(L, 1);
+    err = _body_get_collision_count(body, &count);
+    lua_pushinteger(L, count);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_body_get_collision_data_at(lua_State *L) { // arity: 2 => 4
+    (void)L; int err = 0;
+    void *body; int index; void *body2; double pos_x; double pos_y; double depth;
+    body = _checklightuserdata(L, 1);
+    index = luaL_checknumber(L, 2);
+    err = _body_get_collision_data_at(body, index, &body2, &pos_x, &pos_y, &depth);
+    lua_pushlightuserdata(L, body2);
+    lua_pushnumber(L, pos_x);
+    lua_pushnumber(L, pos_y);
+    lua_pushnumber(L, depth);
+    (void)err; // TODO: handle when err is not 0
+    return 4; // number of values returned in the stack
+}
+static int api_joint_cleanup(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *joint;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_cleanup(joint);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_joint_is_hinge(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; bool val;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_is_hinge(joint, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_is_slider(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; bool val;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_is_slider(joint, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_is_fixed(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; bool val;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_is_fixed(joint, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_get_body(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *joint; int index; void *body;
+    joint = _checklightuserdata(L, 1);
+    index = luaL_checknumber(L, 2);
+    err = _joint_get_body(joint, index, &body);
+    lua_pushlightuserdata(L, body);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_attach(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *joint; void *body1; void *body2;
+    joint = _checklightuserdata(L, 1);
+    body1 = _checklightuserdata(L, 2);
+    body2 = _checklightuserdata(L, 3);
+    err = _joint_attach(joint, body1, body2);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_joint_new_hinge(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *world; void *jointgroup; void *joint;
+    world = _checklightuserdata(L, 1);
+    jointgroup = _checklightuserdata(L, 2);
+    err = _joint_new_hinge(world, jointgroup, &joint);
+    lua_pushlightuserdata(L, joint);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_new_slider(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *world; void *jointgroup; void *joint;
+    world = _checklightuserdata(L, 1);
+    jointgroup = _checklightuserdata(L, 2);
+    err = _joint_new_slider(world, jointgroup, &joint);
+    lua_pushlightuserdata(L, joint);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_new_fixed(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *world; void *jointgroup; void *joint;
+    world = _checklightuserdata(L, 1);
+    jointgroup = _checklightuserdata(L, 2);
+    err = _joint_new_fixed(world, jointgroup, &joint);
+    lua_pushlightuserdata(L, joint);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_set_hinge_anchor(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *joint; double x; double y;
+    joint = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _joint_set_hinge_anchor(joint, x, y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_joint_get_hinge_anchor1(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *joint; double x; double y;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_hinge_anchor1(joint, &x, &y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_joint_get_hinge_anchor2(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *joint; double x; double y;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_hinge_anchor2(joint, &x, &y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_joint_get_hinge_angle(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; double angle;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_hinge_angle(joint, &angle);
+    lua_pushnumber(L, angle);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_get_hinge_angle_rate(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; double anglerate;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_hinge_angle_rate(joint, &anglerate);
+    lua_pushnumber(L, anglerate);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_set_slider_axis(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *joint; double x; double y;
+    joint = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _joint_set_slider_axis(joint, x, y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_joint_get_slider_axis(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *joint; double x; double y;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_slider_axis(joint, &x, &y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_joint_get_slider_position(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; double pos;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_slider_position(joint, &pos);
+    lua_pushnumber(L, pos);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_get_slider_position_rate(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *joint; double posrate;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_get_slider_position_rate(joint, &posrate);
+    lua_pushnumber(L, posrate);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_joint_set_fixed(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *joint;
+    joint = _checklightuserdata(L, 1);
+    err = _joint_set_fixed(joint);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_cleanup(lua_State *L) { // arity: 1 => 0
+    (void)L; int err = 0;
+    void *geom;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_cleanup(geom);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_new_circle(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *space; double radius; void *geom;
+    space = _checklightuserdata(L, 1);
+    radius = luaL_checknumber(L, 2);
+    err = _geom_new_circle(space, radius, &geom);
+    lua_pushlightuserdata(L, geom);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_new_rect(lua_State *L) { // arity: 3 => 1
+    (void)L; int err = 0;
+    void *space; double width; double height; void *geom;
+    space = _checklightuserdata(L, 1);
+    width = luaL_checknumber(L, 2);
+    height = luaL_checknumber(L, 3);
+    err = _geom_new_rect(space, width, height, &geom);
+    lua_pushlightuserdata(L, geom);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_is_circle(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *geom; bool val;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_is_circle(geom, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_is_rect(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *geom; bool val;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_is_rect(geom, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_set_circle_radius(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *geom; double radius;
+    geom = _checklightuserdata(L, 1);
+    radius = luaL_checknumber(L, 2);
+    err = _geom_set_circle_radius(geom, radius);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_get_circle_radius(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *geom; double radius;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_get_circle_radius(geom, &radius);
+    lua_pushnumber(L, radius);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_set_rect_size(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *geom; double width; double height;
+    geom = _checklightuserdata(L, 1);
+    width = luaL_checknumber(L, 2);
+    height = luaL_checknumber(L, 3);
+    err = _geom_set_rect_size(geom, width, height);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_get_rect_size(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *geom; double width; double height;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_get_rect_size(geom, &width, &height);
+    lua_pushnumber(L, width);
+    lua_pushnumber(L, height);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_geom_get_circle_point_depth(lua_State *L) { // arity: 3 => 1
+    (void)L; int err = 0;
+    void *geom; double x; double y; double depth;
+    geom = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _geom_get_circle_point_depth(geom, x, y, &depth);
+    lua_pushnumber(L, depth);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_get_rect_point_depth(lua_State *L) { // arity: 3 => 1
+    (void)L; int err = 0;
+    void *geom; double x; double y; double depth;
+    geom = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _geom_get_rect_point_depth(geom, x, y, &depth);
+    lua_pushnumber(L, depth);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_get_AABB(lua_State *L) { // arity: 1 => 4
+    (void)L; int err = 0;
+    void *geom; double minx; double miny; double maxx; double maxy;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_get_AABB(geom, &minx, &miny, &maxx, &maxy);
+    lua_pushnumber(L, minx);
+    lua_pushnumber(L, miny);
+    lua_pushnumber(L, maxx);
+    lua_pushnumber(L, maxy);
+    (void)err; // TODO: handle when err is not 0
+    return 4; // number of values returned in the stack
+}
+static int api_geom_set_body(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *geom; void *body;
+    geom = _checklightuserdata(L, 1);
+    body = _checklightuserdata(L, 2);
+    err = _geom_set_body(geom, body);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_get_body(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *geom; void *body;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_get_body(geom, &body);
+    lua_pushlightuserdata(L, body);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_set_category_bit(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *geom; int category_bit;
+    geom = _checklightuserdata(L, 1);
+    category_bit = luaL_checknumber(L, 2);
+    err = _geom_set_category_bit(geom, category_bit);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_is_category_bit_set(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *geom; int category_bit; bool val;
+    geom = _checklightuserdata(L, 1);
+    category_bit = luaL_checknumber(L, 2);
+    err = _geom_is_category_bit_set(geom, category_bit, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
+static int api_geom_set_collide_bit(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *geom; int collide_bit;
+    geom = _checklightuserdata(L, 1);
+    collide_bit = luaL_checknumber(L, 2);
+    err = _geom_set_collide_bit(geom, collide_bit);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_is_collide_bit_set(lua_State *L) { // arity: 2 => 1
+    (void)L; int err = 0;
+    void *geom; int collide_bit; bool val;
+    geom = _checklightuserdata(L, 1);
+    collide_bit = luaL_checknumber(L, 2);
+    err = _geom_is_collide_bit_set(geom, collide_bit, &val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
 
 static const struct luaL_Reg lyte_core_api_functions[] = {
     {"quit", api_quit},
@@ -1624,6 +2255,73 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"shader_set_uniform_floatvec4", api_shader_set_uniform_floatvec4},
     {"shader_set_uniform_image", api_shader_set_uniform_image},
     {"shader_reset_uniform", api_shader_reset_uniform},
+    {"world_new", api_world_new},
+    {"world_cleanup", api_world_cleanup},
+    {"world_set_gravity", api_world_set_gravity},
+    {"world_update", api_world_update},
+    {"body_new", api_body_new},
+    {"body_cleanup", api_body_cleanup},
+    {"body_set_position", api_body_set_position},
+    {"body_get_position", api_body_get_position},
+    {"body_set_rotation", api_body_set_rotation},
+    {"body_get_rotation", api_body_get_rotation},
+    {"body_set_linear_vel", api_body_set_linear_vel},
+    {"body_get_linear_vel", api_body_get_linear_vel},
+    {"body_set_angular_vel", api_body_set_angular_vel},
+    {"body_get_angular_vel", api_body_get_angular_vel},
+    {"body_set_mass_circle", api_body_set_mass_circle},
+    {"body_set_mass_rect", api_body_set_mass_rect},
+    {"body_add_force", api_body_add_force},
+    {"body_get_force", api_body_get_force},
+    {"body_add_torque", api_body_add_torque},
+    {"body_get_torque", api_body_get_torque},
+    {"body_set_kinematic", api_body_set_kinematic},
+    {"body_is_kinematic", api_body_is_kinematic},
+    {"space_new", api_space_new},
+    {"space_cleanup", api_space_cleanup},
+    {"jointgroup_new", api_jointgroup_new},
+    {"jointgroup_cleanup", api_jointgroup_cleanup},
+    {"coll_update_check", api_coll_update_check},
+    {"coll_update_correct", api_coll_update_correct},
+    {"body_get_collision_count", api_body_get_collision_count},
+    {"body_get_collision_data_at", api_body_get_collision_data_at},
+    {"joint_cleanup", api_joint_cleanup},
+    {"joint_is_hinge", api_joint_is_hinge},
+    {"joint_is_slider", api_joint_is_slider},
+    {"joint_is_fixed", api_joint_is_fixed},
+    {"joint_get_body", api_joint_get_body},
+    {"joint_attach", api_joint_attach},
+    {"joint_new_hinge", api_joint_new_hinge},
+    {"joint_new_slider", api_joint_new_slider},
+    {"joint_new_fixed", api_joint_new_fixed},
+    {"joint_set_hinge_anchor", api_joint_set_hinge_anchor},
+    {"joint_get_hinge_anchor1", api_joint_get_hinge_anchor1},
+    {"joint_get_hinge_anchor2", api_joint_get_hinge_anchor2},
+    {"joint_get_hinge_angle", api_joint_get_hinge_angle},
+    {"joint_get_hinge_angle_rate", api_joint_get_hinge_angle_rate},
+    {"joint_set_slider_axis", api_joint_set_slider_axis},
+    {"joint_get_slider_axis", api_joint_get_slider_axis},
+    {"joint_get_slider_position", api_joint_get_slider_position},
+    {"joint_get_slider_position_rate", api_joint_get_slider_position_rate},
+    {"joint_set_fixed", api_joint_set_fixed},
+    {"geom_cleanup", api_geom_cleanup},
+    {"geom_new_circle", api_geom_new_circle},
+    {"geom_new_rect", api_geom_new_rect},
+    {"geom_is_circle", api_geom_is_circle},
+    {"geom_is_rect", api_geom_is_rect},
+    {"geom_set_circle_radius", api_geom_set_circle_radius},
+    {"geom_get_circle_radius", api_geom_get_circle_radius},
+    {"geom_set_rect_size", api_geom_set_rect_size},
+    {"geom_get_rect_size", api_geom_get_rect_size},
+    {"geom_get_circle_point_depth", api_geom_get_circle_point_depth},
+    {"geom_get_rect_point_depth", api_geom_get_rect_point_depth},
+    {"geom_get_AABB", api_geom_get_AABB},
+    {"geom_set_body", api_geom_set_body},
+    {"geom_get_body", api_geom_get_body},
+    {"geom_set_category_bit", api_geom_set_category_bit},
+    {"geom_is_category_bit_set", api_geom_is_category_bit_set},
+    {"geom_set_collide_bit", api_geom_set_collide_bit},
+    {"geom_is_collide_bit_set", api_geom_is_collide_bit_set},
     {NULL, NULL} // sentinel
 };
 

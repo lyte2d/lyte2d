@@ -43,15 +43,14 @@ local function get_function_like(fn, fname, is_method, is_mapped, orig_ns)
             if i < #fn.args then ret = ret .. ", " end
         end
         ret = ret .. ")"
-    -- consider lifting this limitation in the future
-        if #fn.rets > 1 then error("Functions are expected to return at most 1 value.") end
-        if #fn.rets == 1 then
-            -- if is_method then ret = ret .. " => "  else ret = ret .. ": " end
+        if #fn.rets > 0 then
             ret = ret .. ": "
-            local r = fn.rets[1]
-            local doc = r.doc
-            local typename = TypeMaps[r.type] and TypeMaps[r.type]["tl"] or get_namespaced_name(fn, r.type)
-            ret = ret .. typename
+            for i, r in ipairs(fn.rets) do
+                local doc = r.doc
+                local typename = TypeMaps[r.type] and TypeMaps[r.type]["tl"] or get_namespaced_name(fn, r.type)
+                ret = ret .. typename
+                if i < #fn.rets then ret = ret .. ", " end
+            end
             -- if doc then ret = ret .. " /*"  .. doc .. "*/" end
         else
             -- if is_method then ret = ret .. " => void" end

@@ -352,7 +352,130 @@ int lyte_reset_shader_uniform(lyte_Shader shader, const char * uniform_name);
 // core_physics
 // -------------------------
 
-int lyte_physics_init(void);
-int lyte_physics_cleanup(void);
+int lyte_core_physics_init(void);
+int lyte_core_physics_cleanup(void);
+
+// World
+int lyte_new_world(lyte_World *world);
+int lyte_World_cleanup(lyte_World world);
+int lyte_world_set_gravity(lyte_World world, double x, double y);
+int lyte_world_set_ERP(lyte_World world, double erp);
+int lyte_world_set_CFM(lyte_World world, double cfm);
+// World update
+int lyte_world_update_accurate(lyte_World world, double step_size);
+int lyte_world_update_fast(lyte_World world, double step_size);
+// World damping (TBD)
+// World contact params (TBD)
+
+// Body
+int lyte_new_body(lyte_World world, lyte_Body *body);
+int lyte_Body_cleanup(lyte_Body body);
+int lyte_body_set_position(lyte_Body body, double x, double y);
+int lyte_body_get_position(lyte_Body body, double *x, double *y);
+int lyte_body_set_rotation(lyte_Body body, double angle);
+int lyte_body_get_rotation(lyte_Body body, double *angle);
+int lyte_body_set_linear_velocity(lyte_Body body, double x, double y);
+int lyte_body_get_linear_velocity(lyte_Body body, double *x, double *y);
+int lyte_body_set_angular_velocity(lyte_Body body, double z);
+int lyte_body_get_angular_velocity(lyte_Body body, double *z);
+int lyte_body_set_mass_circle(lyte_Body body, double mass, double radius);
+int lyte_body_set_mass_rect(lyte_Body body, double mass, double width, double height);
+int lyte_body_add_force(lyte_Body body, double fx, double fy);
+int lyte_body_add_torque(lyte_Body body, double fz);
+int lyte_body_add_rel_force(lyte_Body body, double fx, double fy);
+int lyte_body_add_rel_torque(lyte_Body body, double fz);
+int lyte_body_add_force_at(lyte_Body body, double fx, double fy, double px, double py);
+int lyte_body_add_force_at_rel(lyte_Body body, double fx, double fy, double px, double py);
+int lyte_body_add_rel_force_at(lyte_Body body, double fx, double fy, double px, double py);
+int lyte_body_add_rel_force_at_rel(lyte_Body body, double fx, double fy, double px, double py);
+// Body set force/torque directly. useful possibly for "sleeping bodies" (TBD)
+int lyte_body_get_force(lyte_Body body, double *x, double *y);
+int lyte_body_get_torque(lyte_Body body, double *z);
+int lyte_body_set_kinematic(lyte_Body body, bool val); // kinematic: doesn't react to forces. false by default
+int lyte_body_is_kinematic(lyte_Body body, bool *is_kinematic); // kinematic: doesn't react to forces
+// Body "utility" find relative to world pos, vel, etc. for points on the body. (TBD)
+// Body enable/disable/autoenable/autodisable etc. (TBD)
+// Body damping (TBD)
+// Body misc (attach custom data, finite rotation) (TBD)
+// Body TODO: get body joints
+// Body TODO: get body geoms
+// additional utilities for 2D (https://ode.org/wiki/index.php/Constrain_Objects_to_2D)
+// these are "internal". new_body should set the constraint
+int _lyte_body_2D_constraint(lyte_World world, lyte_Body body); // do on object creation. creates a planejoint
+int _lyte_body_2D_fix_angular_drift(lyte_Body body, bool z_rotate_enabled); // do on each update. non-Z axis rotations are cancelled with this
+
+
+// Joints
+int lyte_Joint_cleanup(lyte_Joint joint);
+int lyte_joint_get_class(lyte_Joint joint, lyte_JointClass *cls);
+int lyte_joint_get_body(lyte_Joint joint, int index, lyte_Body *body);
+int lyte_joint_attach(lyte_Joint joint, lyte_Body body1, lyte_Body body2);
+// Joint TODO: enable/disable joints. get/set custom data. are connected...
+// Joint feedback TODO: set/get feedback (force/torque application to either body!) (TBD)
+// int lyte_joint_set_hinge_axis(lyte_Joint joint, double z); // auto?
+int lyte_joint_new_hinge(lyte_World world, lyte_JointGroup jointgroup, lyte_Joint *joint);
+int lyte_joint_new_slider(lyte_World world, lyte_JointGroup jointgroup, lyte_Joint *joint);
+int lyte_joint_new_fixed(lyte_World world, lyte_JointGroup jointgroup, lyte_Joint *joint);
+int lyte_joint_set_hinge_anchor(lyte_Joint joint, double x, double y);
+int lyte_joint_get_hinge_anchor1(lyte_Joint joint, double *x, double *y);
+int lyte_joint_get_hinge_anchor2(lyte_Joint joint, double *x, double *y);
+int lyte_joint_get_hinge_angle(lyte_Joint joint, double *angle);
+int lyte_joint_get_hinge_angle_rate(lyte_Joint joint, double *angle);
+int lyte_joint_set_slider_axis(lyte_Joint joint, double x, double y);
+int lyte_joint_get_slider_axis(lyte_Joint joint, double *x, double *y);
+int lyte_joint_get_slider_position(lyte_Joint joint, double *pos);
+int lyte_joint_get_slider_position_rate(lyte_Joint joint, double *posrate);
+int lyte_joint_set_fixed(lyte_Joint joint);
+// Joint TODO: parameter functions!
+
+
+// Geom
+int lyte_Geom_cleanup(lyte_Geom geom);
+int lyte_geom_set_body(lyte_Geom geom, lyte_Body body);
+int lyte_geom_get_body(lyte_Geom geom, lyte_Body *body);
+// Geom set/get position, rot/quat etc. Maybe not needed since Body has these. (TBD)
+int lyte_geom_set_offset_position(lyte_Geom geom, double x, double y);
+int lyte_geom_get_offset_position(lyte_Geom geom, double *x, double *y);
+int lyte_geom_set_offset_rotation(lyte_Geom geom, double angle);
+int lyte_geom_get_offset_rotation(lyte_Geom geom, double *angle);
+int lyte_geom_clear_offset(lyte_Geom geom);
+int lyte_geom_get_AABB(lyte_Geom geom, double *minx, double *miny, double *maxx, double *maxy);
+// Geom IsSpace, GetSpace (TBD)
+int lyte_geom_get_class(lyte_Geom geom, lyte_GeomClass *cls);
+int lyte_geom_set_category_bit(lyte_Geom geom, int category_bit); // can have multiple. value between 0 and 63
+int lyte_geom_is_category_bit_set(lyte_Geom geom, int category_bit, bool *is_set);
+int lyte_geom_set_collide_bit(lyte_Geom geom, int collide_bit); // can have multiple. value between 0 and 63
+int lyte_geom_is_collide_bit_set(lyte_Geom geom, int collide_bit, bool *is_set);
+// Geom enable/disable (TBD)
+int lyte_new_geom_circle(lyte_Space space, double radius, lyte_Geom *geom);
+int lyte_geom_circle_set_radius(lyte_Geom geom, double radius);
+int lyte_geom_circle_get_radius(lyte_Geom geom, double *radius);
+int lyte_geom_circle_get_point_depth(lyte_Geom geom, double x, double y, double *depth); // depth: inside positive, outside negative, surface zer
+int lyte_new_geom_rect(lyte_Space space, double width, double height, lyte_Geom *geom);
+int lyte_geom_rect_set_size(lyte_Space space, double width, double height);
+int lyte_geom_rect_get_size(lyte_Space space, double *width, double *height);
+int lyte_geom_rect_get_point_depth(lyte_Geom geom, double x, double y, double *depth); // depth: inside positive, outside negative, surface zero
+// Geom other types, especially capsule and possibly heightfield
+// Geom utilities
+
+// collision stuff
+int lyte_coll_update_check_collisions(lyte_World world, lyte_Space space, lyte_JointGroup jointgroup);
+int lyte_coll_update_correct_drifts(lyte_Space space);
+
+int lyte_body_get_coll_count(lyte_Body body, int *count);
+int lyte_body_get_coll_data_at(lyte_Body body, int index, lyte_Body *body2, double *pos_x, double *pos_y, double *depth);
+
+// Space creation and management.. hashspace, simplespace, ... (TODO: needed for geom creation)
+int lyte_Space_cleanup(lyte_Space space);
+int lyte_new_space_simple(lyte_Space *space);
+// Space: hashspace, spaces inside other spaces etc. (TBD)
+// Space: space add/query etc. not needed? Geoms handle these once given a space ID on creation
+
+// JointGroup
+int _lyte_jointgroup_empty(lyte_JointGroup jointgroup);
+
+int lyte_JointGroup_cleanup(lyte_JointGroup jointgroup);
+int lyte_new_jointgroup(lyte_JointGroup *jointgroup);
+
 
 #endif  // LYTE_CORE_H_INCLUDED

@@ -24,9 +24,15 @@ local Music_Ptr = Pointer
 local Sound_Ptr = Pointer
 local Shader_Ptr = Pointer
 local ShaderBuilder_Ptr = Pointer
+local World_Ptr = Pointer
+local Body_Ptr = Pointer
+local Space_Ptr = Pointer
+local JointGroup_Ptr = Pointer
+local Geom_Ptr = Pointer
+local Joint_Ptr = Pointer
 
 
-return process_def_tree(Namespace("lyte_core",
+return process_def_tree(Namespace("lyte_core", {
     Doc"lyte_core namespace. Direct API mappings to C library.",
 
     Function("quit",
@@ -1011,6 +1017,439 @@ return process_def_tree(Namespace("lyte_core",
         LuaImpl
     ),
 
+    Function("world_new",
+        Ret("val", World_Ptr),
+        Doc"Create a new physics world."
+    ),
+
+    Function("world_cleanup",
+        Arg("world", World_Ptr),
+        Doc"Cleanup (delete) world and all contained objects."
+    ),
+
+    Function("world_set_gravity",
+        Arg("world", World_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set worlds gravity values. By default, gravity is (0, 0).")
+    ),
+
+    Function("world_update",
+        Arg("world", World_Ptr),
+        Arg("step_size", Double),
+        Doc("Update world.")
+    ),
+
+
+    Function("body_new",
+        Arg("world", World_Ptr),
+        Ret("val", Body_Ptr),
+        Doc"Create a new physics body."
+    ),
+
+    Function("body_cleanup",
+        Arg("body", Body_Ptr),
+        Doc"Cleanup (delete) a body."
+    ),
+
+    Function("body_set_position",
+        Arg("body", Body_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set body's position.")
+    ),
+
+    Function("body_get_position",
+        Arg("body", Body_Ptr),
+        Ret("x", Double),
+        Ret("y", Double),
+        Doc("Get body's position.")
+    ),
+
+    Function("body_set_rotation",
+        Arg("body", Body_Ptr),
+        Arg("angle", Double),
+        Doc("Set body's rotation (angle).")
+    ),
+
+    Function("body_get_rotation",
+        Arg("body", Body_Ptr),
+        Ret("angle", Double),
+        Doc("Get body's rotation (angle).")
+    ),
+
+    Function("body_set_linear_vel",
+        Arg("body", Body_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set body's linear velocity.")
+    ),
+
+    Function("body_get_linear_vel",
+        Arg("body", Body_Ptr),
+        Ret("x", Double),
+        Ret("y", Double),
+        Doc("Get body's linear velocity.")
+    ),
+
+    Function("body_set_angular_vel",
+        Arg("body", Body_Ptr),
+        Arg("z", Double),
+        Doc("Set body's angular velocity.")
+    ),
+
+    Function("body_get_angular_vel",
+        Arg("body", Body_Ptr),
+        Ret("z", Double),
+        Doc("Get body's angular velocity.")
+    ),
+
+    Function("body_set_mass_circle",
+        Arg("body", Body_Ptr),
+        Arg("mass", Double),
+        Arg("radius", Double),
+        Doc("Set body's (circular) mass.")
+    ),
+
+    Function("body_set_mass_rect",
+        Arg("body", Body_Ptr),
+        Arg("mass", Double),
+        Arg("width", Double),
+        Arg("height", Double),
+        Doc("Set body's (rectangular) mass.")
+    ),
+
+    Function("body_add_force",
+        Arg("body", Body_Ptr),
+        Arg("fx", Double),
+        Arg("fy", Double),
+        Doc("Add force to body.")
+    ),
+
+    Function("body_get_force",
+        Arg("body", Body_Ptr),
+        Ret("fx", Double),
+        Ret("fy", Double),
+        Doc("Get body's linear .")
+    ),
+
+    Function("body_add_torque",
+        Arg("body", Body_Ptr),
+        Arg("fz", Double),
+        Doc("Add torque to body.")
+    ),
+
+    Function("body_get_torque",
+        Arg("body", Body_Ptr),
+        Ret("fz", Double),
+        Doc("Get body's torque.")
+    ),
+
+    Function("body_set_kinematic",
+        Arg("body", Body_Ptr),
+        Arg("val", Bool),
+        Doc("Set body as 'kinematic'. False by default.")
+    ),
+
+    Function("body_is_kinematic",
+        Arg("body", Body_Ptr),
+        Ret("val", Bool),
+        Doc("Is body set as 'kinematic'? False by default.")
+    ),
+
+    Function("space_new",
+        Ret("val", Space_Ptr),
+        Doc("Create a new Space for collisions")
+    ),
+
+    Function("space_cleanup",
+        Arg("space", Space_Ptr),
+        Doc("Cleanup the Space (delete).")
+    ),
+
+    Function("jointgroup_new",
+        Ret("val", JointGroup_Ptr),
+        Doc("Create a new JointGroup.")
+    ),
+
+    Function("jointgroup_cleanup",
+        Arg("jointgroup", JointGroup_Ptr),
+        Doc("Cleanup the JointGroup (delete).")
+    ),
+
+    Function("coll_update_check",
+        Arg("world", World_Ptr),
+        Arg("space", Space_Ptr),
+        Arg("jointgroup", JointGroup_Ptr),
+        Doc("Check collisions for current frame")
+    ),
+
+    Function("coll_update_correct",
+        Arg("space", Space_Ptr),
+        Doc("Correct angular drift for 2D")
+    ),
+
+    Function("body_get_collision_count",
+        Arg("body", Body_Ptr),
+        Ret("count", Int),
+        Doc("Get the number of collisions for this body.")
+    ),
+
+    Function("body_get_collision_data_at",
+        Arg("body", Body_Ptr),
+        Arg("index", Int),
+        Ret("body2", Body_Ptr),
+        Ret("pos_x", Double),
+        Ret("pos_y", Double),
+        Ret("depth", Double),
+        Doc("Get the data of for collision for this body at given index. Indexes start with 0.")
+    ),
+
+    Function("joint_cleanup",
+        Arg("joint", Joint_Ptr),
+        Doc("Cleanup (delete) given joint.")
+    ),
+
+    Function("joint_is_hinge",
+        Arg("joint", Joint_Ptr),
+        Ret("val", Bool),
+        Doc("Check if the Joint is of class 'hinge'.")
+    ),
+
+    Function("joint_is_slider",
+        Arg("joint", Joint_Ptr),
+        Ret("val", Bool),
+        Doc("Check if the Joint is of class 'slider'.")
+    ),
+
+    Function("joint_is_fixed",
+        Arg("joint", Joint_Ptr),
+        Ret("val", Bool),
+        Doc("Check if the Joint is of class 'fixed'.")
+    ),
+
+    Function("joint_get_body",
+        Arg("joint", Joint_Ptr),
+        Arg("index", Int),
+        Ret("body", Body_Ptr),
+        Doc("Get the body at 'index' for the given joint.")
+    ),
+
+    Function("joint_attach",
+        Arg("joint", Joint_Ptr),
+        Arg("body1", Body_Ptr),
+        Arg("body2", Body_Ptr),
+        Doc("Attach the given bodies with the joint.")
+    ),
+
+    Function("joint_new_hinge",
+        Arg("world", World_Ptr),
+        Arg("jointgroup", JointGroup_Ptr),
+        Ret("joint", Joint_Ptr),
+        Doc("Create a new Joint of class 'hinge'.")
+    ),
+
+    Function("joint_new_slider",
+        Arg("world", World_Ptr),
+        Arg("jointgroup", JointGroup_Ptr),
+        Ret("joint", Joint_Ptr),
+        Doc("Create a new Joint of class 'slider'.")
+    ),
+
+    Function("joint_new_fixed",
+        Arg("world", World_Ptr),
+        Arg("jointgroup", JointGroup_Ptr),
+        Ret("joint", Joint_Ptr),
+        Doc("Create a new Joint of class 'fixed'.")
+    ),
+
+    Function("joint_set_hinge_anchor",
+        Arg("joint", Joint_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set the anchor location for the given hinge joint.")
+    ),
+
+    Function("joint_get_hinge_anchor1",
+        Arg("joint", Joint_Ptr),
+        Ret("x", Double),
+        Ret("y", Double),
+        Doc("Get the anchor location for the given hinge joint. From body1. Should be the same for body2.")
+    ),
+
+    Function("joint_get_hinge_anchor2",
+        Arg("joint", Joint_Ptr),
+        Ret("x", Double),
+        Ret("y", Double),
+        Doc("Get the anchor location for the given hinge joint. From body2. Should be the same for body1.")
+    ),
+
+    Function("joint_get_hinge_angle",
+        Arg("joint", Joint_Ptr),
+        Ret("angle", Double),
+        Doc("Get the angle or the given hinge joint.")
+    ),
+
+    Function("joint_get_hinge_angle_rate",
+        Arg("joint", Joint_Ptr),
+        Ret("anglerate", Double),
+        Doc("Get the angle rate for the given hinge joint.")
+    ),
+
+    Function("joint_set_slider_axis",
+        Arg("joint", Joint_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set the axis for the given slider joint.")
+    ),
+
+    Function("joint_get_slider_axis",
+        Arg("joint", Joint_Ptr),
+        Ret("x", Double),
+        Ret("y", Double),
+        Doc("Get the axis for the given slider joint.")
+    ),
+
+    Function("joint_get_slider_position",
+        Arg("joint", Joint_Ptr),
+        Ret("pos", Double),
+        Doc("Get the slider position for the given slider joint.")
+    ),
+
+    Function("joint_get_slider_position_rate",
+        Arg("joint", Joint_Ptr),
+        Ret("posrate", Double),
+        Doc("Get the slider position rate for the given slider joint.")
+    ),
+
+    Function("joint_set_fixed",
+        Arg("joint", Joint_Ptr),
+        Doc("Set the joint as 'fixed'.")
+    ),
+
+    Function("geom_cleanup",
+        Arg("geom", Geom_Ptr),
+        Doc("Cleanup the Geom (delete).")
+    ),
+
+    Function("geom_new_circle",
+        Arg("space", Space_Ptr),
+        Arg("radius", Double),
+        Ret("geom", Geom_Ptr),
+        Doc("Create a new Geom (for collision).")
+    ),
+
+    Function("geom_new_rect",
+        Arg("space", Space_Ptr),
+        Arg("width", Double),
+        Arg("height", Double),
+        Ret("geom", Geom_Ptr),
+        Doc("Create a new Geom (for collision).")
+    ),
+
+    Function("geom_is_circle",
+        Arg("geom", Geom_Ptr),
+        Ret("val", Bool),
+        Doc("Is the Geom a 'circle'?")
+    ),
+
+    Function("geom_is_rect",
+        Arg("geom", Geom_Ptr),
+        Ret("val", Bool),
+        Doc("Is the Geom a 'rect'?")
+    ),
+
+    Function("geom_set_circle_radius",
+        Arg("geom", Geom_Ptr),
+        Arg("radius", Double),
+        Doc("Set the Geom's (circle) radius.")
+    ),
+
+    Function("geom_get_circle_radius",
+        Arg("geom", Geom_Ptr),
+        Ret("radius", Double),
+        Doc("Get the Geom's (circle) radius.")
+    ),
+
+    Function("geom_set_rect_size",
+        Arg("geom", Geom_Ptr),
+        Arg("width", Double),
+        Arg("height", Double),
+        Doc("Set the Geom's (rect) width and height.")
+    ),
+
+    Function("geom_get_rect_size",
+        Arg("geom", Geom_Ptr),
+        Ret("width", Double),
+        Ret("height", Double),
+        Doc("Get the Geom's (rect) width and height.")
+    ),
+
+    Function("geom_get_circle_point_depth",
+        Arg("geom", Geom_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Ret("depth", Double),
+        Doc("Get the depth of the point in Geom's (circle). Positive inside, Negative outside, Zero on the surface.")
+    ),
+
+    Function("geom_get_rect_point_depth",
+        Arg("geom", Geom_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Ret("depth", Double),
+        Doc("Get the depth of the point in Geom's (rect). Positive inside, Negative outside, Zero on the surface.")
+    ),
+
+    Function("geom_get_AABB",
+        Arg("geom", Geom_Ptr),
+        Ret("minx", Double),
+        Ret("miny", Double),
+        Ret("maxx", Double),
+        Ret("maxy", Double),
+        Doc("Get the AABB rectangle coord associated with the Geom.")
+    ),
+
+    Function("geom_set_body",
+        Arg("geom", Geom_Ptr),
+        Arg("body", Body_Ptr),
+        Doc("Set a Geom for the Body.")
+    ),
+
+    Function("geom_get_body",
+        Arg("geom", Geom_Ptr),
+        Ret("body", Body_Ptr),
+        Doc("Get the Body associated with the Geom.")
+    ),
+
+    -- TODO: offset position and rotation (available in lyte_core)
+
+    Function("geom_set_category_bit",
+        Arg("geom", Geom_Ptr),
+        Arg("category_bit", Int),
+        Doc("Set the category bit for the Geom. Between 0 and 63.")
+    ),
+
+    Function("geom_is_category_bit_set",
+        Arg("geom", Geom_Ptr),
+        Arg("category_bit", Int),
+        Ret("val", Bool),
+        Doc("Is the category bit associated with the Geom? (Between 0 and 63.)")
+    ),
+
+    Function("geom_set_collide_bit",
+        Arg("geom", Geom_Ptr),
+        Arg("collide_bit", Int),
+        Doc("Set the collide bit for the Geom. Between 0 and 63.")
+    ),
+
+    Function("geom_is_collide_bit_set",
+        Arg("geom", Geom_Ptr),
+        Arg("collide_bit", Int),
+        Ret("val", Bool),
+        Doc("Is the collide bit associated with the Geom? (Between 0 and 63.)")
+    ),
+
     List("FloatVec4",
         Float,
         MaxCount(4),
@@ -1082,4 +1521,4 @@ return process_def_tree(Namespace("lyte_core",
             Doc"Acceptable keyboardkey values."
         }
     )
-))
+}))
