@@ -586,7 +586,7 @@ int lyte_body_get_coll_data_at(lyte_Body body, int index, lyte_Body *body2, doub
     return 0;
 }
 
-int _lyte_nearcallback(void *data, lyte_Geom o1, lyte_Geom o2) {
+void _lyte_nearcallback(void *data, lyte_Geom o1, lyte_Geom o2) {
     dContact contacts[LYTE_PHYSICS_MAX_CONTACTS] = {0};
     // TODO: should these be parameters? (add to lyte_NearCallbackData?)
     for (int i = 0; i < LYTE_PHYSICS_MAX_CONTACTS; i++) {
@@ -613,7 +613,6 @@ int _lyte_nearcallback(void *data, lyte_Geom o1, lyte_Geom o2) {
             _lyte_add_collision(b1, b2, g.pos[0], g.pos[1], g.depth); // Consider extending _lyte_Collision with normal information. and perhaps which geoms are hitting too.
         }
     }
-    return 0;
 }
 
 int lyte_coll_update_check_collisions(lyte_World world, lyte_Space space, lyte_JointGroup jointgroup) {
@@ -624,7 +623,7 @@ int lyte_coll_update_check_collisions(lyte_World world, lyte_Space space, lyte_J
     // TODO: consider adding contact parameter configuration. right now they're hardcoded in nearcallback
     _lyte_NearCallbackData cbdata = {0};
     cbdata.jointgroup = jointgroup;
-    dSpaceCollide(space, &cbdata, &_lyte_nearcallback);
+    dSpaceCollide(space, &cbdata, (dNearCallback*)&_lyte_nearcallback);
 
     return 0;
 }
