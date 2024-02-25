@@ -42,7 +42,9 @@ cmake_dependent_option(ODE_WITH_LIBCCD_CONVEX_SPHERE "Use libccd for convex-sphe
 cmake_dependent_option(ODE_WITH_LIBCCD_SYSTEM "Use system libccd." OFF "ODE_WITH_LIBCCD" OFF)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-	option(ODE_DOUBLE_PRECISION "Use double-precision math." OFF)
+	# mg change for EMSCRIPTEN (TODO perhaps limit it there?)
+	# option(ODE_DOUBLE_PRECISION "Use double-precision math." OFF)
+	option(ODE_DOUBLE_PRECISION "Use double-precision math." ON)
 else()
 	option(ODE_DOUBLE_PRECISION "Use double-precision math." ON)
 endif()

@@ -472,15 +472,13 @@ int lyte_geom_circle_get_point_depth(lyte_Geom geom, double x, double y, double 
     return 0;
 }
 
-#define _RECT_GEOM_DEPTH_ 1 // TODO: is 1 a good value for depth here?
-
 int lyte_new_geom_rect(lyte_Space space, double width, double height, lyte_Geom *geom) {
-    *geom = dCreateBox(space, width, height, _RECT_GEOM_DEPTH_);
+    *geom = dCreateBox(space, width, height, (width+height)/2);
     return 0;
 }
 
 int lyte_geom_rect_set_size(lyte_Space geom, double width, double height) {
-    dGeomBoxSetLengths(geom, width, height, _RECT_GEOM_DEPTH_);
+    dGeomBoxSetLengths(geom, width, height, (width+height)/2);
     return 0;
 }
 

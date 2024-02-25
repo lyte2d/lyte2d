@@ -273,6 +273,42 @@ declare namespace lyte {
     function set_shader_uniform(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue): void
     // Reset the specified uniform. 
     function reset_shader_uniform(shader: lyte.Shader, uniform_name: string): void
+    // Cleanup the physics world (dynamics + collision). 
+    function cleanup_world(world: lyte.World): void
+    // Create a new physics world 
+    function new_world(): lyte.World
+    // Update the physics world (dynamics + collision). 
+    function update_world(world: lyte.World, step_size: number): void
+    // Update the physics world gravity. 
+    function set_world_gravity(world: lyte.World, x: number, y: number): void
+    // Cleanup the physics collider. 
+    function cleanup_collider(collider: lyte.Collider): void
+    // Refresh the physics collider position (x, y) and angle 
+    function refresh_collider(collider: lyte.Collider): void
+    // Create new circle collider (body + geom) in the given physics world. 
+    function new_circle_collider(world: lyte.World, radius: number, x: number, y: number, angle: number): void
+    // Create new rectangle collider (body + geom) in the given physics world. 
+    function new_rect_collider(world: lyte.World, width: number, height: number, x: number, y: number, angle: number): void
+    // Set collider position. 
+    function set_collider_position(collider: lyte.Collider, x: number, y: number): void
+    // Set collider rotation. 
+    function set_collider_rotation(collider: lyte.Collider, angle: number): void
+    // Add force to collider. 
+    function add_force_to_collider(collider: lyte.Collider, fx: number, fy: number): void
+    // Add torque to collider. 
+    function add_torque_to_collider(collider: lyte.Collider, fz: number): void
+    // Set the collider's linear velocity 
+    function set_collider_linear_velocity(collider: lyte.Collider, vx: number, vy: number): void
+    // Set the collider's angular velocity 
+    function set_collider_angular_velocity(collider: lyte.Collider, vz: number): void
+    // Set the collider as 'kinematic'. By default, it's not kinematic. 
+    function set_collider_kinematic(collider: lyte.Collider, val: boolean): void
+    // Is the collider set as 'kinematic'? By default, it's not. 
+    function is_collider_kinematic(collider: lyte.Collider): boolean
+    // Get the number of collisions in the current frame 
+    function get_collider_collision_count(collider: lyte.Collider): number
+    // Get the collision data in the current frame as a list 
+    function get_collider_collisions(collider: lyte.Collider): lyte.CollisionList
 
     // records
 
@@ -342,6 +378,43 @@ declare namespace lyte {
         build: (shaderbuilder: lyte.ShaderBuilder) => lyte.Shader
         __gc: (shaderbuilder: lyte.ShaderBuilder) => void
     }
+    // Physics dynamics world + collision space. 
+    type World = {
+        update: (world: lyte.World, step_size: number) => void
+        set_gravity: (world: lyte.World, x: number, y: number) => void
+        new_circle_collider: (world: lyte.World, radius: number, x: number, y: number, angle: number) => void
+        new_rect_collider: (world: lyte.World, width: number, height: number, x: number, y: number, angle: number) => void
+        __gc: (world: lyte.World) => void
+    }
+    // Physics body + mass + colliding geometry. 
+    type Collider = {
+        x: number
+        y: number
+        angle: number
+        refresh: (collider: lyte.Collider) => void
+        set_position: (collider: lyte.Collider, x: number, y: number) => void
+        set_rotation: (collider: lyte.Collider, angle: number) => void
+        set_linear_velocity: (collider: lyte.Collider, vx: number, vy: number) => void
+        set_angular_velocity: (collider: lyte.Collider, vz: number) => void
+        add_force: (collider: lyte.Collider, fx: number, fy: number) => void
+        add_torque: (collider: lyte.Collider, fz: number) => void
+        is_kinematic: (collider: lyte.Collider) => boolean
+        set_kinematic: (collider: lyte.Collider, val: boolean) => void
+        get_collision_count: (collider: lyte.Collider) => number
+        get_collisions: (collider: lyte.Collider) => lyte.CollisionList
+        __gc: (collider: lyte.Collider) => void
+    }
+    // Collision information between two colliders 
+    type Collision = {
+        c1: lyte.Collider
+        c2: lyte.Collider
+        pos_x: number
+        pos_y: number
+        depth: number
+    }
+    // Physics joints (constraints). 
+    type Joint = {
+    }
 
     // variants (unions)
 
@@ -355,6 +428,8 @@ declare namespace lyte {
 
     // Float values
     type FloatVec4 = number[]
+    // Collision List
+    type CollisionList = object[]
 
     // dicts
 

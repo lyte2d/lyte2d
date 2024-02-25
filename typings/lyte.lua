@@ -410,6 +410,60 @@
 --- Reset the specified uniform. 
 --- @type fun(shader: lyte.Shader, uniform_name: string)
     lyte.reset_shader_uniform = lyte.reset_shader_uniform and lyte.reset_shader_uniform or function() end
+--- Cleanup the physics world (dynamics + collision). 
+--- @type fun(world: lyte.World)
+    lyte.cleanup_world = lyte.cleanup_world and lyte.cleanup_world or function() end
+--- Create a new physics world 
+--- @type fun(): lyte.World
+    lyte.new_world = lyte.new_world and lyte.new_world or function() end
+--- Update the physics world (dynamics + collision). 
+--- @type fun(world: lyte.World, step_size: number)
+    lyte.update_world = lyte.update_world and lyte.update_world or function() end
+--- Update the physics world gravity. 
+--- @type fun(world: lyte.World, x: number, y: number)
+    lyte.set_world_gravity = lyte.set_world_gravity and lyte.set_world_gravity or function() end
+--- Cleanup the physics collider. 
+--- @type fun(collider: lyte.Collider)
+    lyte.cleanup_collider = lyte.cleanup_collider and lyte.cleanup_collider or function() end
+--- Refresh the physics collider position (x, y) and angle 
+--- @type fun(collider: lyte.Collider)
+    lyte.refresh_collider = lyte.refresh_collider and lyte.refresh_collider or function() end
+--- Create new circle collider (body + geom) in the given physics world. 
+--- @type fun(world: lyte.World, radius: number, x: number, y: number, angle: number)
+    lyte.new_circle_collider = lyte.new_circle_collider and lyte.new_circle_collider or function() end
+--- Create new rectangle collider (body + geom) in the given physics world. 
+--- @type fun(world: lyte.World, width: number, height: number, x: number, y: number, angle: number)
+    lyte.new_rect_collider = lyte.new_rect_collider and lyte.new_rect_collider or function() end
+--- Set collider position. 
+--- @type fun(collider: lyte.Collider, x: number, y: number)
+    lyte.set_collider_position = lyte.set_collider_position and lyte.set_collider_position or function() end
+--- Set collider rotation. 
+--- @type fun(collider: lyte.Collider, angle: number)
+    lyte.set_collider_rotation = lyte.set_collider_rotation and lyte.set_collider_rotation or function() end
+--- Add force to collider. 
+--- @type fun(collider: lyte.Collider, fx: number, fy: number)
+    lyte.add_force_to_collider = lyte.add_force_to_collider and lyte.add_force_to_collider or function() end
+--- Add torque to collider. 
+--- @type fun(collider: lyte.Collider, fz: number)
+    lyte.add_torque_to_collider = lyte.add_torque_to_collider and lyte.add_torque_to_collider or function() end
+--- Set the collider's linear velocity 
+--- @type fun(collider: lyte.Collider, vx: number, vy: number)
+    lyte.set_collider_linear_velocity = lyte.set_collider_linear_velocity and lyte.set_collider_linear_velocity or function() end
+--- Set the collider's angular velocity 
+--- @type fun(collider: lyte.Collider, vz: number)
+    lyte.set_collider_angular_velocity = lyte.set_collider_angular_velocity and lyte.set_collider_angular_velocity or function() end
+--- Set the collider as 'kinematic'. By default, it's not kinematic. 
+--- @type fun(collider: lyte.Collider, val: boolean)
+    lyte.set_collider_kinematic = lyte.set_collider_kinematic and lyte.set_collider_kinematic or function() end
+--- Is the collider set as 'kinematic'? By default, it's not. 
+--- @type fun(collider: lyte.Collider): boolean
+    lyte.is_collider_kinematic = lyte.is_collider_kinematic and lyte.is_collider_kinematic or function() end
+--- Get the number of collisions in the current frame 
+--- @type fun(collider: lyte.Collider): int
+    lyte.get_collider_collision_count = lyte.get_collider_collision_count and lyte.get_collider_collision_count or function() end
+--- Get the collision data in the current frame as a list 
+--- @type fun(collider: lyte.Collider): lyte.CollisionList
+    lyte.get_collider_collisions = lyte.get_collider_collisions and lyte.get_collider_collisions or function() end
 
 -- records
 
@@ -479,6 +533,43 @@
     --- @field build fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
     --- @field __gc fun(shaderbuilder: lyte.ShaderBuilder)
     lyte.ShaderBuilder = lyte.ShaderBuilder and lyte.ShaderBuilder or {}
+-- Physics dynamics world + collision space. 
+--- @class lyte.World
+    --- @field update fun(world: lyte.World, step_size: number)
+    --- @field set_gravity fun(world: lyte.World, x: number, y: number)
+    --- @field new_circle_collider fun(world: lyte.World, radius: number, x: number, y: number, angle: number)
+    --- @field new_rect_collider fun(world: lyte.World, width: number, height: number, x: number, y: number, angle: number)
+    --- @field __gc fun(world: lyte.World)
+    lyte.World = lyte.World and lyte.World or {}
+-- Physics body + mass + colliding geometry. 
+--- @class lyte.Collider
+    --- @field x number
+    --- @field y number
+    --- @field angle number
+    --- @field refresh fun(collider: lyte.Collider)
+    --- @field set_position fun(collider: lyte.Collider, x: number, y: number)
+    --- @field set_rotation fun(collider: lyte.Collider, angle: number)
+    --- @field set_linear_velocity fun(collider: lyte.Collider, vx: number, vy: number)
+    --- @field set_angular_velocity fun(collider: lyte.Collider, vz: number)
+    --- @field add_force fun(collider: lyte.Collider, fx: number, fy: number)
+    --- @field add_torque fun(collider: lyte.Collider, fz: number)
+    --- @field is_kinematic fun(collider: lyte.Collider): boolean
+    --- @field set_kinematic fun(collider: lyte.Collider, val: boolean)
+    --- @field get_collision_count fun(collider: lyte.Collider): int
+    --- @field get_collisions fun(collider: lyte.Collider): lyte.CollisionList
+    --- @field __gc fun(collider: lyte.Collider)
+    lyte.Collider = lyte.Collider and lyte.Collider or {}
+-- Collision information between two colliders 
+--- @class lyte.Collision
+    --- @field c1 lyte.Collider
+    --- @field c2 lyte.Collider
+    --- @field pos_x number
+    --- @field pos_y number
+    --- @field depth number
+    lyte.Collision = lyte.Collision and lyte.Collision or {}
+-- Physics joints (constraints). 
+--- @class lyte.Joint
+    lyte.Joint = lyte.Joint and lyte.Joint or {}
 
 -- variants (unions)
 
@@ -489,6 +580,8 @@
 
 --- Float values
 --- @alias lyte.FloatVec4 number[]
+--- Collision List
+--- @alias lyte.CollisionList userdata[]
 
 -- dicts
 
@@ -928,6 +1021,207 @@
 --- Reset the specified uniform. 
 --- @type fun(shader: userdata, uniform_name: string)
     lyte_core.shader_reset_uniform = lyte_core.shader_reset_uniform and lyte_core.shader_reset_uniform or function() end
+--- Create a new physics world. 
+--- @type fun(): userdata
+    lyte_core.world_new = lyte_core.world_new and lyte_core.world_new or function() end
+--- Cleanup (delete) world and all contained objects. 
+--- @type fun(world: userdata)
+    lyte_core.world_cleanup = lyte_core.world_cleanup and lyte_core.world_cleanup or function() end
+--- Set worlds gravity values. By default, gravity is (0, 0). 
+--- @type fun(world: userdata, x: number, y: number)
+    lyte_core.world_set_gravity = lyte_core.world_set_gravity and lyte_core.world_set_gravity or function() end
+--- Update world. 
+--- @type fun(world: userdata, step_size: number)
+    lyte_core.world_update = lyte_core.world_update and lyte_core.world_update or function() end
+--- Create a new physics body. 
+--- @type fun(world: userdata): userdata
+    lyte_core.body_new = lyte_core.body_new and lyte_core.body_new or function() end
+--- Cleanup (delete) a body. 
+--- @type fun(body: userdata)
+    lyte_core.body_cleanup = lyte_core.body_cleanup and lyte_core.body_cleanup or function() end
+--- Set body's position. 
+--- @type fun(body: userdata, x: number, y: number)
+    lyte_core.body_set_position = lyte_core.body_set_position and lyte_core.body_set_position or function() end
+--- Get body's position. 
+--- @type fun(body: userdata): number, number
+    lyte_core.body_get_position = lyte_core.body_get_position and lyte_core.body_get_position or function() end
+--- Set body's rotation (angle). 
+--- @type fun(body: userdata, angle: number)
+    lyte_core.body_set_rotation = lyte_core.body_set_rotation and lyte_core.body_set_rotation or function() end
+--- Get body's rotation (angle). 
+--- @type fun(body: userdata): number
+    lyte_core.body_get_rotation = lyte_core.body_get_rotation and lyte_core.body_get_rotation or function() end
+--- Set body's linear velocity. 
+--- @type fun(body: userdata, x: number, y: number)
+    lyte_core.body_set_linear_vel = lyte_core.body_set_linear_vel and lyte_core.body_set_linear_vel or function() end
+--- Get body's linear velocity. 
+--- @type fun(body: userdata): number, number
+    lyte_core.body_get_linear_vel = lyte_core.body_get_linear_vel and lyte_core.body_get_linear_vel or function() end
+--- Set body's angular velocity. 
+--- @type fun(body: userdata, z: number)
+    lyte_core.body_set_angular_vel = lyte_core.body_set_angular_vel and lyte_core.body_set_angular_vel or function() end
+--- Get body's angular velocity. 
+--- @type fun(body: userdata): number
+    lyte_core.body_get_angular_vel = lyte_core.body_get_angular_vel and lyte_core.body_get_angular_vel or function() end
+--- Set body's (circular) mass. 
+--- @type fun(body: userdata, mass: number, radius: number)
+    lyte_core.body_set_mass_circle = lyte_core.body_set_mass_circle and lyte_core.body_set_mass_circle or function() end
+--- Set body's (rectangular) mass. 
+--- @type fun(body: userdata, mass: number, width: number, height: number)
+    lyte_core.body_set_mass_rect = lyte_core.body_set_mass_rect and lyte_core.body_set_mass_rect or function() end
+--- Add force to body. 
+--- @type fun(body: userdata, fx: number, fy: number)
+    lyte_core.body_add_force = lyte_core.body_add_force and lyte_core.body_add_force or function() end
+--- Get body's linear . 
+--- @type fun(body: userdata): number, number
+    lyte_core.body_get_force = lyte_core.body_get_force and lyte_core.body_get_force or function() end
+--- Add torque to body. 
+--- @type fun(body: userdata, fz: number)
+    lyte_core.body_add_torque = lyte_core.body_add_torque and lyte_core.body_add_torque or function() end
+--- Get body's torque. 
+--- @type fun(body: userdata): number
+    lyte_core.body_get_torque = lyte_core.body_get_torque and lyte_core.body_get_torque or function() end
+--- Set body as 'kinematic'. False by default. 
+--- @type fun(body: userdata, val: boolean)
+    lyte_core.body_set_kinematic = lyte_core.body_set_kinematic and lyte_core.body_set_kinematic or function() end
+--- Is body set as 'kinematic'? False by default. 
+--- @type fun(body: userdata): boolean
+    lyte_core.body_is_kinematic = lyte_core.body_is_kinematic and lyte_core.body_is_kinematic or function() end
+--- Create a new Space for collisions 
+--- @type fun(): userdata
+    lyte_core.space_new = lyte_core.space_new and lyte_core.space_new or function() end
+--- Cleanup the Space (delete). 
+--- @type fun(space: userdata)
+    lyte_core.space_cleanup = lyte_core.space_cleanup and lyte_core.space_cleanup or function() end
+--- Create a new JointGroup. 
+--- @type fun(): userdata
+    lyte_core.jointgroup_new = lyte_core.jointgroup_new and lyte_core.jointgroup_new or function() end
+--- Cleanup the JointGroup (delete). 
+--- @type fun(jointgroup: userdata)
+    lyte_core.jointgroup_cleanup = lyte_core.jointgroup_cleanup and lyte_core.jointgroup_cleanup or function() end
+--- Check collisions for current frame 
+--- @type fun(world: userdata, space: userdata, jointgroup: userdata)
+    lyte_core.coll_update_check = lyte_core.coll_update_check and lyte_core.coll_update_check or function() end
+--- Correct angular drift for 2D 
+--- @type fun(space: userdata)
+    lyte_core.coll_update_correct = lyte_core.coll_update_correct and lyte_core.coll_update_correct or function() end
+--- Get the number of collisions for this body. 
+--- @type fun(body: userdata): int
+    lyte_core.body_get_collision_count = lyte_core.body_get_collision_count and lyte_core.body_get_collision_count or function() end
+--- Get the data of for collision for this body at given index. Indexes start with 0. 
+--- @type fun(body: userdata, index: int): userdata, number, number, number
+    lyte_core.body_get_collision_data_at = lyte_core.body_get_collision_data_at and lyte_core.body_get_collision_data_at or function() end
+--- Cleanup (delete) given joint. 
+--- @type fun(joint: userdata)
+    lyte_core.joint_cleanup = lyte_core.joint_cleanup and lyte_core.joint_cleanup or function() end
+--- Check if the Joint is of class 'hinge'. 
+--- @type fun(joint: userdata): boolean
+    lyte_core.joint_is_hinge = lyte_core.joint_is_hinge and lyte_core.joint_is_hinge or function() end
+--- Check if the Joint is of class 'slider'. 
+--- @type fun(joint: userdata): boolean
+    lyte_core.joint_is_slider = lyte_core.joint_is_slider and lyte_core.joint_is_slider or function() end
+--- Check if the Joint is of class 'fixed'. 
+--- @type fun(joint: userdata): boolean
+    lyte_core.joint_is_fixed = lyte_core.joint_is_fixed and lyte_core.joint_is_fixed or function() end
+--- Get the body at 'index' for the given joint. 
+--- @type fun(joint: userdata, index: int): userdata
+    lyte_core.joint_get_body = lyte_core.joint_get_body and lyte_core.joint_get_body or function() end
+--- Attach the given bodies with the joint. 
+--- @type fun(joint: userdata, body1: userdata, body2: userdata)
+    lyte_core.joint_attach = lyte_core.joint_attach and lyte_core.joint_attach or function() end
+--- Create a new Joint of class 'hinge'. 
+--- @type fun(world: userdata, jointgroup: userdata): userdata
+    lyte_core.joint_new_hinge = lyte_core.joint_new_hinge and lyte_core.joint_new_hinge or function() end
+--- Create a new Joint of class 'slider'. 
+--- @type fun(world: userdata, jointgroup: userdata): userdata
+    lyte_core.joint_new_slider = lyte_core.joint_new_slider and lyte_core.joint_new_slider or function() end
+--- Create a new Joint of class 'fixed'. 
+--- @type fun(world: userdata, jointgroup: userdata): userdata
+    lyte_core.joint_new_fixed = lyte_core.joint_new_fixed and lyte_core.joint_new_fixed or function() end
+--- Set the anchor location for the given hinge joint. 
+--- @type fun(joint: userdata, x: number, y: number)
+    lyte_core.joint_set_hinge_anchor = lyte_core.joint_set_hinge_anchor and lyte_core.joint_set_hinge_anchor or function() end
+--- Get the anchor location for the given hinge joint. From body1. Should be the same for body2. 
+--- @type fun(joint: userdata): number, number
+    lyte_core.joint_get_hinge_anchor1 = lyte_core.joint_get_hinge_anchor1 and lyte_core.joint_get_hinge_anchor1 or function() end
+--- Get the anchor location for the given hinge joint. From body2. Should be the same for body1. 
+--- @type fun(joint: userdata): number, number
+    lyte_core.joint_get_hinge_anchor2 = lyte_core.joint_get_hinge_anchor2 and lyte_core.joint_get_hinge_anchor2 or function() end
+--- Get the angle or the given hinge joint. 
+--- @type fun(joint: userdata): number
+    lyte_core.joint_get_hinge_angle = lyte_core.joint_get_hinge_angle and lyte_core.joint_get_hinge_angle or function() end
+--- Get the angle rate for the given hinge joint. 
+--- @type fun(joint: userdata): number
+    lyte_core.joint_get_hinge_angle_rate = lyte_core.joint_get_hinge_angle_rate and lyte_core.joint_get_hinge_angle_rate or function() end
+--- Set the axis for the given slider joint. 
+--- @type fun(joint: userdata, x: number, y: number)
+    lyte_core.joint_set_slider_axis = lyte_core.joint_set_slider_axis and lyte_core.joint_set_slider_axis or function() end
+--- Get the axis for the given slider joint. 
+--- @type fun(joint: userdata): number, number
+    lyte_core.joint_get_slider_axis = lyte_core.joint_get_slider_axis and lyte_core.joint_get_slider_axis or function() end
+--- Get the slider position for the given slider joint. 
+--- @type fun(joint: userdata): number
+    lyte_core.joint_get_slider_position = lyte_core.joint_get_slider_position and lyte_core.joint_get_slider_position or function() end
+--- Get the slider position rate for the given slider joint. 
+--- @type fun(joint: userdata): number
+    lyte_core.joint_get_slider_position_rate = lyte_core.joint_get_slider_position_rate and lyte_core.joint_get_slider_position_rate or function() end
+--- Set the joint as 'fixed'. 
+--- @type fun(joint: userdata)
+    lyte_core.joint_set_fixed = lyte_core.joint_set_fixed and lyte_core.joint_set_fixed or function() end
+--- Cleanup the Geom (delete). 
+--- @type fun(geom: userdata)
+    lyte_core.geom_cleanup = lyte_core.geom_cleanup and lyte_core.geom_cleanup or function() end
+--- Create a new Geom (for collision). 
+--- @type fun(space: userdata, radius: number): userdata
+    lyte_core.geom_new_circle = lyte_core.geom_new_circle and lyte_core.geom_new_circle or function() end
+--- Create a new Geom (for collision). 
+--- @type fun(space: userdata, width: number, height: number): userdata
+    lyte_core.geom_new_rect = lyte_core.geom_new_rect and lyte_core.geom_new_rect or function() end
+--- Is the Geom a 'circle'? 
+--- @type fun(geom: userdata): boolean
+    lyte_core.geom_is_circle = lyte_core.geom_is_circle and lyte_core.geom_is_circle or function() end
+--- Is the Geom a 'rect'? 
+--- @type fun(geom: userdata): boolean
+    lyte_core.geom_is_rect = lyte_core.geom_is_rect and lyte_core.geom_is_rect or function() end
+--- Set the Geom's (circle) radius. 
+--- @type fun(geom: userdata, radius: number)
+    lyte_core.geom_set_circle_radius = lyte_core.geom_set_circle_radius and lyte_core.geom_set_circle_radius or function() end
+--- Get the Geom's (circle) radius. 
+--- @type fun(geom: userdata): number
+    lyte_core.geom_get_circle_radius = lyte_core.geom_get_circle_radius and lyte_core.geom_get_circle_radius or function() end
+--- Set the Geom's (rect) width and height. 
+--- @type fun(geom: userdata, width: number, height: number)
+    lyte_core.geom_set_rect_size = lyte_core.geom_set_rect_size and lyte_core.geom_set_rect_size or function() end
+--- Get the Geom's (rect) width and height. 
+--- @type fun(geom: userdata): number, number
+    lyte_core.geom_get_rect_size = lyte_core.geom_get_rect_size and lyte_core.geom_get_rect_size or function() end
+--- Get the depth of the point in Geom's (circle). Positive inside, Negative outside, Zero on the surface. 
+--- @type fun(geom: userdata, x: number, y: number): number
+    lyte_core.geom_get_circle_point_depth = lyte_core.geom_get_circle_point_depth and lyte_core.geom_get_circle_point_depth or function() end
+--- Get the depth of the point in Geom's (rect). Positive inside, Negative outside, Zero on the surface. 
+--- @type fun(geom: userdata, x: number, y: number): number
+    lyte_core.geom_get_rect_point_depth = lyte_core.geom_get_rect_point_depth and lyte_core.geom_get_rect_point_depth or function() end
+--- Get the AABB rectangle coord associated with the Geom. 
+--- @type fun(geom: userdata): number, number, number, number
+    lyte_core.geom_get_AABB = lyte_core.geom_get_AABB and lyte_core.geom_get_AABB or function() end
+--- Set a Geom for the Body. 
+--- @type fun(geom: userdata, body: userdata)
+    lyte_core.geom_set_body = lyte_core.geom_set_body and lyte_core.geom_set_body or function() end
+--- Get the Body associated with the Geom. 
+--- @type fun(geom: userdata): userdata
+    lyte_core.geom_get_body = lyte_core.geom_get_body and lyte_core.geom_get_body or function() end
+--- Set the category bit for the Geom. Between 0 and 63. 
+--- @type fun(geom: userdata, category_bit: int)
+    lyte_core.geom_set_category_bit = lyte_core.geom_set_category_bit and lyte_core.geom_set_category_bit or function() end
+--- Is the category bit associated with the Geom? (Between 0 and 63.) 
+--- @type fun(geom: userdata, category_bit: int): boolean
+    lyte_core.geom_is_category_bit_set = lyte_core.geom_is_category_bit_set and lyte_core.geom_is_category_bit_set or function() end
+--- Set the collide bit for the Geom. Between 0 and 63. 
+--- @type fun(geom: userdata, collide_bit: int)
+    lyte_core.geom_set_collide_bit = lyte_core.geom_set_collide_bit and lyte_core.geom_set_collide_bit or function() end
+--- Is the collide bit associated with the Geom? (Between 0 and 63.) 
+--- @type fun(geom: userdata, collide_bit: int): boolean
+    lyte_core.geom_is_collide_bit_set = lyte_core.geom_is_collide_bit_set and lyte_core.geom_is_collide_bit_set or function() end
 
 -- records
 

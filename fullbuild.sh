@@ -83,8 +83,8 @@ mkdir -p $RELDIR/bin
 cp $BUILDDIR/wingui/lyte/lyte_gui.exe $RELDIR/bin
 
 cp $BUILDDIR/wasm/lyte/lyte.html $RELDIR/bin
-cp $BUILDDIR/wasm/lyte/lyte.wasm $RELDIR/bin
-cp $BUILDDIR/wasm/lyte/lyte.js $RELDIR/bin
+# cp $BUILDDIR/wasm/lyte/lyte.wasm $RELDIR/bin
+# cp $BUILDDIR/wasm/lyte/lyte.js $RELDIR/bin
 
 cp $BUILDDIR/linux/lyte/lyte $RELDIR/bin
 
@@ -111,7 +111,8 @@ pwd
 ls -al
 echo " @@"
 $ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      LICENSE licenses_all.txt lyte_readme.md   lyte.exe lyte_gui.exe
-$ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             LICENSE licenses_all.txt lyte_readme.md   lyte.html lyte.js lyte.wasm
+# $ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             LICENSE licenses_all.txt lyte_readme.md   lyte.html lyte.js lyte.wasm
+$ZIPCMD $ZIPDIR/lyte2d.wasm.v$VERSION.zip             LICENSE licenses_all.txt lyte_readme.md   lyte.html # lyte.js lyte.wasm
 $ZIPCMD $ZIPDIR/lyte2d.linux.x64.v$VERSION.zip        LICENSE licenses_all.txt lyte_readme.md   lyte
 # $ZIPCMD $ZIPDIR/lyte2d.windows.x64.v$VERSION.zip      licenses_all.txt lyte_readme.md   lyte.exe
 # $ZIPCMD $ZIPDIR/lyte2d.EVERYTHING.x64.v$VERSION.zip   licenses.txt readme.md   lyte* lyte*.*

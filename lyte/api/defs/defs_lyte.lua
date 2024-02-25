@@ -860,6 +860,300 @@ end
         Method("build", MapTo("shaderbuilder_build")),
         Method("__gc", MapTo("cleanup_shaderbuilder")),
         Doc"ShaderBuilder type"
-    )
+    ),
 
+
+    Function("cleanup_world",
+        Arg("world", Wrap("World")),
+        Doc("Cleanup the physics world (dynamics + collision)."),
+        LuaImpl,
+        Code[[function(world)
+    local world_id = world.id
+    local space_id = world.space_id
+    local contacts_jg_id = world.contacts_jg_id
+    local other_jg_id = world.other_jg_id
+    lyte_core.cleanup_jointgroup(other_jg_id)
+    lyte_core.cleanup_jointgroup(contacts_jg_id)
+    lyte_core.cleanup_space(space_id)
+    lyte_core.cleanup_world(world_id)
+    return world
+end
+]]
+    ),
+
+    Function("new_world",
+        Ret("world", Wrap("World")),
+        Doc("Create a new physics world"),
+        LuaImpl,
+        Code[[function()
+    local world_id = lyte_core.world_new()
+    local space_id = lyte_core.space_new()
+    local contacts_jg_id = lyte_core.jointgroup_new()
+    local other_jg_id = lyte_core.jointgroup_new()
+
+    local world = classnew(lyte.World, world_id)
+    world.space_id = space_id
+    world.contacts_jg_id = contacts_jg_id
+    world.other_jg_id = other_jg_id
+
+    return world
+end
+]]
+    ),
+
+    Function("update_world",
+        Arg("world", Wrap("World")),
+        Arg("step_size", Double),
+        Doc("Update the physics world (dynamics + collision)."),
+        LuaImpl,
+        Code[[function(world, step_size)
+    local world_id = world.id
+    local space_id = world.space_id
+    local contacts_jg_id = world.contacts_jg_id
+
+    lyte_core.world_update(world_id, step_size)
+    lyte_core.coll_update_correct(space_id)
+    lyte_core.coll_update_check(world_id, space_id, contacts_jg_id);
+end
+]]
+    ),
+
+    Function("set_world_gravity",
+        Arg("world", Wrap("World")),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Update the physics world gravity."),
+        LuaImpl,
+        Code[[function(world, x, y)
+    local world_id = world.id
+    lyte_core.world_set_gravity(world_id, x, y)
+end
+]]
+    ),
+
+    Function("cleanup_collider",
+        Arg("collider", Wrap("Collider")),
+        Doc("Cleanup the physics collider."),
+        LuaImpl,
+        Code[[function(collider)
+    local body_id = collider.id
+    local geom_id = collider.geom_id
+    lyte_core.cleanup_geom(geom_id)
+    lyte_core.clean_body(body_id)
+end
+]]
+    ),
+
+    Function("refresh_collider",
+        Arg("collider", Wrap("Collider")),
+        Doc("Refresh the physics collider position (x, y) and angle"),
+        LuaImpl,
+        Code[[function(collider)
+    local body_id = collider.id
+    collider.x, collider.y = lyte_core.body_get_position(body_id)
+    collider.angle = lyte_core.body_get_rotation(body_id)
+end
+]]
+    ),
+
+
+
+    Function("new_circle_collider",
+        Arg("world", Wrap("World")),
+        Arg("radius", Double),
+        Arg("x", Double),
+        Arg("y", Double),
+        Arg("angle", Double),
+        Doc("Create new circle collider (body + geom) in the given physics world."),
+        LuaImpl,
+        Code[[function(world, radius, x, y, angle)
+    local world_id = world.id
+    local space_id = world.space_id
+
+    local body_id = lyte_core.body_new(world_id)
+    local geom_id = lyte_core.geom_new_circle(space_id, radius)
+    local collider = classnew(lyte.Collider, body_id)
+    collider.geom_id = geom_id
+    collider.x = x
+    collider.y = src_y
+    collider.angle = angle
+    collider.radius = radius
+
+    lyte_core.geom_set_body(geom_id, body_id)
+    lyte_core.body_set_position(body_id, x, y)
+    lyte_core.body_set_rotation(body_id, angle)
+
+    -- lyte_core.body_set_mass_circle(body_id, 2*math.pi*radius, radius)
+
+    return collider
+end
+]]
+    ),
+
+    Function("new_rect_collider",
+        Arg("world", Wrap("World")),
+        Arg("width", Double),
+        Arg("height", Double),
+        Arg("x", Double),
+        Arg("y", Double),
+        Arg("angle", Double),
+        Doc("Create new rectangle collider (body + geom) in the given physics world."),
+        LuaImpl,
+        Code[[function(world, width, height, x, y, angle)
+    local world_id = world.id
+    local space_id = world.space_id
+
+    local body_id = lyte_core.body_new(world_id)
+    local geom_id = lyte_core.geom_new_rect(space_id, width, height)
+    local collider = classnew(lyte.Collider, body_id)
+    collider.geom_id = geom_id
+    collider.x = x
+    collider.y = src_y
+    collider.angle = angle
+    collider.width = width
+    collider.height = height
+
+    lyte_core.geom_set_body(geom_id, body_id)
+    lyte_core.body_set_position(body_id, x, y)
+    lyte_core.body_set_rotation(body_id, angle)
+
+    -- lyte_core.body_set_mass_rect(body_id, width*height, width, height)
+
+    return collider
+end
+]]
+    ),
+
+    Function("set_collider_position",
+        Arg("collider", Wrap("Collider")),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set collider position."),
+        MapWrapTo("lyte_core.body_set_position")
+    ),
+
+    Function("set_collider_rotation",
+        Arg("collider", Wrap("Collider")),
+        Arg("angle", Double),
+        Doc("Set collider rotation."),
+        MapWrapTo("lyte_core.body_set_rotation")
+    ),
+
+    Function("add_force_to_collider",
+        Arg("collider", Wrap("Collider")),
+        Arg("fx", Double),
+        Arg("fy", Double),
+        Doc("Add force to collider."),
+        MapWrapTo("lyte_core.body_add_force")
+    ),
+
+    Function("add_torque_to_collider",
+        Arg("collider", Wrap("Collider")),
+        Arg("fz", Double),
+        Doc("Add torque to collider."),
+        MapWrapTo("lyte_core.body_add_torque")
+    ),
+
+    Function("set_collider_linear_velocity",
+        Arg("collider", Wrap("Collider")),
+        Arg("vx", Double),
+        Arg("vy", Double),
+        Doc("Set the collider's linear velocity"),
+        MapWrapTo("lyte_core.body_set_linear_vel")
+    ),
+
+    Function("set_collider_angular_velocity",
+        Arg("collider", Wrap("Collider")),
+        Arg("vz", Double),
+        Doc("Set the collider's angular velocity"),
+        MapWrapTo("lyte_core.body_set_angular_vel")
+    ),
+
+    Function("set_collider_kinematic",
+        Arg("collider", Wrap("Collider")),
+        Arg("val", Bool),
+        Doc("Set the collider as 'kinematic'. By default, it's not kinematic."),
+        MapWrapTo("lyte_core.body_set_kinematic")
+    ),
+
+    Function("is_collider_kinematic",
+        Arg("collider", Wrap("Collider")),
+        Ret("val", Bool),
+        Doc("Is the collider set as 'kinematic'? By default, it's not."),
+        MapWrapTo("lyte_core.body_is_kinematic")
+    ),
+
+
+    Function("get_collider_collision_count",
+        Arg("collider", Wrap("Collider")),
+        Ret("val", Int),
+        Doc("Get the number of collisions in the current frame"),
+        MapWrapTo("lyte_core.body_get_collision_count")
+    ),
+
+    Function("get_collider_collisions",
+        Arg("collider", Wrap("Collider")),
+        Ret("colls", Wrap("CollisionList")),
+        Doc("Get the collision data in the current frame as a list"),
+        Code[[function(collider)
+        local body_id = collider.id
+        local colls = {}
+        local cnt = lyte_core.body_get_collision_count(body_id)
+        for i=0,cnt-1 do
+            local b2_id, pos_x, pos_y, depth =  lyte_core.body_get_collision_data_at(body_id, i)
+            local coll = {c1=body_id, c2=b2_id, pos_x=pos_x, pos_y=pos_y, depth=depth}
+            colls[i+1] = coll
+        end
+        return colls
+    end
+]]
+    ),
+
+    Record("World",
+        Method("update", MapTo("update_world")),
+        Method("set_gravity", MapTo("set_world_gravity")),
+        Method("new_circle_collider", MapTo("new_circle_collider")),
+        Method("new_rect_collider", MapTo("new_rect_collider")),
+        Method("__gc", MapTo("cleanup_world")),
+        Doc("Physics dynamics world + collision space.")
+    ),
+
+    Record("Collider",
+        Field("x", Double),
+        Field("y", Double),
+        Field("angle", Double),
+        Method("refresh", MapTo("refresh_collider")),
+        Method("set_position", MapTo("set_collider_position")),
+        Method("set_rotation", MapTo("set_collider_rotation")),
+        Method("set_linear_velocity", MapTo("set_collider_linear_velocity")),
+        Method("set_angular_velocity", MapTo("set_collider_angular_velocity")),
+        Method("add_force", MapTo("add_force_to_collider")),
+        Method("add_torque", MapTo("add_torque_to_collider")),
+        Method("is_kinematic", MapTo("is_collider_kinematic")),
+        Method("set_kinematic", MapTo("set_collider_kinematic")),
+        Method("get_collision_count", MapTo("get_collider_collision_count")),
+        Method("get_collisions", MapTo("get_collider_collisions")),
+        Method("__gc", MapTo("cleanup_collider")),
+        Doc("Physics body + mass + colliding geometry.")
+    ),
+
+    Record("Collision",
+        Field("c1", Wrap("Collider")),
+        Field("c2", Wrap("Collider")),
+        Field("pos_x", Double),
+        Field("pos_y", Double),
+        Field("depth", Double),
+        Doc("Collision information between two colliders")
+    ),
+
+    List("CollisionList",
+        Pointer,
+        MaxCount(10),
+        Doc"Collision List"
+    ),
+
+    Record("Joint",
+        -- Method("__gc", MapTo("cleanup_joint")),
+        Doc("Physics joints (constraints).")
+    )
 ))

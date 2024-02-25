@@ -320,135 +320,46 @@ lyte.reset_shader_uniform = function(shader_wrapped, uniform_name)
     local shader = shader_wrapped.id
     lyte_core.shader_reset_uniform(shader, uniform_name)
 end
-
--- records 
-lyte.ShaderDef = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-    end;
-    __tostring=function(self) return '(obj type = lyte.ShaderDef)' end;
-}
-lyte.Image = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        if k=='width' then return lyte.get_image_width(self, k) end
-        if k=='height' then return lyte.get_image_height(self, k) end
-        if k=='is_canvas' then return lyte.is_image_canvas(self, k) end
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-    end;
-    __gc=lyte.cleanup_image;
-    __tostring=function(self) return '(obj type = lyte.Image)' end;
-}
-lyte.ImageBatch = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        if k=='rect_count' then return lyte.get_imagebatch_rect_count(self, k) end
-        if k=='add_rect' then return lyte.add_imagebatch_rect end
-        if k=='draw' then return lyte.draw_imagebatch end
-        if k=='reset' then return lyte.reset_imagebatch end
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-    end;
-    __gc=lyte.cleanup_imagebatch;
-    __tostring=function(self) return '(obj type = lyte.ImageBatch)' end;
-}
-lyte.Font = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-    end;
-    __gc=lyte.cleanup_font;
-    __tostring=function(self) return '(obj type = lyte.Font)' end;
-}
-lyte.Music = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        if k=='playing' then return lyte.is_music_playing(self, k) end
-        if k=='length' then return lyte.get_music_length(self, k) end
-        if k=='length_played' then return lyte.get_music_length_played(self, k) end
-        if k=='pan' then return lyte.get_music_pan(self, k) end
-        if k=='pitch' then return lyte.get_music_pitch(self, k) end
-        if k=='volume' then return lyte.get_music_volume(self, k) end
-        if k=='play' then return lyte.play_music end
-        if k=='pause' then return lyte.pause_music end
-        if k=='resume' then return lyte.resume_music end
-        if k=='stop' then return lyte.stop_music end
-        if k=='seek' then return lyte.seek_music end
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-        if k=='pan' then lyte.set_music_pan(self, v)
-        elseif k=='pitch' then lyte.set_music_pitch(self, v)
-        elseif k=='volume' then lyte.set_music_volume(self, v)
-        end
-    end;
-    __gc=lyte.cleanup_music;
-    __tostring=function(self) return '(obj type = lyte.Music)' end;
-}
-lyte.Sound = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        if k=='pan' then return lyte.get_sound_pan(self, k) end
-        if k=='pitch' then return lyte.get_sound_pitch(self, k) end
-        if k=='volume' then return lyte.get_sound_volume(self, k) end
-        if k=='clone' then return lyte.clone_sound end
-        if k=='pause' then return lyte.pause_sound end
-        if k=='play' then return lyte.play_sound end
-        if k=='resume' then return lyte.resume_sound end
-        if k=='stop' then return lyte.stop_sound end
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-        if k=='pan' then lyte.set_sound_pan(self, v)
-        elseif k=='pitch' then lyte.set_sound_pitch(self, v)
-        elseif k=='volume' then lyte.set_sound_volume(self, v)
-        end
-    end;
-    __gc=lyte.cleanup_sound;
-    __tostring=function(self) return '(obj type = lyte.Sound)' end;
-}
-lyte.Shader = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        if k=='set' then return lyte.set_shader_uniform end
-        if k=='reset' then return lyte.reset_shader_uniform end
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-    end;
-    __gc=lyte.cleanup_shader;
-    __tostring=function(self) return '(obj type = lyte.Shader)' end;
-}
-lyte.ShaderBuilder = {
-    id=nil;
-    __new=function(self, id) rawset(self, 'id', id) end;
-    __index=function(self, k)
-        if k=='uniform' then return lyte.shaderbuilder_uniform end
-        if k=='vertex' then return lyte.shaderbuilder_vertex end
-        if k=='fragment' then return lyte.shaderbuilder_fragment end
-        if k=='build' then return lyte.shaderbuilder_build end
-        return rawget(self, k)
-    end;
-    __newindex=function(self, k, v)
-    end;
-    __gc=lyte.cleanup_shaderbuilder;
-    __tostring=function(self) return '(obj type = lyte.ShaderBuilder)' end;
-}
+lyte.set_collider_position = function(collider_wrapped, x, y)
+    local collider = collider_wrapped.id
+    lyte_core.body_set_position(collider, x, y)
+end
+lyte.set_collider_rotation = function(collider_wrapped, angle)
+    local collider = collider_wrapped.id
+    lyte_core.body_set_rotation(collider, angle)
+end
+lyte.add_force_to_collider = function(collider_wrapped, fx, fy)
+    local collider = collider_wrapped.id
+    lyte_core.body_add_force(collider, fx, fy)
+end
+lyte.add_torque_to_collider = function(collider_wrapped, fz)
+    local collider = collider_wrapped.id
+    lyte_core.body_add_torque(collider, fz)
+end
+lyte.set_collider_linear_velocity = function(collider_wrapped, vx, vy)
+    local collider = collider_wrapped.id
+    lyte_core.body_set_linear_vel(collider, vx, vy)
+end
+lyte.set_collider_angular_velocity = function(collider_wrapped, vz)
+    local collider = collider_wrapped.id
+    lyte_core.body_set_angular_vel(collider, vz)
+end
+lyte.set_collider_kinematic = function(collider_wrapped, val)
+    local collider = collider_wrapped.id
+    lyte_core.body_set_kinematic(collider, val)
+end
+lyte.is_collider_kinematic = function(collider_wrapped)
+    local collider = collider_wrapped.id
+    local val = lyte_core.body_is_kinematic(collider)
+    local _ret_val = val
+    return _ret_val
+end
+lyte.get_collider_collision_count = function(collider_wrapped)
+    local collider = collider_wrapped.id
+    local val = lyte_core.body_get_collision_count(collider)
+    local _ret_val = val
+    return _ret_val
+end
 
 -- manually handled functions in current namespace
 lyte.draw_image = function(image_wrapped, dest_x, dest_y, angle, origin_x, origin_y, scale_x, scale_y)
@@ -542,6 +453,308 @@ lyte.set_shader_uniform = function (shader, uniform_name, uniform_value)
         error("Unknown value type for uniform_value in set_shader_uniform")
     end
 end
+lyte.cleanup_world = function(world)
+    local world_id = world.id
+    local space_id = world.space_id
+    local contacts_jg_id = world.contacts_jg_id
+    local other_jg_id = world.other_jg_id
+    lyte_core.cleanup_jointgroup(other_jg_id)
+    lyte_core.cleanup_jointgroup(contacts_jg_id)
+    lyte_core.cleanup_space(space_id)
+    lyte_core.cleanup_world(world_id)
+    return world
+end
+lyte.new_world = function()
+    local world_id = lyte_core.world_new()
+    local space_id = lyte_core.space_new()
+    local contacts_jg_id = lyte_core.jointgroup_new()
+    local other_jg_id = lyte_core.jointgroup_new()
+
+    local world = classnew(lyte.World, world_id)
+    world.space_id = space_id
+    world.contacts_jg_id = contacts_jg_id
+    world.other_jg_id = other_jg_id
+
+    return world
+end
+lyte.update_world = function(world, step_size)
+    local world_id = world.id
+    local space_id = world.space_id
+    local contacts_jg_id = world.contacts_jg_id
+
+    lyte_core.world_update(world_id, step_size)
+    lyte_core.coll_update_correct(space_id)
+    lyte_core.coll_update_check(world_id, space_id, contacts_jg_id);
+end
+lyte.set_world_gravity = function(world, x, y)
+    local world_id = world.id
+    lyte_core.world_set_gravity(world_id, x, y)
+end
+lyte.cleanup_collider = function(collider)
+    local body_id = collider.id
+    local geom_id = collider.geom_id
+    lyte_core.cleanup_geom(geom_id)
+    lyte_core.clean_body(body_id)
+end
+lyte.refresh_collider = function(collider)
+    local body_id = collider.id
+    collider.x, collider.y = lyte_core.body_get_position(body_id)
+    collider.angle = lyte_core.body_get_rotation(body_id)
+end
+lyte.new_circle_collider = function(world, radius, x, y, angle)
+    local world_id = world.id
+    local space_id = world.space_id
+
+    local body_id = lyte_core.body_new(world_id)
+    local geom_id = lyte_core.geom_new_circle(space_id, radius)
+    local collider = classnew(lyte.Collider, body_id)
+    collider.geom_id = geom_id
+    collider.x = x
+    collider.y = src_y
+    collider.angle = angle
+    collider.radius = radius
+
+    lyte_core.geom_set_body(geom_id, body_id)
+    lyte_core.body_set_position(body_id, x, y)
+    lyte_core.body_set_rotation(body_id, angle)
+
+    -- lyte_core.body_set_mass_circle(body_id, 2*math.pi*radius, radius)
+
+    return collider
+end
+lyte.new_rect_collider = function(world, width, height, x, y, angle)
+    local world_id = world.id
+    local space_id = world.space_id
+
+    local body_id = lyte_core.body_new(world_id)
+    local geom_id = lyte_core.geom_new_rect(space_id, width, height)
+    local collider = classnew(lyte.Collider, body_id)
+    collider.geom_id = geom_id
+    collider.x = x
+    collider.y = src_y
+    collider.angle = angle
+    collider.width = width
+    collider.height = height
+
+    lyte_core.geom_set_body(geom_id, body_id)
+    lyte_core.body_set_position(body_id, x, y)
+    lyte_core.body_set_rotation(body_id, angle)
+
+    -- lyte_core.body_set_mass_rect(body_id, width*height, width, height)
+
+    return collider
+end
+lyte.get_collider_collisions = function(collider)
+        local body_id = collider.id
+        local colls = {}
+        local cnt = lyte_core.body_get_collision_count(body_id)
+        for i=0,cnt-1 do
+            local b2_id, pos_x, pos_y, depth =  lyte_core.body_get_collision_data_at(body_id, i)
+            local coll = {c1=body_id, c2=b2_id, pos_x=pos_x, pos_y=pos_y, depth=depth}
+            colls[i+1] = coll
+        end
+        return colls
+    end
+
+-- records
+lyte.ShaderDef = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __tostring=function(self) return '(obj type = lyte.ShaderDef)' end;
+}
+lyte.Image = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='width' then return lyte.get_image_width(self, k) end
+        if k=='height' then return lyte.get_image_height(self, k) end
+        if k=='is_canvas' then return lyte.is_image_canvas(self, k) end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_image;
+    __tostring=function(self) return '(obj type = lyte.Image)' end;
+}
+lyte.ImageBatch = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='rect_count' then return lyte.get_imagebatch_rect_count(self, k) end
+        if k=='add_rect' then return lyte.add_imagebatch_rect end
+        if k=='draw' then return lyte.draw_imagebatch end
+        if k=='reset' then return lyte.reset_imagebatch end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_imagebatch;
+    __tostring=function(self) return '(obj type = lyte.ImageBatch)' end;
+}
+lyte.Font = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_font;
+    __tostring=function(self) return '(obj type = lyte.Font)' end;
+}
+lyte.Music = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='playing' then return lyte.is_music_playing(self, k) end
+        if k=='length' then return lyte.get_music_length(self, k) end
+        if k=='length_played' then return lyte.get_music_length_played(self, k) end
+        if k=='pan' then return lyte.get_music_pan(self, k) end
+        if k=='pitch' then return lyte.get_music_pitch(self, k) end
+        if k=='volume' then return lyte.get_music_volume(self, k) end
+        if k=='play' then return lyte.play_music end
+        if k=='pause' then return lyte.pause_music end
+        if k=='resume' then return lyte.resume_music end
+        if k=='stop' then return lyte.stop_music end
+        if k=='seek' then return lyte.seek_music end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        if k=='pan' then lyte.set_music_pan(self, v)
+        elseif k=='pitch' then lyte.set_music_pitch(self, v)
+        elseif k=='volume' then lyte.set_music_volume(self, v)
+        else
+          rawset(self, k, v)
+        end
+    end;
+    __gc=lyte.cleanup_music;
+    __tostring=function(self) return '(obj type = lyte.Music)' end;
+}
+lyte.Sound = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='pan' then return lyte.get_sound_pan(self, k) end
+        if k=='pitch' then return lyte.get_sound_pitch(self, k) end
+        if k=='volume' then return lyte.get_sound_volume(self, k) end
+        if k=='clone' then return lyte.clone_sound end
+        if k=='pause' then return lyte.pause_sound end
+        if k=='play' then return lyte.play_sound end
+        if k=='resume' then return lyte.resume_sound end
+        if k=='stop' then return lyte.stop_sound end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        if k=='pan' then lyte.set_sound_pan(self, v)
+        elseif k=='pitch' then lyte.set_sound_pitch(self, v)
+        elseif k=='volume' then lyte.set_sound_volume(self, v)
+        else
+          rawset(self, k, v)
+        end
+    end;
+    __gc=lyte.cleanup_sound;
+    __tostring=function(self) return '(obj type = lyte.Sound)' end;
+}
+lyte.Shader = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='set' then return lyte.set_shader_uniform end
+        if k=='reset' then return lyte.reset_shader_uniform end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_shader;
+    __tostring=function(self) return '(obj type = lyte.Shader)' end;
+}
+lyte.ShaderBuilder = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='uniform' then return lyte.shaderbuilder_uniform end
+        if k=='vertex' then return lyte.shaderbuilder_vertex end
+        if k=='fragment' then return lyte.shaderbuilder_fragment end
+        if k=='build' then return lyte.shaderbuilder_build end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_shaderbuilder;
+    __tostring=function(self) return '(obj type = lyte.ShaderBuilder)' end;
+}
+lyte.World = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='update' then return lyte.update_world end
+        if k=='set_gravity' then return lyte.set_world_gravity end
+        if k=='new_circle_collider' then return lyte.new_circle_collider end
+        if k=='new_rect_collider' then return lyte.new_rect_collider end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_world;
+    __tostring=function(self) return '(obj type = lyte.World)' end;
+}
+lyte.Collider = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        if k=='refresh' then return lyte.refresh_collider end
+        if k=='set_position' then return lyte.set_collider_position end
+        if k=='set_rotation' then return lyte.set_collider_rotation end
+        if k=='set_linear_velocity' then return lyte.set_collider_linear_velocity end
+        if k=='set_angular_velocity' then return lyte.set_collider_angular_velocity end
+        if k=='add_force' then return lyte.add_force_to_collider end
+        if k=='add_torque' then return lyte.add_torque_to_collider end
+        if k=='is_kinematic' then return lyte.is_collider_kinematic end
+        if k=='set_kinematic' then return lyte.set_collider_kinematic end
+        if k=='get_collision_count' then return lyte.get_collider_collision_count end
+        if k=='get_collisions' then return lyte.get_collider_collisions end
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __gc=lyte.cleanup_collider;
+    __tostring=function(self) return '(obj type = lyte.Collider)' end;
+}
+lyte.Collision = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __tostring=function(self) return '(obj type = lyte.Collision)' end;
+}
+lyte.Joint = {
+    id=nil;
+    __new=function(self, id) rawset(self, 'id', id) end;
+    __index=function(self, k)
+        return rawget(self, k)
+    end;
+    __newindex=function(self, k, v)
+        rawset(self, k, v)
+    end;
+    __tostring=function(self) return '(obj type = lyte.Joint)' end;
+}
 
 -- unhandled functions in current namespace
 -- tick [implementation: user]

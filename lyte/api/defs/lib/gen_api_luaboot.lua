@@ -75,6 +75,15 @@ local function generate_api_luaboot(NS)
     end
     out = out .. "\n"
 
+    out = out .. "-- manually handled functions in current namespace\n"
+    for _i, fn in ipairs(NS.functions) do
+        if fn.code then
+            out = out ..  fn.namespace .. "." .. fn.name .. " = " .. fn.code
+        end
+    end
+    out = out .. "\n"
+
+
     out = out .. "-- records \n"
     for _i, rec in ipairs(NS.records) do
         out = out .. NS.name .. "." .. rec.name .. " = {\n"
@@ -112,7 +121,13 @@ local function generate_api_luaboot(NS)
                 out = out .. "k=='" .. f.name .. "' then " .. NS.name .. "." .. f.mapwrite.name .. "(self, v)\n"
             end
         end
-        if if_mapwrite_exists then out = out .. SPC2 .. "end\n" end
+        if if_mapwrite_exists then
+            out = out .. SPC2 .. "else\n"
+            out = out .. SPC2 .. "  rawset(self, k, v)\n"
+            out = out .. SPC2 .. "end\n"
+        else
+            out = out .. SPC2 .. "rawset(self, k, v)\n"
+        end
         out = out .. SPC .. "end;\n"
         -- "meta" methods
         for _i, m in ipairs(rec.methods) do
@@ -122,14 +137,6 @@ local function generate_api_luaboot(NS)
         end
         out = out .. SPC .. "__tostring=function(self) return '(obj type = " .. NS.name .. "." .. rec.name .. ")' end;\n"
         out = out .. "}\n"
-    end
-    out = out .. "\n"
-
-    out = out .. "-- manually handled functions in current namespace\n"
-    for _i, fn in ipairs(NS.functions) do
-        if fn.code then
-            out = out ..  fn.namespace .. "." .. fn.name .. " = " .. fn.code
-        end
     end
     out = out .. "\n"
 
