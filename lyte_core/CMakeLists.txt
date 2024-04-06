@@ -4,6 +4,10 @@ message("===============> Project: ${PROJECT_NAME}")
 
 add_library(${PROJECT_NAME} STATIC)
 
+if(APPLE)
+  find_package(OpenGL REQUIRED)
+endif()
+
 if(CMAKE_BUILD_TYPE MATCHES "Release" OR CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
   message("===> [Release] " ${PROJECT_NAME} " : Release mode: " ${CMAKE_BUILD_TYPE})
 else()
@@ -31,6 +35,12 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE
         glfw
     )
+
+    if(APPLE)
+      target_link_libraries(${PROJECT_NAME} PUBLIC
+         OpenGL::GL
+      )
+    endif()
 endif()
 
 

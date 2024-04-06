@@ -26,7 +26,7 @@
 #include <freetype/internal/ftstream.h>
 
   /* memory-mapping includes and definitions */
-#ifdef HAVE_UNISTD_H
+#if defined(HAVE_FCNTL_H) || defined(__APPLE__)
 #include <unistd.h>
 #endif
 
@@ -60,7 +60,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef HAVE_FCNTL_H
+#if defined(HAVE_FCNTL_H) || defined(__APPLE__)
 #include <fcntl.h>
 #endif
 

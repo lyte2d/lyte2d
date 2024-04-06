@@ -23,7 +23,15 @@
 #endif
 
 #include "sokol_gfx.h"
+
+#if defined(__APPLE__)
+#include <opengl/gl.h>
+#define GLFW_INCLUDE_GLCOREARB
+#else
 #define GLFW_INCLUDE_NONE
+#endif
+
+
 #include "GLFW/glfw3.h"
 
 #include "sokol_gp.h"
