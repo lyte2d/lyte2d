@@ -1818,6 +1818,15 @@ static int api_joint_attach(lua_State *L) { // arity: 3 => 0
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
+static int api_joint_attach_one(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *joint; void *body;
+    joint = _checklightuserdata(L, 1);
+    body = _checklightuserdata(L, 2);
+    err = _joint_attach_one(joint, body);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
 static int api_joint_new_hinge(lua_State *L) { // arity: 2 => 1
     (void)L; int err = 0;
     void *world; void *jointgroup; void *joint;
@@ -2291,6 +2300,7 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"joint_is_fixed", api_joint_is_fixed},
     {"joint_get_body", api_joint_get_body},
     {"joint_attach", api_joint_attach},
+    {"joint_attach_one", api_joint_attach_one},
     {"joint_new_hinge", api_joint_new_hinge},
     {"joint_new_slider", api_joint_new_slider},
     {"joint_new_fixed", api_joint_new_fixed},

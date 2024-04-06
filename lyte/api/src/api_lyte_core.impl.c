@@ -902,6 +902,11 @@ static inline int _joint_attach(void *joint, void *body1, void *body2) {
     err = lyte_joint_attach(joint, body1, body2);
     return err;
 }
+static inline int _joint_attach_one(void *joint, void *body) {
+    (void)joint; (void)body; int err = 0;
+    err = lyte_joint_attach_one(joint, body);
+    return err;
+}
 static inline int _joint_new_hinge(void *world, void *jointgroup, void **joint) {
     (void)world; (void)jointgroup; int err = 0;
     err = lyte_joint_new_hinge(world, jointgroup, joint);

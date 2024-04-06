@@ -47,7 +47,7 @@ static int _lyte_add_collision(lyte_Body b1, lyte_Body b2, double pos_x, double 
         .b1 = b1,
         .b2 = b2,
         .pos_x = pos_x,
-        .pos_x = pos_y,
+        .pos_y = pos_y,
         .depth = depth,
     };
     _coll_last_index++;
@@ -55,7 +55,7 @@ static int _lyte_add_collision(lyte_Body b1, lyte_Body b2, double pos_x, double 
         .b1 = b2,
         .b2 = b1,
         .pos_x = pos_x,
-        .pos_x = pos_y,
+        .pos_y = pos_y,
         .depth = depth,
     };
     _coll_last_index++;
@@ -283,6 +283,11 @@ int lyte_joint_get_class(lyte_Joint joint, lyte_JointClass *cls) {
 
 int lyte_joint_attach(lyte_Joint joint, lyte_Body body1, lyte_Body body2) {
     dJointAttach(joint, body1, body2);
+    return 0;
+}
+
+int lyte_joint_attach_one(lyte_Joint joint, lyte_Body body) {
+    dJointAttach(joint, body, 0);
     return 0;
 }
 

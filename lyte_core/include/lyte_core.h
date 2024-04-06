@@ -29,7 +29,6 @@
 #endif
 
 
-
 // -------------------------
 // core data types
 // -------------------------
@@ -410,6 +409,7 @@ int lyte_Joint_cleanup(lyte_Joint joint);
 int lyte_joint_get_class(lyte_Joint joint, lyte_JointClass *cls);
 int lyte_joint_get_body(lyte_Joint joint, int index, lyte_Body *body);
 int lyte_joint_attach(lyte_Joint joint, lyte_Body body1, lyte_Body body2);
+int lyte_joint_attach_one(lyte_Joint joint, lyte_Body body);
 // Joint TODO: enable/disable joints. get/set custom data. are connected...
 // Joint feedback TODO: set/get feedback (force/torque application to either body!) (TBD)
 // int lyte_joint_set_hinge_axis(lyte_Joint joint, double z); // auto?

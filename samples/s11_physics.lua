@@ -1,33 +1,3 @@
-
-local new_rect_immov = function(world, width, height, x, y, angle)
-    local world_id = world.id
-    local space_id = world.space_id
-
-    local body_id = 0
-    -- local body_id = lyte_core.body_new(world_id)
-    local geom_id = lyte_core.geom_new_rect(space_id, width, height)
-    local collider = classnew(lyte.Collider, body_id)
-    collider.geom_id = geom_id
-    collider.x = x
-    collider.y = src_y
-    collider.angle = angle
-    collider.width = width
-    collider.height = height
-
-    lyte_core.geom_set_body(geom_id, body_id)
-
-    -- we need geom_set_pos
-    -- per ode notes, we need body (0) for immovable objects
-
-    -- lyte_core.body_set_position(body_id, x, y)
-    -- lyte_core.body_set_rotation(body_id, angle)
-
-    -- lyte_core.body_set_mass_rect(body_id, width*height, width, height)
-
-    return collider
-end
-
-
 -- simple physics world
 local world = lyte.new_world()
 
@@ -36,34 +6,24 @@ local circles = {}
 local rects = {}
 
 -- create some random circle colliders
-for i=1,45 do
+for i=1,20 do
     local x = math.random(0, 800)
-    local y = math.random(0, 300)
-    local r = math.random(10,30)
+    local y = math.random(0, 600)
+    local r = math.random(10,50)
     circles[i] = world:new_circle_collider(r, x, y, 0);
     circles[i].hit = false
 end
 
 -- create some random rectangle colliders
-for i=1,45 do
+for i=1,25 do
     local x = math.random(0, 800)
-    local y = math.random(0, 300)
+    local y = math.random(0, 600)
     local w = math.random(15,25)
-    local h = math.random(25,40)
+    local h = math.random(25,50)
     local rot = math.random()*math.pi*2
     rects[i] = world:new_rect_collider(w, h, x, y, rot)
     rects[i].hit = false
 end
-
-big_one = world:new_rect_collider(1400,40,400,450,0)
-attach_joint = lyte_core.joint_new_fixed(world.id, world.other_jg_id)
--- lyte_core.joint_attach_one(attach_joint, big_one.id)
--- big_one:set_position(400,400)
--- lyte_core.joint_set_fixed(attach_joint)
-
-lyte_core.body_set_kinematic(big_one.id)
-
-table.insert(rects, big_one)
 
 
 local function refresh_objects(dt)
@@ -81,10 +41,8 @@ end
 
 refresh_objects(0) -- initial coords
 
-
-
 function lyte.tick(dt)
-    world:update(1/60)
+    world:update(dt)
 
     lyte.cls(0.2,0.2,0.2,1)
 

@@ -410,6 +410,60 @@
 --- Reset the specified uniform. 
 --- @type fun(shader: lyte.Shader, uniform_name: string)
     lyte.reset_shader_uniform = lyte.reset_shader_uniform and lyte.reset_shader_uniform or function() end
+--- Cleanup the physics world (dynamics + collision). 
+--- @type fun(world: lyte.World)
+    lyte.cleanup_world = lyte.cleanup_world and lyte.cleanup_world or function() end
+--- Create a new physics world 
+--- @type fun(): lyte.World
+    lyte.new_world = lyte.new_world and lyte.new_world or function() end
+--- Update the physics world (dynamics + collision). 
+--- @type fun(world: lyte.World, step_size: number)
+    lyte.update_world = lyte.update_world and lyte.update_world or function() end
+--- Update the physics world gravity. 
+--- @type fun(world: lyte.World, x: number, y: number)
+    lyte.set_world_gravity = lyte.set_world_gravity and lyte.set_world_gravity or function() end
+--- Cleanup the physics collider. 
+--- @type fun(collider: lyte.Collider)
+    lyte.cleanup_collider = lyte.cleanup_collider and lyte.cleanup_collider or function() end
+--- Refresh the physics collider position (x, y) and angle 
+--- @type fun(collider: lyte.Collider)
+    lyte.refresh_collider = lyte.refresh_collider and lyte.refresh_collider or function() end
+--- Create new circle collider (body + geom) in the given physics world. 
+--- @type fun(world: lyte.World, radius: number, x: number, y: number, angle: number)
+    lyte.new_circle_collider = lyte.new_circle_collider and lyte.new_circle_collider or function() end
+--- Create new rectangle collider (body + geom) in the given physics world. 
+--- @type fun(world: lyte.World, width: number, height: number, x: number, y: number, angle: number)
+    lyte.new_rect_collider = lyte.new_rect_collider and lyte.new_rect_collider or function() end
+--- Set collider position. 
+--- @type fun(collider: lyte.Collider, x: number, y: number)
+    lyte.set_collider_position = lyte.set_collider_position and lyte.set_collider_position or function() end
+--- Set collider rotation. 
+--- @type fun(collider: lyte.Collider, angle: number)
+    lyte.set_collider_rotation = lyte.set_collider_rotation and lyte.set_collider_rotation or function() end
+--- Add force to collider. 
+--- @type fun(collider: lyte.Collider, fx: number, fy: number)
+    lyte.add_force_to_collider = lyte.add_force_to_collider and lyte.add_force_to_collider or function() end
+--- Add torque to collider. 
+--- @type fun(collider: lyte.Collider, fz: number)
+    lyte.add_torque_to_collider = lyte.add_torque_to_collider and lyte.add_torque_to_collider or function() end
+--- Set the collider's linear velocity 
+--- @type fun(collider: lyte.Collider, vx: number, vy: number)
+    lyte.set_collider_linear_velocity = lyte.set_collider_linear_velocity and lyte.set_collider_linear_velocity or function() end
+--- Set the collider's angular velocity 
+--- @type fun(collider: lyte.Collider, vz: number)
+    lyte.set_collider_angular_velocity = lyte.set_collider_angular_velocity and lyte.set_collider_angular_velocity or function() end
+--- Set the collider as 'kinematic'. By default, it's not kinematic. 
+--- @type fun(collider: lyte.Collider, val: boolean)
+    lyte.set_collider_kinematic = lyte.set_collider_kinematic and lyte.set_collider_kinematic or function() end
+--- Is the collider set as 'kinematic'? By default, it's not. 
+--- @type fun(collider: lyte.Collider): boolean
+    lyte.is_collider_kinematic = lyte.is_collider_kinematic and lyte.is_collider_kinematic or function() end
+--- Get the number of collisions in the current frame 
+--- @type fun(collider: lyte.Collider): int
+    lyte.get_collider_collision_count = lyte.get_collider_collision_count and lyte.get_collider_collision_count or function() end
+--- Get the collision data in the current frame as a list 
+--- @type fun(collider: lyte.Collider): lyte.CollisionList
+    lyte.get_collider_collisions = lyte.get_collider_collisions and lyte.get_collider_collisions or function() end
 
 -- records
 
@@ -479,6 +533,43 @@
     --- @field build fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
     --- @field __gc fun(shaderbuilder: lyte.ShaderBuilder)
     lyte.ShaderBuilder = lyte.ShaderBuilder and lyte.ShaderBuilder or {}
+-- Physics dynamics world + collision space. 
+--- @class lyte.World
+    --- @field update fun(world: lyte.World, step_size: number)
+    --- @field set_gravity fun(world: lyte.World, x: number, y: number)
+    --- @field new_circle_collider fun(world: lyte.World, radius: number, x: number, y: number, angle: number)
+    --- @field new_rect_collider fun(world: lyte.World, width: number, height: number, x: number, y: number, angle: number)
+    --- @field __gc fun(world: lyte.World)
+    lyte.World = lyte.World and lyte.World or {}
+-- Physics body + mass + colliding geometry. 
+--- @class lyte.Collider
+    --- @field x number
+    --- @field y number
+    --- @field angle number
+    --- @field refresh fun(collider: lyte.Collider)
+    --- @field set_position fun(collider: lyte.Collider, x: number, y: number)
+    --- @field set_rotation fun(collider: lyte.Collider, angle: number)
+    --- @field set_linear_velocity fun(collider: lyte.Collider, vx: number, vy: number)
+    --- @field set_angular_velocity fun(collider: lyte.Collider, vz: number)
+    --- @field add_force fun(collider: lyte.Collider, fx: number, fy: number)
+    --- @field add_torque fun(collider: lyte.Collider, fz: number)
+    --- @field is_kinematic fun(collider: lyte.Collider): boolean
+    --- @field set_kinematic fun(collider: lyte.Collider, val: boolean)
+    --- @field get_collision_count fun(collider: lyte.Collider): int
+    --- @field get_collisions fun(collider: lyte.Collider): lyte.CollisionList
+    --- @field __gc fun(collider: lyte.Collider)
+    lyte.Collider = lyte.Collider and lyte.Collider or {}
+-- Collision information between two colliders 
+--- @class lyte.Collision
+    --- @field c1 lyte.Collider
+    --- @field c2 lyte.Collider
+    --- @field pos_x number
+    --- @field pos_y number
+    --- @field depth number
+    lyte.Collision = lyte.Collision and lyte.Collision or {}
+-- Physics joints (constraints). 
+--- @class lyte.Joint
+    lyte.Joint = lyte.Joint and lyte.Joint or {}
 
 -- variants (unions)
 
@@ -489,6 +580,8 @@
 
 --- Float values
 --- @alias lyte.FloatVec4 number[]
+--- Collision List
+--- @alias lyte.CollisionList userdata[]
 
 -- dicts
 

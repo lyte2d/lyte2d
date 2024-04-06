@@ -1242,6 +1242,12 @@ return process_def_tree(Namespace("lyte_core", {
         Doc("Attach the given bodies with the joint.")
     ),
 
+    Function("joint_attach_one",
+        Arg("joint", Joint_Ptr),
+        Arg("body", Body_Ptr),
+        Doc("Attach the given body with to the 'world'.")
+    ),
+
     Function("joint_new_hinge",
         Arg("world", World_Ptr),
         Arg("jointgroup", JointGroup_Ptr),
