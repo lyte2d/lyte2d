@@ -36,6 +36,7 @@ typedef struct MusicItem {
 typedef struct SoundDataItem {
     uint32_t handle;
     Wave wave;
+    Sound sound;
     size_t data_size;
     size_t ref_count;
     void *data;
@@ -43,7 +44,7 @@ typedef struct SoundDataItem {
 
 typedef struct SoundItem {
     SoundDataItem *sdi;
-    Sound sound;
+    Sound sound_alias;
     double volume;
     double pan;
     double pitch;
@@ -311,17 +312,18 @@ int lyte_load_sound(const char * path, lyte_Sound *val) {
     sdi->data_size = read_len;
     sdi->data = buf;
     sdi->wave = LoadWaveFromMemory(file_extension, sdi->data, sdi->data_size);
+    sdi->sound = LoadSoundFromWave(sdi->wave);
 
     SoundItem *si = malloc(sizeof(SoundItem));
     si->volume = 1.0;
     si->pan = 0.5;
     si->pitch = 1.0;
-    si->sound = LoadSoundFromWave(sdi->wave);
+    si->sound_alias = LoadSoundAlias(sdi->sound);
     si->sdi = sdi;
     sdi->ref_count = 1;
-    SetSoundVolume(si->sound, si->volume);
-    SetSoundPan(si->sound, si->pan);
-    SetSoundPitch(si->sound, si->pitch);
+    SetSoundVolume(si->sound_alias, si->volume);
+    SetSoundPan(si->sound_alias, si->pan);
+    SetSoundPitch(si->sound_alias, si->pitch);
 
     // val = (lyte_Sound *)&si;
     *val = si;
@@ -344,12 +346,12 @@ int lyte_clone_sound(lyte_Sound orig, lyte_Sound *val) {
     nsi->volume = si->volume;
     nsi->pan = si->pan;
     nsi->pitch = si->pitch;
-    nsi->sound = LoadSoundFromWave(sdi->wave);
+    nsi->sound_alias = LoadSoundAlias(sdi->sound);
     nsi->sdi = sdi;
     sdi->ref_count++;
-    SetSoundVolume(nsi->sound, nsi->volume);
-    SetSoundPan(nsi->sound, nsi->pan);
-    SetSoundPitch(nsi->sound, nsi->pitch);
+    SetSoundVolume(nsi->sound_alias, nsi->volume);
+    SetSoundPan(nsi->sound_alias, nsi->pan);
+    SetSoundPitch(nsi->sound_alias, nsi->pitch);
     // val = (lyte_Sound*)&nsi;
     *val = nsi;
     return 0;
@@ -365,9 +367,9 @@ int lyte_Sound_cleanup(lyte_Sound sound) {
         fprintf(stderr, "Sound data not found\n");
         return -2;
     }
-    UnloadSound(si->sound);
     sdi->ref_count--;
     if (sdi->ref_count == 0) {
+        UnloadSound(sdi->sound);
         UnloadWave(sdi->wave);
         free(sdi->data);
         free(sdi);
@@ -382,7 +384,7 @@ int lyte_play_sound(lyte_Sound snd) {
         fprintf(stderr, "Sound not found\n");
         return -1;
     }
-    PlaySound(si->sound);
+    PlaySound(si->sound_alias);
     return 0;
 }
 
@@ -392,7 +394,7 @@ int lyte_pause_sound(lyte_Sound snd) {
         fprintf(stderr, "Sound not found\n");
         return -1;
     }
-    PauseSound(si->sound);
+    PauseSound(si->sound_alias);
     return 0;
 }
 
@@ -402,7 +404,7 @@ int lyte_resume_sound(lyte_Sound snd) {
         fprintf(stderr, "Sound not found\n");
         return -1;
     }
-    ResumeSound(si->sound);
+    ResumeSound(si->sound_alias);
     return 0;
 }
 
@@ -412,7 +414,7 @@ int lyte_stop_sound(lyte_Sound snd) {
         fprintf(stderr, "Sound not found\n");
         return -1;
     }
-    StopSound(si->sound);
+    StopSound(si->sound_alias);
     return 0;
 }
 
@@ -422,7 +424,7 @@ int lyte_is_sound_playing(lyte_Sound snd, bool *val) {
         fprintf(stderr, "Sound not found\n");
         return -1;
     }
-    *val = IsSoundPlaying(si->sound);
+    *val = IsSoundPlaying(si->sound_alias);
     return 0;
 }
 
@@ -463,7 +465,7 @@ int lyte_set_sound_volume(lyte_Sound snd, double volume) {
         return -1;
     }
     si->volume = volume;
-    SetSoundVolume(si->sound, si->volume);
+    SetSoundVolume(si->sound_alias, si->volume);
     return 0;
 }
 
@@ -474,7 +476,7 @@ int lyte_set_sound_pan(lyte_Sound snd, double pan) {
         return -1;
     }
     si->pan = pan;
-    SetSoundPan(si->sound, si->pan);
+    SetSoundPan(si->sound_alias, si->pan);
     return 0;
 }
 
@@ -485,7 +487,7 @@ int lyte_set_sound_pitch(lyte_Sound snd, double pitch) {
         return -1;
     }
     si->pitch = pitch;
-    SetSoundPitch(si->sound, si->pitch);
+    SetSoundPitch(si->sound_alias, si->pitch);
     return 0;
 }
 
