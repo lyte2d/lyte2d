@@ -91,7 +91,6 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_image
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/sc/external
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
