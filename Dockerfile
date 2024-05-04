@@ -21,8 +21,8 @@ RUN apt-get update \
             python3-pip \
             python3 \
             xxd \
-            lua5.1 \
-    && update-ca-certificates
+            lua5.1
+RUN update-ca-certificates
 
 # cmake
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.19.8/cmake-3.19.8-Linux-x86_64.sh -q -O /tmp/cmake-install.sh \
