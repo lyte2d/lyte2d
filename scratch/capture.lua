@@ -24,8 +24,13 @@ function lyte.tick(dt, w, h)
     my = lyte.get_mouse_y()
     lyte.draw_text("let's capture the screen bro: " .. math.random(10, 100000), 10, 10)
     lyte.draw_text("W " .. w .. "," .. h .." M " .. mx .. "," .. my, 10, h-40)
-    if lyte.is_key_pressed("space") then
-       img = lyte_core.capture_image(0,0,520,130)
+    if lyte.is_key_pressed("space") or lyte.is_key_down("down") then
+        if img then
+            lyte_core.image_cleanup(img)
+            img = nil
+        end
+        img = lyte_core.capture_image(0,0,500,400)
+
     end
     if img then
         lyte_core.image_draw(img, 10, 100)
