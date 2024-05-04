@@ -501,6 +501,18 @@ static int api_image_is_canvas(lua_State *L) { // arity: 1 => 1
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
+static int api_capture_image(lua_State *L) { // arity: 4 => 1
+    (void)L; int err = 0;
+    int x; int y; int w; int h; void *val;
+    x = luaL_checknumber(L, 1);
+    y = luaL_checknumber(L, 2);
+    w = luaL_checknumber(L, 3);
+    h = luaL_checknumber(L, 4);
+    err = _capture_image(x, y, w, h, &val);
+    lua_pushlightuserdata(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
 static int api_imagebatch_cleanup(lua_State *L) { // arity: 1 => 0
     (void)L; int err = 0;
     void *imagebatch;
@@ -2154,6 +2166,7 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"image_set_canvas", api_image_set_canvas},
     {"reset_canvas", api_reset_canvas},
     {"image_is_canvas", api_image_is_canvas},
+    {"capture_image", api_capture_image},
     {"imagebatch_cleanup", api_imagebatch_cleanup},
     {"imagebatch_new", api_imagebatch_new},
     {"imagebatch_reset", api_imagebatch_reset},

@@ -691,6 +691,9 @@
 --- Check if the image was created as a canvas. 
 --- @type fun(image: userdata): boolean
     lyte_core.image_is_canvas = lyte_core.image_is_canvas and lyte_core.image_is_canvas or function() end
+--- Note: slow. Capture render image. This is a slow operation! 
+--- @type fun(x: int, y: int, w: int, h: int): userdata
+    lyte_core.capture_image = lyte_core.capture_image and lyte_core.capture_image or function() end
 --- Free ImageBatch resources 
 --- @type fun(imagebatch: userdata)
     lyte_core.imagebatch_cleanup = lyte_core.imagebatch_cleanup and lyte_core.imagebatch_cleanup or function() end
@@ -1129,6 +1132,9 @@
 --- Attach the given bodies with the joint. 
 --- @type fun(joint: userdata, body1: userdata, body2: userdata)
     lyte_core.joint_attach = lyte_core.joint_attach and lyte_core.joint_attach or function() end
+--- Attach the given body with to the 'world'. 
+--- @type fun(joint: userdata, body: userdata)
+    lyte_core.joint_attach_one = lyte_core.joint_attach_one and lyte_core.joint_attach_one or function() end
 --- Create a new Joint of class 'hinge'. 
 --- @type fun(world: userdata, jointgroup: userdata): userdata
     lyte_core.joint_new_hinge = lyte_core.joint_new_hinge and lyte_core.joint_new_hinge or function() end

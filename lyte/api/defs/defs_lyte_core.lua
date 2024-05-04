@@ -255,6 +255,16 @@ return process_def_tree(Namespace("lyte_core", {
         LuaImpl
     ),
 
+    Function("capture_image",
+        Arg("x", Int),
+        Arg("y", Int),
+        Arg("w", Int),
+        Arg("h", Int),
+        Ret("val", Image_Ptr),
+        -- ctor=true
+        Doc("Note: slow. Capture render image. This is a slow operation!")
+    ),
+
     -- RENAMED
     Function("imagebatch_cleanup",
         Arg("imagebatch", ImageBatch_Ptr),

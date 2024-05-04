@@ -183,11 +183,6 @@ int lyte_pop_matrix(void) {
 
 int lyte_reset_matrix(void) {
     sgp_reset_transform();
-    float xscale = lytecore_state.hidpi_xscale;
-    float yscale = lytecore_state.hidpi_yscale;
-    if (xscale != 1.0 || yscale != 1.0) {
-        sgp_scale(2.0, 2.0);
-    }
     return 0;
 }
 

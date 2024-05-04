@@ -260,7 +260,10 @@ int lyte_get_mouse_x(int *val) {
     double x, y;
     glfwGetCursorPos(lytecore_state.window, &x, &y);
     inputstate.mouse_x = x;
-    *val = inputstate.mouse_x - lytecore_state.window_margins.left - lytecore_state.window_paddings.left;
+    *val = inputstate.mouse_x
+         - (lytecore_state.window_margins.left) // * lytecore_state.hidpi_xscale
+        //  - (lytecore_state.window_paddings.left)
+        ;
     return 0;
 }
 
@@ -268,7 +271,10 @@ int lyte_get_mouse_y(int *val) {
     double x, y;
     glfwGetCursorPos(lytecore_state.window, &x, &y);
     inputstate.mouse_y = y;
-    *val = inputstate.mouse_y - lytecore_state.window_margins.top - lytecore_state.window_paddings.top;
+    *val = inputstate.mouse_y
+        - (lytecore_state.window_margins.top) // * lytecore_state.hidpi_xscale
+        // - lytecore_state.window_paddings.top
+        ;
     return 0;
 }
 

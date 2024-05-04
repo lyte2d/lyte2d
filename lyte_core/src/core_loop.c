@@ -59,12 +59,24 @@ static inline void _tick_function(void) {
     lytecore_state.hidpi_xscale = xscale;
     lytecore_state.hidpi_yscale = yscale;
 
+    // win_w = win_w / xscale;
+    // win_h = win_h / yscale;
+    PL = PL / xscale;
+    PR = PR / xscale;
+    PT = PT / yscale;
+    PB = PB / yscale;
+    // ML = ML / xscale;
+    // MR = MR / xscale;
+    // MT = MT / yscale;
+    // MB = MB / yscale;
 
-    int fwidth = win_w - PL - PR;
-    int fheight = win_h - PT - PB; // BUGG?
 
-    lytecore_state.window_size.width = (float)win_w/xscale;
-    lytecore_state.window_size.height = (float)win_h/yscale;
+
+    lytecore_state.window_size.width = win_w / xscale;
+    lytecore_state.window_size.height = win_h / yscale;
+
+    int fwidth = lytecore_state.window_size.width  - PL - PR;
+    int fheight = lytecore_state.window_size.height - PT - PB; // BUGG?
 
     bool resized = false;
     if (lytecore_state.first_frame || prev_w != lytecore_state.window_size.width || prev_h != lytecore_state.window_size.height) {
@@ -72,16 +84,26 @@ static inline void _tick_function(void) {
         lytecore_state.first_frame = false;
     }
 
-    sgp_begin(win_w, win_h);
+    sgp_begin(lytecore_state.window_size.width, lytecore_state.window_size.height);
 
-    sgp_viewport(ML, MT, win_w-ML-MR, win_h-MT-MB);
-    sgp_project(-PL, fwidth+PR, -PT, fheight+PB);
+    sgp_viewport(
+        ML * xscale,
+        MT * yscale,
+        (lytecore_state.window_size.width -ML-MR) * xscale,
+        (lytecore_state.window_size.height-MT-MB) * yscale
+    );
+    sgp_project(
+        (-PL), // * xscale,
+        (fwidth+PR),// * xscale,
+        (-PT), // * yscale,
+        (fheight+PB) // * yscale
+    );
     lyte_set_blendmode(lytecore_state.blendmode);
 
 
     // lyte_push_matrix();
     sgp_reset_transform();
-    sgp_scale(xscale, yscale);
+    // sgp_scale(xscale, yscale);
     lytecore_state.tick_fn(lytecore_state.app_data, delta_time, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen);
     // lyte_pop_matrix();
 

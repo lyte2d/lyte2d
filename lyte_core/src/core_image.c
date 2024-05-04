@@ -10,6 +10,7 @@
 #include "physfs.h"
 
 #include "sokol_gfx.h"
+#include "sokol_gfx_ext.h"
 #include "sokol_gp.h"
 #include "stb_image.h"
 
@@ -281,7 +282,8 @@ int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, 
     return 0;
 }
 
-int lyte_set_canvas(lyte_Image image) {
+
+static int _lyte_set_canvas(lyte_Image image, bool updown) {
     if (current_canvas) {
         fprintf(stderr, "Canvas was already set.");
             return 1;
@@ -296,8 +298,12 @@ int lyte_set_canvas(lyte_Image image) {
         return 1;
     }
     sgp_begin(imageitem->width, imageitem->height);
-    sgp_scale(1.0, -1.0);
-    sgp_translate(0, -imageitem->height);
+    if (updown) {
+        sgp_scale(1.0, 1.0);
+    } else {
+        sgp_scale(1.0, -1.0);
+        sgp_translate(0, -imageitem->height);
+    }
     sgp_push_transform();
 
     lyte_set_blendmode(lytecore_state.blendmode);
@@ -305,6 +311,11 @@ int lyte_set_canvas(lyte_Image image) {
     current_canvas = imageitem;
     return 0;
 }
+
+int lyte_set_canvas(lyte_Image image) {
+    return _lyte_set_canvas(image, false);
+}
+
 
 int lyte_reset_canvas(void) {
     if (!current_canvas) {
@@ -416,3 +427,73 @@ int lyte_draw_imagebatch(lyte_ImageBatch imagebatch) {
     return 0;
 }
 
+static sg_image capture_screen_image(int x, int y, int w , int h) {
+    // sg_image_info info = sg_query_image_info(fb_image);
+    // size_t num_pixels = (size_t)(info.width * info.height * 4);
+    size_t num_pixels = (size_t)(w * h * 4);
+    // void *pixels = SOKOL_MALLOC(num_pixels);
+    void *pixels = malloc(num_pixels);
+    assert(pixels);
+    sg_query_pixels(x, y, w, h, true, pixels, num_pixels);
+    sg_image_desc image_desc;
+    memset(&image_desc, 0, sizeof(image_desc));
+    image_desc.width = w;//info.width;
+    image_desc.height = h;//info.height;
+    image_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
+    image_desc.data.subimage[0][0].ptr = pixels;
+    image_desc.data.subimage[0][0].size = num_pixels;
+    sg_image image = sg_make_image(&image_desc);
+    assert(sg_query_image_state(image) == SG_RESOURCESTATE_VALID);
+    // SOKOL_FREE(pixels);
+    free(pixels);
+    return image;
+
+}
+
+
+int lyte_capture_image(int x, int y, int w, int h, lyte_Image *val) {
+    float xscale = lytecore_state.hidpi_xscale;
+    float yscale = lytecore_state.hidpi_xscale;
+    int orig_w = w;
+    int orig_h = h;
+
+    x *= xscale;
+    y *= yscale;
+    w *= xscale;
+    h *= yscale;
+    sg_image img =  capture_screen_image(x, y, w, h);
+
+    sg_sampler_desc sampler_desc = {0};
+    sampler_desc.min_filter = (sg_filter)lytecore_state.filtermode;
+    sampler_desc.mag_filter = (sg_filter)lytecore_state.filtermode;
+    // sampler_desc.wrap_u = SG_WRAP_REPEAT;
+    // sampler_desc.wrap_v = SG_WRAP_REPEAT;
+    sampler_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
+    sampler_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
+    sg_sampler sgsampler = sg_make_sampler(&sampler_desc);
+
+
+    ImageItem *ii = malloc(sizeof(ImageItem));
+    ii->handle = img.id;
+    ii->sampler_handle = sgsampler.id;
+    ii->width = w;
+    ii->height = h;
+    ii->is_canvas = false;
+    ii->ref = 1;
+
+
+    lyte_Image cvs;
+
+    lyte_new_canvas(orig_w, orig_h, &cvs);
+    _lyte_set_canvas(cvs, true);
+    lyte_cls(0,0,0,0);
+    lyte_scale(1/xscale, 1/yscale);
+    lyte_draw_image(ii, 0, 0);
+    lyte_reset_canvas();
+
+    free(ii);
+
+    *val = cvs;
+
+    return 0;
+}

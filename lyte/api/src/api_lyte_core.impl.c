@@ -147,6 +147,11 @@ static inline int _image_is_canvas(void *image, bool *val) {
     err = lyte_is_image_canvas(image, val);
     return err;
 }
+static inline int _capture_image(int x, int y, int w, int h, void **val) {
+    (void)x; (void)y; (void)w; (void)h; int err = 0;
+    err = lyte_capture_image(x, y, w, h, val);
+    return err;
+}
 static inline int _imagebatch_cleanup(void *imagebatch) {
     (void)imagebatch; int err = 0;
     err = lyte_ImageBatch_cleanup(imagebatch);

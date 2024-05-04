@@ -235,6 +235,7 @@ int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, 
 int lyte_set_canvas(lyte_Image image);
 int lyte_reset_canvas(void);
 int lyte_is_image_canvas(lyte_Image image, bool *val);
+int lyte_capture_image(int x, int y, int w, int h, lyte_Image *val);
 
 int lyte_new_imagebatch(lyte_Image image, lyte_ImageBatch *val);
 int lyte_ImageBatch_cleanup(lyte_ImageBatch imagebatch);
