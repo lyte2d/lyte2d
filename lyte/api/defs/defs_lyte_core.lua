@@ -1438,6 +1438,36 @@ return process_def_tree(Namespace("lyte_core", {
         Doc("Get the Body associated with the Geom.")
     ),
 
+
+    Function("geom_set_position",
+        Arg("geom", Geom_Ptr),
+        Arg("x", Double),
+        Arg("y", Double),
+        Doc("Set geom's position.")
+    ),
+
+    Function("geom_get_position",
+        Arg("geom", Geom_Ptr),
+        Ret("x", Double),
+        Ret("y", Double),
+        Doc("Get geom's position.")
+    ),
+
+    Function("geom_set_rotation",
+        Arg("geom", Geom_Ptr),
+        Arg("angle", Double),
+        Doc("Set geom's rotation (angle).")
+    ),
+
+    Function("geom_get_rotation",
+        Arg("geom", Geom_Ptr),
+        Ret("angle", Double),
+        Doc("Get geom's rotation (angle).")
+    ),
+
+
+
+
     -- TODO: offset position and rotation (available in lyte_core)
 
     Function("geom_set_category_bit",

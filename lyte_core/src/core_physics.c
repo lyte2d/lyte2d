@@ -14,6 +14,9 @@
 #define LYTE_PHYSICS_INIT_COLL_COUNT 8 // will double as needed
 
 
+//TODO: move to use geoms for collision instead of bodies. that reflects ODE better
+//and enables geom-only objects on lua side
+
 typedef struct _lyte_NearCallbackData {
     lyte_JointGroup jointgroup;
 } _lyte_NearCallbackData ;
@@ -385,6 +388,49 @@ int lyte_geom_get_body(lyte_Geom geom, lyte_Body *body) {
     return 0;
 }
 
+
+
+int lyte_geom_set_position(lyte_Geom geom , double x, double y) {
+    dGeomSetPosition(geom, x, y, 0);
+    return 0;
+}
+
+int lyte_geom_get_position(lyte_Geom  geom, double *x, double *y) {
+    const double *pos = dGeomGetPosition(geom);
+    *x = pos[0];
+    *y = pos[1];
+    return 0;
+}
+
+int lyte_geom_set_rotation(lyte_Geom geom, double angle) {
+    dMatrix3 rot;
+    dRFromAxisAndAngle(rot, 0, 0, 1, angle);
+    dGeomSetRotation(geom, rot);
+    return 0;
+}
+
+int lyte_geom_get_rotation(lyte_Geom geom, double *angle) {
+    const double *rot = dGeomGetRotation(geom);
+    *angle = atan2f(rot[4], rot[0]);
+    return 0;
+}
+
+// int lyte_geom_set_linear_velocity(lyte_Geom geom, double x, double y) {
+
+//     return 0;
+// }
+
+// int lyte_geom_get_linear_velocity(lyte_Geom geom, double *x, double *y) {
+//     return 0;
+// }
+
+// int lyte_geom_set_angular_velocity(lyte_Geom geom, double z) {
+//     return 0;
+// }
+
+// int lyte_geom_get_angular_velocity(lyte_Geom geom, double *z) {
+//     return 0;
+// }
 
 int lyte_geom_set_offset_position(lyte_Geom geom, double x, double y) {
     dGeomSetOffsetPosition(geom, x, y, 0);

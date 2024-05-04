@@ -2100,6 +2100,44 @@ static int api_geom_get_body(lua_State *L) { // arity: 1 => 1
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
+static int api_geom_set_position(lua_State *L) { // arity: 3 => 0
+    (void)L; int err = 0;
+    void *geom; double x; double y;
+    geom = _checklightuserdata(L, 1);
+    x = luaL_checknumber(L, 2);
+    y = luaL_checknumber(L, 3);
+    err = _geom_set_position(geom, x, y);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_get_position(lua_State *L) { // arity: 1 => 2
+    (void)L; int err = 0;
+    void *geom; double x; double y;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_get_position(geom, &x, &y);
+    lua_pushnumber(L, x);
+    lua_pushnumber(L, y);
+    (void)err; // TODO: handle when err is not 0
+    return 2; // number of values returned in the stack
+}
+static int api_geom_set_rotation(lua_State *L) { // arity: 2 => 0
+    (void)L; int err = 0;
+    void *geom; double angle;
+    geom = _checklightuserdata(L, 1);
+    angle = luaL_checknumber(L, 2);
+    err = _geom_set_rotation(geom, angle);
+    (void)err; // TODO: handle when err is not 0
+    return 0; // number of values returned in the stack
+}
+static int api_geom_get_rotation(lua_State *L) { // arity: 1 => 1
+    (void)L; int err = 0;
+    void *geom; double angle;
+    geom = _checklightuserdata(L, 1);
+    err = _geom_get_rotation(geom, &angle);
+    lua_pushnumber(L, angle);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
 static int api_geom_set_category_bit(lua_State *L) { // arity: 2 => 0
     (void)L; int err = 0;
     void *geom; int category_bit;
@@ -2341,6 +2379,10 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"geom_get_AABB", api_geom_get_AABB},
     {"geom_set_body", api_geom_set_body},
     {"geom_get_body", api_geom_get_body},
+    {"geom_set_position", api_geom_set_position},
+    {"geom_get_position", api_geom_get_position},
+    {"geom_set_rotation", api_geom_set_rotation},
+    {"geom_get_rotation", api_geom_get_rotation},
     {"geom_set_category_bit", api_geom_set_category_bit},
     {"geom_is_category_bit_set", api_geom_is_category_bit_set},
     {"geom_set_collide_bit", api_geom_set_collide_bit},

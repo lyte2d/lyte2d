@@ -438,6 +438,17 @@ int lyte_Geom_cleanup(lyte_Geom geom);
 int lyte_geom_set_body(lyte_Geom geom, lyte_Body body);
 int lyte_geom_get_body(lyte_Geom geom, lyte_Body *body);
 // Geom set/get position, rot/quat etc. Maybe not needed since Body has these. (TBD)
+
+int lyte_geom_set_position(lyte_Geom geom, double x, double y);
+int lyte_geom_get_position(lyte_Geom geom, double *x, double *y);
+int lyte_geom_set_rotation(lyte_Geom geom, double angle);
+int lyte_geom_get_rotation(lyte_Geom geom, double *angle);
+// int lyte_geom_set_linear_velocity(lyte_Geom geom, double x, double y);
+// int lyte_geom_get_linear_velocity(lyte_Geom geom, double *x, double *y);
+// int lyte_geom_set_angular_velocity(lyte_Geom geom, double z);
+// int lyte_geom_get_angular_velocity(lyte_Geom geom, double *z);
+
+
 int lyte_geom_set_offset_position(lyte_Geom geom, double x, double y);
 int lyte_geom_get_offset_position(lyte_Geom geom, double *x, double *y);
 int lyte_geom_set_offset_rotation(lyte_Geom geom, double angle);

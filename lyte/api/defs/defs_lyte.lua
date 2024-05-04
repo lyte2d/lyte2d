@@ -1137,6 +1137,19 @@ end
         Doc("Physics body + mass + colliding geometry.")
     ),
 
+    -- Record("FixedCollider",
+    --     Field("x", Double),
+    --     Field("y", Double),
+    --     Field("angle", Double),
+    --     -- Method("refresh", MapTo("refresh_fixedcollider")),
+    --     -- Method("set_position", MapTo("set_fixedcollider_position")),
+    --     -- Method("set_rotation", MapTo("set_fixedcollider_rotation")),
+    --     -- Method("get_collision_count", MapTo("get_fixedcollider_collision_count")),
+    --     -- Method("get_collisions", MapTo("get_fixedcollider_collisions")),
+    --     -- Method("__gc", MapTo("cleanup_fixedcollider")),
+    --     Doc("Physics colliding geometry. Forces do not apply, but it can collide with other colliders.")
+    -- ),
+
     Record("Collision",
         Field("c1", Wrap("Collider")),
         Field("c2", Wrap("Collider")),

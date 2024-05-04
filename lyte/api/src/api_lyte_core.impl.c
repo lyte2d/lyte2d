@@ -1053,6 +1053,26 @@ static inline int _geom_get_body(void *geom, void **body) {
     err = lyte_geom_get_body(geom, body);
     return err;
 }
+static inline int _geom_set_position(void *geom, double x, double y) {
+    (void)geom; (void)x; (void)y; int err = 0;
+    err = lyte_geom_set_position(geom, x, y);
+    return err;
+}
+static inline int _geom_get_position(void *geom, double *x, double *y) {
+    (void)geom; int err = 0;
+    err = lyte_geom_get_position(geom, x, y);
+    return err;
+}
+static inline int _geom_set_rotation(void *geom, double angle) {
+    (void)geom; (void)angle; int err = 0;
+    err = lyte_geom_set_rotation(geom, angle);
+    return err;
+}
+static inline int _geom_get_rotation(void *geom, double *angle) {
+    (void)geom; int err = 0;
+    err = lyte_geom_get_rotation(geom, angle);
+    return err;
+}
 static inline int _geom_set_category_bit(void *geom, int category_bit) {
     (void)geom; (void)category_bit; int err = 0;
     err = lyte_geom_set_category_bit(geom, category_bit);
