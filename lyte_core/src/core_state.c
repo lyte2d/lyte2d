@@ -45,6 +45,9 @@ int lyte_core_state_init(lyte_Config config) {
     lytecore_state.current_color[2] = 1.0;
     lytecore_state.current_color[3] = 1.0;
 
+    lytecore_state.hidpi_xscale = 1.0;
+    lytecore_state.hidpi_yscale = 1.0;
+
 
 #ifndef __EMSCRIPTEN__
     bool first_arg_update = false;
@@ -180,6 +183,11 @@ int lyte_pop_matrix(void) {
 
 int lyte_reset_matrix(void) {
     sgp_reset_transform();
+    float xscale = lytecore_state.hidpi_xscale;
+    float yscale = lytecore_state.hidpi_yscale;
+    if (xscale != 1.0 || yscale != 1.0) {
+        sgp_scale(2.0, 2.0);
+    }
     return 0;
 }
 

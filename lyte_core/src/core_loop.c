@@ -52,10 +52,20 @@ static inline void _tick_function(void) {
         glfwGetFramebufferSize(lytecore_state.window, &win_w, &win_h);
 #endif
 
+    float xscale, yscale;
+    glfwGetWindowContentScale(lytecore_state.window , &xscale, &yscale);
+    // printf("Window scale: %f %f \n", xscale, yscale);
+
+    lytecore_state.hidpi_xscale = xscale;
+    lytecore_state.hidpi_yscale = yscale;
+
+
     int fwidth = win_w - PL - PR;
     int fheight = win_h - PT - PB; // BUGG?
-    lytecore_state.window_size.width = win_w;
-    lytecore_state.window_size.height = win_h;
+
+    lytecore_state.window_size.width = (float)win_w/xscale;
+    lytecore_state.window_size.height = (float)win_h/yscale;
+
     bool resized = false;
     if (lytecore_state.first_frame || prev_w != lytecore_state.window_size.width || prev_h != lytecore_state.window_size.height) {
         resized = true;
@@ -69,9 +79,11 @@ static inline void _tick_function(void) {
     lyte_set_blendmode(lytecore_state.blendmode);
 
 
-    lyte_push_matrix();
-    lytecore_state.tick_fn(lytecore_state.app_data, delta_time, win_w, win_h, resized, lytecore_state.fullscreen);
-    lyte_pop_matrix();
+    // lyte_push_matrix();
+    sgp_reset_transform();
+    sgp_scale(xscale, yscale);
+    lytecore_state.tick_fn(lytecore_state.app_data, delta_time, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen);
+    // lyte_pop_matrix();
 
     // NOTE: at this point only sgp state has been changed, and sg has not
     // so for optimization, we can decide if any drawing was done or not here

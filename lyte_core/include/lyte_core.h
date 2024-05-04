@@ -77,6 +77,9 @@ typedef struct lyte_CoreState {
     lyte_QuadSize window_margins;
     lyte_QuadSize window_paddings;
 
+    float hidpi_xscale;
+    float hidpi_yscale;
+
     float current_color[4];
 
     void *window; // GLFWwindow
