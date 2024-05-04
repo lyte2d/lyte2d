@@ -44,11 +44,11 @@ typedef struct lyte_InputState {
 
 static lyte_InputState inputstate = {0};
 
-
-static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-    inputstate.mouse_x = xpos;
-    inputstate.mouse_y = ypos;
-}
+// // instead of the event, we'll query glfw directly.
+// static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+//     inputstate.mouse_x = xpos;
+//     inputstate.mouse_y = ypos;
+// }
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (action == GLFW_PRESS) {
@@ -129,7 +129,7 @@ static void textinput_reset(void) {
 }
 
 int lyte_core_input_init(void) {
-    glfwSetCursorPosCallback(lytecore_state.window, cursor_position_callback);
+    // glfwSetCursorPosCallback(lytecore_state.window, cursor_position_callback);
     glfwSetMouseButtonCallback(lytecore_state.window, mouse_button_callback);
     glfwSetScrollCallback(lytecore_state.window, mouse_scroll_callback);
     glfwSetKeyCallback(lytecore_state.window, key_callback);
@@ -257,11 +257,17 @@ int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val) {
 }
 
 int lyte_get_mouse_x(int *val) {
+    double x, y;
+    glfwGetCursorPos(lytecore_state.window, &x, &y);
+    inputstate.mouse_x = x;
     *val = inputstate.mouse_x - lytecore_state.window_margins.left - lytecore_state.window_paddings.left;
     return 0;
 }
 
 int lyte_get_mouse_y(int *val) {
+    double x, y;
+    glfwGetCursorPos(lytecore_state.window, &x, &y);
+    inputstate.mouse_y = y;
     *val = inputstate.mouse_y - lytecore_state.window_margins.top - lytecore_state.window_paddings.top;
     return 0;
 }
