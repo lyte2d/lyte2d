@@ -69,6 +69,11 @@ SOKOL_GFX_API_DECL void sg_query_pixels(int x, int y, int w, int h, bool origin_
 // }
 
 static void _sg_gl_query_pixels(int x, int y, int w, int h, bool origin_top_left, void *pixels) {
+    (void)x; (void)y; (void)w; (void)h; (void)origin_top_left; (void)pixels;
+#ifdef _WIN32
+    printf("This API is not yet supported on Windows.\n");
+    exit(1);
+#else
     SOKOL_ASSERT(pixels);
     GLuint gl_fb;
     GLint dims[4];
@@ -86,6 +91,7 @@ static void _sg_gl_query_pixels(int x, int y, int w, int h, bool origin_top_left
     _SG_GL_CHECK_ERROR();
     glReadPixels(x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
     _SG_GL_CHECK_ERROR();
+#endif
 }
 
 // static void _sg_gl_update_texture_filter(_sg_image_t* img, sg_filter min_filter, sg_filter mag_filter) {

@@ -486,7 +486,7 @@ int lyte_capture_image(int x, int y, int w, int h, lyte_Image *val) {
 
     lyte_new_canvas(orig_w, orig_h, &cvs);
     _lyte_set_canvas(cvs, true);
-    // lyte_cls(0,0,0,0);
+    lyte_cls(0,0,0,0);
     lyte_scale(1/xscale, 1/yscale);
     lyte_draw_image(ii, 0, 0);
     lyte_reset_canvas();

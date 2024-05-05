@@ -82,7 +82,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     ./include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/
   PRIVATE
     ./src
     ${GLFW_SOURCE_DIR}/include
@@ -95,8 +95,8 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_sources(${PROJECT_NAME}
-PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/glad_gl.c
+# PUBLIC
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/glad_gl.c
 
 PRIVATE
     ./src/map.c

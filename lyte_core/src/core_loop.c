@@ -45,16 +45,19 @@ static inline void _tick_function(void) {
     float MT = lytecore_state.window_margins.top;
     float MB = lytecore_state.window_margins.bottom;
 
+    float xscale, yscale;
+
 #if defined(__EMSCRIPTEN__)
     win_w = emsc_width();
     win_h = emsc_height();
+    xscale = 1.0;
+    yscale = 1.0;
 #else
-        glfwGetFramebufferSize(lytecore_state.window, &win_w, &win_h);
+    glfwGetFramebufferSize(lytecore_state.window, &win_w, &win_h);
+    glfwGetWindowContentScale(lytecore_state.window , &xscale, &yscale);
 #endif
 
-    float xscale, yscale;
-    glfwGetWindowContentScale(lytecore_state.window , &xscale, &yscale);
-    // printf("Window scale: %f %f \n", xscale, yscale);
+
 
     lytecore_state.hidpi_xscale = xscale;
     lytecore_state.hidpi_yscale = yscale;
