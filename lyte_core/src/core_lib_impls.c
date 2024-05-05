@@ -10,6 +10,7 @@
 // #define SOKOL_VALIDATE_NON_FATAL
 
 #define SOKOL_IMPL
+#include <glad/gl.h>
 
 #include "sokol_glue.h"
 #include "sokol_fetch.h"
@@ -20,9 +21,13 @@
 #define GLFW_INCLUDE_ES3
 #else
 #define SOKOL_GLCORE33
+#define GLFW_INCLUDE_NONE
 #endif
 
+
+
 #include "sokol_gfx.h"
+
 
 
 #if defined(__APPLE__)

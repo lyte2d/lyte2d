@@ -82,6 +82,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     ./include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/
   PRIVATE
     ./src
     ${GLFW_SOURCE_DIR}/include
@@ -111,6 +112,8 @@ target_sources(${PROJECT_NAME} PRIVATE
     ./src/lyte_emsc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_image/stb_image.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src/raudio.c
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/glad_gl.c
 )
 
 
