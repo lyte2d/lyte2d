@@ -94,7 +94,11 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src
 )
 
-target_sources(${PROJECT_NAME} PRIVATE
+target_sources(${PROJECT_NAME}
+PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/glad_gl.c
+
+PRIVATE
     ./src/map.c
     ./src/utf8encode.c
     ./src/core_lib_impls.c
@@ -112,8 +116,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     ./src/lyte_emsc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_image/stb_image.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src/raudio.c
-    PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8/deps/glad_gl.c
 )
 
 
