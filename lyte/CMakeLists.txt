@@ -73,6 +73,11 @@ if( WIN_GUI )
     endif()
 endif()
 
+if(TOOLCHAIN_PREFIX STREQUAL x86_64-w64-mingw32)
+    message("==> Building statically with MinGW")
+    target_link_options(${PROJECT_NAME} PRIVATE "-static")
+endif()
+
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
