@@ -287,10 +287,19 @@ local function make_lyte_searcher(env)
     return loader_lyte
 end
 
+local function lyte_library_loader(modulename)
+    local filename = modulename:gsub("%.", "/")
+    modulename = filename:match("[^/]*$")
+
+    return package.loadlib(filename, "luaopen_" .. modulename), filename
+end
+
+
 
 table.insert(package.loaders, 2, lyte_lua_loader)
+table.insert(package.loaders, 3, lyte_library_loader)
+table.insert(package.loaders, 4, make_lyte_searcher(nil))
 
-table.insert(package.loaders, 3, make_lyte_searcher(nil))
 table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
 
 

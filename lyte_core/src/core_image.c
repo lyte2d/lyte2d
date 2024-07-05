@@ -174,6 +174,7 @@ int lyte_Image_cleanup(lyte_Image image) {
 int lyte_get_image_width(lyte_Image image, int *val) {
     ImageItem *imageitem = image;
     if (!imageitem) {
+        *val = 0;
         fprintf(stderr, "Image not found\n");
         return -1;
     }
@@ -184,6 +185,7 @@ int lyte_get_image_width(lyte_Image image, int *val) {
 int lyte_get_image_height(lyte_Image image, int *val) {
     ImageItem *imageitem = image;
     if (!imageitem) {
+        *val = 0;
         fprintf(stderr, "Image not found\n");
         return -1;
     }
@@ -286,7 +288,7 @@ int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, 
 static int _lyte_set_canvas(lyte_Image image, bool updown) {
     if (current_canvas) {
         fprintf(stderr, "Canvas was already set.");
-            return 1;
+        return 1;
     }
     ImageItem *imageitem = image;
     if (!imageitem) {
@@ -304,11 +306,17 @@ static int _lyte_set_canvas(lyte_Image image, bool updown) {
         sgp_scale(1.0, -1.0);
         sgp_translate(0, -imageitem->height);
     }
-    sgp_push_transform();
 
     lyte_set_blendmode(lytecore_state.blendmode);
 
     current_canvas = imageitem;
+
+    sg_pass canvas_pass = (sg_pass){.id = current_canvas->id_pass};
+    sg_pass_action pass_action; // = {0};
+    memset(&pass_action, 0, sizeof(sg_pass_action));
+    pass_action.colors[0].load_action = SG_LOADACTION_LOAD;
+    sg_begin_pass(canvas_pass, &pass_action);
+
     return 0;
 }
 
@@ -320,18 +328,8 @@ int lyte_set_canvas(lyte_Image image) {
 int lyte_reset_canvas(void) {
     if (!current_canvas) {
         fprintf(stderr, "No canvas was set.");
-            return 1;
+        return 1;
     }
-    sgp_pop_transform();
-    sg_pass canvas_pass = (sg_pass){ .id = current_canvas->id_pass };
-    sg_pass_action pass_action;
-    memset(&pass_action, 0, sizeof(sg_pass_action));
-    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
-    pass_action.colors[0].clear_value.r = 1.0f;
-    pass_action.colors[0].clear_value.g = 1.0f;
-    pass_action.colors[0].clear_value.b = 1.0f;
-    pass_action.colors[0].clear_value.a = 1.0f;
-    sg_begin_pass(canvas_pass, &pass_action);
     sgp_flush();
     sgp_end();
     sg_end_pass();

@@ -46,9 +46,13 @@ RUN apt-get -y --no-install-recommends install \
             libglu1-mesa-dev
 
 # wasm/emscripten
+# note: fixing emscripten to 3.1.59 as newer versions started to depend a newer glibc that exists in ubuntu 20.
+#       we'd like to continue to use ubuntu 18.0 version of glibc for linux builds.
+#       eventually we'll separate the builds out and this will stop being a problem.
 RUN git clone https://github.com/emscripten-core/emsdk.git \
     && cd emsdk \
     && git pull \
-    && ./emsdk install latest \
-    && ./emsdk activate latest \
+    && git checkout 3.1.59 \
+    && ./emsdk install 3.1.59 \
+    && ./emsdk activate 3.1.59 \
     && cd ..
