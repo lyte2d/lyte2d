@@ -65,7 +65,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 message("===> Adding FreeType")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/freetype ${CMAKE_CURRENT_BINARY_DIR}/freetype)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/freetype-2.13.2 ${CMAKE_CURRENT_BINARY_DIR}/freetype)
 target_link_libraries(${PROJECT_NAME} PRIVATE
   freetype
 )
