@@ -79,9 +79,11 @@ return function(NS)
 
     -- user functions (lyte.tick)
     for _, x in ipairs(NS.functions) do
-        if x.impl and x.impl == "user" then
-            if x.doc then out = out .. SPC .. "--- " .. x.doc .. "\n" end
-            out = out .. get_function_like(x, fullname(x.name), false, false, x.namespace) .. "\n"
+        if string.sub(x.name, 1, 8) ~= "cleanup_" then
+            if x.impl and x.impl == "user" then
+                if x.doc then out = out .. SPC .. "--- " .. x.doc .. "\n" end
+                out = out .. get_function_like(x, fullname(x.name), false, false, x.namespace) .. "\n"
+            end
         end
     end
 
@@ -90,9 +92,11 @@ return function(NS)
     out = out .. "\n" .. SPC .. "-- functions\n\n"
     -- non user functions
     for _, x in ipairs(NS.functions) do
-        if x.impl and x.impl ~= "user" then
-            if x.doc then out = out .. SPC .. "--- " .. x.doc .. "\n" end
-            out = out .. get_function_like(x, fullname(x.name), false, false, x.namespace) .. "\n"
+        if string.sub(x.name, 1, 8) ~= "cleanup_" then
+            if x.impl and x.impl ~= "user" then
+                if x.doc then out = out .. SPC .. "--- " .. x.doc .. "\n" end
+                out = out .. get_function_like(x, fullname(x.name), false, false, x.namespace) .. "\n"
+            end
         end
     end
 
@@ -109,8 +113,10 @@ return function(NS)
             out = out .. SPC2 .. "--- @field " ..  f.name .. " " .. typename .. mapping .. "\n"
         end
         for _, m in ipairs(x.methods) do
-            local mapping = get_function_like(m.mapto, m.name, true, false, x.namespace) -- .. " -- maps to: " .. m.mapto.name
-            out = out .. SPC2 ..  mapping .. "\n"
+            if m.name ~= "__gc" and m.name ~= "cleanup" then
+                local mapping = get_function_like(m.mapto, m.name, true, false, x.namespace) -- .. " -- maps to: " .. m.mapto.name
+                out = out .. SPC2 ..  mapping .. "\n"
+            end
         end
         out = out .. SPC2 .. fullname(x.name) .. " = " ..  fullname(x.name) .. " and " ..  fullname(x.name) .. " or {}\n"
     end

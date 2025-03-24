@@ -6,7 +6,7 @@
 #include <string.h>
 #include <math.h> // for sinf() and cosf()
 
-#include "lyte_core.h"
+#include "_internal.h"
 
 #include "sokol_gfx.h"
 #include "sokol_gp.h"

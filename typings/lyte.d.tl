@@ -33,8 +33,6 @@ global record lyte
     draw_ellipse: function(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
     -- Draw an ellipse border. 
     draw_ellipse_line: function(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
-    -- Free Image resources 
-    cleanup_image: function(image: lyte.Image)
     -- Load the image specified in the path. 
     load_image: function(image_path: string): lyte.Image
     -- Draw an image. Angle, scale and origin values are all optional. 
@@ -53,8 +51,6 @@ global record lyte
     reset_canvas: function()
     -- Check if the image was created as a canvas. 
     is_image_canvas: function(image: lyte.Image): boolean
-    -- Free ImageBatch resources 
-    cleanup_imagebatch: function(imagebatch: lyte.ImageBatch)
     -- Create an image batch 
     new_imagebatch: function(image: lyte.Image): lyte.ImageBatch
     -- Reset the image batch, remove all added rects. 
@@ -65,8 +61,6 @@ global record lyte
     get_imagebatch_rect_count: function(imagebatch: lyte.ImageBatch): int
     -- Draw the image batch. 
     draw_imagebatch: function(imagebatch: lyte.ImageBatch)
-    -- Free Font resources 
-    cleanup_font: function(font: lyte.Font)
     -- Load the font specified in the path, and set the initial size. 
     load_font: function(font_path: string, size: number): lyte.Font
     -- Set the effective font to be used in the drawing operations. 
@@ -155,8 +149,6 @@ global record lyte
     set_mastervolume: function(mastervolume: number)
     -- Get the master volume. 
     get_mastervolume: function(): number
-    -- Free Music resources 
-    cleanup_music: function(music: lyte.Music)
     -- Load the music specified in the path. 
     load_music: function(music_path: string): lyte.Music
     -- Play the music. 
@@ -187,8 +179,6 @@ global record lyte
     get_music_pan: function(music: lyte.Music): number
     -- Get the pitch of the given music object. 
     get_music_pitch: function(music: lyte.Music): number
-    -- Free Sound resources 
-    cleanup_sound: function(sound: lyte.Sound)
     -- Load the sound specified in the path. 
     load_sound: function(sound_path: string): lyte.Sound
     -- Clone the sound specified in the path. 
@@ -249,8 +239,6 @@ global record lyte
     set_filtermode: function(filtermode: lyte.FilterMode)
     -- Reset the filtermode value to its default value. 
     reset_filtermode: function()
-    -- Free ShaderBuilder resources 
-    cleanup_shaderbuilder: function(shaderbuilder: lyte.ShaderBuilder)
     -- Create a ShaderBuilder object. 
     new_shaderbuilder: function(): lyte.ShaderBuilder
     -- Add uniform definition to the shaderbuilder 
@@ -261,8 +249,6 @@ global record lyte
     shaderbuilder_fragment: function(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
     -- Add fragment to the shaderbuilder 
     shaderbuilder_build: function(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
-    -- Free Shader resources 
-    cleanup_shader: function(shader: lyte.Shader)
     -- Create a shader with given specification. 
     new_shader: function(shaderdef: lyte.ShaderDef): lyte.Shader
     -- Set the custom shader and use it for consequent calls. 
@@ -273,16 +259,12 @@ global record lyte
     set_shader_uniform: function(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
     -- Reset the specified uniform. 
     reset_shader_uniform: function(shader: lyte.Shader, uniform_name: string)
-    -- Cleanup the physics world (dynamics + collision). 
-    cleanup_world: function(world: lyte.World)
     -- Create a new physics world 
     new_world: function(): lyte.World
     -- Update the physics world (dynamics + collision). 
     update_world: function(world: lyte.World, step_size: number)
     -- Update the physics world gravity. 
     set_world_gravity: function(world: lyte.World, x: number, y: number)
-    -- Cleanup the physics collider. 
-    cleanup_collider: function(collider: lyte.Collider)
     -- Refresh the physics collider position (x, y) and angle 
     refresh_collider: function(collider: lyte.Collider)
     -- Create new circle collider (body + geom) in the given physics world. 
@@ -323,7 +305,6 @@ global record lyte
         width: int
         height: int
         is_canvas: boolean
-        __gc: function(image: lyte.Image)
     end
     -- ImageBatch type. 
     record ImageBatch
@@ -331,11 +312,9 @@ global record lyte
         add_rect: function(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
         draw: function(imagebatch: lyte.ImageBatch)
         reset: function(imagebatch: lyte.ImageBatch)
-        __gc: function(imagebatch: lyte.ImageBatch)
     end
     -- Font type. 
     record Font
-        __gc: function(font: lyte.Font)
     end
     -- Music type. 
     record Music
@@ -350,7 +329,6 @@ global record lyte
         resume: function(music: lyte.Music)
         stop: function(music: lyte.Music)
         seek: function(music: lyte.Music, secs: number)
-        __gc: function(music: lyte.Music)
     end
     -- Sound type. 
     record Sound
@@ -362,13 +340,11 @@ global record lyte
         play: function(sound: lyte.Sound)
         resume: function(sound: lyte.Sound)
         stop: function(sound: lyte.Sound)
-        __gc: function(sound: lyte.Sound)
     end
     -- Shader type 
     record Shader
         set: function(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
         reset: function(shader: lyte.Shader, uniform_name: string)
-        __gc: function(shader: lyte.Shader)
     end
     -- ShaderBuilder type 
     record ShaderBuilder
@@ -376,7 +352,6 @@ global record lyte
         vertex: function(shaderbuilder: lyte.ShaderBuilder, vertex_code: string)
         fragment: function(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
         build: function(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
-        __gc: function(shaderbuilder: lyte.ShaderBuilder)
     end
     -- Physics dynamics world + collision space. 
     record World
@@ -384,7 +359,6 @@ global record lyte
         set_gravity: function(world: lyte.World, x: number, y: number)
         new_circle_collider: function(world: lyte.World, radius: number, x: number, y: number, angle: number)
         new_rect_collider: function(world: lyte.World, width: number, height: number, x: number, y: number, angle: number)
-        __gc: function(world: lyte.World)
     end
     -- Physics body + mass + colliding geometry. 
     record Collider
@@ -402,7 +376,6 @@ global record lyte
         set_kinematic: function(collider: lyte.Collider, val: boolean)
         get_collision_count: function(collider: lyte.Collider): int
         get_collisions: function(collider: lyte.Collider): lyte.CollisionList
-        __gc: function(collider: lyte.Collider)
     end
     -- Collision information between two colliders 
     record Collision

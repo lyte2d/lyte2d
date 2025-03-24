@@ -5,24 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 
 #include "physfs.h"
 
 #include "raudio.h"
-
-#ifndef INIT_NUM_MUSICITEMS
-#define INIT_NUM_MUSICITEMS 10
-#endif
-
-#ifndef INIT_NUM_SOUNDDATAITEMS
-#define INIT_NUM_SOUNDDATAITEMS 40
-#endif
-
-#ifndef INIT_NUM_SOUNDITEMS
-#define INIT_NUM_SOUNDITEMS 80
-#endif
-
 
 typedef struct MusicItem {
     Music music;

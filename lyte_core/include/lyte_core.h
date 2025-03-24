@@ -12,22 +12,6 @@
 #include "lyte_emsc.h"
 #endif
 
-#define SGP_UNIFORM_CONTENT_SLOTS 1024
-#define SGP_TEXTURE_SLOTS 8
-
-
-#ifndef MIN
-#define MIN(a,b) (((a)<(b))?(a):(b))
-#endif
-
-#ifndef MAX
-#define MAX(a,b) (((a)>(b))?(a):(b))
-#endif
-
-#ifndef M_PI
-#define M_PI  3.14159265358979323846264f
-#endif
-
 
 // -------------------------
 // core data types
@@ -37,9 +21,6 @@ typedef struct lyte_Size {
     int width, height;
 } lyte_Size;
 
-typedef struct lyte_QuadSize {
-    int left, right, top, bottom;
-} lyte_QuadSize;
 
 typedef struct lyte_Args {
     int argc;
@@ -60,48 +41,10 @@ typedef struct lyte_Config {
     lyte_FilterMode filtermode;
 } lyte_Config;
 
-typedef struct lyte_CoreState {
-    lyte_Args args;
-
-    lyte_BlendMode default_blendmode;
-    lyte_FilterMode default_filtermode;
-
-    const char *exe_name;
-    const char *window_title;
-    lyte_Size window_size;
-    lyte_Size window_min_size;
-    bool fullscreen;
-    bool vsync;
-    lyte_BlendMode blendmode;
-    lyte_FilterMode filtermode;
-    lyte_QuadSize window_margins;
-    lyte_QuadSize window_paddings;
-
-    float hidpi_xscale;
-    float hidpi_yscale;
-
-    float current_color[4];
-
-    void *window; // GLFWwindow
-    void *monitor; // GLFWmonitor
-    void *mode; // GLFWVidMode
-
-    void *shader; // ShaderItem (internal)
-
-    bool do_quit; // set to true to quit the app
-    bool first_frame; // first frame of the tick function
-
-    lyte_TickFunction tick_fn;
-    void *app_data;
-
-} lyte_CoreState;
-
 
 // -------------------------
 // core state
 // -------------------------
-
-extern lyte_CoreState lytecore_state;
 
 int lyte_core_state_init(lyte_Config config);
 

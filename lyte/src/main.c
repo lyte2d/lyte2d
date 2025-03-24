@@ -472,7 +472,7 @@ static void tick_fn_loading(void *data, float dt, int width, int height, bool re
 // }
 
 
-static int init(void) {
+static int init(lyte_Config cfg) {
     int err = 0;
 
     err = lyte_core_filesystem_init();
@@ -521,7 +521,7 @@ static int init(void) {
     lyte_core_filesystem_add_path_local(localpath, "/");
     lyte_core_filesystem_add_path_memory("BOOT_ZIP", boot_zip, boot_zip_len, "/");
     _download_zip_handle = lyte_core_filesystem_fetch_file_async("APP_ZIP", archivepath, LYTE_APP_ZIP_MAX_SIZE, "/");
-    _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", lytecore_state.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
+    _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", cfg.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
 
     // removing this for bootzip experimentation
     // _registerloader(L, _lyte_loader, 2);
@@ -562,8 +562,7 @@ static int cleanup(void) {
 
 int main(int argc, char *argv[]) {
     int err  = 0;
-
-    err = lyte_core_state_init((lyte_Config){
+    lyte_Config cfg = (lyte_Config){
         .args.argc = argc,
         .args.argv = argv,
         .exe_name = argv[0],
@@ -574,9 +573,11 @@ int main(int argc, char *argv[]) {
         // .window_title = "lyte",
         .window_size = (lyte_Size){ .width=LYTE_INIT_WIDTH, .height=LYTE_INIT_HEIGHT },
         .window_min_size = (lyte_Size){ .width=0, .height=0 },
-    });
+    };
 
-    err = init();
+    err = lyte_core_state_init(cfg);
+
+    err = init(cfg);
 
     // err = lyte_core_window_init();
 

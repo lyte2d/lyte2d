@@ -1,6 +1,17 @@
 //
 // "implementation" includes for the header libraries
 
+#define STB_IMAGE_IMPLEMENTATION
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-function"
+#endif
+#include "stb_image.h"
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
+
+
 #define XLOG
 #define SOKOL_LOG(s) XLOG(s)
 
@@ -11,7 +22,7 @@
 
 #define SOKOL_IMPL
 
-#include "sokol_glue.h"
+// #include "sokol_glue.h"
 #include "sokol_fetch.h"
 #include "sokol_args.h"
 
@@ -19,7 +30,7 @@
 #define SOKOL_GLES3
 #define GLFW_INCLUDE_ES3
 #else
-#define SOKOL_GLCORE33
+#define SOKOL_GLCORE
 #endif
 
 #include "sokol_gfx.h"

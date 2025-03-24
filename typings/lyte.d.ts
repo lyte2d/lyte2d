@@ -33,8 +33,6 @@ declare namespace lyte {
     function draw_ellipse(dest_x: number, dest_y: number, radius_x: number, radius_y: number): void
     // Draw an ellipse border. 
     function draw_ellipse_line(dest_x: number, dest_y: number, radius_x: number, radius_y: number): void
-    // Free Image resources 
-    function cleanup_image(image: lyte.Image): void
     // Load the image specified in the path. 
     function load_image(image_path: string): lyte.Image
     // Draw an image. Angle, scale and origin values are all optional. 
@@ -53,8 +51,6 @@ declare namespace lyte {
     function reset_canvas(): void
     // Check if the image was created as a canvas. 
     function is_image_canvas(image: lyte.Image): boolean
-    // Free ImageBatch resources 
-    function cleanup_imagebatch(imagebatch: lyte.ImageBatch): void
     // Create an image batch 
     function new_imagebatch(image: lyte.Image): lyte.ImageBatch
     // Reset the image batch, remove all added rects. 
@@ -65,8 +61,6 @@ declare namespace lyte {
     function get_imagebatch_rect_count(imagebatch: lyte.ImageBatch): number
     // Draw the image batch. 
     function draw_imagebatch(imagebatch: lyte.ImageBatch): void
-    // Free Font resources 
-    function cleanup_font(font: lyte.Font): void
     // Load the font specified in the path, and set the initial size. 
     function load_font(font_path: string, size: number): lyte.Font
     // Set the effective font to be used in the drawing operations. 
@@ -155,8 +149,6 @@ declare namespace lyte {
     function set_mastervolume(mastervolume: number): void
     // Get the master volume. 
     function get_mastervolume(): number
-    // Free Music resources 
-    function cleanup_music(music: lyte.Music): void
     // Load the music specified in the path. 
     function load_music(music_path: string): lyte.Music
     // Play the music. 
@@ -187,8 +179,6 @@ declare namespace lyte {
     function get_music_pan(music: lyte.Music): number
     // Get the pitch of the given music object. 
     function get_music_pitch(music: lyte.Music): number
-    // Free Sound resources 
-    function cleanup_sound(sound: lyte.Sound): void
     // Load the sound specified in the path. 
     function load_sound(sound_path: string): lyte.Sound
     // Clone the sound specified in the path. 
@@ -249,8 +239,6 @@ declare namespace lyte {
     function set_filtermode(filtermode: lyte.FilterMode): void
     // Reset the filtermode value to its default value. 
     function reset_filtermode(): void
-    // Free ShaderBuilder resources 
-    function cleanup_shaderbuilder(shaderbuilder: lyte.ShaderBuilder): void
     // Create a ShaderBuilder object. 
     function new_shaderbuilder(): lyte.ShaderBuilder
     // Add uniform definition to the shaderbuilder 
@@ -261,8 +249,6 @@ declare namespace lyte {
     function shaderbuilder_fragment(shaderbuilder: lyte.ShaderBuilder, fragment_code: string): void
     // Add fragment to the shaderbuilder 
     function shaderbuilder_build(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
-    // Free Shader resources 
-    function cleanup_shader(shader: lyte.Shader): void
     // Create a shader with given specification. 
     function new_shader(shaderdef: lyte.ShaderDef): lyte.Shader
     // Set the custom shader and use it for consequent calls. 
@@ -273,16 +259,12 @@ declare namespace lyte {
     function set_shader_uniform(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue): void
     // Reset the specified uniform. 
     function reset_shader_uniform(shader: lyte.Shader, uniform_name: string): void
-    // Cleanup the physics world (dynamics + collision). 
-    function cleanup_world(world: lyte.World): void
     // Create a new physics world 
     function new_world(): lyte.World
     // Update the physics world (dynamics + collision). 
     function update_world(world: lyte.World, step_size: number): void
     // Update the physics world gravity. 
     function set_world_gravity(world: lyte.World, x: number, y: number): void
-    // Cleanup the physics collider. 
-    function cleanup_collider(collider: lyte.Collider): void
     // Refresh the physics collider position (x, y) and angle 
     function refresh_collider(collider: lyte.Collider): void
     // Create new circle collider (body + geom) in the given physics world. 
@@ -323,7 +305,6 @@ declare namespace lyte {
         width: number
         height: number
         is_canvas: boolean
-        __gc: (image: lyte.Image) => void
     }
     // ImageBatch type. 
     type ImageBatch = {
@@ -331,11 +312,9 @@ declare namespace lyte {
         add_rect: (imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number) => void
         draw: (imagebatch: lyte.ImageBatch) => void
         reset: (imagebatch: lyte.ImageBatch) => void
-        __gc: (imagebatch: lyte.ImageBatch) => void
     }
     // Font type. 
     type Font = {
-        __gc: (font: lyte.Font) => void
     }
     // Music type. 
     type Music = {
@@ -350,7 +329,6 @@ declare namespace lyte {
         resume: (music: lyte.Music) => void
         stop: (music: lyte.Music) => void
         seek: (music: lyte.Music, secs: number) => void
-        __gc: (music: lyte.Music) => void
     }
     // Sound type. 
     type Sound = {
@@ -362,13 +340,11 @@ declare namespace lyte {
         play: (sound: lyte.Sound) => void
         resume: (sound: lyte.Sound) => void
         stop: (sound: lyte.Sound) => void
-        __gc: (sound: lyte.Sound) => void
     }
     // Shader type 
     type Shader = {
         set: (shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue) => void
         reset: (shader: lyte.Shader, uniform_name: string) => void
-        __gc: (shader: lyte.Shader) => void
     }
     // ShaderBuilder type 
     type ShaderBuilder = {
@@ -376,7 +352,6 @@ declare namespace lyte {
         vertex: (shaderbuilder: lyte.ShaderBuilder, vertex_code: string) => void
         fragment: (shaderbuilder: lyte.ShaderBuilder, fragment_code: string) => void
         build: (shaderbuilder: lyte.ShaderBuilder) => lyte.Shader
-        __gc: (shaderbuilder: lyte.ShaderBuilder) => void
     }
     // Physics dynamics world + collision space. 
     type World = {
@@ -384,7 +359,6 @@ declare namespace lyte {
         set_gravity: (world: lyte.World, x: number, y: number) => void
         new_circle_collider: (world: lyte.World, radius: number, x: number, y: number, angle: number) => void
         new_rect_collider: (world: lyte.World, width: number, height: number, x: number, y: number, angle: number) => void
-        __gc: (world: lyte.World) => void
     }
     // Physics body + mass + colliding geometry. 
     type Collider = {
@@ -402,7 +376,6 @@ declare namespace lyte {
         set_kinematic: (collider: lyte.Collider, val: boolean) => void
         get_collision_count: (collider: lyte.Collider) => number
         get_collisions: (collider: lyte.Collider) => lyte.CollisionList
-        __gc: (collider: lyte.Collider) => void
     }
     // Collision information between two colliders 
     type Collision = {

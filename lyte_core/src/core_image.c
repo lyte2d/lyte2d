@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 
 #include "physfs.h"
 
@@ -25,7 +25,7 @@ typedef struct ImageItem {
     int height;
     bool is_canvas; // if true, values below should also be set
     uint32_t id_depth_image;
-    uint32_t id_pass;
+    uint32_t id_attach;
 } ImageItem;
 
 static ImageItem *current_canvas = NULL;
@@ -130,15 +130,15 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
     }
     c->id_depth_image = fb_depth_image.id;
     // create frame buffer pass
-    sg_pass_desc pass_desc = {0};
-    pass_desc.color_attachments[0].image = fb_image;
-    pass_desc.depth_stencil_attachment.image = fb_depth_image;
-    sg_pass fb_pass = sg_make_pass(&pass_desc);
-    if(sg_query_pass_state(fb_pass) != SG_RESOURCESTATE_VALID) {
-        fprintf(stderr, "Failed to create frame buffer pass\n");
+    sg_attachments_desc attch_desc = {0};
+    attch_desc.colors[0].image = fb_image;
+    attch_desc.depth_stencil.image = fb_depth_image;
+    sg_attachments fb_attach = sg_make_attachments(&attch_desc);
+    if(sg_query_attachments_state(fb_attach) != SG_RESOURCESTATE_VALID) {
+        fprintf(stderr, "Failed to create frame attachments\n");
         return 3;
     }
-    c->id_pass = fb_pass.id;
+    c->id_attach = fb_attach.id;
     c->ref = 1;
 
     // img = (lyte_Image *)&c;
@@ -156,7 +156,7 @@ static inline void _free_imageitem(ImageItem *imageitem) {
     if (imageitem->ref == 0) {
         if (imageitem->is_canvas) {
             sg_destroy_image((sg_image){.id = imageitem->id_depth_image});
-            sg_destroy_pass((sg_pass){.id = imageitem->id_pass});
+            sg_destroy_attachments((sg_attachments){.id = imageitem->id_attach});
         }
         sg_destroy_image((sg_image){.id = imageitem->handle});
         sg_destroy_sampler((sg_sampler){.id = imageitem->sampler_handle});
@@ -311,11 +311,14 @@ static int _lyte_set_canvas(lyte_Image image, bool updown) {
 
     current_canvas = imageitem;
 
-    sg_pass canvas_pass = (sg_pass){.id = current_canvas->id_pass};
-    sg_pass_action pass_action; // = {0};
-    memset(&pass_action, 0, sizeof(sg_pass_action));
-    pass_action.colors[0].load_action = SG_LOADACTION_LOAD;
-    sg_begin_pass(canvas_pass, &pass_action);
+    // sg_pass canvas_pass = (sg_pass){.id = current_canvas->id_pass};
+    sg_pass canvas_pass = {0};
+    sg_pass_action pass_action = {0};
+    // memset(&pass_action, 0, sizeof(sg_pass_action));
+    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
+    canvas_pass.action = pass_action;
+    canvas_pass.attachments = (sg_attachments){.id = current_canvas->id_attach};
+    sg_begin_pass(&canvas_pass);
 
     return 0;
 }

@@ -62,11 +62,13 @@ return function(NS)
 
     out = out .. "\n" .. SPC .. "// functions\n\n"
     for _, x in ipairs(NS.functions) do
-        local fnmap = x.fnmap or ""
-        -- if x.doc then out = out .. SPC .. "// " .. x.doc .. " [impl: "  ..  x.impl .. "/" .. fnmap .. "]\n"
-        if x.doc then out = out .. SPC .. "// " .. x.doc .. "\n"
+        if string.sub(x.name, 1, 8) ~= "cleanup_" then
+            local fnmap = x.fnmap or ""
+            -- if x.doc then out = out .. SPC .. "// " .. x.doc .. " [impl: "  ..  x.impl .. "/" .. fnmap .. "]\n"
+            if x.doc then out = out .. SPC .. "// " .. x.doc .. "\n"
+            end
+            out = out .. SPC .. get_function_like(x, x.name, false, false, x.namespace) .. "\n"
         end
-        out = out .. SPC .. get_function_like(x, x.name, false, false, x.namespace) .. "\n"
     end
 
     out = out .. "\n" .. SPC .. "// records\n\n"
@@ -82,8 +84,10 @@ return function(NS)
             out = out .. SPC2 .. f.name .. ": " .. typename .. mapping .. "\n"
         end
         for _, m in ipairs(x.methods) do
-            local mapping = get_function_like(m.mapto, m.name, true, false, m.namespace) -- .. " // maps to: " .. m.mapto.name
-            out = out .. SPC2 .. m.name .. ": " ..  mapping .. "\n"
+            if m.name ~= "__gc" and m.name ~= "cleanup" then
+                local mapping = get_function_like(m.mapto, m.name, true, false, m.namespace) -- .. " // maps to: " .. m.mapto.name
+                out = out .. SPC2 .. m.name .. ": " ..  mapping .. "\n"
+            end
         end
         out = out .. SPC .. "}\n"
     end

@@ -50,9 +50,6 @@
 --- Draw an ellipse border. 
 --- @type fun(dest_x: number, dest_y: number, radius_x: number, radius_y: number)
     lyte.draw_ellipse_line = lyte.draw_ellipse_line and lyte.draw_ellipse_line or function() end
---- Free Image resources 
---- @type fun(image: lyte.Image)
-    lyte.cleanup_image = lyte.cleanup_image and lyte.cleanup_image or function() end
 --- Load the image specified in the path. 
 --- @type fun(image_path: string): lyte.Image
     lyte.load_image = lyte.load_image and lyte.load_image or function() end
@@ -80,9 +77,6 @@
 --- Check if the image was created as a canvas. 
 --- @type fun(image: lyte.Image): boolean
     lyte.is_image_canvas = lyte.is_image_canvas and lyte.is_image_canvas or function() end
---- Free ImageBatch resources 
---- @type fun(imagebatch: lyte.ImageBatch)
-    lyte.cleanup_imagebatch = lyte.cleanup_imagebatch and lyte.cleanup_imagebatch or function() end
 --- Create an image batch 
 --- @type fun(image: lyte.Image): lyte.ImageBatch
     lyte.new_imagebatch = lyte.new_imagebatch and lyte.new_imagebatch or function() end
@@ -98,9 +92,6 @@
 --- Draw the image batch. 
 --- @type fun(imagebatch: lyte.ImageBatch)
     lyte.draw_imagebatch = lyte.draw_imagebatch and lyte.draw_imagebatch or function() end
---- Free Font resources 
---- @type fun(font: lyte.Font)
-    lyte.cleanup_font = lyte.cleanup_font and lyte.cleanup_font or function() end
 --- Load the font specified in the path, and set the initial size. 
 --- @type fun(font_path: string, size: number): lyte.Font
     lyte.load_font = lyte.load_font and lyte.load_font or function() end
@@ -233,9 +224,6 @@
 --- Get the master volume. 
 --- @type fun(): number
     lyte.get_mastervolume = lyte.get_mastervolume and lyte.get_mastervolume or function() end
---- Free Music resources 
---- @type fun(music: lyte.Music)
-    lyte.cleanup_music = lyte.cleanup_music and lyte.cleanup_music or function() end
 --- Load the music specified in the path. 
 --- @type fun(music_path: string): lyte.Music
     lyte.load_music = lyte.load_music and lyte.load_music or function() end
@@ -281,9 +269,6 @@
 --- Get the pitch of the given music object. 
 --- @type fun(music: lyte.Music): number
     lyte.get_music_pitch = lyte.get_music_pitch and lyte.get_music_pitch or function() end
---- Free Sound resources 
---- @type fun(sound: lyte.Sound)
-    lyte.cleanup_sound = lyte.cleanup_sound and lyte.cleanup_sound or function() end
 --- Load the sound specified in the path. 
 --- @type fun(sound_path: string): lyte.Sound
     lyte.load_sound = lyte.load_sound and lyte.load_sound or function() end
@@ -374,9 +359,6 @@
 --- Reset the filtermode value to its default value. 
 --- @type fun()
     lyte.reset_filtermode = lyte.reset_filtermode and lyte.reset_filtermode or function() end
---- Free ShaderBuilder resources 
---- @type fun(shaderbuilder: lyte.ShaderBuilder)
-    lyte.cleanup_shaderbuilder = lyte.cleanup_shaderbuilder and lyte.cleanup_shaderbuilder or function() end
 --- Create a ShaderBuilder object. 
 --- @type fun(): lyte.ShaderBuilder
     lyte.new_shaderbuilder = lyte.new_shaderbuilder and lyte.new_shaderbuilder or function() end
@@ -392,9 +374,6 @@
 --- Add fragment to the shaderbuilder 
 --- @type fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
     lyte.shaderbuilder_build = lyte.shaderbuilder_build and lyte.shaderbuilder_build or function() end
---- Free Shader resources 
---- @type fun(shader: lyte.Shader)
-    lyte.cleanup_shader = lyte.cleanup_shader and lyte.cleanup_shader or function() end
 --- Create a shader with given specification. 
 --- @type fun(shaderdef: lyte.ShaderDef): lyte.Shader
     lyte.new_shader = lyte.new_shader and lyte.new_shader or function() end
@@ -410,9 +389,6 @@
 --- Reset the specified uniform. 
 --- @type fun(shader: lyte.Shader, uniform_name: string)
     lyte.reset_shader_uniform = lyte.reset_shader_uniform and lyte.reset_shader_uniform or function() end
---- Cleanup the physics world (dynamics + collision). 
---- @type fun(world: lyte.World)
-    lyte.cleanup_world = lyte.cleanup_world and lyte.cleanup_world or function() end
 --- Create a new physics world 
 --- @type fun(): lyte.World
     lyte.new_world = lyte.new_world and lyte.new_world or function() end
@@ -422,9 +398,6 @@
 --- Update the physics world gravity. 
 --- @type fun(world: lyte.World, x: number, y: number)
     lyte.set_world_gravity = lyte.set_world_gravity and lyte.set_world_gravity or function() end
---- Cleanup the physics collider. 
---- @type fun(collider: lyte.Collider)
-    lyte.cleanup_collider = lyte.cleanup_collider and lyte.cleanup_collider or function() end
 --- Refresh the physics collider position (x, y) and angle 
 --- @type fun(collider: lyte.Collider)
     lyte.refresh_collider = lyte.refresh_collider and lyte.refresh_collider or function() end
@@ -478,7 +451,6 @@
     --- @field width int
     --- @field height int
     --- @field is_canvas boolean
-    --- @field __gc fun(image: lyte.Image)
     lyte.Image = lyte.Image and lyte.Image or {}
 -- ImageBatch type. 
 --- @class lyte.ImageBatch
@@ -486,11 +458,9 @@
     --- @field add_rect fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     --- @field draw fun(imagebatch: lyte.ImageBatch)
     --- @field reset fun(imagebatch: lyte.ImageBatch)
-    --- @field __gc fun(imagebatch: lyte.ImageBatch)
     lyte.ImageBatch = lyte.ImageBatch and lyte.ImageBatch or {}
 -- Font type. 
 --- @class lyte.Font
-    --- @field __gc fun(font: lyte.Font)
     lyte.Font = lyte.Font and lyte.Font or {}
 -- Music type. 
 --- @class lyte.Music
@@ -505,7 +475,6 @@
     --- @field resume fun(music: lyte.Music)
     --- @field stop fun(music: lyte.Music)
     --- @field seek fun(music: lyte.Music, secs: number)
-    --- @field __gc fun(music: lyte.Music)
     lyte.Music = lyte.Music and lyte.Music or {}
 -- Sound type. 
 --- @class lyte.Sound
@@ -517,13 +486,11 @@
     --- @field play fun(sound: lyte.Sound)
     --- @field resume fun(sound: lyte.Sound)
     --- @field stop fun(sound: lyte.Sound)
-    --- @field __gc fun(sound: lyte.Sound)
     lyte.Sound = lyte.Sound and lyte.Sound or {}
 -- Shader type 
 --- @class lyte.Shader
     --- @field set fun(shader: lyte.Shader, uniform_name: string, uniform_value: lyte.ShaderUniformValue)
     --- @field reset fun(shader: lyte.Shader, uniform_name: string)
-    --- @field __gc fun(shader: lyte.Shader)
     lyte.Shader = lyte.Shader and lyte.Shader or {}
 -- ShaderBuilder type 
 --- @class lyte.ShaderBuilder
@@ -531,7 +498,6 @@
     --- @field vertex fun(shaderbuilder: lyte.ShaderBuilder, vertex_code: string)
     --- @field fragment fun(shaderbuilder: lyte.ShaderBuilder, fragment_code: string)
     --- @field build fun(shaderbuilder: lyte.ShaderBuilder): lyte.Shader
-    --- @field __gc fun(shaderbuilder: lyte.ShaderBuilder)
     lyte.ShaderBuilder = lyte.ShaderBuilder and lyte.ShaderBuilder or {}
 -- Physics dynamics world + collision space. 
 --- @class lyte.World
@@ -539,7 +505,6 @@
     --- @field set_gravity fun(world: lyte.World, x: number, y: number)
     --- @field new_circle_collider fun(world: lyte.World, radius: number, x: number, y: number, angle: number)
     --- @field new_rect_collider fun(world: lyte.World, width: number, height: number, x: number, y: number, angle: number)
-    --- @field __gc fun(world: lyte.World)
     lyte.World = lyte.World and lyte.World or {}
 -- Physics body + mass + colliding geometry. 
 --- @class lyte.Collider
@@ -557,7 +522,6 @@
     --- @field set_kinematic fun(collider: lyte.Collider, val: boolean)
     --- @field get_collision_count fun(collider: lyte.Collider): int
     --- @field get_collisions fun(collider: lyte.Collider): lyte.CollisionList
-    --- @field __gc fun(collider: lyte.Collider)
     lyte.Collider = lyte.Collider and lyte.Collider or {}
 -- Collision information between two colliders 
 --- @class lyte.Collision
@@ -1216,6 +1180,18 @@
 --- Get the Body associated with the Geom. 
 --- @type fun(geom: userdata): userdata
     lyte_core.geom_get_body = lyte_core.geom_get_body and lyte_core.geom_get_body or function() end
+--- Set geom's position. 
+--- @type fun(geom: userdata, x: number, y: number)
+    lyte_core.geom_set_position = lyte_core.geom_set_position and lyte_core.geom_set_position or function() end
+--- Get geom's position. 
+--- @type fun(geom: userdata): number, number
+    lyte_core.geom_get_position = lyte_core.geom_get_position and lyte_core.geom_get_position or function() end
+--- Set geom's rotation (angle). 
+--- @type fun(geom: userdata, angle: number)
+    lyte_core.geom_set_rotation = lyte_core.geom_set_rotation and lyte_core.geom_set_rotation or function() end
+--- Get geom's rotation (angle). 
+--- @type fun(geom: userdata): number
+    lyte_core.geom_get_rotation = lyte_core.geom_get_rotation and lyte_core.geom_get_rotation or function() end
 --- Set the category bit for the Geom. Between 0 and 63. 
 --- @type fun(geom: userdata, category_bit: int)
     lyte_core.geom_set_category_bit = lyte_core.geom_set_category_bit and lyte_core.geom_set_category_bit or function() end

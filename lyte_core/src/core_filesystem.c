@@ -8,7 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 #include "map.h"
 
 #include "physfs.h"

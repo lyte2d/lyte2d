@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 
 #include "sokol_gfx.h"
 #include "sokol_gp.h"

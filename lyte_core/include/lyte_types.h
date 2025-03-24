@@ -14,7 +14,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-
 typedef void *lyte_Image;
 typedef void *lyte_ImageBatch;
 typedef void *lyte_Font;
@@ -23,6 +22,7 @@ typedef void *lyte_Sound;
 typedef void *lyte_ShaderBuilder;
 typedef void *lyte_Shader;
 
+
 typedef void *lyte_World;
 typedef void *lyte_Body;
 typedef void *lyte_Space;
@@ -30,7 +30,8 @@ typedef void *lyte_JointGroup;
 typedef void *lyte_Geom;
 typedef void *lyte_Joint;
 
-
+// TODO: remove
+struct M{ int x, y; };
 
 typedef struct lyte_FloatVec4 { float data[4]; size_t count; } lyte_FloatVec4;
 typedef struct lyte_ShaderUniformValue {

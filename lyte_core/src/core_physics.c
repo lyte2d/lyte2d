@@ -5,7 +5,7 @@
 // #include <stdlib.h>
 // #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 
 // http://ode.org/wiki/index.php/Manual
 #include <ode/ode.h>

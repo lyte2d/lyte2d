@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -116,8 +116,10 @@ static inline void _tick_function(void) {
     // this way, it can be kind of like a non-immediate mode gui for app that like it
 
     // PERF_BEGIN();
-    sg_pass_action pass_action = {0};
-    sg_begin_default_pass(&pass_action, win_w, win_h);
+    sg_pass pass = {0};
+    pass.swapchain.width = win_w;
+    pass.swapchain.height = win_h;
+    sg_begin_pass(&pass);
     sgp_flush();
     sgp_end();
     sg_end_pass();

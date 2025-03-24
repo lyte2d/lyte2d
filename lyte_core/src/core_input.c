@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 #include "utf8encode.h"
 
 #define GLFW_INCLUDE_NONE

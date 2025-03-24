@@ -5,9 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lyte_core.h"
+#include "_internal.h"
 
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include "sokol_gfx.h"

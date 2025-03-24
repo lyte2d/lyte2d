@@ -6,10 +6,11 @@ on:
       - rel
     tags:
       - test
+
 jobs:
   build-with-docker:
     permissions: write-all
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Lyte2D
         uses: actions/checkout@v3
@@ -21,14 +22,46 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
+          file: ./etc/Dockerfile
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
           tags: more/builder:latest
 
       - name: Official Lyte2D build (via docker)
-        run: bash ./docker_fullbuild.sh
+        run: bash ./etc/official_docker_run_fullbuild.sh
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: out/rel/**/*
+
+  create-github-release:
+    needs: [build-with-docker]
+    permissions: write-all
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Lyte2D
+        uses: actions/checkout@v3
+
+      - name: Set version from version.txt
+        run: echo "VERSION=$(cat version.txt | tr -d '\n')" >> $GITHUB_ENV
+
+      - name: Debug VERSION
+        run: echo "The version is $VERSION"  # Optional: helps verify VERSION is set
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: out/rel
+
+      - name: Display structure of downloaded files
+        run: ls -R
 
       - name: Create github release for Lyte2D
         uses: marvinpinto/action-automatic-releases@v1.2.1
@@ -36,5 +69,5 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: true
           draft: true
-          automatic_release_tag: v0
+          automatic_release_tag: ${{ env.VERSION }}
           files: out/rel/zip/*.zip

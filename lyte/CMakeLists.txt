@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
+
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 if( WIN_GUI )
     project("lyte_gui"  LANGUAGES C )
@@ -7,10 +8,11 @@ else()
     project("lyte"  LANGUAGES C )
 endif()
 
+include(../etc/basics.cmake)
+
 message("===============> Project: ${PROJECT_NAME}")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS on)
-
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED true)
@@ -23,8 +25,6 @@ if(APPLE)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
 endif()
 
-
-
 add_executable(${PROJECT_NAME})
 
 if(CMAKE_BUILD_TYPE MATCHES "Release" OR CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
@@ -33,7 +33,6 @@ else()
   set(DEBUG ON)
   message("===> [Debug] " ${PROJECT_NAME} " : Debug mode: " ${CMAKE_BUILD_TYPE})
 endif()
-
 
 if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     message("===> *** EMSCRIPTEN PROJECT: " ${PROJECT_NAME})
@@ -78,7 +77,6 @@ if(TOOLCHAIN_PREFIX STREQUAL x86_64-w64-mingw32)
     target_link_options(${PROJECT_NAME} PRIVATE "-static")
 endif()
 
-
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
@@ -94,11 +92,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_USE_WIN32_THREADS_INIT 0)
     set(CMAKE_USE_PTHREADS_INIT 1)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
-
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        GL
-        GLU
-    )
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
