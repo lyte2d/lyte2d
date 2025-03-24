@@ -89,8 +89,8 @@ target_include_directories(${PROJECT_NAME}
     ${GLFW_SOURCE_DIR}/dependencies
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_gp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_image
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash_b5ddc97/src
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src
 )
 
@@ -114,7 +114,7 @@ PRIVATE
     ./src/core_state.c
     ./src/core_window.c
     ./src/lyte_emsc.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_image/stb_image.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b/mg_stb_image.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src/raudio.c
 )
 
