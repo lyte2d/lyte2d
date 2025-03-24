@@ -79,6 +79,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ODE
 )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE RAUDIO_STANDALONE)
+target_compile_definitions(${PROJECT_NAME} PRIVATE RAUDIO_NOLOG)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_MODULE_RAUDIO)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_FILEFORMAT_WAV)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_FILEFORMAT_OGG)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_FILEFORMAT_MP3)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_FILEFORMAT_FLAC)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_FILEFORMAT_XM)
+target_compile_definitions(${PROJECT_NAME} PRIVATE SUPPORT_FILEFORMAT_MOD)
+
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     ./include
@@ -91,7 +101,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_gp
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash_b5ddc97/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio_fe56fa7/src
 )
 
 target_sources(${PROJECT_NAME}
@@ -115,7 +125,7 @@ PRIVATE
     ./src/core_window.c
     ./src/lyte_emsc.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b/mg_stb_image.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio/src/raudio.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/raudio_fe56fa7/src/raudio.c
 )
 
 

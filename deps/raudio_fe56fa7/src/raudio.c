@@ -69,37 +69,6 @@
 *
 **********************************************************************************************/
 
-// MG:
-#if !defined(RAUDIO_STANDALONE)
-#define RAUDIO_STANDALONE
-#endif
-#if !defined(SUPPORT_MODULE_RAUDIO)
-#define SUPPORT_MODULE_RAUDIO
-#endif
-#define RAUDIO_STANDALONE
-#define SUPPORT_FILEFORMAT_WAV
-#define SUPPORT_FILEFORMAT_OGG
-#define SUPPORT_FILEFORMAT_MP3
-#undef SUPPORT_FILEFORMAT_FLAC
-#undef SUPPORT_FILEFORMAT_XM
-#undef SUPPORT_FILEFORMAT_MOD
-
-
-#define RAUDIO_NOLOG // mg: no logging from raudio
-
-static int raudio_nop(const char *const s, ...) {
-    return 0;
-}
-
-// MG: moved from raudio.c
-#if defined(RAUDIO_STANDALONE)
-    #ifndef RAUDIO_NOLOG
-        #define TRACELOG(level, ...)    printf(__VA_ARGS__)
-    #else
-        #define TRACELOG(level, ...)    raudio_nop(__VA_ARGS__)
-    #endif
-#endif
-
 #if defined(RAUDIO_STANDALONE)
     #include "raudio.h"
 #else
@@ -973,13 +942,13 @@ Sound LoadSoundAlias(Sound source)
     if (source.stream.buffer->data != NULL)
     {
         AudioBuffer *audioBuffer = LoadAudioBuffer(AUDIO_DEVICE_FORMAT, AUDIO_DEVICE_CHANNELS, AUDIO.System.device.sampleRate, 0, AUDIO_BUFFER_USAGE_STATIC);
-
+        
         if (audioBuffer == NULL)
         {
             TRACELOG(LOG_WARNING, "SOUND: Failed to create buffer");
             return sound; // Early return to avoid dereferencing the audioBuffer null pointer
         }
-
+        
         audioBuffer->sizeInFrames = source.stream.buffer->sizeInFrames;
         audioBuffer->volume = source.stream.buffer->volume;
         audioBuffer->data = source.stream.buffer->data;
