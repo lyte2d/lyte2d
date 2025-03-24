@@ -30,7 +30,7 @@ else()
     set(GLFW_BUILD_DOCS OFF)
     set(GLFW_INSTALL ON)
     set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.3.8 ${CMAKE_CURRENT_BINARY_DIR}/glfw)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.4 ${CMAKE_CURRENT_BINARY_DIR}/glfw)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
         glfw
