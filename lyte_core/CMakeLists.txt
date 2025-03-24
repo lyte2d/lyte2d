@@ -59,7 +59,7 @@ set(PHYSFS_ARCHIVE_ISO9660 OFF)
 set(PHYSFS_ARCHIVE_VDF OFF)
 set(PHYSFS_ARCHIVE_ZIP ON)
 set(PHYSFS_ARCHIVE_7Z ON)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/physfs ${CMAKE_CURRENT_BINARY_DIR}/physfs)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/physfs-3.2.0 ${CMAKE_CURRENT_BINARY_DIR}/physfs)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     physfs-static
 )

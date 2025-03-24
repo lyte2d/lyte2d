@@ -9,7 +9,7 @@
 #  compile, using preprocessor checks for platform-specific bits instead of
 #  testing in here.
 
-set(PHYSFS_VERSION 3.3.0)
+set(PHYSFS_VERSION 3.2.0)
 
 cmake_minimum_required(VERSION 3.0)
 
@@ -51,7 +51,7 @@ if(HAIKU)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "WindowsPhone" OR CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
-    set(WINRT OFF)
+    set(WINRT TRUE)
 endif()
 
 if(WINRT)
@@ -104,58 +104,58 @@ set(PHYSFS_SRCS
 # These are (mostly) on by default now, so these options are only useful for
 #  disabling them.
 
-option(PHYSFS_ARCHIVE_ZIP "Enable ZIP support" OFF)
+option(PHYSFS_ARCHIVE_ZIP "Enable ZIP support" TRUE)
 if(NOT PHYSFS_ARCHIVE_ZIP)
     add_definitions(-DPHYSFS_SUPPORTS_ZIP=0)
 endif()
 
-option(PHYSFS_ARCHIVE_7Z "Enable 7zip support" OFF)
+option(PHYSFS_ARCHIVE_7Z "Enable 7zip support" TRUE)
 if(NOT PHYSFS_ARCHIVE_7Z)
     add_definitions(-DPHYSFS_SUPPORTS_7Z=0)
 endif()
 
-option(PHYSFS_ARCHIVE_GRP "Enable Build Engine GRP support" OFF)
+option(PHYSFS_ARCHIVE_GRP "Enable Build Engine GRP support" TRUE)
 if(NOT PHYSFS_ARCHIVE_GRP)
     add_definitions(-DPHYSFS_SUPPORTS_GRP=0)
 endif()
 
-option(PHYSFS_ARCHIVE_WAD "Enable Doom WAD support" OFF)
+option(PHYSFS_ARCHIVE_WAD "Enable Doom WAD support" TRUE)
 if(NOT PHYSFS_ARCHIVE_WAD)
     add_definitions(-DPHYSFS_SUPPORTS_WAD=0)
 endif()
 
-option(PHYSFS_ARCHIVE_HOG "Enable Descent I/II HOG support" OFF)
+option(PHYSFS_ARCHIVE_HOG "Enable Descent I/II HOG support" TRUE)
 if(NOT PHYSFS_ARCHIVE_HOG)
     add_definitions(-DPHYSFS_SUPPORTS_HOG=0)
 endif()
 
-option(PHYSFS_ARCHIVE_MVL "Enable Descent I/II MVL support" OFF)
+option(PHYSFS_ARCHIVE_MVL "Enable Descent I/II MVL support" TRUE)
 if(NOT PHYSFS_ARCHIVE_MVL)
     add_definitions(-DPHYSFS_SUPPORTS_MVL=0)
 endif()
 
-option(PHYSFS_ARCHIVE_QPAK "Enable Quake I/II QPAK support" OFF)
+option(PHYSFS_ARCHIVE_QPAK "Enable Quake I/II QPAK support" TRUE)
 if(NOT PHYSFS_ARCHIVE_QPAK)
     add_definitions(-DPHYSFS_SUPPORTS_QPAK=0)
 endif()
 
-option(PHYSFS_ARCHIVE_SLB "Enable I-War / Independence War SLB support" OFF)
+option(PHYSFS_ARCHIVE_SLB "Enable I-War / Independence War SLB support" TRUE)
 if(NOT PHYSFS_ARCHIVE_SLB)
     add_definitions(-DPHYSFS_SUPPORTS_SLB=0)
 endif()
 
-option(PHYSFS_ARCHIVE_ISO9660 "Enable ISO9660 support" OFF)
+option(PHYSFS_ARCHIVE_ISO9660 "Enable ISO9660 support" TRUE)
 if(NOT PHYSFS_ARCHIVE_ISO9660)
     add_definitions(-DPHYSFS_SUPPORTS_ISO9660=0)
 endif()
 
-option(PHYSFS_ARCHIVE_VDF "Enable Gothic I/II VDF archive support" OFF)
+option(PHYSFS_ARCHIVE_VDF "Enable Gothic I/II VDF archive support" TRUE)
 if(NOT PHYSFS_ARCHIVE_VDF)
     add_definitions(-DPHYSFS_SUPPORTS_VDF=0)
 endif()
 
 
-option(PHYSFS_BUILD_STATIC "Build static library" OFF)
+option(PHYSFS_BUILD_STATIC "Build static library" TRUE)
 if(PHYSFS_BUILD_STATIC)
     add_library(physfs-static STATIC ${PHYSFS_SRCS})
     add_library(PhysFS::PhysFS-static ALIAS physfs-static)
@@ -169,7 +169,7 @@ if(PHYSFS_BUILD_STATIC)
     endif()
     if(WINRT)
         # Ignore LNK4264 warnings; we don't author any WinRT components, just consume them, so we're okay in a static library.
-		set_target_properties(physfs-static PROPERTIES VS_WINRT_COMPONENT OFF)
+		set_target_properties(physfs-static PROPERTIES VS_WINRT_COMPONENT True)
         set_target_properties(physfs-static PROPERTIES STATIC_LIBRARY_FLAGS "/ignore:4264")
     endif()
     if(WIN32 OR WINRT OR OS2)
@@ -182,7 +182,7 @@ if(PHYSFS_BUILD_STATIC)
     list(APPEND PHYSFS_INSTALL_TARGETS "physfs-static")
 endif()
 
-option(PHYSFS_BUILD_SHARED "Build shared library" OFF)
+option(PHYSFS_BUILD_SHARED "Build shared library" TRUE)
 if(PHYSFS_BUILD_SHARED)
     add_library(physfs SHARED ${PHYSFS_SRCS})
     add_library(PhysFS::PhysFS ALIAS physfs)
@@ -191,7 +191,7 @@ if(PHYSFS_BUILD_SHARED)
     set_target_properties(physfs PROPERTIES SOVERSION ${PHYSFS_SOVERSION})
     set_target_properties(physfs PROPERTIES EXPORT_NAME PhysFS)
     if(WINRT)
-		set_target_properties(physfs PROPERTIES VS_WINRT_COMPONENT OFF)
+		set_target_properties(physfs PROPERTIES VS_WINRT_COMPONENT True)
     endif()
     if(OS2) # OS/2 does not support a DLL name longer than 8 characters.
         set_target_properties(physfs PROPERTIES OUTPUT_NAME "physfs")
@@ -212,7 +212,7 @@ if(PHYSFS_BUILD_SHARED AND PHYSFS_BUILD_STATIC AND NOT WIN32)
     set_target_properties(physfs-static PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 endif()
 
-option(PHYSFS_BUILD_TEST "Build stdio test program." OFF)
+option(PHYSFS_BUILD_TEST "Build stdio test program." TRUE)
 mark_as_advanced(PHYSFS_BUILD_TEST)
 if(PHYSFS_BUILD_TEST)
     find_path(READLINE_H readline/readline.h)
@@ -223,7 +223,7 @@ if(PHYSFS_BUILD_TEST)
             set(CMAKE_REQUIRED_LIBRARIES ${CURSES_LIBRARY})
             find_library(READLINE_LIBRARY readline)
             if(READLINE_LIBRARY)
-                set(HAVE_SYSTEM_READLINE OFF)
+                set(HAVE_SYSTEM_READLINE TRUE)
                 list(APPEND TEST_PHYSFS_LIBS ${READLINE_LIBRARY} ${CURSES_LIBRARY})
                 include_directories(SYSTEM ${READLINE_H} ${HISTORY_H})
                 add_definitions(-DPHYSFS_HAVE_READLINE=1)
@@ -265,7 +265,7 @@ if(NOT PHYSFS_DISABLE_INSTALL)
     endif()
 endif()
 
-option(PHYSFS_BUILD_DOCS "Build doxygen based documentation" OFF)
+option(PHYSFS_BUILD_DOCS "Build doxygen based documentation" TRUE)
 if(PHYSFS_BUILD_DOCS)
     find_package(Doxygen)
     if(DOXYGEN_FOUND)
@@ -305,13 +305,13 @@ if(UNIX)
         COMMENT "Building source tarball '${PHYSFS_TARBALL}'..."
     )
 
-    set(PHYSFS_TARGETNAME_UNINSTALL "uninstall" CACHE STRING "Name of 'uninstall' build target")
-    add_custom_target(
-        ${PHYSFS_TARGETNAME_UNINSTALL}
-        "${CMAKE_CURRENT_SOURCE_DIR}/extras/uninstall.sh"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        COMMENT "Uninstall the project..."
-    )
+    # set(PHYSFS_TARGETNAME_UNINSTALL "uninstall" CACHE STRING "Name of 'uninstall' build target")
+    # add_custom_target(
+    #     ${PHYSFS_TARGETNAME_UNINSTALL}
+    #     "${CMAKE_CURRENT_SOURCE_DIR}/extras/uninstall.sh"
+    #     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    #     COMMENT "Uninstall the project..."
+    # )
 endif()
 
 

@@ -593,7 +593,7 @@ static PHYSFS_sint64 zip_find_end_of_central_dir(PHYSFS_Io *io, PHYSFS_sint64 *l
                 (buf[i + 3] == 0x06) )
             {
                 found = 1;  /* that's the signature! */
-                break;
+                break;  
             } /* if */
         } /* for */
 
@@ -767,7 +767,7 @@ static int zip_resolve_symlink(PHYSFS_Io *io, ZIPinfo *info, ZIPentry *entry)
 
     path = (char *) __PHYSFS_smallAlloc(size + 1);
     BAIL_IF(!path, PHYSFS_ERR_OUT_OF_MEMORY, 0);
-
+    
     if (entry->compression_method == COMPMETH_NONE)
         rc = __PHYSFS_readAll(io, path, size);
 
