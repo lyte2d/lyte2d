@@ -2,10 +2,11 @@ name: Official Lyte2D build and release
 
 on:
   push:
-    branches:
-      - rel
+    # branches:
+    #   - rel
     tags:
-      - test
+      # - test
+      - ci-build
 
 jobs:
   build-with-docker:

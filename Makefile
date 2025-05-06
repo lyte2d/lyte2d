@@ -23,7 +23,7 @@ docker-bash:
 	./etc/local_docker_bash.sh
 
 KICK-GITHUB-TEST-BUILD: ## tags with test (and removes it right away) to test github builds
-	git tag test
+	git tag ci-build
 	git push --tags
-	git push --delete origin test
-	git tag --delete test
+	git push --delete origin ci-build
+	git tag --delete ci-build
