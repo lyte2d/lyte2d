@@ -70,5 +70,5 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: true
           draft: true
-          automatic_release_tag: ${{ env.VERSION }}
+          automatic_release_tag: "V${{ env.VERSION }}"
           files: out/rel/zip/*.zip
