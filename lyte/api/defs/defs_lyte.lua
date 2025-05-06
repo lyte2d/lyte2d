@@ -860,8 +860,10 @@ end
         Method("build", MapTo("shaderbuilder_build")),
         Method("__gc", MapTo("cleanup_shaderbuilder")),
         Doc"ShaderBuilder type"
-    ),
+    )
 
+--[==[
+    ,
 
     Function("cleanup_world",
         Arg("world", Wrap("World")),
@@ -1169,4 +1171,6 @@ end
         -- Method("__gc", MapTo("cleanup_joint")),
         Doc("Physics joints (constraints).")
     )
+--]==]
+
 ))

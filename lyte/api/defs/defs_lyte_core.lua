@@ -1027,6 +1027,8 @@ return process_def_tree(Namespace("lyte_core", {
         LuaImpl
     ),
 
+--[==[
+
     Function("world_new",
         Ret("val", World_Ptr),
         Doc"Create a new physics world."
@@ -1496,6 +1498,8 @@ return process_def_tree(Namespace("lyte_core", {
         Doc("Is the collide bit associated with the Geom? (Between 0 and 63.)")
     ),
 
+--]==]
+
     List("FloatVec4",
         Float,
         MaxCount(4),
@@ -1567,4 +1571,5 @@ return process_def_tree(Namespace("lyte_core", {
             Doc"Acceptable keyboardkey values."
         }
     )
+
 }))
