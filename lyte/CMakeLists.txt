@@ -101,8 +101,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_sources(${PROJECT_NAME} PRIVATE
     ./src/main.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/src/api_lyte_core_gen.c
-
+    ./src/api_lyte_core_gen.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/luautf8/lutf8lib.c
 )
 
