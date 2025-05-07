@@ -16,3 +16,9 @@ Please see one of the typings files `lyte.d.tl` or `lyte.d.ts` for the API docs.
 - Install Lua LSP
 - Copy `lyte.lua` file to your project root (or src perhaps.) and you should automatically get code completions with docs.
 
+## Debugger
+
+- You can use `lldebugger` extension to debug Lyte2D lua code directly in VSCode
+
+## TODO
+- Extend guidance
