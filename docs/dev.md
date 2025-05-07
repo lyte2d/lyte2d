@@ -34,9 +34,10 @@
 - Top level version.txt file is used for filenames and tags
 - Windows builds are less than ideal. They're build with mingw. Ideally they should be build with MSVC on the CI for smaller/faster binaries.
 
-### API definitions
-- `./lyte/api_defs` folder contains Lyte2D API definitions in a DSL implemented in Lua
+### API definitions & code/bindings generation
+- `./lyte/api_defs/` folder contains Lyte2D API definitions in a DSL implemented in Lua
 - From this, C bindings, documents and the typing files are generated
+- It's a bit janky, but it works!
 - Can be used to add other APIs (imagine adding a lyte_network top level, and defining the APIs for that in this folder)
 - NOTE: YOU CAN OPT OUT OF THIS.  This folder can be safely removed if the desire is to manually edit/add new APIs going forward.
 
@@ -46,7 +47,17 @@
 ### Notes
 - This is written in a mixture of C89/C99 and Lua.
 - GLFW, OpenGL, Sokol, Sokol_GP, Raudio, Freetype etc.
-- No AI/LLM was used in building this framework. I'm not against LLM use (I use it elsewhere.)
-- It's quite performant. I'm especially proud of font rendering and the completely dynamic (string) shaders that work everywhere
+- No AI/LLM was used in building this framework. I'm not against LLM use (I use it elsewhere), but I haven't used it at all for this one.
+- It's quite performant. I'm especially proud of font rendering and the completely dynamic (string) GLSL3x shaders that work everywhere.
 - It's close to beta quality with the current release (as we removed the jankier parts)
+- It works on Mac/Linux either with their respective binaries or directly running the Windows binaries with Wine.
+- Ditto for SteamDeck! It just works!
+- Should work on iOS and anroid with relatively small work
+-
 
+### Possible future avenues
+- LuaJIT on desktop, or Lua 5.4.x everywhere
+- Networking, Physics, GUIs
+- Code/binding gen system (api_defs) can be ripped out, either to be replaced with some alternative or manual work
+- Error handling can be done better
+- luasteam integration. Should be very straightforward!
