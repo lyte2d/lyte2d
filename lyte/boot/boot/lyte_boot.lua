@@ -67,9 +67,6 @@ local error_title = "Error"
 -- this will be used to help dev time
 -- errors will be visible on the window instead of crashing/cmdline
 
--- _G.LYTE_TEAL_LAX_MODE = true
-_G.LYTE_TEAL_LAX_MODE = false
-
 _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
 
     local error_text = _G.LYTE_ERROR_TEXT or "unknown"
@@ -186,19 +183,6 @@ local function run_many(codestr, filename, ...)
 end
 
 
-local fnl_file = "/lyte_boot_libs/fennel_lib.lua"
-local fnl_src = lyte_core.load_textfile(fnl_file)
-_G.fennel = loadstring(fnl_src, fnl_file)()
-
-local lulpeg_file = "/lyte_boot_libs/lulpeg.lua"
-local lulpeg_src = lyte_core.load_textfile(lulpeg_file)
-_G.lpeg = loadstring(lulpeg_src, lulpeg_file)()
-
-local tl_file = "/lyte_boot_libs/tl.lua"
-local tl_src = lyte_core.load_textfile(tl_file)
-_G.tl = loadstring(tl_src, tl_file)()
-
-
 -- TODO/Consider: lyte.file_exists() API to get rid of file not exists warnings
 --   not visible in gui version of windows build (which is the "production" build) so lower priority
 local function load_lua_file_or_dir_module(modulename, ext)
@@ -226,66 +210,6 @@ local function lyte_lua_loader(modulename)
 end
 
 
-local function make_lyte_searcher(env)
-    local function loader_lyte(modulename)
-        local filename = nil
-        local code_str= nil
-        local lang = nil
-        local languages = {"fnl", "tl"}
-
-        for _, ext in ipairs(languages) do
-            -- filename = modulename:gsub("%.", "/")  .. "." .. ext
-            -- code_str = lyte_core.load_textfile(filename)
-            code_str, filename = load_lua_file_or_dir_module(modulename, ext)
-            if code_str then
-                lang = ext
-                break
-            end
-        end
-
-        -- if lang == "lua" then
-        --     return function(...)
-        --         return run_many(code_str, filename, ...)
-        --     end, filename
-        --
-        -- elseif...
-        if lang == "fnl" then
-            return function(...)
-                -- macro loader vs function loader
-                if env == "_COMPILER" then
-                    -- macro loader
-                    return fennel.eval(code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename}, ...)
-                else
-                    local x, y = pcall(fennel.compileString, code_str, {correlate=true, env=env, filename="@"..filename, moduleName=modulename})
-                    return run_many(y, filename, ...)
-                end
-                -- END NOTENOTE: this should be the same between different file types
-            end, filename
-        elseif lang == "tl" then
-            return function(...)
-                    local done, result = pcall(tl.process_string, code_str, _G.LYTE_TEAL_LAX_MODE, nil, "@"..filename, modulename)
-                    if (not done) then
-                        _G.LYTE_ERROR_TEXT = "<teal error> " .. result
-                        _G.LYTE_ERROR_LINE = get_error_line(result)
-                        print ("tl.process_string failed. file: " .. filename .. ", error: " .. result)
-                    end
-                    if (#result.syntax_errors > 0) then
-                        _G.LYTE_ERROR_TEXT = "<teal Syntax error> file: " .. filename
-                        _G.LYTE_ERROR_LINE = get_error_line(result)
-                        print("errors:")
-                        for k,v in ipairs(result.syntax_errors) do print (k, fennel.view(v)) end
-                        error(_G.LYTE_ERROR_TEXT)
-                    end
-                    local lua_code = tl.pretty_print_ast(result.ast)
-                    return run_many(lua_code, filename, ...)
-            end, filename
-        else
-            print("Internal error: Unknown/incorrectly configured lang: " .. lang)
-        end
-
-    end
-    return loader_lyte
-end
 
 local function lyte_library_loader(modulename)
     local filename = modulename:gsub("%.", "/")
@@ -298,9 +222,8 @@ end
 
 table.insert(package.loaders, 2, lyte_lua_loader)
 table.insert(package.loaders, 3, lyte_library_loader)
-table.insert(package.loaders, 4, make_lyte_searcher(nil))
-
-table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
+-- table.insert(package.loaders, 4, make_lyte_searcher(nil))
+-- table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
 
 
 -- load  generated APIs
@@ -311,9 +234,9 @@ end
 
 -- REPL helpers
 
-_G.LYTE_REPL_EVAL_FENNEL = function(str)
-    return fennel.eval(str, {correlate=true, env=nil, filename="@lyte_repl", moduleName="lyte_repl"})
-end
+-- _G.LYTE_REPL_EVAL_FENNEL = function(str)
+--     return fennel.eval(str, {correlate=true, env=nil, filename="@lyte_repl", moduleName="lyte_repl"})
+-- end
 
 _G.LYTE_REPL_EVAL_LUA  = function(str)
     if (str == nil or str == "") then str = " " end
@@ -336,19 +259,19 @@ _G.LYTE_SET_REPL_LUA = function()
 end
 
 
-_G.LYTE_SET_REPL_FENNEL = function()
-    _G.LYTE_REPL_TOSTRING = fennel.view
-    debug.traceback = fennel.traceback
-    _G.LYTE_REPL_EVAL = _G.LYTE_REPL_EVAL_FENNEL
-end
+-- _G.LYTE_SET_REPL_FENNEL = function()
+--     _G.LYTE_REPL_TOSTRING = fennel.view
+--     debug.traceback = fennel.traceback
+--     _G.LYTE_REPL_EVAL = _G.LYTE_REPL_EVAL_FENNEL
+-- end
 
 
-if LYTE_REPL_REQUESTED == "fennel" or LYTE_REPL_REQUESTED == "fnl" then
-    _G.LYTE_SET_REPL_FENNEL()
-else
+-- if LYTE_REPL_REQUESTED == "fennel" or LYTE_REPL_REQUESTED == "fnl" then
+--     _G.LYTE_SET_REPL_FENNEL()
+-- else
     -- Note: Teal based repl doesn't make much sense
     _G.LYTE_SET_REPL_LUA()
-end
+-- end
 
 -- this function can be overridden (carefully) in conf
 local tick_loading = function(dt, w, h)
