@@ -11,11 +11,6 @@ echo "Debug output:  kikito's inspect output (lua table format) (post-processed 
 lua -e "print('return ' .. (require 'lib.tag.inspect')(require'defs_lyte'.tree, {indent='    '}) .. '\n')" > output/dbg/_lyte_tree.inspect.lua
 lua -e "print('return ' .. (require 'lib.tag.inspect')(require'defs_lyte_core'.tree, {indent='    '}) .. '\n')" > output/dbg/_lyte_core_tree.inspect.lua
 
-echo "Debug output:  fennel (fennel tree) (post-processed tree)"
-lua -e "print((require 'lib.tag.fennel_lib').view(require'defs_lyte'.tree) .. '\n')" > output/dbg/_lyte_tree.fennel.fnl
-lua -e "print((require 'lib.tag.fennel_lib').view(require'defs_lyte_core'.tree) .. '\n')" > output/dbg/_lyte_core_tree.fennel.fnl
-
-
 
 echo "Typings: in Lua for VSCode"
 lua -e "print(require('lib.defs_to_docstrings')(require'defs_lyte'.tree))" > output/typings/lyte.lua

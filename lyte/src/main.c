@@ -10,8 +10,6 @@
 
 #include <signal.h>
 
-#include "repl.h"
-// #include "lyte_api.h"
 #include "api_lyte_core_gen.h"
 
 #include "lyte_core.h"
@@ -39,7 +37,6 @@ int luaopen_utf8 (lua_State *L);
 #define LYTE_INIT_HEIGHT 260 // not used
 
 static bool _need_to_load_archives = false;
-static bool _has_repl = false; // enable with repl=true
 
 static char *_app_modulename = "app";
 static char *_app_zip_filename = "app.zip";
@@ -119,9 +116,6 @@ static inline bool _find_module_path(lua_State *L, char *str, const char *module
 }
 
 static int _try_load(lua_State *L) {
-    // TODO: clean up.
-    // TODO: add support for fennel, moonscript, teal, typescriptToLua etc.
-
     CHK_STACK(1);
     const char *module_name = luaL_checkstring(L, 1);
     lua_pop(L, 1);
@@ -130,34 +124,12 @@ static int _try_load(lua_State *L) {
     char str[4096] = {0};
     bool exists = false;
     (void)exists;
-    // bool is_fennel = false;
 
     exists = _find_module_path(L, str, module_name, ".lua"); // has side effect: pushes the module name to the path
 
     CHK_STACK(1);
 
     const char *path_name = luaL_checkstring(L, -1);
-
-    // if (!exists) {
-    //     lua_pop(L, 1);
-    //     // exists = _lyte_find_module_path(L, str, module_name, ".fnl");
-    //     // if (!exists) {
-    //         // lua_pop(L, 1);
-    //         if (error_if_missing) {
-    //             fprintf(stderr, "Warning: couldn't find file: %s.lua or %s.fnl\n", module_name, module_name);
-    //             lua_error(L);
-    //         } else {
-    //             fprintf(stderr, "Couldn't find file: %s.lua or %s.fnl\n", module_name, module_name);
-    //             CHK_STACK(0);
-    //             return 0;
-    //         }
-    //     // } else {
-    //         // is_fennel = true;
-    //     // }
-    // }
-
-
-    // printf("==> module: %s  path: %s\n", module_name, path_name);
 
     lua_pop(L, 1);
     int err=0;
@@ -172,35 +144,6 @@ static int _try_load(lua_State *L) {
         // printf("%s", file_content);
     }
 
-    // TODO: language support (fennel, teal, moonscript etc)
-
-    // char *fennel_eval_open = "";
-    // char *fennel_eval_close_1 = "";
-    // char *fennel_eval_close_2 = "";
-    // char *fennel_eval_close_3 = "";
-
-    // if (is_fennel) {
-    //     fennel_eval_open = "return fennel.eval([===[";
-    //     fennel_eval_close_1 = "]===], ";
-    //     fennel_eval_close_2 = "{correlate=true, filename='";
-    //     fennel_eval_close_3 = "', allowedGlobals=false})";
-    //     // sprintf((char *)module_file_buf, "%s", fennel_eval_open);
-    // }
-
-    // size_t MAX_LEN = LUA_MODULE_FILES_MAX_SIZE - 1024; //TODO: strlen(fennel_eval_open) - strlen(fennel_eval_close);
-
-    // // sz = M_path_readbytes(path_name, (const uint8_t *)(module_file_buf + strlen(fennel_eval_open)), MAX_LEN);
-    // sz = strlen(file_content);
-    // // memcpy((uint8_t *)(module_file_buf + strlen(fennel_eval_open)), file_content, sz);
-
-    // // if (sz == 0) {
-    // //     lua_error(L);
-    // // }
-    // if (is_fennel) {
-    //     // sprintf((char *)module_file_buf + sz + strlen(fennel_eval_open)  , "%s%s%s%s%s", fennel_eval_open, fennel_eval_close_1, fennel_eval_close_2, module_name, fennel_eval_close_3);
-    //     sprintf((char *)module_file_buf , "%s%s%s%s%s%s", fennel_eval_open, file_content, fennel_eval_close_1, fennel_eval_close_2, module_name, fennel_eval_close_3);
-    // }
-
     CHK_STACK(0);
     lua_getglobal(L, "package");
     CHK_STACK(1);
@@ -209,16 +152,13 @@ static int _try_load(lua_State *L) {
     lua_pushstring(L, module_name);
     CHK_STACK(3);
 
-    //err = luaL_dostring(L, (const char *)module_file_buf);
     char path_with_at[4096] = {0};
     sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepath and not part of code
-    // err = luaL_loadbuffer(L, (const char *)module_file_buf, strlen(module_file_buf), (const char *)path_with_at);
+
     size_t fc_len = strlen(file_content);
     err = luaL_loadbuffer(L, (const char *)file_content,fc_len , (const char *)path_with_at);
     if (err == 0) {
-        // err = lua_pcall(L, 0, LUA_MULTRET, 0);
-        //lua_call(L, 0, LUA_MULTRET);
-         err = docall(L, 0, 0);
+        err = docall(L, 0, 0);
         if (err &&  lua_gettop(L) > 0) {
             // remove loaded modules..
             lua_remove(L, 1);
@@ -256,13 +196,6 @@ static int _try_load(lua_State *L) {
     return 0;
 }
 
-// static int _lyte_loader(lua_State *L) {
-//     CHK_STACK(1);
-//     lua_pushcclosure(L, _try_load, 1);
-//     CHK_STACK(1);
-//     return 1;
-// }
-
 static inline int _load_lua_file(lua_State *L, const char *path, bool error_if_missing) {
     (void)error_if_missing;
     lua_pushstring(L, path);
@@ -280,9 +213,6 @@ static void _check_fetch_file_status(lua_State *L) {
 
         _need_to_load_archives = false;
 
-
-        // _load_lua_file(L, _app_modulename, !_has_repl);
-
         lua_pushstring(L, _app_modulename);
         lua_setglobal(L, "LYTE_APP_MODULENAME");
 
@@ -292,18 +222,7 @@ static void _check_fetch_file_status(lua_State *L) {
         docall(L, 1, 0);
 
         if (lua_gettop(L) != 0) {
-            if (!_has_repl) {
-                // lua_error(L);
-                // const char * err =luaL_checkstring(L, -1);
-                // fprintf(stderr, "\n Error (ignored):\n %s\n", err);
-                // lua_pushstring(L, "'app' module not found");
-                // lua_setglobal(L, "LYTE_ERROR_TEXT");
-                lua_settop(L, 0);
-            } else {
-                // lua_pushstring(L, "(REPL MODE) 'app' module not found");
-                // lua_setglobal(L, "LYTE_ERROR_TEXT");
-                lua_settop(L, 0);
-            }
+            lua_settop(L, 0);
         }
 
     }
@@ -320,7 +239,7 @@ static int _lua_panic_fn(lua_State *L) {
     return 0;
 }
 
-static void tick_fn_active_norepl(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
+static void tick_fn_active(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
     lua_State *L = data;
     int status = 0;
 
@@ -367,23 +286,6 @@ static void tick_fn_active_norepl(void *data, float dt, int width, int height, b
 }
 
 
-
-static void tick_fn_active_repl(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
-    static bool _skip_tick = false;
-    lua_State *L = data;
-
-    // can skip one frame when returning from repl (so that DT isn't crazy high on that first frame)
-    if (!_skip_tick) {
-        tick_fn_active_norepl(data, dt, width, height, resized, fullscreen);
-    } else {
-        _skip_tick = false;
-    }
-    if (_has_repl) {
-        _skip_tick = repl_check(L);
-    }
-
-}
-
 static void tick_fn_active_tick_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
     lua_State *L = data;
     int status = 0;
@@ -415,62 +317,18 @@ static void tick_fn_active_tick_loading(void *data, float dt, int width, int hei
 }
 
 static void tick_fn_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
-    // (void)resized; (void)fullscreen;
-    // static float _angle = 0.0f;
-    // static float _loading_time = 0.0f;
-    // int ww = width/4.0;
-    // int hh = height/8.0;
-
     lua_State *L = data;
 
     CHK_STACK(0);
     if(_need_to_load_archives) {
-        // _loading_time += dt;
-
-        // if (_loading_time > 0.5) {
-        //     _angle += dt * 1;
-        // }
-
-        // // loading screen
-        // lyte_push_matrix();
-        // lyte_translate(width/2, height/2);
-        // lyte_rotate(_angle);
-        // lyte_cls(0.0,0.0,0.0,1.0);
-        // lyte_set_color(1.0, 1.0, 1.0, 0.7);
-        // lyte_draw_rect(-ww/2, -hh/2, ww, hh);
-        // lyte_pop_matrix();
-
-
         tick_fn_active_tick_loading(data, dt, width, height, resized, fullscreen);
 
         _check_fetch_file_status(L);
 
     } else {
-        if (_has_repl) {
-            repl_prompt();
-            lyte_core_set_loop(tick_fn_active_repl, L);
-        } else {
-            lyte_core_set_loop(tick_fn_active_norepl, L);
-        }
+        lyte_core_set_loop(tick_fn_active, L);
     }
 }
-
-// static void _registerloader(lua_State* L, lua_CFunction loader, int index) {
-//     lua_getglobal(L, "table");
-//     lua_getfield(L, -1, "insert");
-//     lua_getglobal(L, "package");
-//     lua_getfield(L, -1, "loaders");
-//     lua_remove(L, -2);
-//     if (lua_istable(L, -1)) {
-//         lua_pushinteger(L, index);
-//         lua_pushcfunction(L, loader);
-//         lua_call(L, 3, 0);
-//     } else {
-//         lua_pop(L, 2);
-//     }
-//     lua_pop(L, 1);
-// }
-
 
 static int init(lyte_Config cfg) {
     int err = 0;
@@ -490,7 +348,6 @@ static int init(lyte_Config cfg) {
     luaopen_utf8(L);
 
 
-    // register_lyte(L);
     register_lyte_core_api(L);
 
     lua_gc(L, LUA_GCCOLLECT, 0);
@@ -523,22 +380,7 @@ static int init(lyte_Config cfg) {
     _download_zip_handle = lyte_core_filesystem_fetch_file_async("APP_ZIP", archivepath, LYTE_APP_ZIP_MAX_SIZE, "/");
     _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", cfg.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
 
-    // removing this for bootzip experimentation
-    // _registerloader(L, _lyte_loader, 2);
-
     lua_gc(L, LUA_GCCOLLECT, 0);
-
-#ifndef __EMSCRIPTEN__
-    if (lyte_core_state_has_arg("repl")) {
-        _has_repl = true;
-        if (_has_repl) {
-            lua_pushstring(L, lyte_core_state_get_arg("repl"));
-            lua_setglobal(L, "LYTE_REPL_REQUESTED");
-
-            repl_setup();
-        }
-    }
-#endif
 
     // LOAD BOOT
     _load_lua_file(L, "lyte_boot", true);
@@ -578,8 +420,6 @@ int main(int argc, char *argv[]) {
     err = lyte_core_state_init(cfg);
 
     err = init(cfg);
-
-    // err = lyte_core_window_init();
 
     err = lyte_core_start_loop((lyte_TickFunction)tick_fn_loading, _global_L);
 

@@ -79,12 +79,10 @@ endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/isocline ${CMAKE_CURRENT_BINARY_DIR}/isocline)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     lyte_core
     lua51-static
-    isocline
 )
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_THREAD_LIBS_INIT "-lpthread")
@@ -104,8 +102,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_sources(${PROJECT_NAME} PRIVATE
     ./src/main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/api/src/api_lyte_core_gen.c
-    ./src/nbchar.c
-    ./src/repl.c
+
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/luautf8/lutf8lib.c
 )
 

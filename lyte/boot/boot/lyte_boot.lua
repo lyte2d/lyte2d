@@ -222,9 +222,6 @@ end
 
 table.insert(package.loaders, 2, lyte_lua_loader)
 table.insert(package.loaders, 3, lyte_library_loader)
--- table.insert(package.loaders, 4, make_lyte_searcher(nil))
--- table.insert(fennel["macro-searchers"], 1 ,make_lyte_searcher("_COMPILER"))
-
 
 -- load  generated APIs
 local req_gen_code, err_gen_code = pcall(require, "api_lyte_gen") -- Lua part of the generated API code
@@ -232,46 +229,8 @@ if not req_gen_code then
     print("Internal error: " .. err_gen_code)
 end
 
--- REPL helpers
-
--- _G.LYTE_REPL_EVAL_FENNEL = function(str)
---     return fennel.eval(str, {correlate=true, env=nil, filename="@lyte_repl", moduleName="lyte_repl"})
--- end
-
-_G.LYTE_REPL_EVAL_LUA  = function(str)
-    if (str == nil or str == "") then str = " " end
-    local code
-    if (str:sub(1,1) == "=") then
-        code = "return " .. str:sub(2)
-    else
-        code = str;
-    end
-    return loadstring(code, "lyte_repl")()
-
-end
 
 _G.debug_traceback_save = debug.traceback
-
-_G.LYTE_SET_REPL_LUA = function()
-    debug.traceback = _G.debug_traceback_save
-    _G.LYTE_REPL_TOSTRING = tostring
-    _G.LYTE_REPL_EVAL = _G.LYTE_REPL_EVAL_LUA
-end
-
-
--- _G.LYTE_SET_REPL_FENNEL = function()
---     _G.LYTE_REPL_TOSTRING = fennel.view
---     debug.traceback = fennel.traceback
---     _G.LYTE_REPL_EVAL = _G.LYTE_REPL_EVAL_FENNEL
--- end
-
-
--- if LYTE_REPL_REQUESTED == "fennel" or LYTE_REPL_REQUESTED == "fnl" then
---     _G.LYTE_SET_REPL_FENNEL()
--- else
-    -- Note: Teal based repl doesn't make much sense
-    _G.LYTE_SET_REPL_LUA()
--- end
 
 -- this function can be overridden (carefully) in conf
 local tick_loading = function(dt, w, h)
