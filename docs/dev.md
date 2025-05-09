@@ -61,3 +61,5 @@
 - Code/binding gen system (api_defs) can be ripped out, either to be replaced with some alternative or manual work
 - Error handling can be done better
 - luasteam integration. Should be very straightforward!
+- Web based editor. Should be strightforward
+- VSCode editor that incorporates the WASM build. Immediately display the game inside vscode

@@ -1,0 +1,62 @@
+<div class="title">User guide</div>
+<p></p><b>Get started</b>
+<p>Download the executable and place it somewhere in your path. 'lyte.exe' (or 'lyte' on linux) is assumed
+    to be in your path.</p>
+<ul>
+    <li>Create an <code>app.lua</code> file.</li>
+    <li>Implement <code>lyte.tick</code> function. (See examples) </li>
+    <li>Make sure you're in the same directory in your shell/cmd window</li>
+    <li>Start your game with <code>lyte</code>.</li>
+</ul><b>Want to run some code in another location?</b>
+<ul>
+    <li>If you want to use another directory as the base, you can do
+        <code>lyte dir=../my_games/testgame</code> or <code>lyte ../my_games/testgame</code> </li>
+    <li>If you want to use another file as your entry point file (instead of app.lua), you can do <code>lyte app=myapp</code>,
+        assuming you have 'myapp.lua' in the current directory. You should NOT specify the extension</li>
+    <li><code>dir=...</code> and <code>app=...</code> arguments can be combined to run a file in an
+        arbitrary directory</li>
+</ul><b>Package your game once you're ready.</b>
+<ul>
+    <li>Ready to share your game with others? Cool!</li>
+    <li>Create an 'app.zip' file. Inside the zip, 'app.lua' should be at the root/topmost location</li>
+    <li>Copy 'lyte.exe', and rename it to 'mygame.exe' (swap 'mygame' for your chosen binary name)</li>
+    <li>Alternatively, consider using 'lyte_gui.exe' on Windows, for no-console launch</li>
+    <li>Running <code>mygame</code> will automatically load app.zip if it's in the same directory.</li>
+    <li>Option 1: you can share the exe and the zip file, and your players can play it as it is</li>
+    <li>Option 2: Fuse your app (next section.)</li>
+</ul><b>App 'fusing'</b>
+<ul>
+    <li>Lyte2D support LOVE2D style app fusing. Basically you merge the exe and the zip files into a single
+        binary that will contain everything needed to run your code.</li>
+    <li>On linux you can do <code>cat lyte.exe app.zip > mygame.exe</code>. Then just distribute
+        'mygame.exe' however you'd like.</li>
+    <li>Similar on Windows. (...to be documented, in the meantime see LOVE2D docs.)</li>
+</ul><b>Configuring your app.</b>
+<ul>
+    <li>If you'd like to configure your window size, fullscreen, etc. before the app loads, you can create a
+        'config.lua' file next to your 'app.lua'. Here's an example config.lua file: </li>
+    <pre><code style="background-color:inherit" id="cfg-1" class="language-lua">return {
+    window_width = 800,
+    window_height = 500,
+    window_title = "my game",
+    fullscreen = false,
+    window_vsync = true,
+    default_filtermode = "nearest", --linear
+    default_blendmode = "blend",
+}
+</code></pre>
+    <li>Note: you need to keep this file next to the zip or exe file if you fuse your app</li>
+</ul>
+<b>HTML5 -- browser games!</b>
+<ul>
+    <li>Lyte2D has WASM builds! Just put your "app.zip" file next to the HTML5 files. (lyte.html, lyte.js,
+        lyte.wasm).</li>
+    <li>Rename 'lyte.html' to suit your needs. And put all four files up on a static host (itch.io, github
+        pages, etc.)</li>
+</ul>
+<b>Known issues with alpha</b>
+<ul>
+    <li>Functions do not have default arguments, so all arguments must be passed to each function. This will
+        be fixed in a later release.</li>
+    <li>Line/Circle drawing can have minor issues with very small sizes.</li>
+</ul>
