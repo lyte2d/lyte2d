@@ -8,6 +8,7 @@ Here're some highlights:
 - Simple shapes; lines, circles, rects etc. Transforms...
 - Image drawing, including partial rectangles from the image.
 - Blend modes (default: alpha blending) and filter modes (default: nearest neighbor for pixel crisp games)
+- OpenGL 3.3 shaders (completely dynamic)
 - Audio: looping music and sound effects, pan and pitch control.
 - Keyboard/mouse/gamepad input.
 - Async fetching application zip for larger game archives
