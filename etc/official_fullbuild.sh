@@ -104,8 +104,8 @@ mkdir -p $TMPDIR/docs
 
 cp -r $SOURCEDIR/LICENSE $TMPDIR/docs
 cp -r $SOURCEDIR/deps/deps_licenses.txt $TMPDIR/docs
-cp -r $SOURCEDIR/typings/* $TMPDIR/docs
-cp -r $SOURCEDIR/docs/guide.md $TMPDIR/docs
+cp -r $SOURCEDIR/typings/lyte.d.tl $TMPDIR/docs
+cp -r $SOURCEDIR/docs/guide.html $TMPDIR/docs
 
 
 cp -r $BINDIR/* $TMPDIR/
