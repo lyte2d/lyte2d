@@ -260,10 +260,31 @@ int lyte_get_mouse_x(int *val) {
     double x, y;
     glfwGetCursorPos(lytecore_state.window, &x, &y);
     inputstate.mouse_x = x;
-    *val = inputstate.mouse_x
-         - (lytecore_state.window_margins.left) // * lytecore_state.hidpi_xscale
-        //  - (lytecore_state.window_paddings.left)
-        ;
+
+    // the margins eat into our logical window
+    int effective_width = (lytecore_state.window_size.width
+        - lytecore_state.window_margins.left
+        - lytecore_state.window_margins.right
+    );
+
+#ifndef __APPLE__
+    // scale our coordinate by the DPI scale...
+    int scaled_x = inputstate.mouse_x / lytecore_state.hidpi_xscale;
+#else
+    // (on Apple platforms this coordinate is already scaled)
+    int scaled_x = inputstate.mouse_x;
+#endif
+
+    // ...then shift it by the margin origin...
+    scaled_x -= lytecore_state.window_margins.left;
+
+    // ...then re-scale it into the logical window size
+    scaled_x *= lytecore_state.window_size.width / (float)effective_width;
+
+    // ...then shift if by the padding origin...
+    // scaled_x -= lytecore_state.window_paddings.left;
+
+    *val = scaled_x;
     return 0;
 }
 
@@ -271,10 +292,31 @@ int lyte_get_mouse_y(int *val) {
     double x, y;
     glfwGetCursorPos(lytecore_state.window, &x, &y);
     inputstate.mouse_y = y;
-    *val = inputstate.mouse_y
-        - (lytecore_state.window_margins.top) // * lytecore_state.hidpi_xscale
-        // - lytecore_state.window_paddings.top
-        ;
+
+    // the margins eat into our logical window
+    int effective_height = (lytecore_state.window_size.height
+        - lytecore_state.window_margins.top
+        - lytecore_state.window_margins.bottom
+    );
+
+#ifndef __APPLE__
+    // scale our coordinate by the DPI scale...
+    int scaled_y = inputstate.mouse_y / lytecore_state.hidpi_yscale;
+#else
+    // (on Apple platforms this coordinate is already scaled)
+    int scaled_y = inputstate.mouse_y;
+#endif
+
+    // ...then re-scale it into the logical window size
+    scaled_y *= lytecore_state.window_size.height / (float)effective_height;
+
+    // ...then shift it by the margin origin...
+    scaled_y -= lytecore_state.window_margins.top;
+
+    // ...then shift it by the padding origin...
+    //scaled_y -= lytecore_state.window_paddings.top;
+
+    *val = scaled_y;
     return 0;
 }
 
