@@ -41,9 +41,9 @@ target_compile_definitions(raudio PUBLIC
 )
 
 # Dependenices
-target_link_libraries(raudio
-    m # math
-)
+if(UNIX AND NOT APPLE AND NOT ANDROID) # Or a more robust check like if(NOT WIN32 AND NOT APPLE)
+    target_link_libraries(raudio PRIVATE m) # math
+endif()
 
 # Audio file support options
 if (SUPPORT_FILEFORMAT_WAV)
