@@ -100,6 +100,13 @@ const char *lyte_core_state_get_arg(const char *name) {
     return sargs_value(name);
 }
 
+const char *lyte_core_state_get_arg_default(const char *name, const char *default_value) {
+    if (sargs_exists(name)) {
+        return sargs_value(name);
+    }
+    return default_value;
+}
+
 bool lyte_core_state_get_arg_bool(const char *name) {
     return sargs_boolean(name);
 }
