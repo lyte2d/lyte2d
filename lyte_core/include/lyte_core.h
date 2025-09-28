@@ -50,6 +50,7 @@ int lyte_core_state_init(lyte_Config config);
 
 bool lyte_core_state_has_arg(const char *name);
 const char *lyte_core_state_get_arg(const char *name);
+const char *lyte_core_state_get_arg_default(const char *name, const char *default_value);
 bool lyte_core_state_get_arg_bool(const char *name);
 
 int lyte_quit(void);

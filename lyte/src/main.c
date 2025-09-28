@@ -353,21 +353,13 @@ static int init(lyte_Config cfg) {
     lua_gc(L, LUA_GCCOLLECT, 0);
 
     _need_to_load_archives = true;
-    char *localpath = ".";
-    char *archivepath = _app_zip_filename;
+    const char *localpath = lyte_core_state_get_arg_default("dir", ".");
+    const char *app_zip_filename = lyte_core_state_get_arg_default("zip", _app_zip_filename);
 
-    // check: 'zip' first. acrhive file name change.  default "app.zip"
-    if (lyte_core_state_has_arg("zip")) {
-        archivepath = (char *)lyte_core_state_get_arg("zip");
-    }
-
-    // check: 'dir' second. default: "./"
-    if (lyte_core_state_has_arg("dir")) {
-        localpath = (char *)lyte_core_state_get_arg("dir");
-        char path[4096];
-        sprintf(path, "%s/%s", localpath, _app_zip_filename);
-        archivepath =path;
-    }
+    char archivepath[4096];
+    strcpy(archivepath, localpath);
+    strcat(archivepath, "/");
+    strcat(archivepath, app_zip_filename);
 
     // default: "app.lua"
     if (lyte_core_state_has_arg("app")) {
