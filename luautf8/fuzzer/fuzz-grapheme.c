@@ -9,7 +9,7 @@
 #include "lauxlib.h"
 
 #include "unicode/ucnv.h"
-#include "unicode/unorm2.h"
+#include "unicode/ubrk.h"
 
 lua_State *L;
 
@@ -70,6 +70,39 @@ static bool php_mbstring_check_utf8(unsigned char *in, size_t in_len)
 	return true;
 }
 
+/* From PHP codebase */
+const unsigned char mblen_table_utf8[] = {
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+
+const size_t utf16_code_unit_len(const unsigned char *s, size_t byte_len) {
+	const unsigned char *e = s + byte_len;
+	size_t result = 0;
+	while (s < e) {
+		unsigned char c = *s;
+		s += mblen_table_utf8[c];
+		result++;
+		if (c >= 0xF0 && c <= 0xF4)
+			result++; /* 4-byte UTF-8 characters will take 2 UTF-16 code units */
+	}
+	return result;
+}
+
 /* Adapted from source code for PostgreSQL ICU extension */
 static int32_t icu_to_uchar(UConverter *icu_converter, UChar **buff_uchar, const char *buff, int32_t nbytes)
 {
@@ -92,39 +125,25 @@ static int32_t icu_to_uchar(UConverter *icu_converter, UChar **buff_uchar, const
 	return len_uchar;
 }
 
-static int32_t icu_from_uchar(UConverter *icu_converter, char **result, const UChar *buff_uchar, int32_t len_uchar)
-{
-	UErrorCode status = U_ZERO_ERROR;
-	uint32_t len_result = ucnv_fromUChars(icu_converter, NULL, 0, buff_uchar, len_uchar, &status);
-	if (U_FAILURE(status) && status != U_BUFFER_OVERFLOW_ERROR)
-		assert(0);
-
-	*result = (char *) malloc(len_result + 1);
-
-	status = U_ZERO_ERROR;
-	len_result = ucnv_fromUChars(icu_converter, *result, len_result + 1, buff_uchar, len_uchar, &status);
-	if (U_FAILURE(status))
-		assert(0);
-
-	return len_result;
-}
-
 int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 {
 	/*
-	printf("Input (%zu): ", Size);
+	printf("(%zu): ", Size);
 	for (unsigned int i = 0; i < Size; i++)
 		printf("%02x ", Data[i]);
 	printf("\n");
 	*/
 
 	/* We can only compare with the results from ICU if the entire string was valid UTF-8;
-	 * ICU won't even allow us to check whether the string is NFC unless it's valid UTF-8 */
+	 * ICU needs to convert the entire string to codepoints before operationg on it,
+	 * and it can only do that if it's valid UTF-8 */
 	bool valid_utf8 = php_mbstring_check_utf8((unsigned char*)Data, Size);
 
 	UChar *ubuff = NULL;
 	int32_t usize = 0;
 	UConverter *icu_converter = NULL;
+	UBreakIterator *bi = NULL;
+	uint32_t p = 0;
 
 	if (valid_utf8) {
 		UErrorCode errcode = U_ZERO_ERROR;
@@ -134,91 +153,62 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 			assert(0);
 		}
 		usize = icu_to_uchar(icu_converter, &ubuff, (const char*)Data, Size);
+		errcode = U_ZERO_ERROR;
+
+		/*
+		printf("UTF-16 code units from ICU: (%d): ", usize);
+		for (unsigned int i = 0; i < usize; i++)
+			printf("%04x ", ubuff[i]);
+		printf("\n");
+		*/
+
+		bi = ubrk_open(UBRK_CHARACTER, 0, ubuff, usize, &errcode);
+		if (U_FAILURE(errcode)) {
+			printf("Error from ubrk_open: %s\n", u_errorName(errcode));
+			assert(0);
+		}
+		p = ubrk_first(bi);
 	}
 
 	lua_getglobal(L, "utf8");
-	lua_getfield(L, -1, "isnfc");
+	lua_getfield(L, -1, "grapheme_indices");
 	lua_pushlstring(L, (const char*)Data, Size);
 	int err = lua_pcall(L, 1, 1, 0);
+	assert(!err);
+	assert(lua_iscfunction(L, -1));
+	lua_CFunction iterator = lua_tocfunction(L, -1);
 
-	if (err) {
-		/* utf8.isnfc raised an error */
-		assert(!valid_utf8);
-	} else {
-		assert(lua_isboolean(L, -1));
-		int was_nfc = lua_toboolean(L, -1);
-
-		/* If the string was not NFC, we cannot assume that the string is valid UTF-8,
-		 * even if no error was raised... if utf8.isnfc notices that the string is not NFC,
-		 * it will immediately return false and will not check whether the trailing portion
-		 * is valid UTF-8 or not */
-		assert(!was_nfc || valid_utf8);
-
-		if (valid_utf8) {
-			UErrorCode errcode = U_ZERO_ERROR;
-			const UNormalizer2 *norm = unorm2_getNFCInstance(&errcode);
-			assert(!U_FAILURE(errcode));
-			UBool was_actually_nfc = unorm2_isNormalized(norm, ubuff, usize, &errcode);
-			assert(!U_FAILURE(errcode));
-
-			/*
-			printf("lua-utf8, is the input NFC? %s\n", was_nfc ? "yes" : "no");
-			printf("ICU, is the input NFC?      %s\n", was_actually_nfc ? "yes" : "no");
-			*/
-
-			assert(was_nfc == was_actually_nfc);
+	while (true) {
+		lua_pushvalue(L, -1); // duplicate iterator (on top of stack)
+		int err = lua_pcall(L, 0, 2, 0);
+		if (err) {
+			assert(!valid_utf8);
+			break;
 		}
-	}
 
-	lua_getglobal(L, "utf8");
-	lua_getfield(L, -1, "normalize_nfc");
-	lua_pushlstring(L, (const char*)Data, Size);
-	err = lua_pcall(L, 1, 2, 0);
-
-	if (err) {
-		/* utf8.nfc_normalize raised an error */
-		assert(!valid_utf8);
-	} else {
-		assert(lua_isboolean(L, -1));
-		int was_already_nfc = lua_toboolean(L, -1);
-
-		assert(lua_isstring(L, -2));
-		const char *str = lua_tostring(L, -2);
-		size_t str_len = lua_objlen(L, -2);
-
-		assert(valid_utf8 || !was_already_nfc);
-
-		if (valid_utf8) {
-			UErrorCode errcode = U_ZERO_ERROR;
-			const UNormalizer2 *norm = unorm2_getNFCInstance(&errcode);
-			assert(!U_FAILURE(errcode));
-
-			uint32_t dest_size = 3 * usize; /* Maximum size which string could possibly expand to as NFC */
-			UChar *dest = malloc(dest_size * sizeof(UChar));
-
-			uint32_t dest_len = unorm2_normalize(norm, ubuff, usize, dest, dest_size, &errcode);
-			assert(!U_FAILURE(errcode));
-
-			/* Convert NFC codepoints to UTF-8 bytes */
-			char *bytes = NULL;
-			uint32_t byte_len = icu_from_uchar(icu_converter, &bytes, dest, dest_len);
-
-			/*
-			printf("lua-utf8 (%zu): ", str_len);
-			for (unsigned int i = 0; i < str_len; i++)
-				printf("%02x ", (uint8_t)str[i]);
-			printf("\n");
-			printf("ICU      (%u): ", byte_len);
-			for (unsigned int i = 0; i < byte_len; i++)
-				printf("%02x ", (uint8_t)bytes[i]);
-			printf("\n");
-			*/
-
-			assert(byte_len == str_len);
-			assert(strncmp(str, bytes, str_len) == 0);
-
-			free(dest);
-			free(bytes);
+		if (lua_isnil(L, -1)) {
+			/* Finished iteration */
+			if (valid_utf8) {
+				p = ubrk_next(bi);
+				assert(p == UBRK_DONE);
+			}
+			break;
+		} else {
+			assert(lua_isnumber(L, -1));
+			assert(lua_isnumber(L, -2));
+			int start = lua_tonumber(L, -2);
+			int end = lua_tonumber(L, -1);
+			lua_pop(L, 2);
+			if (valid_utf8) {
+				printf("start = %d, end = %d, p = %d\n", start, end, p);
+				/* start and end are byte offsets, p is a codepoint offset */
+				assert(p == utf16_code_unit_len(Data, start-1));
+				p = ubrk_next(bi);
+				printf("moved to next boundary, now p = %d\n", p);
+				printf("utf16_code_unit_len(Data, end) = %zu\n", utf16_code_unit_len(Data, end));
+				assert(p != UBRK_DONE);
+				assert(p == utf16_code_unit_len(Data, end));
+			}
 		}
 	}
 
@@ -227,6 +217,8 @@ int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size)
 	free(ubuff);
 	if (icu_converter)
 		ucnv_close(icu_converter);
+	if (bi)
+		ubrk_close(bi);
 
 	return 0;
 }
