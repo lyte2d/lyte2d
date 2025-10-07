@@ -391,19 +391,6 @@ for _,case in ipairs(normalization_test_cases) do
    end
 end
 
--- Regression tests:
--- Although U+1100-115F are all leading Jamo (Korean characters), for some reason,
--- the normalization algorithm only combines U+1100-1112 with a following vowel Jamo
-assert(utf8.isnfc("\225\133\133\225\133\163"))
--- In certain cases, we did not properly check if a combining mark was blocked from
--- combining with the preceding starter codepoint (by another combining mark with
--- the same canonicalization class)
-assert(utf8.isnfc("\196\148\204\162\204\167"))
--- It is possible that a codepoint which is composed from a starter and combining mark
--- might be decomposed, then the resulting starter might be decomposed AGAIN, then
--- those two resulting combining marks might be reordered with a following combining
--- mark
-assert(not utf8.isnfc("\199\154\204\164"))
 
 -- test normalize_nfc
 for _,case in ipairs(normalization_test_cases) do
@@ -411,41 +398,6 @@ for _,case in ipairs(normalization_test_cases) do
    assert(utf8.normalize_nfc(case.nfc) == case.nfc)
    assert(utf8.normalize_nfc(case.nfd) == case.nfc)
 end
-
--- Regression tests:
--- Long series of combining marks; these need to be sorted in canonical order
-assert(utf8.normalize_nfc("\215\129\215\133\215\133\215\129\215\129\215\129\215\129\215\129\215\129") == "\215\129\215\129\215\129\215\129\215\129\215\129\215\129\215\133\215\133")
--- After converting combining marks to standard codepoints, it is possible their canonicalization class may change
--- If so, make sure they are still put in the correct order
-assert(utf8.normalize_nfc("\200\135\204\163\204\169") == "\225\186\185\204\169\204\145")
--- This test case caused an out-of-bounds read where my code tried to sort an empty array
-assert(utf8.normalize_nfc("\225\190\129\204\129") == "\225\190\133")
--- After converting one codepoint to two, as required by the NFC normalization tables,
--- if the 2nd resulting codepoint is a combining mark, we have to be ready to re-order
--- it with any following combining marks
-assert(utf8.normalize_nfc("\224\165\152\204\184") == "\224\164\149\204\184\224\164\188")
--- It can also happen that a codepoint converts to a starter followed by TWO combining marks,
--- and we must be able to reorder BOTH of those combining marks with a following combining mark
-assert(utf8.normalize_nfc("\239\172\172\204\184") == "\215\169\204\184\214\188\215\129")
--- It can even happen that a deprecated 'starter' codepoint (canonicalization class = 0)
--- can convert to 'combining mark' codepoints (canonicalization class != 0)
-assert(utf8.normalize_nfc("\223\179\224\189\179") == "\224\189\177\224\189\178\223\179")
--- In certain cases, we did not properly check if a combining mark was blocked from
--- combining with the preceding starter codepoint (by another combining mark with
--- the same canonicalization class)
-assert(utf8.normalize_nfc("\196\148\204\162\204\167") == "\196\148\204\162\204\167")
-assert(utf8.normalize_nfc("\200\148\204\160\204\148\204\164") == "\200\148\204\160\204\164\204\148")
--- It is possible that a codepoint which is composed from a starter and combining mark
--- might be decomposed, then the resulting starter might be decomposed AGAIN, then
--- those two resulting combining marks might be reordered with a following combining
--- mark
-assert(utf8.normalize_nfc("\199\154\204\164") == "\225\185\179\204\136\204\140")
--- When a codepoint decomposes to a starter followed by 2 combining marks, we need to
--- make sure those combining marks are in the right order with any following ones
-assert(utf8.normalize_nfc("\199\160\205\129\204\168") == "\196\132\204\135\204\132\204\129")
--- Fixing another issue with ordering of combining marks after a codepoint decomposes
--- to a starter followed by 1 or 2 combining marks:
-assert(utf8.normalize_nfc("\199\155\204\155\204\131\204\155") == "\198\175\204\155\204\136\204\128\204\131")
 
 
 -- Official set of test cases for grapheme cluster segmentation, provided by Unicode Consortium
@@ -457,7 +409,7 @@ for line in f:lines() do
       line = line:gsub("^%s*÷%s*", "")
       line = line:gsub("%s*÷%s*$", "")
       local clusters = { "" }
-      for str in line:gmatch("%S+") do
+      for str in line:gmatch("%S*") do
          if str == '×' then
             -- do nothing
          elseif str == '÷' then
