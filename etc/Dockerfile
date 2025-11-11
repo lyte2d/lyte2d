@@ -2,7 +2,7 @@
 FROM ubuntu:18.04
 LABEL Description="Lyte2D Build Environment"
 
-ENV HOME /root
+ENV HOME=/root
 
 SHELL ["/bin/bash", "-c"]
 
