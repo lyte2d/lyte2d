@@ -107,7 +107,7 @@ static inline void _tick_function(void) {
     // lyte_push_matrix();
     sgp_reset_transform();
     // sgp_scale(xscale, yscale);
-    lytecore_state.tick_fn(lytecore_state.app_data, delta_time, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen);
+    lytecore_state.tick_fn(lytecore_state.app_data, delta_time, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen, lytecore_state.has_focus);
     // lyte_pop_matrix();
 
     // NOTE: at this point only sgp state has been changed, and sg has not

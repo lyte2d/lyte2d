@@ -36,6 +36,16 @@ void _sg_log(const char* tag, uint32_t log_level, uint32_t log_item_id, const ch
     }
 }
 
+static void window_focus_callback(GLFWwindow* window, int focused)
+{
+    if (focused) {
+        lytecore_state.has_focus = true;
+    }
+    else {
+        lytecore_state.has_focus = false;
+    }
+}
+
 int lyte_core_window_init(void) {
 
 #if defined(__EMSCRIPTEN__)
@@ -118,6 +128,9 @@ int lyte_core_window_init(void) {
     // show window
     glfwShowWindow(lytecore_state.window);
 #endif
+
+    lytecore_state.has_focus = true;
+    glfwSetWindowFocusCallback(lytecore_state.window, window_focus_callback);
 
     // NOTE: Input code and window are tighyly integrated. We need to initialize this here
     lyte_core_input_init();

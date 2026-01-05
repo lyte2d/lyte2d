@@ -14,6 +14,7 @@ return process_def_tree(Namespace("lyte",
         Arg("window_height", Int),
         Arg("window_resized", Bool),
         Arg("is_fullscreen", Bool),
+        Arg("has_focus", Bool),
         Doc"Tick function. Should be created by the user.",
         UserImpl
     ),

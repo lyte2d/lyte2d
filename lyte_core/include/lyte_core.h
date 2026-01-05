@@ -27,7 +27,7 @@ typedef struct lyte_Args {
     char **argv;
 } lyte_Args;
 
-typedef void (*lyte_TickFunction)(void *app_data, float delta_time, int width, int height, bool resized, bool fullscreen);
+typedef void (*lyte_TickFunction)(void *app_data, float delta_time, int width, int height, bool resized, bool fullscreen, bool has_focus);
 
 typedef struct lyte_Config {
     lyte_Args args;
