@@ -452,6 +452,7 @@ static void string_to_nfc (lua_State *L, luaL_Buffer *buff, const char *s, const
   uint32_t onstack[8];
   size_t vec_size = 0, vec_max = sizeof(onstack)/sizeof(uint32_t);
   uint32_t *vector = onstack;
+  nfc_table *entry = NULL;
 
   while (s < e) {
     const char *new_s = utf8_decode(s, &ch, 1);
@@ -463,7 +464,7 @@ static void string_to_nfc (lua_State *L, luaL_Buffer *buff, const char *s, const
 
     if (!canon_cls) {
       /* This is a starter codepoint */
-      nfc_table *entry = nfc_quickcheck(ch);
+      entry = nfc_quickcheck(ch);
 
       /* Handle preceding starter and optional sequence of combining marks which may have followed it */
       if (prev_canon_cls) {
