@@ -307,6 +307,11 @@ static inline int _set_window_paddings(int left, int right, int top, int bottom)
     err = lyte_set_window_paddings(left, right, top, bottom);
     return err;
 }
+static inline int _has_focus(bool *val) {
+    int err = 0;
+    err = lyte_has_focus(val);
+    return err;
+}
 static inline int _is_key_down(int key, bool *val) {
     (void)key; int err = 0;
     err = lyte_is_key_down(key, val);

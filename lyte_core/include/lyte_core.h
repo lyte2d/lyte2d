@@ -99,6 +99,7 @@ int lyte_set_window_vsync(bool vsync);
 int lyte_is_window_vsync(bool *val);
 int lyte_set_window_margins(int left, int right, int top, int bottom);
 int lyte_set_window_paddings(int left, int right, int top, int bottom);
+int lyte_has_focus(bool *val);
 
 
 // -------------------------

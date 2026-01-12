@@ -413,3 +413,8 @@ int lyte_set_window_paddings(int left, int right, int top, int bottom) {
     lytecore_state.window_paddings.bottom = bottom;
     return 0;
 }
+
+int lyte_has_focus(bool *val) {
+    *val = lytecore_state.has_focus;
+    return 0;
+}

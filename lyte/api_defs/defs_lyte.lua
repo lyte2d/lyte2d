@@ -319,6 +319,8 @@ end
 
     Function("set_window_paddings", MapTo("lyte_core.set_window_paddings")),
 
+    Function("has_focus", MapTo("lyte_core.has_focus")),
+
     Function("is_key_down", MapTo("lyte_core.is_key_down")),
 
     Function("is_key_pressed", MapTo("lyte_core.is_key_pressed")),
