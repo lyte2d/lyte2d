@@ -7,16 +7,19 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
+#include <limits.h>
 #include <stdlib.h>
 
 #include "unidata.h"
 
 /* UTF-8 string operations */
 
+#define LUTF8_VERSION "0.2.0"
+
 #define UTF8_BUFFSZ 8
 #define UTF8_MAX    0x7FFFFFFFu
 #define UTF8_MAXCP  0x10FFFFu
-#define iscont(p)   ((*(p) & 0xC0) == 0x80)
+#define iscontp(p)    ((*(p) & 0xC0) == 0x80)
 #define CAST(tp,expr) ((tp)(expr))
 
 #ifndef LUA_QL
@@ -28,7 +31,7 @@ static int utf8_invalid (utfint ch)
 
 static size_t utf8_encode (char *buff, utfint x) {
   int n = 1;  /* number of bytes put in buffer (backwards) */
-  lua_assert(x <= UTF8_MAX);
+  assert(x <= UTF8_MAX);
   if (x < 0x80)  /* ascii? */
     buff[UTF8_BUFFSZ - 1] = x & 0x7F;
   else {  /* need continuation bytes */
@@ -73,12 +76,12 @@ static const char *utf8_decode (const char *s, utfint *val, int strict) {
 }
 
 static const char *utf8_prev (const char *s, const char *e) {
-  while (s < e && iscont(e - 1)) --e;
+  while (s < e && iscontp(e - 1)) --e;
   return s < e ? e - 1 : s;
 }
 
 static const char *utf8_next (const char *s, const char *e) {
-  while (s < e && iscont(s + 1)) ++s;
+  while (s < e && iscontp(s + 1)) ++s;
   return s < e ? s + 1 : e;
 }
 
@@ -251,10 +254,9 @@ static int lookup_canon_cls (utfint ch) {
 static nfc_table *nfc_quickcheck (utfint ch) {
   /* The first character which needs to be checked for possible NFC violations
    * is U+0300 COMBINING GRAVE ACCENT */
-  if (ch < 0x300) {
-    return NULL;
-  }
-  size_t begin = 0, end = table_size(nfc_quickcheck_table);
+  size_t begin = 0, end;
+  if (ch < 0x300) return NULL;
+  end = table_size(nfc_quickcheck_table);
 
   while (begin < end) {
     size_t mid = (begin + end) / 2;
@@ -325,18 +327,28 @@ static int nfc_check (utfint ch, nfc_table *entry, utfint starter, unsigned int 
     }
   } else if (reason == REASON_COMBINING_MARK) {
     /* Combining mark; check if it should have been combined with preceding starter codepoint */
-    if (canon_cls > prev_canon_cls && nfc_combine(starter, ch, NULL)) {
+    if (canon_cls <= prev_canon_cls) {
+      return 1;
+    }
+    if (nfc_combine(starter, ch, NULL)) {
       /* Yes, they should have been combined. This string is not NFC */
       return 0;
     }
     /* Could it be that preceding 'starter' codepoint is already combined, but with a
      * combining mark which is out of order with this one? */
     decompose_table *decomp = nfc_decompose(starter);
-    if (decomp && decomp->canon_cls2 > canon_cls && nfc_combine(decomp->to1, ch, NULL)) {
-      return 0;
+    if (decomp) {
+      if (decomp->canon_cls2 > canon_cls && nfc_combine(decomp->to1, ch, NULL)) {
+        return 0;
+      } else {
+        decompose_table *decomp2 = nfc_decompose(decomp->to1);
+        if (decomp2 && decomp2->canon_cls2 > canon_cls && nfc_combine(decomp2->to1, ch, NULL)) {
+          return 0;
+        }
+      }
     }
   } else if (reason == REASON_JAMO_VOWEL) {
-    if (!prev_canon_cls && starter >= 0x1100 && starter <= 0x115F) {
+    if (!prev_canon_cls && starter >= 0x1100 && starter <= 0x1112) {
       /* Preceding codepoint was a leading jamo; they should have been combined */
       return 0;
     }
@@ -413,7 +425,47 @@ static void stable_sort_combining_marks (uint32_t *vector, uint32_t *scratch, si
   }
 }
 
+/* Shuffle item `i` up or down to get it into the right position */
+static void stable_insert_combining_mark (uint32_t *vector, size_t vec_size, unsigned int i)
+{
+  unsigned int item = vector[i];
+  unsigned int canon_cls = item & 0xFF;
+  if (i > 0) {
+    if (canon_cls < (vector[i-1] & 0xFF)) {
+      do {
+        vector[i] = vector[i-1];
+        i--;
+      } while (i > 0 && canon_cls < (vector[i-1] & 0xFF));
+      vector[i] = item;
+      return;
+    }
+  }
+  if (i < vec_size-1) {
+    if (canon_cls > (vector[i+1] & 0xFF)) {
+      do {
+        vector[i] = vector[i+1];
+        i++;
+      } while (i < vec_size-1 && canon_cls > (vector[i+1] & 0xFF));
+      vector[i] = item;
+      return;
+    }
+  }
+}
+
 static void add_utf8char (luaL_Buffer *b, utfint ch);
+
+static inline void grow_vector_if_needed (uint32_t **vector, uint32_t *onstack, size_t *size, size_t needed)
+{
+  size_t current_size = *size;
+  if (needed >= current_size) {
+    size_t new_size = current_size * 2; /* `needed` is never bigger than `current_size * 2` */
+    uint32_t *new_vector = malloc(new_size * sizeof(uint32_t));
+    memcpy(new_vector, *vector, current_size * sizeof(uint32_t));
+    *size = new_size;
+    if (*vector != onstack) free(*vector);
+    *vector = new_vector;
+  }
+}
 
 static void string_to_nfc (lua_State *L, luaL_Buffer *buff, const char *s, const char *e)
 {
@@ -441,9 +493,9 @@ static void string_to_nfc (lua_State *L, luaL_Buffer *buff, const char *s, const
    * If it is, we memcpy the bytes verbatim into the output buffer. If it is not, then we
    * convert the codepoints to NFC and then emit those codepoints as UTF-8 bytes. */
 
-  utfint starter = -1, ch = 0; /* 'starter' is last starter codepoint seen */
+  utfint starter = (utfint)-1, ch; /* 'starter' is last starter codepoint seen */
   const char *to_copy = s; /* pointer to next bytes we might need to memcpy into output buffer */
-  unsigned int prev_canon_cls = 0; // , canon_cls = 0;
+  unsigned int prev_canon_cls = 0;
   int fixedup = 0; /* has the sequence currently under consideration been modified to make it NFC? */
 
   /* Temporary storage for a sequence of consecutive combining marks
@@ -452,18 +504,38 @@ static void string_to_nfc (lua_State *L, luaL_Buffer *buff, const char *s, const
   uint32_t onstack[8];
   size_t vec_size = 0, vec_max = sizeof(onstack)/sizeof(uint32_t);
   uint32_t *vector = onstack;
+  nfc_table *entry = NULL;
 
   while (s < e) {
     const char *new_s = utf8_decode(s, &ch, 1);
     if (new_s == NULL) {
-      lua_pushstring(L, "string is not valid UTF-8");
-      lua_error(L);
+      if (vector != onstack) free(vector);
+      luaL_error(L, "string is not valid UTF-8");
     }
     unsigned int canon_cls = lookup_canon_cls(ch);
 
     if (!canon_cls) {
       /* This is a starter codepoint */
-      nfc_table *entry = nfc_quickcheck(ch);
+      entry = nfc_quickcheck(ch);
+
+      /* But in rare cases, a deprecated 'starter' codepoint may convert
+       * to combining marks instead!
+       * Why, oh why, did the Unicode Consortium do this?? */
+      if (entry && entry->reason == REASON_MUST_CONVERT_2) {
+        utfint conv1 = entry->data1;
+        unsigned int canon_cls1 = lookup_canon_cls(conv1);
+        if (canon_cls1) {
+          utfint conv2 = entry->data2;
+          unsigned int canon_cls2 = lookup_canon_cls(conv2);
+          grow_vector_if_needed(&vector, onstack, &vec_max, vec_size + 2);
+          vector[vec_size++] = (conv1 << 8) | (canon_cls1 & 0xFF);
+          vector[vec_size++] = (conv2 << 8) | (canon_cls2 & 0xFF);
+          s = new_s;
+          prev_canon_cls = canon_cls2;
+          fixedup = 1;
+          continue;
+        }
+      }
 
       /* Handle preceding starter and optional sequence of combining marks which may have followed it */
       if (prev_canon_cls) {
@@ -479,6 +551,7 @@ process_combining_marks:
             stable_sort_combining_marks(vector, scratch, vec_size);
             free(scratch);
             fixedup = 1;
+            break;
           }
         }
 
@@ -495,10 +568,7 @@ process_combining_marks:
               continue;
             } else if (mark_entry->reason == REASON_MUST_CONVERT_2) {
               /* This combining mark must be converted to two others */
-              if (vec_size == vec_max) {
-                vec_max *= 2;
-                vector = realloc((vector == onstack) ? NULL : vector, vec_max * sizeof(uint32_t));
-              }
+              grow_vector_if_needed(&vector, onstack, &vec_max, vec_size + 1);
               memmove(&vector[i+2], &vector[i+1], sizeof(uint32_t) * (vec_size - i - 1));
               vector[i] = (mark_entry->data1 << 8) | lookup_canon_cls(mark_entry->data1);
               vector[i+1] = (mark_entry->data2 << 8) | lookup_canon_cls(mark_entry->data2);
@@ -506,24 +576,46 @@ process_combining_marks:
               fixedup = 1;
               continue;
             } else if (mark_entry->reason == REASON_COMBINING_MARK) {
-              if ((i == 0 || (vector[i] & 0xFF) > (vector[i-1] & 0xFF)) && nfc_combine(starter, combine_mark, &starter)) {
-                /* This combining mark must be combined with preceding starter */
-                vec_size--;
-                memmove(&vector[i], &vector[i+1], sizeof(uint32_t) * (vec_size - i)); /* Remove element i */
-                fixedup = 1;
-                continue;
-              }
+              unsigned int mark_canon_cls = vector[i] & 0xFF;
+              if (i == 0 || mark_canon_cls > (vector[i-1] & 0xFF)) {
+                if (nfc_combine(starter, combine_mark, &starter)) {
+                  /* This combining mark must be combined with preceding starter */
+                  vec_size--;
+                  memmove(&vector[i], &vector[i+1], sizeof(uint32_t) * (vec_size - i)); /* Remove element i */
+                  fixedup = 1;
+                  continue;
+                }
 
-              decompose_table *decomp = nfc_decompose(starter);
-              if (decomp && decomp->canon_cls2 > (vector[i] & 0xFF) && nfc_combine(decomp->to1, combine_mark, &starter)) {
-                /* The preceding starter already included an accent, but when represented as a combining
-                 * mark, that accent has a HIGHER canonicalization class than this one
-                 * Further, this one is able to combine with the same base character
-                 * In other words, the base character was wrongly combined with a "lower-priority"
-                 * combining mark; fix that up */
-                vector[i] = (decomp->to2 << 8) | lookup_canon_cls(decomp->to2);
-                fixedup = 1;
-                continue;
+                decompose_table *decomp = nfc_decompose(starter);
+                if (decomp) {
+                  if (decomp->canon_cls2 > mark_canon_cls && nfc_combine(decomp->to1, combine_mark, &starter)) {
+                    /* The preceding starter already included an accent, but when represented as a combining
+                     * mark, that accent has a HIGHER canonicalization class than this one
+                     * Further, this one is able to combine with the same base character
+                     * In other words, the base character was wrongly combined with a "lower-priority"
+                     * combining mark; fix that up */
+                    unsigned int class2 = lookup_canon_cls(decomp->to2);
+                    memmove(&vector[1], &vector[0], sizeof(uint32_t) * i);
+                    vector[0] = (decomp->to2 << 8) | class2;
+                    stable_insert_combining_mark(vector, vec_size, 0);
+                    fixedup = 1;
+                    continue;
+                  } else {
+                    decompose_table *decomp2 = nfc_decompose(decomp->to1);
+                    if (decomp2 && decomp2->canon_cls2 > mark_canon_cls && nfc_combine(decomp2->to1, combine_mark, &starter)) {
+                      grow_vector_if_needed(&vector, onstack, &vec_max, vec_size + 1);
+                      memmove(&vector[i+2], &vector[i+1], sizeof(uint32_t) * (vec_size - i - 1));
+                      memmove(&vector[2], &vector[0], sizeof(uint32_t) * i);
+                      vector[0] = (decomp2->to2 << 8) | lookup_canon_cls(decomp2->to2);
+                      vector[1] = (decomp->to2 << 8) | lookup_canon_cls(decomp->to2);
+                      vec_size++;
+                      stable_insert_combining_mark(vector, vec_size, 1);
+                      stable_insert_combining_mark(vector, vec_size, 0);
+                      fixedup = 1;
+                      continue;
+                    }
+                  }
+                }
               }
             }
           }
@@ -533,7 +625,7 @@ process_combining_marks:
         if (fixedup) {
           /* The preceding starter/combining mark sequence was bad; convert fixed-up codepoints
            * to UTF-8 bytes */
-          if ((int)starter != -1)
+          if (starter != (utfint)-1)
             add_utf8char(buff, starter);
           for (unsigned int i = 0; i < vec_size; i++)
             add_utf8char(buff, vector[i] >> 8);
@@ -550,14 +642,14 @@ process_combining_marks:
         }
         vec_size = 0; /* Clear vector of combining marks in readiness for next such sequence */
         fixedup = 0;
-      } else if ((int)starter != -1) {
+      } else if (starter != (utfint)-1) {
         /* This starter was preceded immediately by another starter
          * Check if this one should combine with it */
         fixedup = 0;
         if (entry) {
           if (entry->reason == REASON_STARTER_CAN_COMBINE && nfc_combine(starter, ch, &ch)) {
             fixedup = 1;
-          } else if (entry->reason == REASON_JAMO_VOWEL && starter >= 0x1100 && starter <= 0x115F) {
+          } else if (entry->reason == REASON_JAMO_VOWEL && starter >= 0x1100 && starter <= 0x1112) {
             ch = 0xAC00 + ((starter - 0x1100) * 588) + ((ch - 0x1161) * 28);
             fixedup = 1;
           } else if (entry->reason == REASON_JAMO_TRAILING) {
@@ -581,25 +673,48 @@ process_combining_marks:
           fixedup = 1;
         } else if (entry->reason == REASON_MUST_CONVERT_2) {
           utfint conv1 = entry->data1;
-          /* It is possible that after converting 'ch' to two other codepoints,
-           * the first one might also need to convert to two codepoints */
-          nfc_table *conv_entry = nfc_quickcheck(conv1);
-          if (conv_entry && conv_entry->reason == REASON_MUST_CONVERT_2) {
-            add_utf8char(buff, conv_entry->data1);
-            add_utf8char(buff, conv_entry->data2);
+          utfint conv2 = entry->data2;
+          /* It's possible that 'ch' might convert to two other codepoints,
+           * where the 2nd one is a combining mark */
+          unsigned int canon_cls2 = lookup_canon_cls(conv2);
+          if (canon_cls2) {
+            /* It's possible that the 1st resulting codepoint may need to be
+             * split again into more codepoints */
+            nfc_table *conv_entry = nfc_quickcheck(conv1);
+            if (conv_entry && conv_entry->reason == REASON_MUST_CONVERT_2) {
+              utfint conv3 = conv2;
+              unsigned int canon_cls3 = canon_cls2;
+              conv1 = conv_entry->data1;
+              conv2 = conv_entry->data2;
+              canon_cls2 = lookup_canon_cls(conv2);
+              if (canon_cls2) {
+                starter = conv1;
+                vector[0] = (conv2 << 8) | canon_cls2;
+                vector[1] = (conv3 << 8) | canon_cls3;
+                vec_size = 2;
+              } else {
+                add_utf8char(buff, conv1);
+                starter = conv2;
+                vector[0] = (conv3 << 8) | canon_cls3;
+                vec_size = 1;
+              }
+              canon_cls = canon_cls3;
+            } else {
+              starter = conv1;
+              vector[0] = (conv2 << 8) | canon_cls2;
+              vec_size = 1;
+              canon_cls = canon_cls2;
+            }
           } else {
             add_utf8char(buff, conv1);
+            starter = conv2;
           }
-          starter = entry->data2;
           fixedup = 1;
         }
       }
     } else {
       /* Accumulate combining marks in vector */
-      if (vec_size == vec_max) {
-        vec_max *= 2;
-        vector = realloc((vector == onstack) ? NULL : vector, vec_max * sizeof(uint32_t));
-      }
+      grow_vector_if_needed(&vector, onstack, &vec_max, vec_size + 1);
       vector[vec_size++] = (ch << 8) | (canon_cls & 0xFF);
     }
 
@@ -609,11 +724,10 @@ process_combining_marks:
 
   if (vec_size)
     goto process_combining_marks; /* Finish processing trailing combining marks */
-  if ((int)starter != -1)
+  if (starter != (utfint)-1)
     add_utf8char(buff, starter);
 
-  if (vector != onstack)
-    free(vector);
+  if (vector != onstack) free(vector);
 }
 
 /* Grapheme cluster support */
@@ -685,15 +799,15 @@ static int utf8_isalnum (utfint ch) {
   return 0;
 }
 
-static int utf8_width (utfint ch, int ambi_is_single) {
+static int utf8_width (utfint ch, int ambiwidth, int default_width) {
   if (find_in_range(doublewidth_table, table_size(doublewidth_table), ch))
     return 2;
   if (find_in_range(ambiwidth_table, table_size(ambiwidth_table), ch))
-    return ambi_is_single ? 1 : 2;
+    return ambiwidth;
   if (find_in_range(compose_table, table_size(compose_table), ch))
-    return 0;
+    return default_width;
   if (find_in_range(unprintable_table, table_size(unprintable_table), ch))
-    return 0;
+    return default_width;
   return 1;
 }
 
@@ -734,17 +848,21 @@ static lua_Integer byte_relat (lua_Integer pos, size_t len) {
   else return (lua_Integer)len + pos + 1;
 }
 
+static void check_byte_range(lua_State *L, size_t len, lua_Integer *posi, lua_Integer *posj) {
+  luaL_argcheck(L, 1 <= *posi && --*posi <= (lua_Integer)len, 2,
+      "initial position out of bounds");
+  luaL_argcheck(L, --*posj < (lua_Integer)len, 3,
+      "final position out of bounds");
+}
+
 static int Lutf8_len (lua_State *L) {
   size_t len, n;
   const char *s = luaL_checklstring(L, 1, &len), *p, *e;
   lua_Integer posi = byte_relat(luaL_optinteger(L, 2, 1), len);
-  lua_Integer pose = byte_relat(luaL_optinteger(L, 3, -1), len);
+  lua_Integer posj = byte_relat(luaL_optinteger(L, 3, len), len);
   int lax = lua_toboolean(L, 4);
-  luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 2,
-                   "initial position out of string");
-  luaL_argcheck(L, --pose < (lua_Integer)len, 3,
-                   "final position out of string");
-  for (n = 0, p=s+posi, e=s+pose+1; p < e; ++n) {
+  check_byte_range(L, len, &posi, &posj);
+  for (n = 0, p=s+posi, e=s+posj+1; p < e; ++n) {
     if (lax)
       p = utf8_next(p, e);
     else {
@@ -765,9 +883,9 @@ static int Lutf8_len (lua_State *L) {
 static int Lutf8_sub (lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e);
   lua_Integer posi = luaL_checkinteger(L, 2);
-  lua_Integer pose = luaL_optinteger(L, 3, -1);
-  if (utf8_range(s, e, &posi, &pose))
-    lua_pushlstring(L, s+posi, pose-posi);
+  lua_Integer posj = luaL_optinteger(L, 3, -1);
+  if (utf8_range(s, e, &posi, &posj))
+    lua_pushlstring(L, s+posi, posj-posi);
   else
     lua_pushliteral(L, "");
   return 1;
@@ -805,9 +923,9 @@ static int Lutf8_byte (lua_State *L) {
   size_t n = 0;
   const char *e, *s = check_utf8(L, 1, &e);
   lua_Integer posi = luaL_optinteger(L, 2, 1);
-  lua_Integer pose = luaL_optinteger(L, 3, posi);
-  if (utf8_range(s, e, &posi, &pose)) {
-    for (e = s + pose, s = s + posi; s < e; ++n) {
+  lua_Integer posj = luaL_optinteger(L, 3, posi);
+  if (utf8_range(s, e, &posi, &posj)) {
+    for (e = s + posj, s = s + posi; s < e; ++n) {
       utfint ch = 0;
       s = utf8_safe_decode(L, s, &ch);
       lua_pushinteger(L, ch);
@@ -820,19 +938,19 @@ static int Lutf8_codepoint (lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e);
   size_t len = e-s;
   lua_Integer posi = byte_relat(luaL_optinteger(L, 2, 1), len);
-  lua_Integer pose = byte_relat(luaL_optinteger(L, 3, posi), len);
+  lua_Integer posj = byte_relat(luaL_optinteger(L, 3, posi), len);
   int lax = lua_toboolean(L, 4);
   int n;
   const char *se;
-  luaL_argcheck(L, posi >= 1, 2, "out of range");
-  luaL_argcheck(L, pose <= (lua_Integer)len, 3, "out of range");
-  if (posi > pose) return 0;  /* empty interval; return no values */
-  if (pose - posi >= INT_MAX)  /* (lua_Integer -> int) overflow? */
+  luaL_argcheck(L, posi >= 1, 2, "out of bounds");
+  luaL_argcheck(L, posj <= (lua_Integer)len, 3, "out of bounds");
+  if (posi > posj) return 0;  /* empty interval; return no values */
+  if (posj - posi >= INT_MAX)  /* (lua_Integer -> int) overflow? */
     return luaL_error(L, "string slice too long");
-  n = (int)(pose -  posi + 1);
+  n = (int)(posj -  posi + 1);
   luaL_checkstack(L, n, "string slice too long");
   n = 0;  /* count the number of returns */
-  se = s + pose;  /* string end */
+  se = s + posj;  /* string end */
   for (n = 0, s += posi - 1; s < se;) {
     utfint code = 0;
     s = utf8_safe_decode(L, s, &code);
@@ -850,7 +968,7 @@ static int Lutf8_char (lua_State *L) {
   luaL_buffinit(L, &b);
   for (i = 1; i <= n; ++i) {
     lua_Integer code = luaL_checkinteger(L, i);
-    luaL_argcheck(L, (unsigned int)code <= UTF8_MAXCP, i, "value out of range");
+    luaL_argcheck(L, code <= UTF8_MAXCP, i, "value out of range");
     add_utf8char(&b, CAST(utfint, code));
   }
   luaL_pushresult(&b);
@@ -915,9 +1033,8 @@ static int Lutf8_escape (lua_State *L) {
       case '4': case '5': case '6': case '7':
       case '8': case '9': case '{':
         break;
-      case 'x': case 'X': hex = 1; /* fall through */
-      case 'u': case 'U': if (s+1 < e) { ++s; break; }
-                            /* fall through */
+      case 'x': case 'X': hex = 1; /* FALLTHROUGH */
+      case 'u': case 'U': if (s+1 < e) { ++s; break; } /* FALLTHROUGH */
       default:
         s = utf8_safe_decode(L, s, &ch);
         goto next;
@@ -956,14 +1073,14 @@ static int Lutf8_insert (lua_State *L) {
 static int Lutf8_remove (lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e);
   lua_Integer posi = luaL_optinteger(L, 2, -1);
-  lua_Integer pose = luaL_optinteger(L, 3, -1);
-  if (!utf8_range(s, e, &posi, &pose))
+  lua_Integer posj = luaL_optinteger(L, 3, -1);
+  if (!utf8_range(s, e, &posi, &posj))
     lua_settop(L, 1);
   else {
     luaL_Buffer b;
     luaL_buffinit(L, &b);
     luaL_addlstring(&b, s, posi);
-    luaL_addlstring(&b, s+pose, e-s-pose);
+    luaL_addlstring(&b, s+posj, e-s-posj);
     luaL_pushresult(&b);
   }
   return 1;
@@ -974,7 +1091,7 @@ static int push_offset (lua_State *L, const char *s, const char *e, lua_Integer 
   const char *p;
   if (idx != 0)
     p = utf8_offset(s, e, offset, idx);
-  else if (p = s+offset-1, iscont(p))
+  else if (p = s+offset-1, iscontp(p))
     p = utf8_prev(s, p);
   if (p == NULL || p == e) return 0;
   utf8_decode(p, &ch, 0);
@@ -1007,15 +1124,15 @@ static int Lutf8_offset (lua_State *L) {
                    "position out of range");
   if (n == 0) {
     /* find beginning of current byte sequence */
-    while (posi > 0 && iscont(s + posi)) posi--;
+    while (posi > 0 && iscontp(s + posi)) posi--;
   } else {
-    if (iscont(s + posi))
+    if (iscontp(s + posi))
       return luaL_error(L, "initial position is a continuation byte");
     if (n < 0) {
        while (n < 0 && posi > 0) {  /* move back */
          do {  /* find beginning of previous character */
            posi--;
-         } while (posi > 0 && iscont(s + posi));
+         } while (posi > 0 && iscontp(s + posi));
          n++;
        }
      } else {
@@ -1023,16 +1140,21 @@ static int Lutf8_offset (lua_State *L) {
        while (n > 0 && posi < (lua_Integer)len) {
          do {  /* find beginning of next character */
            posi++;
-         } while (iscont(s + posi));  /* (cannot pass final '\0') */
+         } while (iscontp(s + posi));  /* (cannot pass final '\0') */
          n--;
        }
      }
   }
-  if (n == 0)  /* did it find given character? */
-    lua_pushinteger(L, posi + 1);
-  else  /* no such character */
-    lua_pushnil(L);
-  return 1;
+  if (n != 0) return lua_pushnil(L), 1;
+  lua_pushinteger(L, posi + 1);
+  if ((s[posi] & 0x80) != 0) {
+    do {
+      posi++;
+    } while (iscontp(s + posi + 1));
+  }
+  /* else one-byte character: final position is the initial one */
+  lua_pushinteger(L, posi + 1);  /* 'posi' now is the final position */
+  return 2;
 }
 
 static int Lutf8_next (lua_State *L) {
@@ -1070,54 +1192,89 @@ static int Lutf8_codes (lua_State *L) {
   return 3;
 }
 
+static int width_opt (lua_State *L, int idx, int *pdefault) {
+  int ambiwidth = CAST(int, luaL_optinteger(L, idx, 1));
+  if (pdefault != NULL) *pdefault = CAST(int, luaL_optinteger(L, idx+1, 0));
+  return ambiwidth;
+}
+
 static int Lutf8_width (lua_State *L) {
   int t = lua_type(L, 1);
-  int ambi_is_single = !lua_toboolean(L, 2);
-  int default_width = CAST(int, luaL_optinteger(L, 3, 0));
-  if (t == LUA_TNUMBER) {
-    size_t chwidth = utf8_width(CAST(utfint, lua_tointeger(L, 1)), ambi_is_single);
-    if (chwidth == 0) chwidth = default_width;
-    lua_pushinteger(L, (lua_Integer)chwidth);
-  } else if (t != LUA_TSTRING)
+  int width = 0, ambiwidth, default_width;
+  if (t != LUA_TNUMBER && t != LUA_TSTRING)
     return typeerror(L, 1, "number/string");
-  else {
-    const char *e, *s = to_utf8(L, 1, &e);
-    int width = 0;
+  if (t == LUA_TSTRING) {
+    size_t len;
+    const char *e, *s = luaL_checklstring(L, 1, &len);
+    lua_Integer posi = byte_relat(luaL_optinteger(L, 2, 1), len);
+    lua_Integer posj = byte_relat(luaL_optinteger(L, 3, len), len);
+    ambiwidth = width_opt(L, 4, &default_width);
+    luaL_argcheck(L, 1 <= posi && --posi <= (lua_Integer)len, 2,
+        "initial position out of bounds");
+    luaL_argcheck(L, --posj < (lua_Integer)len, 3,
+        "final position out of bounds");
+    e = s + posj + 1, s += posi;
     while (s < e) {
       utfint ch = 0;
-      int chwidth;
       s = utf8_safe_decode(L, s, &ch);
-      chwidth = utf8_width(ch, ambi_is_single);
-      width += chwidth == 0 ? default_width : chwidth;
+      width += utf8_width(ch, ambiwidth, default_width);
     }
-    lua_pushinteger(L, (lua_Integer)width);
+    return lua_pushinteger(L, (lua_Integer)width), 1;
   }
-  return 1;
+  ambiwidth = width_opt(L, 2, &default_width);
+  return lua_pushinteger(L, utf8_width(CAST(utfint, lua_tointeger(L, 1)),
+        ambiwidth, default_width)), 1;
 }
 
 static int Lutf8_widthindex (lua_State *L) {
-  const char *e, *s = check_utf8(L, 1, &e);
-  int width = CAST(int, luaL_checkinteger(L, 2));
-  int ambi_is_single = !lua_toboolean(L, 3);
-  int default_width = CAST(int, luaL_optinteger(L, 4, 0));
-  size_t idx = 1;
-  while (s < e) {
+  size_t len;
+  const char *e, *s = luaL_checklstring(L, 1, &len);
+  int chwidth, width = CAST(int, luaL_checkinteger(L, 2));
+  lua_Integer posi = byte_relat(luaL_optinteger(L, 3, 1), len);
+  lua_Integer posj = byte_relat(luaL_optinteger(L, 4, len), len), idx;
+  int default_width, ambiwidth = width_opt(L, 5, &default_width);
+  check_byte_range(L, len, &posi, &posj);
+  for (idx = 0, e = s+posj+1, s += posi; s < e; ++idx, width -= chwidth) {
     utfint ch = 0;
-    size_t chwidth;
     s = utf8_safe_decode(L, s, &ch);
-    chwidth = utf8_width(ch, ambi_is_single);
-    if (chwidth == 0) chwidth = default_width;
-    width -= CAST(int, chwidth);
-    if (width <= 0) {
-      lua_pushinteger(L, idx);
-      lua_pushinteger(L, width + chwidth);
+    chwidth = utf8_width(ch, ambiwidth, default_width);
+    if (width <= chwidth) {
+      lua_pushinteger(L, idx + 1);
+      lua_pushinteger(L, width);
       lua_pushinteger(L, chwidth);
       return 3;
     }
-    ++idx;
   }
-  lua_pushinteger(L, (lua_Integer)idx);
-  return 1;
+  return lua_pushinteger(L, idx), 1;
+}
+
+static int Lutf8_widthlimit(lua_State *L) {
+  size_t len;
+  const char *s, *e, *n, *h = luaL_checklstring(L, 1, &len);
+  lua_Integer width = luaL_checkinteger(L, 2);
+  lua_Integer posi = byte_relat(luaL_optinteger(L, 3, 1), len);
+  lua_Integer posj = byte_relat(luaL_optinteger(L, 4, len), len);
+  int chwidth, default_width, ambiwidth = width_opt(L, 5, &default_width);
+  utfint ch;
+  check_byte_range(L, len, &posi, &posj);
+  s = h+posi, e = h+posj+1;
+  if (width >= 0) {
+    for (; s < e && width != 0; s = n, width -= chwidth) {
+      n = utf8_safe_decode(L, s, &ch);
+      chwidth = utf8_width(ch, ambiwidth, default_width);
+      if (width < chwidth) break;
+    }
+    lua_pushinteger(L, s - h);
+  } else {
+    for (; s < e && width != 0; e = n, width += chwidth) {
+      utf8_safe_decode(L, n = utf8_prev(s, e), &ch);
+      chwidth = utf8_width(ch, ambiwidth, default_width);
+      if (-width < chwidth) break;
+    }
+    lua_pushinteger(L, e - h + 1);
+  }
+  lua_pushinteger(L, width);
+  return 2;
 }
 
 static int Lutf8_ncasecmp (lua_State *L) {
@@ -1443,7 +1600,7 @@ static const char *match (MatchState *ms, const char *s, const char *p) {
             }
             case '+':  /* 1 or more repetitions */
               s = next_s;  /* 1 match already done */
-              /* fall through */
+              /* FALLTHROUGH */
             case '*':  /* 0 or more repetitions */
               s = max_expand(ms, s, p, ep);
               break;
@@ -1548,7 +1705,7 @@ static int find_aux (lua_State *L, int find) {
     const char *s2 = lmemfind(init, es-init, p, ep-p);
     if (s2) {
       const char *e2 = s2 + (ep - p);
-      if (iscont(e2)) e2 = utf8_next(e2, es);
+      if (iscontp(e2)) e2 = utf8_next(e2, es);
       lua_pushinteger(L, idx = get_index(s2, s, es) + 1);
       lua_pushinteger(L, idx + get_index(e2, s2, es) - 1);
       return 2;
@@ -1799,15 +1956,12 @@ static int Lutf8_clean(lua_State *L) {
 
 static int Lutf8_isnfc(lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e);
-  utfint starter = 0, ch = 0;
+  utfint starter = 0, ch;
   unsigned int prev_canon_cls = 0;
 
   while (s < e) {
     s = utf8_decode(s, &ch, 1);
-    if (s == NULL) {
-      lua_pushstring(L, "string is not valid UTF-8");
-      lua_error(L);
-    }
+    luaL_argcheck(L, (s != NULL), 1, "string is not valid UTF-8");
     if (ch < 0x300) {
       starter = ch; /* Fast path */
       prev_canon_cls = 0;
@@ -1838,17 +1992,14 @@ static int Lutf8_isnfc(lua_State *L) {
 
 static int Lutf8_normalize_nfc(lua_State *L) {
   const char *e, *s = check_utf8(L, 1, &e), *p = s, *starter_p = s;
-  utfint starter = 0, ch=0;
+  utfint starter = 0, ch;
   unsigned int prev_canon_cls = 0;
 
   /* First scan to see if we can find any problems... if not, we may just return the
    * input string unchanged */
   while (p < e) {
     const char *new_p = utf8_decode(p, &ch, 1);
-    if (new_p == NULL) {
-      lua_pushstring(L, "string is not valid UTF-8");
-      lua_error(L);
-    }
+    luaL_argcheck(L, (new_p != NULL), 1, "string is not valid UTF-8");
 
     unsigned int canon_cls = lookup_canon_cls(ch);
     if (canon_cls && canon_cls < prev_canon_cls) {
@@ -1872,8 +2023,7 @@ static int Lutf8_normalize_nfc(lua_State *L) {
   lua_pushboolean(L, 1); /* String was in normal form already, so 2nd return value is 'true' */
   return 2;
 
-build_string:
-;
+build_string: ;
   /* We will need to build a new string, this one is not NFC */
   luaL_Buffer buff;
   luaL_buffinit(L, &buff);
@@ -1897,7 +2047,7 @@ static int iterate_grapheme_indices(lua_State *L) {
   }
   const char *e = s + end;
 
-  utfint ch=0, next_ch=0;
+  utfint ch, next_ch;
   const char *p = utf8_safe_decode(L, s + pos - 1, &ch);
 
   while (1) {
@@ -1921,7 +2071,7 @@ static int iterate_grapheme_indices(lua_State *L) {
       /* U+200D is ZERO WIDTH JOINER, it always binds to preceding char */
       if (next_p < e && find_in_range(pictographic_table, table_size(pictographic_table), ch)) {
         /* After an Extended_Pictographic codepoint and ZWJ, we bind to a following Extended_Pictographic */
-        utfint nextnext_ch = 0;
+        utfint nextnext_ch;
         const char *probe_ep = utf8_safe_decode(L, next_p, &nextnext_ch);
         if (find_in_range(pictographic_table, table_size(pictographic_table), nextnext_ch)) {
           p = probe_ep;
@@ -1962,7 +2112,7 @@ static int iterate_grapheme_indices(lua_State *L) {
         /* The 2nd codepoint has property Grapheme_Extend, or is an Emoji_Modifier codepoint */
         if (next_p < e && find_in_range(pictographic_table, table_size(pictographic_table), ch)) {
           /* Consume any number of 'extend' codepoints, one ZWJ, and following Extended_Pictographic codepoint */
-          utfint probed_ch = 0;
+          utfint probed_ch;
           const char *probe = next_p;
           while (probe < e) {
             probe = utf8_safe_decode(L, probe, &probed_ch);
@@ -2032,10 +2182,10 @@ next_iteration: ;
 
 static int Lutf8_grapheme_indices(lua_State *L) {
   size_t len;
-  const char *s = luaL_checklstring(L, 1, &len);
-  if (s==NULL) { }
-  lua_Integer start = byte_relat(luaL_optinteger(L, 2, 1), len);
-  lua_Integer end = byte_relat(luaL_optinteger(L, 3, len), len);
+  lua_Integer start, end;
+  luaL_checklstring(L, 1, &len);
+  start = byte_relat(luaL_optinteger(L, 2, 1), len);
+  end = byte_relat(luaL_optinteger(L, 3, len), len);
   luaL_argcheck(L, start >= 1, 2, "out of range");
   luaL_argcheck(L, end <= (lua_Integer)len, 3, "out of range");
 
@@ -2061,27 +2211,31 @@ LUALIB_API int luaopen_utf8 (lua_State *L) {
     ENTRY(codes),
     ENTRY(codepoint),
 
+    ENTRY(find),
+    ENTRY(gmatch),
+    ENTRY(gsub),
+    ENTRY(match),
     ENTRY(len),
     ENTRY(sub),
     ENTRY(reverse),
     ENTRY(lower),
     ENTRY(upper),
-    ENTRY(title),
-    ENTRY(fold),
     ENTRY(byte),
     ENTRY(char),
+
+    ENTRY(title),
+    ENTRY(fold),
     ENTRY(escape),
     ENTRY(insert),
     ENTRY(remove),
     ENTRY(charpos),
     ENTRY(next),
+    ENTRY(ncasecmp),
+
     ENTRY(width),
     ENTRY(widthindex),
-    ENTRY(ncasecmp),
-    ENTRY(find),
-    ENTRY(gmatch),
-    ENTRY(gsub),
-    ENTRY(match),
+    ENTRY(widthlimit),
+
     ENTRY(isvalid),
     ENTRY(invalidoffset),
     ENTRY(clean),
@@ -2100,6 +2254,9 @@ LUALIB_API int luaopen_utf8 (lua_State *L) {
 
   lua_pushlstring(L, UTF8PATT, sizeof(UTF8PATT)-1);
   lua_setfield(L, -2, "charpattern");
+
+  lua_pushliteral(L, LUTF8_VERSION);
+  lua_setfield(L, -2, "version");
 
   return 1;
 }
