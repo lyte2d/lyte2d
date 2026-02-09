@@ -105,3 +105,11 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/luautf8/lutf8lib.c
 )
 
+if(MSVC)
+
+else ()
+    # lutf8lib has a bunch of warnings that *look* innocuous. Since we're compiling it
+    # along with `lyte`, it's inheriting -Werror. Set -Wno-error to undo this.
+    # feels a little dirty but it's a pretty well-trodden library.
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/../deps/luautf8/lutf8lib.c PROPERTIES COMPILE_FLAGS -Wno-error)
+endif()
