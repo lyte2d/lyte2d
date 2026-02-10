@@ -14,6 +14,7 @@ but fairly feature complete! Think Love2D, but with a tighter API and built-in W
 ## Links
 
 - [Lyte2D website](https://lyte2d.com)
+- [Releases](https://github.com/lyte2d/lyte2d/releases)
 - [User Guide](guide.html)
 - [Developer Doc](dev.md) (For building Lyte2D from scratch, and learning about the general architecture)
 - [Example Code](https://github.com/lyte2d/lyte2d/tree/main/samples)
