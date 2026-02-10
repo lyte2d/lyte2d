@@ -364,7 +364,7 @@ end
 -- keep in sync with gen_api_native.lua variable CTypeMaps
 TypeMaps = {
     ["bool"] =    {   lua = "boolean",   tl = "boolean",    ts = "boolean" },
-    ["int"] =     {   lua = "number",    tl = "int",        ts = "number" },
+    ["int"] =     {   lua = "number",    tl = "integer",    ts = "number" },
     ["float"] =   {   lua = "number",    tl = "number",     ts = "number" },
     ["double"] =  {   lua = "number",    tl = "number",     ts = "number" },
     ["string"] =  {   lua = "string",    tl = "string",     ts = "string" },
