@@ -3,7 +3,7 @@
 --- @meta
 --- @class lyte
 --- Tick function. Should be created by the user. 
---- @field tick fun(delta_time: number, window_width: int, window_height: int, window_resized: boolean, is_fullscreen: boolean)
+--- @field tick fun(delta_time: number, window_width: int, window_height: int, window_resized: boolean, is_fullscreen: boolean, has_focus: boolean)
     lyte = lyte or {}
 
 -- functions
@@ -167,6 +167,9 @@
 --- Set the window paddings. Paddings are can be drawn on. 
 --- @type fun(left: int, right: int, top: int, bottom: int)
     lyte.set_window_paddings = lyte.set_window_paddings and lyte.set_window_paddings or function() end
+--- Check if the window has input focus. 
+--- @type fun(): boolean
+    lyte.has_focus = lyte.has_focus and lyte.has_focus or function() end
 --- Check if the given key is down. 
 --- @type fun(key: lyte.KeyboardKey): boolean
     lyte.is_key_down = lyte.is_key_down and lyte.is_key_down or function() end
@@ -666,6 +669,9 @@
 --- Set the window paddings. Paddings are can be drawn on. 
 --- @type fun(left: int, right: int, top: int, bottom: int)
     lyte_core.set_window_paddings = lyte_core.set_window_paddings and lyte_core.set_window_paddings or function() end
+--- Check if the window has input focus. 
+--- @type fun(): boolean
+    lyte_core.has_focus = lyte_core.has_focus and lyte_core.has_focus or function() end
 --- Check if the given key is down. 
 --- @type fun(key: lyte_core.KeyboardKey): boolean
     lyte_core.is_key_down = lyte_core.is_key_down and lyte_core.is_key_down or function() end

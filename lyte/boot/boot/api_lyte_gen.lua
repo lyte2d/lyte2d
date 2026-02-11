@@ -41,6 +41,7 @@ lyte.is_window_vsync =  lyte_core.is_window_vsync
 lyte.set_window_icon_file =  lyte_core.set_window_icon_file
 lyte.set_window_margins =  lyte_core.set_window_margins
 lyte.set_window_paddings =  lyte_core.set_window_paddings
+lyte.has_focus =  lyte_core.has_focus
 lyte.is_key_down =  lyte_core.is_key_down
 lyte.is_key_pressed =  lyte_core.is_key_pressed
 lyte.is_key_released =  lyte_core.is_key_released

@@ -4,7 +4,7 @@ global record lyte
     -- functions
 
     -- Tick function. Should be created by the user. 
-    tick: function(delta_time: number, window_width: int, window_height: int, window_resized: boolean, is_fullscreen: boolean)
+    tick: function(delta_time: number, window_width: int, window_height: int, window_resized: boolean, is_fullscreen: boolean, has_focus: boolean)
     -- Quit the application by closing the window. 
     quit: function()
     -- Clear the screen or current canvas if one is used. 
@@ -111,6 +111,8 @@ global record lyte
     set_window_margins: function(left: int, right: int, top: int, bottom: int)
     -- Set the window paddings. Paddings are can be drawn on. 
     set_window_paddings: function(left: int, right: int, top: int, bottom: int)
+    -- Check if the window has input focus. 
+    has_focus: function(): boolean
     -- Check if the given key is down. 
     is_key_down: function(key: lyte.KeyboardKey): boolean
     -- Check if the given key is pressed. 
