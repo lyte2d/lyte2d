@@ -789,6 +789,14 @@ static int api_set_window_paddings(lua_State *L) { // arity: 4 => 0
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
+static int api_has_focus(lua_State *L) { // arity: 0 => 1
+    (void)L; int err = 0;
+    bool val;
+    err = _has_focus(&val);
+    lua_pushboolean(L, val);
+    (void)err; // TODO: handle when err is not 0
+    return 1; // number of values returned in the stack
+}
 static int api_is_key_down(lua_State *L) { // arity: 1 => 1
     (void)L; int err = 0;
     const char *key_str; int key; bool val;
@@ -1558,6 +1566,7 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"set_window_icon_file", api_set_window_icon_file},
     {"set_window_margins", api_set_window_margins},
     {"set_window_paddings", api_set_window_paddings},
+    {"has_focus", api_has_focus},
     {"is_key_down", api_is_key_down},
     {"is_key_pressed", api_is_key_pressed},
     {"is_key_released", api_is_key_released},

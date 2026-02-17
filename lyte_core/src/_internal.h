@@ -38,6 +38,7 @@ typedef struct lyte_CoreState {
     lyte_Size window_min_size;
     bool fullscreen;
     bool vsync;
+    bool has_focus;
     lyte_BlendMode blendmode;
     lyte_FilterMode filtermode;
     lyte_QuadSize window_margins;

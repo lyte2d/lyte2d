@@ -239,7 +239,7 @@ static int _lua_panic_fn(lua_State *L) {
     return 0;
 }
 
-static void tick_fn_active(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
+static void tick_fn_active(void *data, float dt, int width, int height, bool resized, bool fullscreen, bool has_focus) {
     lua_State *L = data;
     int status = 0;
 
@@ -254,8 +254,9 @@ static void tick_fn_active(void *data, float dt, int width, int height, bool res
     lua_pushinteger(L,height);
     lua_pushboolean(L,resized);
     lua_pushboolean(L,fullscreen);
+    lua_pushboolean(L,has_focus);
 
-    status = docall(L, 5, 0);
+    status = docall(L, 6, 0);
 
     if (status != 0) {
         const char * err =luaL_checkstring(L, -1);
@@ -286,7 +287,7 @@ static void tick_fn_active(void *data, float dt, int width, int height, bool res
 }
 
 
-static void tick_fn_active_tick_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
+static void tick_fn_active_tick_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen, bool has_focus) {
     lua_State *L = data;
     int status = 0;
 
@@ -300,8 +301,9 @@ static void tick_fn_active_tick_loading(void *data, float dt, int width, int hei
     lua_pushinteger(L,height);
     lua_pushboolean(L,resized);
     lua_pushboolean(L,fullscreen);
+    lua_pushboolean(L,has_focus);
 
-    status = docall(L, 5, 0);
+    status = docall(L, 6, 0);
 
     if (status &&  lua_gettop(L) > 0) {
         // TODO: check if this triggers
@@ -316,12 +318,12 @@ static void tick_fn_active_tick_loading(void *data, float dt, int width, int hei
     }
 }
 
-static void tick_fn_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen) {
+static void tick_fn_loading(void *data, float dt, int width, int height, bool resized, bool fullscreen, bool has_focus) {
     lua_State *L = data;
 
     CHK_STACK(0);
     if(_need_to_load_archives) {
-        tick_fn_active_tick_loading(data, dt, width, height, resized, fullscreen);
+        tick_fn_active_tick_loading(data, dt, width, height, resized, fullscreen, has_focus);
 
         _check_fetch_file_status(L);
 
