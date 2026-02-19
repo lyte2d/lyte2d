@@ -1,0 +1,11 @@
+/scratch
+/build
+/build.*
+/play
+*.TODO
+*.exe
+*.dll
+*.o
+*.log
+*.dxvk-cache
+.luamonrc
