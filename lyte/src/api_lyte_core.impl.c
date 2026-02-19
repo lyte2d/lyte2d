@@ -741,7 +741,6 @@ enum {
     _BLENDMODE_MUL = LYTE_BLENDMODE_MUL, /* order: 4 string: 'mul' */
 };
 enum {
-    _FILTERMODE__INVALID = LYTE_FILTERMODE__INVALID, /* order: 0 string: '_invalid' */
     _FILTERMODE_NEAREST = LYTE_FILTERMODE_NEAREST, /* order: 1 string: 'nearest' */
     _FILTERMODE_LINEAR = LYTE_FILTERMODE_LINEAR, /* order: 2 string: 'linear' */
 };
