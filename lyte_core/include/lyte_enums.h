@@ -39,7 +39,7 @@ typedef enum lyte_FilterMode {
     // MG: values map to: SOKOL GP
     LYTE_FILTERMODE_NEAREST = 1,// order: 1, str: 'nearest'
     LYTE_FILTERMODE_LINEAR = 2,// order: 2, str: 'linear'
-    LYTE_FILTERMODE_COUNT = 3,
+    LYTE_FILTERMODE_COUNT = 2,
     LYTE_FILTERMODE_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 } lyte_FilterMode;
 
