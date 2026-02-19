@@ -17,17 +17,6 @@
 // #define MAX_IMAGEBATCH_RECT_CAPACITY 1024
 #define INITIAL_IMAGEBATCH_RECT_CAPACITY 16
 
-typedef struct ImageItem {
-    uint32_t handle; // **MAGIC_1** NOTE: needs to stay the first element in the struct. (pointer magic in core_shader.c)
-    uint32_t sampler_handle;
-    int ref;
-    int width;
-    int height;
-    bool is_canvas; // if true, values below should also be set
-    uint32_t id_depth_image;
-    uint32_t id_attach;
-} ImageItem;
-
 static ImageItem *current_canvas = NULL;
 
 int lyte_core_image_init(void) {
@@ -64,8 +53,8 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     sg_image_desc image_desc = {0};
     image_desc.width = width;
     image_desc.height = height;
-    image_desc.data.subimage[0][0].ptr = data;
-    image_desc.data.subimage[0][0].size = (size_t)(width * height * 4);
+    image_desc.data.mip_levels[0].ptr = data;
+    image_desc.data.mip_levels[0].size = (size_t)(width * height * 4);
     sg_image sgimage = sg_make_image(&image_desc);
     stbi_image_free(data);
 
@@ -85,6 +74,7 @@ int lyte_load_image(const char *path, lyte_Image *img) {
     ii->height = height;
     ii->is_canvas = false;
     ii->ref = 1;
+    ii->view = sgp_make_texture_view_from_image(sgimage, NULL);
 
     // img = (lyte_Image *)&ii;
     *img = ii;
@@ -100,48 +90,57 @@ int lyte_new_canvas(int w, int h, lyte_Image *img) {
     c->is_canvas = true;
 
     // create frame buffer image
-    sg_image_desc fb_image_desc = {0};
-    fb_image_desc.render_target = true;
-    fb_image_desc.width = w;
-    fb_image_desc.height = h;
-    sg_image fb_image = sg_make_image(&fb_image_desc);
+    const sg_image fb_image = sg_make_image(&(sg_image_desc){
+        .usage.color_attachment = true,
+        .width = w,
+        .height = h,
+        .pixel_format = SG_PIXELFORMAT_RGBA8,
+        .sample_count = 1,
+    });
+
     if(sg_query_image_state(fb_image) != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Failed to create frame buffer image\n");
         return 1;
     }
     c->handle = fb_image.id;
+
     sg_sampler_desc fb_sampler_desc = {0};
-    // fb_sampler_desc.min_filter = (sg_filter)_lib->filtermode; // TODO: filtermode for canvas
-    // fb_sampler_desc.mag_filter = (sg_filter)_lib->filtermode;
+
+    // TODO: filtermode for canvas
     fb_sampler_desc.wrap_u = SG_WRAP_CLAMP_TO_EDGE;
     fb_sampler_desc.wrap_v = SG_WRAP_CLAMP_TO_EDGE;
     sg_sampler fb_sampler = sg_make_sampler(&fb_sampler_desc);
     c->sampler_handle = fb_sampler.id;
+
     // create frame buffer depth stencil
-    sg_image_desc fb_depth_image_desc = {0};
-    fb_depth_image_desc.render_target = true;
-    fb_depth_image_desc.width = w;
-    fb_depth_image_desc.height = h;
-    fb_depth_image_desc.pixel_format = SG_PIXELFORMAT_DEPTH_STENCIL;
-    sg_image fb_depth_image = sg_make_image(&fb_depth_image_desc);
+    const sg_image fb_depth_image = sg_make_image(&(sg_image_desc){
+        .usage.depth_stencil_attachment = true,
+        .width = w,
+        .height = h,
+        .pixel_format = SG_PIXELFORMAT_DEPTH_STENCIL,
+        .sample_count = 1,
+    });
+
     if(sg_query_image_state(fb_depth_image) != SG_RESOURCESTATE_VALID) {
         fprintf(stderr, "Failed to create frame buffer depth image\n");
         return 2;
     }
     c->id_depth_image = fb_depth_image.id;
     // create frame buffer pass
-    sg_attachments_desc attch_desc = {0};
-    attch_desc.colors[0].image = fb_image;
-    attch_desc.depth_stencil.image = fb_depth_image;
-    sg_attachments fb_attach = sg_make_attachments(&attch_desc);
-    if(sg_query_attachments_state(fb_attach) != SG_RESOURCESTATE_VALID) {
-        fprintf(stderr, "Failed to create frame attachments\n");
-        return 3;
-    }
-    c->id_attach = fb_attach.id;
-    c->ref = 1;
+    c->attachments = (sg_attachments) {0};
+    c->attachments.colors[0] = sg_make_view(&(sg_view_desc){
+        .color_attachment.image = fb_image,
+    });
 
-    // img = (lyte_Image *)&c;
+    c->attachments.depth_stencil = sg_make_view(&(sg_view_desc){
+        .depth_stencil_attachment.image = fb_depth_image,
+    });
+
+    c->view = sg_make_view(&(sg_view_desc) {
+        .texture.image = fb_image
+    });
+
+    c->ref = 1;
     *img = c;
     return 0;
 }
@@ -156,10 +155,12 @@ static inline void _free_imageitem(ImageItem *imageitem) {
     if (imageitem->ref == 0) {
         if (imageitem->is_canvas) {
             sg_destroy_image((sg_image){.id = imageitem->id_depth_image});
-            sg_destroy_attachments((sg_attachments){.id = imageitem->id_attach});
+            sg_destroy_view(imageitem->attachments.colors[0]);
+            sg_destroy_view(imageitem->attachments.depth_stencil);
         }
         sg_destroy_image((sg_image){.id = imageitem->handle});
         sg_destroy_sampler((sg_sampler){.id = imageitem->sampler_handle});
+        sg_destroy_view(imageitem->view);
         free(imageitem);
     }
 }
@@ -210,14 +211,13 @@ int lyte_draw_image(lyte_Image image, double x, double y) {
         fprintf(stderr, "Image not found\n");
         return -1;
     }
-    sg_image sgimage = (sg_image){ .id = imageitem->handle };
-    sgp_set_image(0, sgimage);
+    sgp_set_view(0, imageitem->view);
     sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
     sgp_set_sampler(0, sgsampler);
 
     sgp_draw_textured_rect(0, (sgp_rect){x, y, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
 
-    sgp_reset_image(0);
+    sgp_reset_view(0);
     return 0;
 }
 
@@ -228,7 +228,7 @@ int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, doubl
         return -1;
     }
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
-    sgp_set_image(0, sgimage);
+    sgp_set_view(0, imageitem->view);
     sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
     sgp_set_sampler(0, sgsampler);
 
@@ -240,8 +240,7 @@ int lyte_draw_image_ex(lyte_Image image, double x, double y, double angle, doubl
     sgp_draw_textured_rect(0, (sgp_rect){0, 0, imageitem->width, imageitem->height}, (sgp_rect){0, 0, imageitem->width, imageitem->height});
     sgp_pop_transform();
 
-    sgp_reset_image(0);
-    return 0;
+    sgp_reset_view(0);
 
     return 0;
 }
@@ -253,11 +252,12 @@ int lyte_draw_image_rect(lyte_Image image, double x, double y, double src_x, dou
         return -1;
     }
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
-    sgp_set_image(0, sgimage);
+    sgp_set_view(0, imageitem->view);
+
     sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
     sgp_set_sampler(0, sgsampler);
     sgp_draw_textured_rect(0, (sgp_rect){x, y, src_w, src_h}, (sgp_rect){src_x, src_y, src_w, src_h});
-    sgp_reset_image(0);
+    sgp_reset_view(0);
     return 0;
 }
 
@@ -268,7 +268,8 @@ int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, 
         return -1;
     }
     sg_image sgimage = (sg_image){ .id = imageitem->handle };
-    sgp_set_image(0, sgimage);
+    sgp_set_view(0, imageitem->view);
+
     sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
     sgp_set_sampler(0, sgsampler);
 
@@ -280,7 +281,7 @@ int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, 
     sgp_draw_textured_rect(0, (sgp_rect){0, 0, src_w, src_h}, (sgp_rect){src_x, src_y, src_w, src_h});
     sgp_pop_transform();
 
-    sgp_reset_image(0);
+    sgp_reset_view(0);
     return 0;
 }
 
@@ -311,14 +312,12 @@ static int _lyte_set_canvas(lyte_Image image, bool updown) {
 
     current_canvas = imageitem;
 
-    // sg_pass canvas_pass = (sg_pass){.id = current_canvas->id_pass};
-    sg_pass canvas_pass = {0};
-    sg_pass_action pass_action = {0};
-    // memset(&pass_action, 0, sizeof(sg_pass_action));
-    pass_action.colors[0].load_action = SG_LOADACTION_CLEAR;
-    canvas_pass.action = pass_action;
-    canvas_pass.attachments = (sg_attachments){.id = current_canvas->id_attach};
-    sg_begin_pass(&canvas_pass);
+    sg_begin_pass(&(sg_pass) {
+        .action = {
+            .colors[0].load_action = SG_LOADACTION_CLEAR
+        },
+        .attachments = imageitem->attachments
+    });
 
     return 0;
 }
@@ -419,11 +418,11 @@ int lyte_draw_imagebatch(lyte_ImageBatch imagebatch) {
     if (ibi->rects) {
         ImageItem *imageitem = ibi->image;
         sg_image sgimage = (sg_image){ .id = imageitem->handle };
-        sgp_set_image(0, sgimage);
+        sgp_set_view(0, imageitem->view);
         sg_sampler sgsampler = (sg_sampler){ .id = imageitem->sampler_handle };
         sgp_set_sampler(0, sgsampler);
         sgp_draw_textured_rects(0, ibi->rects, ibi->count);
-        sgp_reset_image(0);
+        sgp_reset_view(0);
     }
     return 0;
 }
@@ -441,8 +440,8 @@ static sg_image capture_screen_image(int x, int y, int w , int h) {
     image_desc.width = w;//info.width;
     image_desc.height = h;//info.height;
     image_desc.pixel_format = SG_PIXELFORMAT_RGBA8;
-    image_desc.data.subimage[0][0].ptr = pixels;
-    image_desc.data.subimage[0][0].size = num_pixels;
+    image_desc.data.mip_levels[0].ptr = pixels;
+    image_desc.data.mip_levels[0].size = num_pixels;
     sg_image image = sg_make_image(&image_desc);
     assert(sg_query_image_state(image) == SG_RESOURCESTATE_VALID);
     // SOKOL_FREE(pixels);

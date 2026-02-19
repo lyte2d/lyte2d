@@ -80,8 +80,8 @@ target_include_directories(${PROJECT_NAME}
     ${GLFW_SOURCE_DIR}/include
     ${GLFW_SOURCE_DIR}/dependencies
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/mg_libs
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_547f455
-    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_gp_a6ce39f
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_e01e395
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_gp_a9dbdce
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash_b5ddc97/src
 )
