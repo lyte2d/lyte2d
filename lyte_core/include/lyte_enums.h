@@ -1,4 +1,3 @@
-// GENERATED
 // (c) 2023 MG
 
 #ifndef API_ENUMS_H_INCLUDED
@@ -37,10 +36,9 @@ typedef enum lyte_BlendMode {
 
 typedef enum lyte_FilterMode {
     // MG: values map to: SOKOL GP
-    LYTE_FILTERMODE__INVALID = 1,// order: 0, str: '_invalid'
-    LYTE_FILTERMODE_NEAREST = 2,// order: 1, str: 'nearest'
-    LYTE_FILTERMODE_LINEAR = 3,// order: 2, str: 'linear'
-    LYTE_FILTERMODE_COUNT = 3,
+    LYTE_FILTERMODE_NEAREST = 1,// order: 1, str: 'nearest'
+    LYTE_FILTERMODE_LINEAR = 2,// order: 2, str: 'linear'
+    LYTE_FILTERMODE_COUNT = 2,
     LYTE_FILTERMODE_FORCE_UINT32 = 0x7FFFFFFF, // inspired by sokol_gfx enums
 } lyte_FilterMode;
 

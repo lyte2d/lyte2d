@@ -62,7 +62,6 @@ EnumStrInt lyte_core_BlendMode_strings[] = {
     {NULL, -1},
 };
 EnumStrInt lyte_core_FilterMode_strings[] = {
-    {"_invalid", _FILTERMODE__INVALID},
     {"nearest", _FILTERMODE_NEAREST},
     {"linear", _FILTERMODE_LINEAR},
     {NULL, -1},

@@ -5,6 +5,7 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include "sokol_gfx.h"
 
 #define SGP_UNIFORM_CONTENT_SLOTS 1024
 #define SGP_TEXTURE_SLOTS 8
@@ -49,8 +50,8 @@ typedef struct lyte_CoreState {
     float current_color[4];
 
     GLFWwindow *window;  // GLFWwindow
-    GLFWwindow *monitor; // GLFWmonitor
-    GLFWwindow *mode;    // GLFWVidMode
+    GLFWmonitor *monitor; // GLFWmonitor
+    GLFWvidmode *mode;    // GLFWVidMode
 
     void *shader; // ShaderItem (internal)
 
@@ -62,6 +63,19 @@ typedef struct lyte_CoreState {
 
 } lyte_CoreState;
 
+
+// core_shader.c needs this struct; otherwise it could be confined to lyte_image.c
+typedef struct ImageItem {
+    uint32_t handle;
+    uint32_t sampler_handle;
+    sg_view view;
+    int ref;
+    int width;
+    int height;
+    bool is_canvas; // if true, values below should also be set
+    uint32_t id_depth_image;
+    sg_attachments attachments;
+} ImageItem;
 
 extern lyte_CoreState lytecore_state;
 
