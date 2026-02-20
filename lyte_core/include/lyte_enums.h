@@ -1,4 +1,3 @@
-// GENERATED
 // (c) 2023 MG
 
 #ifndef API_ENUMS_H_INCLUDED
