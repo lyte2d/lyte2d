@@ -39,6 +39,7 @@ int lyte_core_state_init(lyte_Config config) {
 
     lytecore_state.do_quit = false;
     lytecore_state.first_frame = false;
+    lytecore_state.has_focus = false;
 
     lytecore_state.current_color[0] = 1.0;
     lytecore_state.current_color[1] = 1.0;
