@@ -3,8 +3,6 @@
 
 #include "lyte_core.h"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 #include "sokol_gfx.h"
 
 #define SGP_UNIFORM_CONTENT_SLOTS 1024
@@ -48,10 +46,6 @@ typedef struct lyte_CoreState {
     float hidpi_yscale;
 
     float current_color[4];
-
-    GLFWwindow *window;  // GLFWwindow
-    GLFWmonitor *monitor; // GLFWmonitor
-    GLFWvidmode *mode;    // GLFWVidMode
 
     void *shader; // ShaderItem (internal)
 

@@ -14,7 +14,7 @@
 
 #include "lyte_core.h"
 
-
+#include "sokol_app.h"
 
 #include "_boot_zip_generated.c"
 
@@ -334,6 +334,7 @@ static int init(lyte_Config cfg) {
     int err = 0;
 
     err = lyte_core_filesystem_init();
+    err = lyte_core_window_init();
     err = lyte_core_image_init();
     err = lyte_core_audio_init();
     err = lyte_core_font_init();
@@ -394,9 +395,25 @@ static int cleanup(void) {
 }
 
 
-int main(int argc, char *argv[]) {
-    int err  = 0;
-    lyte_Config cfg = (lyte_Config){
+lyte_Config initial_config;
+
+void sokol_init(void) {
+    int err = lyte_core_state_init(initial_config);
+    err = init(initial_config);
+
+    //err = lyte_core_start_loop((lyte_TickFunction)tick_fn_loading, _global_L);
+    assert(err == 0);
+    lyte_core_set_loop(tick_fn_loading, _global_L);
+}
+
+void sokol_cleanup() {
+    int err = lyte_core_window_cleanup();
+    err = cleanup();
+    assert(err == 0);
+}
+
+sapp_desc sokol_main(int argc, char *argv[]) {
+    initial_config = (lyte_Config){
         .args.argc = argc,
         .args.argv = argv,
         .exe_name = argv[0],
@@ -404,20 +421,15 @@ int main(int argc, char *argv[]) {
         .vsync = true,
         .blendmode = LYTE_BLENDMODE_BLEND,
         .filtermode = LYTE_FILTERMODE_NEAREST,
-        // .window_title = "lyte",
         .window_size = (lyte_Size){ .width=LYTE_INIT_WIDTH, .height=LYTE_INIT_HEIGHT },
         .window_min_size = (lyte_Size){ .width=0, .height=0 },
     };
-
-    err = lyte_core_state_init(cfg);
-
-    err = init(cfg);
-
-    err = lyte_core_start_loop((lyte_TickFunction)tick_fn_loading, _global_L);
-
-    err = lyte_core_window_cleanup();
-
-    err = cleanup();
-
-    return err;
+    return (sapp_desc) {
+        .width = initial_config.window_size.width,
+        .height = initial_config.window_size.height,
+        .init_cb = sokol_init,
+        .frame_cb = lyte_tick,
+        //.cleanup_cb = my_cleanup_func,
+        //.event_cb = my_event_func,
+    };
 }

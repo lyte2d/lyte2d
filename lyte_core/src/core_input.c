@@ -8,9 +8,6 @@
 #include "_internal.h"
 #include "utf8encode.h"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #define LYTE_MAX_JOYSTICKS 16
 #define LYTE_MAX_KEYBOARD_KEYS (LYTE_KEYBOARDKEY_MENU+1)
 #define LYTE_MAX_MOUSEBUTTONS LYTE_MOUSEBUTTON_COUNT
@@ -36,8 +33,8 @@ typedef struct lyte_InputState {
         bool is_gamepad;
         const char *name;
     } gamepad_info[LYTE_MAX_JOYSTICKS];
-    GLFWgamepadstate gamepad_states_prev[LYTE_MAX_JOYSTICKS];
-    GLFWgamepadstate gamepad_states_cur[LYTE_MAX_JOYSTICKS];
+    //GLFWgamepadstate gamepad_states_prev[LYTE_MAX_JOYSTICKS];
+    //GLFWgamepadstate gamepad_states_cur[LYTE_MAX_JOYSTICKS];
 
 } lyte_InputState;
 
@@ -50,6 +47,7 @@ static lyte_InputState inputstate = {0};
 //     inputstate.mouse_y = ypos;
 // }
 
+#if 0
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     if (action == GLFW_PRESS) {
         inputstate.mousebuttons_cur[button] = true;
@@ -67,6 +65,7 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
         inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = true;
     }
 }
+#endif
 
 static void mouse_scroll_reset(void) {
     // mouse scroll is handled like any other button from an API point of view. is_down won't work but pressed/released will
@@ -75,6 +74,7 @@ static void mouse_scroll_reset(void) {
     inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = false;
 }
 
+#if 0
 static void joystick_callback(int jid, int event) {
     if (event == GLFW_CONNECTED) {
         inputstate.joystick_connected[jid] = true;
@@ -122,6 +122,7 @@ static void character_callback(GLFWwindow* window, unsigned codepoint) {
         fprintf(stderr, "Warning: Too many char inputs in one frame. Only few expected per frame.");
     }
 }
+#endif
 
 static void textinput_reset(void) {
     memset(inputstate.textinput_data, 0, sizeof(inputstate.textinput_data));
@@ -130,11 +131,13 @@ static void textinput_reset(void) {
 
 int lyte_core_input_init(void) {
     // glfwSetCursorPosCallback(lytecore_state.window, cursor_position_callback);
+#if 0
     glfwSetMouseButtonCallback(lytecore_state.window, mouse_button_callback);
     glfwSetScrollCallback(lytecore_state.window, mouse_scroll_callback);
     glfwSetKeyCallback(lytecore_state.window, key_callback);
     glfwSetJoystickCallback(joystick_callback);
     glfwSetCharCallback(lytecore_state.window, character_callback);
+#endif
     textinput_reset(); // zero out first frame's text input
     return 0;
 }
@@ -151,43 +154,13 @@ int lyte_core_input_update_state(void) {
     // mouse buttons
     memcpy(inputstate.mousebuttons_prev, inputstate.mousebuttons_cur, LYTE_MAX_MOUSEBUTTONS);
     // gamepad/joystick states
+#if 0
     memcpy(inputstate.gamepad_states_prev, inputstate.gamepad_states_cur, sizeof(GLFWgamepadstate) * LYTE_MAX_JOYSTICKS);
     for (int i=0; i<LYTE_MAX_JOYSTICKS; i++) {
-#if !defined(__EMSCRIPTEN__)
         if (glfwGetGamepadState(i, &inputstate.gamepad_states_cur[i])) { /* TODO: we could count num  gamepads here for convenience */
         }
-#else
-        // emscripten... doesn't have gamepad API for glfw. just joystics.
-        int count;
-        const float* axes = glfwGetJoystickAxes(i, &count);
-        // printf("Num gamepad axes: Count: %d", count);
-        // ASSERT_(count <= M_NUM_GAMEPADAXISES, "Too many gamepad axes. Possibly internal error.");
-        for (int a=0; a<count; a++) {
-            inputstate.gamepad_states_cur[i].axes[a] = axes[a];
-        }
-        const unsigned char* buttons = glfwGetJoystickButtons(i, &count);
-        // printf("Num gamepad buttons: Count: %d", count);
-        // ASSERT_(count <= M_NUM_GAMEPADBUTTONS*2, "Too many gamepad buttons. Possibly internal error");
-        for (int a=0; a<count; a++) {
-            inputstate.gamepad_states_cur[i].buttons[a] = buttons[a];
-        }
-        // MG NOTE:
-        // wasm case: trigger axises in webstandards is that they are buttons.
-        // so map the buttons to axises here. if pressed 1.0 if not 0.0.
-        // good enough for web demos, unless your game heavily depends on trigger sensitivity
-        if (inputstate.gamepad_states_cur[i].buttons[LYTE_GAMEPADBUTTON_INTERNAL_LEFT_TRIGGER]) {
-            inputstate.gamepad_states_cur[i].axes[LYTE_GAMEPADAXIS_LEFT_TRIGGER] = 1.0;
-        } else {
-            inputstate.gamepad_states_cur[i].axes[LYTE_GAMEPADAXIS_LEFT_TRIGGER] = 0.0;
-        }
-        if (inputstate.gamepad_states_cur[i].buttons[LYTE_GAMEPADBUTTON_INTERNAL_RIGHT_TRIGGER]) {
-            inputstate.gamepad_states_cur[i].axes[LYTE_GAMEPADAXIS_RIGHT_TRIGGER] = 1.0;
-        } else {
-            inputstate.gamepad_states_cur[i].axes[LYTE_GAMEPADAXIS_RIGHT_TRIGGER] = 0.0;
-        }
-
-#endif
     }
+#endif
     // reset mouse scroll values
     mouse_scroll_reset();
     // reset  text input values
@@ -257,6 +230,7 @@ int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val) {
 }
 
 int lyte_get_mouse_x(int *val) {
+#if 0
     double x, y;
     glfwGetCursorPos(lytecore_state.window, &x, &y);
     inputstate.mouse_x = x;
@@ -285,10 +259,13 @@ int lyte_get_mouse_x(int *val) {
     // scaled_x -= lytecore_state.window_paddings.left;
 
     *val = scaled_x;
+#endif
+    *val = 0;
     return 0;
 }
 
 int lyte_get_mouse_y(int *val) {
+#if 0
     double x, y;
     glfwGetCursorPos(lytecore_state.window, &x, &y);
     inputstate.mouse_y = y;
@@ -317,6 +294,8 @@ int lyte_get_mouse_y(int *val) {
     //scaled_y -= lytecore_state.window_paddings.top;
 
     *val = scaled_y;
+#endif
+    *val = 0;
     return 0;
 }
 
@@ -337,21 +316,25 @@ int lyte_get_gamepad_name(int index, const char * *val) {
 }
 
 int lyte_is_gamepad_down(int index, lyte_GamepadButton gamepad_button, bool *val) {
-    *val = inputstate.gamepad_states_cur[index].buttons[gamepad_button];
+    //*val = inputstate.gamepad_states_cur[index].buttons[gamepad_button];
+    *val = false;
     return 0;
 }
 
 int lyte_is_gamepad_pressed(int index, lyte_GamepadButton gamepad_button, bool *val) {
-    *val = inputstate.gamepad_states_cur[index].buttons[gamepad_button] && !inputstate.gamepad_states_prev[index].buttons[gamepad_button];
+    //*val = inputstate.gamepad_states_cur[index].buttons[gamepad_button] && !inputstate.gamepad_states_prev[index].buttons[gamepad_button];
+    *val = false;
     return 0;
 }
 
 int lyte_is_gamepad_released(int index, lyte_GamepadButton gamepad_button, bool *val) {
-    *val = !inputstate.gamepad_states_cur[index].buttons[gamepad_button] && inputstate.gamepad_states_prev[index].buttons[gamepad_button];
+    //*val = !inputstate.gamepad_states_cur[index].buttons[gamepad_button] && inputstate.gamepad_states_prev[index].buttons[gamepad_button];
+    *val = false;
     return 0;
 }
 
 int lyte_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val) {
-    *val = inputstate.gamepad_states_cur[index].axes[gamepad_axis];
+    //*val = inputstate.gamepad_states_cur[index].axes[gamepad_axis];
+    *val = 0;
     return 0;
 }

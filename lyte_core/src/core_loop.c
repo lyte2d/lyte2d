@@ -7,14 +7,12 @@
 
 #include "_internal.h"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include "sokol_gfx.h"
 #include "sokol_gp.h"
+#include "sokol_app.h"
+#include "sokol_time.h"
 
-
-static double curr_t, delta_time, last_t;
+static uint64_t curr_t, delta_time, last_t;
 
 static inline void _tick_function(void) {
 
@@ -25,8 +23,9 @@ static inline void _tick_function(void) {
 #endif
 
     /* Timing */
-    curr_t = glfwGetTime();
-    delta_time = curr_t - last_t;
+
+    curr_t = stm_now();
+    delta_time = stm_diff(curr_t, last_t);
     last_t = curr_t;
 
     int prev_w, prev_h;
@@ -47,17 +46,11 @@ static inline void _tick_function(void) {
 
     float xscale, yscale;
 
-#if defined(__EMSCRIPTEN__)
-    win_w = emsc_width();
-    win_h = emsc_height();
+
+    win_w = sapp_width();
+    win_h = sapp_height();
     xscale = 1.0;
     yscale = 1.0;
-#else
-    glfwGetFramebufferSize(lytecore_state.window, &win_w, &win_h);
-    glfwGetWindowContentScale(lytecore_state.window , &xscale, &yscale);
-#endif
-
-
 
     lytecore_state.hidpi_xscale = xscale;
     lytecore_state.hidpi_yscale = yscale;
@@ -107,7 +100,8 @@ static inline void _tick_function(void) {
     // lyte_push_matrix();
     sgp_reset_transform();
     // sgp_scale(xscale, yscale);
-    lytecore_state.tick_fn(lytecore_state.app_data, delta_time, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen);
+    double delta_secs = stm_sec(delta_time);
+    lytecore_state.tick_fn(lytecore_state.app_data, delta_secs, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen);
     // lyte_pop_matrix();
 
     // NOTE: at this point only sgp state has been changed, and sg has not
@@ -125,15 +119,15 @@ static inline void _tick_function(void) {
     sg_end_pass();
     sg_commit();
 
-    glfwSwapBuffers(lytecore_state.window);
+    //glfwSwapBuffers(lytecore_state.window);
 
     lyte_core_audio_update_music_streams(); // new "dowork"
     lyte_core_input_update_state();
     lyte_core_filesystem_update_tasks(); // sfetch_dowork covered here
 
-    lytecore_state.do_quit = lytecore_state.do_quit || glfwWindowShouldClose(lytecore_state.window);
+    //lytecore_state.do_quit = lytecore_state.do_quit || glfwWindowShouldClose(lytecore_state.window);
 
-    glfwPollEvents();
+    //glfwPollEvents();
 }
 
 int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data) {
@@ -155,4 +149,8 @@ int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data) {
     // LOOP ENDS HERE------------------------------------------------
 
     return 0;
+}
+
+void lyte_tick() {
+    _tick_function();
 }

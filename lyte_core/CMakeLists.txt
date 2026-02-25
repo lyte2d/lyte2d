@@ -33,7 +33,6 @@ PRIVATE
     ./src/core_input.c
     ./src/core_image.c
     ./src/core_loop.c
-    # ./src/core_physics.c
     ./src/core_shader.c
     ./src/core_shapes.c
     ./src/core_state.c

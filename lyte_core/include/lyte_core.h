@@ -134,7 +134,7 @@ int lyte_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val)
 
 int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data);
 int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data);
-
+void lyte_tick(void);
 
 // -------------------------
 // core_filesystem

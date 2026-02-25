@@ -8,7 +8,7 @@
 #include "sokol_gfx.h"
 #include "sokol_gp.h"
 #include "sokol_args.h"
-
+#include "sokol_time.h"
 
 lyte_CoreState lytecore_state = {0};
 
@@ -16,6 +16,7 @@ lyte_CoreState lytecore_state = {0};
 
 
 int lyte_core_state_init(lyte_Config config) {
+    stm_setup();
     lytecore_state.args = config.args;
     lytecore_state.vsync = config.vsync;
     lytecore_state.default_blendmode = config.blendmode;
@@ -30,10 +31,6 @@ int lyte_core_state_init(lyte_Config config) {
     lytecore_state.window_title = "?"; //config.window_title;
     lytecore_state.window_size = config.window_size;
     lytecore_state.window_min_size = config.window_min_size;
-
-    lytecore_state.window = NULL;
-    lytecore_state.monitor = NULL;
-    lytecore_state.mode = NULL;
 
     lytecore_state.shader = NULL;
 

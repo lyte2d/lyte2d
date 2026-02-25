@@ -1,22 +1,5 @@
 set(BUILD_SHARED_LIBS OFF)
 
-if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
-else()
-    message("===> Adding GLFW3")
-    set(GLFW_BUILD_EXAMPLES OFF)
-    set(GLFW_BUILD_TESTS OFF)
-    set(GLFW_BUILD_DOCS OFF)
-    set(GLFW_INSTALL ON)
-    set(USE_MSVC_RUNTIME_LIBRARY_DLL OFF)
-
-    set(GLFW_BUILD_WAYLAND OFF) ## Build issue with WAYLAND + GLFW on linux builds
-
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/glfw-3.4 ${CMAKE_CURRENT_BINARY_DIR}/glfw)
-
-    target_link_libraries(${PROJECT_NAME} PRIVATE glfw )
-endif()
-
-
 message("===> Adding PHYSFS")
 set(PHYSFS_BUILD_SHARED OFF)
 set(PHYSFS_BUILD_TEST OFF)
@@ -38,13 +21,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE physfs-static )
 message("===> Adding FreeType")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/freetype-2.13.2 ${CMAKE_CURRENT_BINARY_DIR}/freetype)
 target_link_libraries(${PROJECT_NAME} PRIVATE freetype )
-
-# message("===> Adding ODE")
-# set(ODE_WITH_DEMOS OFF)
-# set(ODE_WITH_TESTS OFF)
-# set(ODE_NO_BUILTIN_THREADING_IMPL ON)
-# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/ode-0.16.4 ${CMAKE_CURRENT_BINARY_DIR}/ode)
-# target_link_libraries(${PROJECT_NAME} PRIVATE ODE )
 
 message("===> Adding Raudio")
 target_compile_definitions(${PROJECT_NAME} PRIVATE RAUDIO_STANDALONE)
@@ -70,6 +46,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(${PROJECT_NAME} PRIVATE
         GL
         GLU
+        X11
+        Xcursor
+        Xi
     )
 endif()
 
@@ -77,13 +56,9 @@ endif()
 message("===> Adding (include dirs) sokol, sokol_gp, stb, fontstash")
 target_include_directories(${PROJECT_NAME}
   PRIVATE
-    ${GLFW_SOURCE_DIR}/include
-    ${GLFW_SOURCE_DIR}/dependencies
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/mg_libs
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_e01e395
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_gp_a9dbdce
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash_b5ddc97/src
 )
-
-

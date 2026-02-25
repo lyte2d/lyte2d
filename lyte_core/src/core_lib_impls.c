@@ -50,8 +50,9 @@
 #include "GLFW/glfw3.h"
 
 #include "sokol_gfx_ext.h"
-
 #include "sokol_gp.h"
+#include "sokol_app.h"
+#include "sokol_time.h"
 
 #define FONTSTASH_IMPLEMENTATION
 #define FONS_USE_FREETYPE
