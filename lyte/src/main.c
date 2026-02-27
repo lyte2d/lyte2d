@@ -412,6 +412,8 @@ void sokol_cleanup() {
     assert(err == 0);
 }
 
+void lyte_core_input_event(const sapp_event * event);
+
 sapp_desc sokol_main(int argc, char *argv[]) {
     initial_config = (lyte_Config){
         .args.argc = argc,
@@ -430,6 +432,6 @@ sapp_desc sokol_main(int argc, char *argv[]) {
         .init_cb = sokol_init,
         .frame_cb = lyte_tick,
         //.cleanup_cb = my_cleanup_func,
-        //.event_cb = my_event_func,
+        .event_cb = lyte_core_input_event,
     };
 }

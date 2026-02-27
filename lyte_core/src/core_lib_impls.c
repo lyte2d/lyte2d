@@ -26,12 +26,7 @@
 #include "sokol_fetch.h"
 #include "sokol_args.h"
 
-#if defined(__EMSCRIPTEN__)
-#define SOKOL_GLES3
-#define GLFW_INCLUDE_ES3
-#else
 #define SOKOL_GLCORE
-#endif
 
 #include "sokol_gfx.h"
 
@@ -46,8 +41,6 @@
 #define GLFW_INCLUDE_NONE
 #endif
 
-
-#include "GLFW/glfw3.h"
 
 #include "sokol_gfx_ext.h"
 #include "sokol_gp.h"

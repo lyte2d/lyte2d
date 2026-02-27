@@ -7,6 +7,7 @@
 
 #include "_internal.h"
 #include "utf8encode.h"
+#include "sokol_app.h"
 
 #define LYTE_MAX_JOYSTICKS 16
 #define LYTE_MAX_KEYBOARD_KEYS (LYTE_KEYBOARDKEY_MENU+1)
@@ -41,37 +42,60 @@ typedef struct lyte_InputState {
 
 static lyte_InputState inputstate = {0};
 
-// // instead of the event, we'll query glfw directly.
-// static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-//     inputstate.mouse_x = xpos;
-//     inputstate.mouse_y = ypos;
-// }
+void lyte_core_input_event(const sapp_event * event) {
+    switch (event->type) {
+    case SAPP_EVENTTYPE_KEY_DOWN:
+        inputstate.keys_cur[event->key_code] = true;
+        if (event->key_repeat) {
+            inputstate.keys_rep[event->key_code] = true;
+        }
+        break;
+    case SAPP_EVENTTYPE_KEY_UP:
+        if (event->key_repeat) {
+            inputstate.keys_rep[event->key_code] = false;
+        } else {
+            inputstate.keys_cur[event->key_code] = false;
+        }
+        break;
+    case SAPP_EVENTTYPE_CHAR:
+        if (inputstate.textinput_idx <= LYTE_MAX_CHARINPUT_CODEPOINTS) {
+            inputstate.textinput_data[inputstate.textinput_idx] = event->char_code;
+            inputstate.textinput_idx++;
+        } else {
+            fprintf(stderr, "Warning: Too many char inputs in one frame. Only few expected per frame.");
+        }
+        break;
 
-#if 0
-static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    if (action == GLFW_PRESS) {
-        inputstate.mousebuttons_cur[button] = true;
-    } else if (action == GLFW_RELEASE) {
-        inputstate.mousebuttons_cur[button] = false;
-    } else {
-        // ASSERT(false);
+    case SAPP_EVENTTYPE_MOUSE_DOWN:
+        if (event->mouse_button < LYTE_MAX_MOUSEBUTTONS) {
+            inputstate.mousebuttons_cur[event->mouse_button] = true;
+        }
+        break;
+    case SAPP_EVENTTYPE_MOUSE_UP:
+        if (event->mouse_button < LYTE_MAX_MOUSEBUTTONS) {
+            inputstate.mousebuttons_cur[event->mouse_button] = false;
+        }
+        break;
+    case SAPP_EVENTTYPE_MOUSE_SCROLL:
+        if (event->scroll_y > 0) {
+            inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLUP] = true;
+        } else if (event->scroll_y < 0) {
+            inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = true;
+        }
+        break;
+    case SAPP_EVENTTYPE_MOUSE_MOVE:
+        inputstate.mouse_x = event->mouse_x;
+        inputstate.mouse_y = event->mouse_y;
+        break;
+    case SAPP_EVENTTYPE_MOUSE_ENTER:
+        break;
+    case SAPP_EVENTTYPE_MOUSE_LEAVE:
+        break;
+    case SAPP_EVENTTYPE_FOCUSED:
+        break;
+    case SAPP_EVENTTYPE_UNFOCUSED:
+        break;
     }
-}
-
-static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    if (yoffset > 0) {
-        inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLUP] = true;
-    } else if (yoffset < 0) {
-        inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = true;
-    }
-}
-#endif
-
-static void mouse_scroll_reset(void) {
-    // mouse scroll is handled like any other button from an API point of view. is_down won't work but pressed/released will
-    // however glfw does not send "release" events for scroll, so approaching it a bit differently here
-    inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLUP] = false;
-    inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = false;
 }
 
 #if 0
@@ -94,34 +118,6 @@ static void joystick_callback(int jid, int event) {
         inputstate.gamepad_info[jid].name = "";
     }
 }
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    // if (key == GLFW_KEY_ENTER && action == GLFW_PRESS && mods&GLFW_MOD_ALT) {
-    //     M_app_setfullscreen(!_lib->fullscreen);
-    // } else if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS && mods&GLFW_MOD_ALT) {
-    //     M_app_quit();
-    // } else {
-        if (action == GLFW_PRESS) {
-            inputstate.keys_cur[key] = true;
-        } else if (action == GLFW_RELEASE) {
-            inputstate.keys_cur[key] = false;
-            inputstate.keys_rep[key] = false;
-        } else if (action == GLFW_REPEAT) {
-            inputstate.keys_rep[key] = true;
-        } else {
-            // ASSERT(false);
-        }
-    // }
-}
-
-static void character_callback(GLFWwindow* window, unsigned codepoint) {
-    if (inputstate.textinput_idx <= LYTE_MAX_CHARINPUT_CODEPOINTS) {
-        inputstate.textinput_data[inputstate.textinput_idx] = codepoint;
-        inputstate.textinput_idx++;
-    } else {
-        fprintf(stderr, "Warning: Too many char inputs in one frame. Only few expected per frame.");
-    }
-}
 #endif
 
 static void textinput_reset(void) {
@@ -129,21 +125,20 @@ static void textinput_reset(void) {
     inputstate.textinput_idx = 0;
 }
 
+static void mouse_scroll_reset(void) {
+    // mouse scroll is handled like any other button from an API point of view. is_down won't work but pressed/released will
+    // however glfw does not send "release" events for scroll, so approaching it a bit differently here
+    inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLUP] = false;
+    inputstate.mousebuttons_cur[LYTE_MOUSEBUTTON_SCROLLDOWN] = false;
+}
+
+
 int lyte_core_input_init(void) {
-    // glfwSetCursorPosCallback(lytecore_state.window, cursor_position_callback);
-#if 0
-    glfwSetMouseButtonCallback(lytecore_state.window, mouse_button_callback);
-    glfwSetScrollCallback(lytecore_state.window, mouse_scroll_callback);
-    glfwSetKeyCallback(lytecore_state.window, key_callback);
-    glfwSetJoystickCallback(joystick_callback);
-    glfwSetCharCallback(lytecore_state.window, character_callback);
-#endif
     textinput_reset(); // zero out first frame's text input
     return 0;
 }
 
 int lyte_core_input_cleanup(void) {
-
     return 9;
 }
 
@@ -230,72 +225,12 @@ int lyte_is_mouse_released(lyte_MouseButton mouse_button, bool *val) {
 }
 
 int lyte_get_mouse_x(int *val) {
-#if 0
-    double x, y;
-    glfwGetCursorPos(lytecore_state.window, &x, &y);
-    inputstate.mouse_x = x;
-
-    // the margins eat into our logical window
-    int effective_width = (lytecore_state.window_size.width
-        - lytecore_state.window_margins.left
-        - lytecore_state.window_margins.right
-    );
-
-#ifndef __APPLE__
-    // scale our coordinate by the DPI scale...
-    int scaled_x = inputstate.mouse_x / lytecore_state.hidpi_xscale;
-#else
-    // (on Apple platforms this coordinate is already scaled)
-    int scaled_x = inputstate.mouse_x;
-#endif
-
-    // ...then shift it by the margin origin...
-    scaled_x -= lytecore_state.window_margins.left;
-
-    // ...then re-scale it into the logical window size
-    scaled_x *= lytecore_state.window_size.width / (float)effective_width;
-
-    // ...then shift if by the padding origin...
-    // scaled_x -= lytecore_state.window_paddings.left;
-
-    *val = scaled_x;
-#endif
-    *val = 0;
+    *val = inputstate.mouse_x;
     return 0;
 }
 
 int lyte_get_mouse_y(int *val) {
-#if 0
-    double x, y;
-    glfwGetCursorPos(lytecore_state.window, &x, &y);
-    inputstate.mouse_y = y;
-
-    // the margins eat into our logical window
-    int effective_height = (lytecore_state.window_size.height
-        - lytecore_state.window_margins.top
-        - lytecore_state.window_margins.bottom
-    );
-
-#ifndef __APPLE__
-    // scale our coordinate by the DPI scale...
-    int scaled_y = inputstate.mouse_y / lytecore_state.hidpi_yscale;
-#else
-    // (on Apple platforms this coordinate is already scaled)
-    int scaled_y = inputstate.mouse_y;
-#endif
-
-    // ...then re-scale it into the logical window size
-    scaled_y *= lytecore_state.window_size.height / (float)effective_height;
-
-    // ...then shift it by the margin origin...
-    scaled_y -= lytecore_state.window_margins.top;
-
-    // ...then shift it by the padding origin...
-    //scaled_y -= lytecore_state.window_paddings.top;
-
-    *val = scaled_y;
-#endif
-    *val = 0;
+    *val = inputstate.mouse_y;
     return 0;
 }
 
