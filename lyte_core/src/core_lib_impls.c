@@ -32,13 +32,10 @@
 
 #if defined(__APPLE__)
 #include <opengl/gl.h>
-#define GLFW_INCLUDE_GLCOREARB
 // #elif defined(_WIN32)
 //  #include <glad/gl.h>
 // #define GL_VIEWPORT 0x0BA2
 // void glReadPixels(GLint   x, GLint   y, GLsizei   width, GLsizei   height, GLenum   format, GLenum   type, void * pixels);
-#else
-#define GLFW_INCLUDE_NONE
 #endif
 
 

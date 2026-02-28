@@ -119,35 +119,15 @@ static inline void _tick_function(void) {
     sg_end_pass();
     sg_commit();
 
-    //glfwSwapBuffers(lytecore_state.window);
-
     lyte_core_audio_update_music_streams(); // new "dowork"
     lyte_core_input_update_state();
     lyte_core_filesystem_update_tasks(); // sfetch_dowork covered here
-
-    //lytecore_state.do_quit = lytecore_state.do_quit || glfwWindowShouldClose(lytecore_state.window);
-
-    //glfwPollEvents();
 }
 
 int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data) {
     lytecore_state.tick_fn = tick_fn;
     lytecore_state.app_data = app_data;
     lytecore_state.first_frame = true; // this will cause "resized" flag to be set so that initial "tick" can set app data correctly
-    return 0;
-}
-
-int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data) {
-    lyte_core_set_loop(tick_fn, app_data);
-
-    // LOOP BEGINS HERE---------------------------------------------
-#ifdef EMSCRIPTEN
-    emscripten_set_main_loop(_tick_function, 0, 1);
-#else
-    while(!(lytecore_state.do_quit)) { _tick_function(); }
-#endif
-    // LOOP ENDS HERE------------------------------------------------
-
     return 0;
 }
 

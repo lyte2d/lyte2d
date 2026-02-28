@@ -18,6 +18,7 @@
 
 #include "_boot_zip_generated.c"
 
+#define MUST(x) if (x != 0) { fprintf(stderr, "Failed @ %s %d: %s\n", __FILE__, __LINE__, #x); abort(); }
 
 // luautf8 library doesn't have a header file...
 int luaopen_utf8 (lua_State *L);
@@ -199,7 +200,6 @@ static int _try_load(lua_State *L) {
 static inline int _load_lua_file(lua_State *L, const char *path, bool error_if_missing) {
     (void)error_if_missing;
     lua_pushstring(L, path);
-    // printf("Load_lua_file %s\n", path);
     return _try_load(L);
 }
 
@@ -330,24 +330,36 @@ static void tick_fn_loading(void *data, float dt, int width, int height, bool re
     }
 }
 
-static int init(lyte_Config cfg) {
-    int err = 0;
+void update_config(lua_State *L, lyte_Config *c) {
+    lua_getglobal(L, "_Config");
 
-    err = lyte_core_filesystem_init();
-    err = lyte_core_window_init();
-    err = lyte_core_image_init();
-    err = lyte_core_audio_init();
-    err = lyte_core_font_init();
-    err = lyte_core_shader_init();
-    // err = lyte_core_physics_init();
+    if (!lua_istable(L, -1)) {
+        lua_pop(L, 1);
+        return;
+    }
 
+    lua_getfield(L, -1, "window_width");
+    c->window_size.width = (int)lua_tointeger(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "window_height");
+    c->window_size.height = (int)lua_tointeger(L, -1);
+    lua_pop(L, 1);
+
+    lua_getfield(L, -1, "fullscreen");
+    c->fullscreen = (bool)lua_toboolean(L, -1);
+    lua_pop(L, 1);
+
+    lua_pop(L, 1);
+}
+
+static int init_lua(lyte_Config *cfg) {
     lua_State *L = luaL_newstate();
     lua_atpanic(L, _lua_panic_fn);
     _global_L = L;
     luaL_openlibs(L);
     // load utf8 library (5.1 doesn't normally have it)
     luaopen_utf8(L);
-
 
     register_lyte_core_api(L);
 
@@ -371,67 +383,70 @@ static int init(lyte_Config cfg) {
     lyte_core_filesystem_add_path_local(localpath, "/");
     lyte_core_filesystem_add_path_memory("BOOT_ZIP", boot_zip, boot_zip_len, "/");
     _download_zip_handle = lyte_core_filesystem_fetch_file_async("APP_ZIP", archivepath, LYTE_APP_ZIP_MAX_SIZE, "/");
-    _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", cfg.exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
+    _download_exe_handle = lyte_core_filesystem_fetch_file_async("APP_EXE", cfg->exe_name, LYTE_APP_EXE_MAX_SIZE, "/");
 
     lua_gc(L, LUA_GCCOLLECT, 0);
 
     // LOAD BOOT
     _load_lua_file(L, "lyte_boot", true);
 
-    return err;
+    update_config(L, cfg);
+    return 0;
 }
 
 
-static int cleanup(void) {
-    int err = 0;
-    err = lyte_core_image_cleanup();
-    err = lyte_core_audio_cleanup();
-    err = lyte_core_font_cleanup();
-    err = lyte_core_shader_cleanup();
-    err = lyte_core_filesystem_cleanup();
-    // err = lyte_core_physics_cleanup();
+static void sokol_init(void) {
 
-    return err;
-}
+    MUST(lyte_core_window_init());
+    MUST(lyte_core_image_init());
+    MUST(lyte_core_audio_init());
+    MUST(lyte_core_font_init());
+    MUST(lyte_core_shader_init());
 
-
-lyte_Config initial_config;
-
-void sokol_init(void) {
-    int err = lyte_core_state_init(initial_config);
-    err = init(initial_config);
-
-    //err = lyte_core_start_loop((lyte_TickFunction)tick_fn_loading, _global_L);
-    assert(err == 0);
+    int post_init_status = luaL_dostring(_global_L, "\
+        lyte.set_default_filtermode(_Config.default_filtermode) \
+        lyte.set_default_blendmode(_Config.default_blendmode) \
+        lyte._default_font = lyte.load_font('/lyte_boot_assets/monogram-extended.ttf', 13 * 2) \
+        lyte.reset_font() \
+        lyte.set_window_title(_Config.window_title) \
+    ");
+    MUST(post_init_status);
     lyte_core_set_loop(tick_fn_loading, _global_L);
 }
 
-void sokol_cleanup() {
-    int err = lyte_core_window_cleanup();
-    err = cleanup();
-    assert(err == 0);
+static void sokol_cleanup() {
+    lyte_core_shader_cleanup();
+    lyte_core_font_cleanup();
+    lyte_core_audio_cleanup();
+    lyte_core_image_cleanup();
+    lyte_core_window_cleanup();
+    lyte_core_filesystem_cleanup();
 }
 
 void lyte_core_input_event(const sapp_event * event);
 
+
 sapp_desc sokol_main(int argc, char *argv[]) {
-    initial_config = (lyte_Config){
+    lyte_Config config = (lyte_Config){
         .args.argc = argc,
         .args.argv = argv,
         .exe_name = argv[0],
-        .fullscreen = false,
-        .vsync = true,
         .blendmode = LYTE_BLENDMODE_BLEND,
         .filtermode = LYTE_FILTERMODE_NEAREST,
-        .window_size = (lyte_Size){ .width=LYTE_INIT_WIDTH, .height=LYTE_INIT_HEIGHT },
-        .window_min_size = (lyte_Size){ .width=0, .height=0 },
     };
+    MUST(lyte_core_state_init(config));
+    MUST(lyte_core_filesystem_init());
+
+    init_lua(&config);
     return (sapp_desc) {
-        .width = initial_config.window_size.width,
-        .height = initial_config.window_size.height,
+        .width = config.window_size.width,
+        .height = config.window_size.height,
         .init_cb = sokol_init,
         .frame_cb = lyte_tick,
-        //.cleanup_cb = my_cleanup_func,
+        .cleanup_cb = sokol_cleanup,
         .event_cb = lyte_core_input_event,
+        .swap_interval = 1,
+        .fullscreen = config.fullscreen,
+        .icon.sokol_default = true
     };
 }

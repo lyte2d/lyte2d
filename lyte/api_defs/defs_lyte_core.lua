@@ -444,16 +444,6 @@ return process_def_tree(Namespace("lyte_core", {
         Doc"Set the window's title."
     ),
 
-    Function("set_window_vsync",
-        Arg("vsync", Bool),
-        Doc"Set the window vsync flag to the given value."
-    ),
-
-    Function("is_window_vsync",
-        Ret("val", Bool),
-        Doc"Check if the window vsync flag is set."
-    ),
-
     Function("set_window_icon_file",
         Arg("icon_path", String),
         Doc"Set the window icon."

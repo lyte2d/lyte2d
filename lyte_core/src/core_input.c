@@ -26,7 +26,6 @@ typedef struct lyte_InputState {
     int textinput_idx;
     float mouse_x, mouse_y;
 
-
     // these two are handled by joystick connet/disconnect events
     uint8_t joystick_connected[LYTE_MAX_JOYSTICKS];
     struct {

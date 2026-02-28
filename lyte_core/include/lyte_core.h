@@ -32,9 +32,7 @@ typedef void (*lyte_TickFunction)(void *app_data, float delta_time, int width, i
 typedef struct lyte_Config {
     lyte_Args args;
     bool fullscreen;
-    bool vsync;
     const char *exe_name;
-    // const char *window_title;
     lyte_Size window_size;
     lyte_Size window_min_size;
     lyte_BlendMode blendmode;
@@ -95,8 +93,6 @@ int lyte_set_fullscreen(bool fullscreen);
 int lyte_is_fullscreen(bool *val);
 int lyte_set_window_title(const char * title);
 int lyte_set_window_icon_file(const char * icon_path);
-int lyte_set_window_vsync(bool vsync);
-int lyte_is_window_vsync(bool *val);
 int lyte_set_window_margins(int left, int right, int top, int bottom);
 int lyte_set_window_paddings(int left, int right, int top, int bottom);
 
@@ -132,7 +128,6 @@ int lyte_get_gamepad_axis(int index, lyte_GamepadAxis gamepad_axis, double *val)
 // core_loop
 // -------------------------
 
-int lyte_core_start_loop(lyte_TickFunction tick_fn, void *app_data);
 int lyte_core_set_loop(lyte_TickFunction tick_fn, void *app_data);
 void lyte_tick(void);
 

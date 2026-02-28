@@ -742,22 +742,6 @@ static int api_set_window_title(lua_State *L) { // arity: 1 => 0
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }
-static int api_set_window_vsync(lua_State *L) { // arity: 1 => 0
-    (void)L; int err = 0;
-    bool vsync;
-    vsync = lua_toboolean(L, 1);
-    err = _set_window_vsync(vsync);
-    (void)err; // TODO: handle when err is not 0
-    return 0; // number of values returned in the stack
-}
-static int api_is_window_vsync(lua_State *L) { // arity: 0 => 1
-    (void)L; int err = 0;
-    bool val;
-    err = _is_window_vsync(&val);
-    lua_pushboolean(L, val);
-    (void)err; // TODO: handle when err is not 0
-    return 1; // number of values returned in the stack
-}
 static int api_set_window_icon_file(lua_State *L) { // arity: 1 => 0
     (void)L; int err = 0;
     const char *icon_path;
@@ -1552,8 +1536,6 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"set_fullscreen", api_set_fullscreen},
     {"is_fullscreen", api_is_fullscreen},
     {"set_window_title", api_set_window_title},
-    {"set_window_vsync", api_set_window_vsync},
-    {"is_window_vsync", api_is_window_vsync},
     {"set_window_icon_file", api_set_window_icon_file},
     {"set_window_margins", api_set_window_margins},
     {"set_window_paddings", api_set_window_paddings},

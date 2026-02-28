@@ -241,14 +241,11 @@ end
 
 local loaded_cfg, _cfg = pcall(require, "config")
 
--- DEFAULTS
-local _def = {
-    W = _cfg.window_width or 800,
-    H = _cfg.window_height or 500,
-    title = _cfg.window_title or "Lyte2D app",
+_Config = {
+    window_width = _cfg.window_width or 800,
+    window_height = _cfg.window_height or 500,
+    window_title = _cfg.window_title or "Lyte2D app",
     fullscreen = _cfg.fullscreen or false,
-    vsync = _cfg.window_vsync ~= false ,
-    resizable = _cfg.window_resizable ~= false,
     default_filtermode = _cfg.default_filtermode or "nearest",
     default_blendmode = _cfg.default_blendmode or "blend",
 }
@@ -259,18 +256,10 @@ if not lyte.tick_loading then
 end
 
 
--- before window opens
-lyte_core.set_window_resizable(false)
-lyte_core.set_window_resizable(_def.resizable)
+-- -- before window opens
+-- lyte_core.set_window_resizable(false)
+-- lyte_core.set_window_resizable(_def.resizable)
 
--- window opens below
-lyte.set_window_size(_def.W, _def.H)
-lyte.set_window_title(_def.title)
-lyte.set_window_vsync(_def.vsync)
-lyte.set_default_filtermode(_def.default_filtermode)
-lyte.set_default_blendmode(_def.default_blendmode)
-lyte.set_fullscreen(_def.fullscreen)
-lyte.set_window_icon_file("lyte_boot_assets/icon.png")
+-- -- window opens below
+-- lyte.set_window_icon_file("lyte_boot_assets/icon.png")
 
-lyte._default_font = lyte._default_font or lyte.load_font("/lyte_boot_assets/monogram-extended.ttf", 13 * 2)
-lyte.reset_font()
