@@ -43,7 +43,6 @@ int lyte_core_filesystem_init(void) {
     }
     sfetch_setup(&(sfetch_desc_t){0});
     mg_map_init(&fetchitems, sizeof(FetchItem), INIT_NUM_FETCHITEMS);
-
     return 0;
 }
 

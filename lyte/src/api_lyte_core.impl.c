@@ -282,16 +282,6 @@ static inline int _set_window_title(const char *title) {
     err = lyte_set_window_title(title);
     return err;
 }
-static inline int _set_window_vsync(bool vsync) {
-    (void)vsync; int err = 0;
-    err = lyte_set_window_vsync(vsync);
-    return err;
-}
-static inline int _is_window_vsync(bool *val) {
-int err = 0;
-    err = lyte_is_window_vsync(val);
-    return err;
-}
 static inline int _set_window_icon_file(const char *icon_path) {
     (void)icon_path; int err = 0;
     err = lyte_set_window_icon_file(icon_path);

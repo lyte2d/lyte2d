@@ -32,11 +32,9 @@ typedef struct lyte_CoreState {
     lyte_FilterMode default_filtermode;
 
     const char *exe_name;
-    const char *window_title;
     lyte_Size window_size;
     lyte_Size window_min_size;
     bool fullscreen;
-    bool vsync;
     lyte_BlendMode blendmode;
     lyte_FilterMode filtermode;
     lyte_QuadSize window_margins;

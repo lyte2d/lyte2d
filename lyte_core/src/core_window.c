@@ -1,5 +1,3 @@
-//
-
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -9,6 +7,7 @@
 
 #include "sokol_gfx.h"
 #include "sokol_gp.h"
+#include "sokol_app.h"
 
 #include "physfs.h" // icon
 #include "stb_image.h" // icon
@@ -29,27 +28,14 @@ void _sg_log(const char* tag, uint32_t log_level, uint32_t log_item_id, const ch
             fprintf(stderr, "Failed to compile shader:\n%s", message);
         } break;
         default: {
+            fprintf(stderr, "Sokol: %s\n", message);
             return;
         } break;
     }
 }
 
 int lyte_core_window_init(void) {
-
-#if defined(__EMSCRIPTEN__)
-    emsc_init("#canvas", EMSC_TRY_WEBGL2);
-#endif
-
-    // MSAA... to change this, window needs to be reopened...
-    // glfwWindowHint(GLFW_SAMPLES, 4);
-
     // make the window current for opengl
-
-    if (lytecore_state.vsync) {
-        //glfwSwapInterval(1);
-    } else {
-        //glfwSwapInterval(0);
-    }
 
     sg_desc sgdesc = {.logger.func = _sg_log};
     sg_setup(&sgdesc);
@@ -141,31 +127,6 @@ int lyte_set_window_position(int x, int y) {
     return 0;
 }
 
-#if 0
-static int get_current_monitor( GLFWmonitor** monitor, GLFWwindow* window) {
-    int winpos[2] = {0};
-    glfwGetWindowPos(window, &winpos[0], &winpos[1]);
-
-    int monitors_size = 0;
-    GLFWmonitor** monitors = glfwGetMonitors(&monitors_size);
-
-    for (int i = 0; i < monitors_size; ++i) {
-        int monitorpos[2] = {0};
-        glfwGetMonitorPos(monitors[i], &monitorpos[0], &monitorpos[1]);
-        const GLFWvidmode* vidmode = glfwGetVideoMode(monitors[i]);
-        if (   winpos[0] >= monitorpos[0]
-            && winpos[0] < (monitorpos[0] + vidmode->width)
-            && winpos[1] >= monitorpos[1]
-            && winpos[1] < (monitorpos[1] + vidmode->height)) {
-            *monitor = monitors[i];
-            return 0;
-        }
-    }
-
-    return 1;
-}
-#endif
-
 int lyte_set_fullscreen(bool fullscreen) {
     fprintf(stderr, "set_fullscreen not implemented yet\n");
     return 0;
@@ -177,8 +138,7 @@ int lyte_is_fullscreen(bool *val) {
 }
 
 int lyte_set_window_title(const char * title) {
-    fprintf(stderr, "set_window_title not implemented yet\n");
-    lytecore_state.window_title = title;
+    sapp_set_window_title(title);
     return 0;
 }
 
@@ -208,24 +168,22 @@ int lyte_set_window_icon_file(const char * path) {
 
     //GLFWimage images[1];
     //images[0].pixels = stbi_load_from_memory(buf, read_len, &images[0].width, &images[0].height, 0, 4);
-    fprintf(stderr, "set_window_icon_file not implemented yet\n");
-
-    //glfwSetWindowIcon(lytecore_state.window, 1, images);
+    printf("read %d byts\n", (int)read_len);
+    sapp_range pixels = {
+        .ptr = data,
+        .size = width * height * 4
+    };
+    const sapp_icon_desc icon_desc = {
+        .images = {
+            { .width = width, .height = height, .pixels = pixels }
+        }
+    };
+    printf("icon %d %d\n", width, height);
+    sapp_set_icon(&icon_desc);
 
     stbi_image_free(data);
     free(buf);
     PHYSFS_close(file);
-    return 0;
-}
-
-int lyte_set_window_vsync(bool vsync) {
-    lytecore_state.vsync = vsync;
-    fprintf(stderr, "set_window_vsybnc not implemented yet\n");
-    return 0;
-}
-
-int lyte_is_window_vsync(bool *val) {
-    *val = lytecore_state.vsync;
     return 0;
 }
 

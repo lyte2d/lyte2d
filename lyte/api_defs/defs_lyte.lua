@@ -308,10 +308,6 @@ end
 
     Function("set_window_title", MapTo("lyte_core.set_window_title")),
 
-    Function("set_window_vsync", MapTo("lyte_core.set_window_vsync")),
-
-    Function("is_window_vsync", MapTo("lyte_core.is_window_vsync")),
-
     Function("set_window_icon_file", MapTo("lyte_core.set_window_icon_file")),
 
     Function("set_window_margins", MapTo("lyte_core.set_window_margins")),
