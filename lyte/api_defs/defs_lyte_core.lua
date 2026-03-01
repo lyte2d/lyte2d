@@ -1524,7 +1524,7 @@ return process_def_tree(Namespace("lyte_core", {
     ),
 
     Enum("FilterMode",
-        '_invalid', 'nearest', 'linear',
+        'nearest', 'linear',
         Doc"Acceptable filtermode values."
     ),
 
