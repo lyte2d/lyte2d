@@ -49,6 +49,7 @@ typedef struct FontItem {
     int font;
     int atlas_dim;
     double fontsize;
+    sg_view view;
 } FontItem;
 
 static FontItem *current_font = NULL;
@@ -71,10 +72,9 @@ static int _fons_render_create(void *user_ptr, int width, int height) {
     sg_image_desc imdesc = (sg_image_desc) {
         .width = width,
         .height = height,
-        // .pixel_format = SG_PIXELFORMAT_R8,
         .pixel_format = SG_PIXELFORMAT_RGBA8,
         .type = SG_IMAGETYPE_2D,
-        .usage = SG_USAGE_DYNAMIC,
+        .usage = {.dynamic_update = true},
     };
     sg_image img = sg_make_image(&imdesc);
 
@@ -87,6 +87,7 @@ static int _fons_render_create(void *user_ptr, int width, int height) {
     fontitem->imageid = img.id;
     fontitem->samplerid = smp.id;
     fontitem->buffer = malloc(width*height*4);
+    fontitem->view = sgp_make_texture_view_from_image(img, NULL);
     return 1;
 }
 
@@ -97,6 +98,7 @@ static void _fons_render_delete(void *user_ptr) {
     sg_destroy_image(img);
     sg_sampler smp = (sg_sampler){ .id=fontitem->samplerid };
     sg_destroy_sampler(smp);
+    sg_destroy_view(fontitem->view);
     fontitem->imageid = 0;
     free(fontitem->buffer);
 }
@@ -138,8 +140,8 @@ static void _fons_render_update(void *user_ptr, int *rect, const uint8_t *data) 
     }
 
     sg_image_data imdat = {0};
-    imdat.subimage[0][0].ptr = mydata,
-    imdat.subimage[0][0].size = width*height*4,
+    imdat.mip_levels[0].ptr = mydata,
+    imdat.mip_levels[0].size = width*height*4,
     sg_update_image(img, &imdat);
 }
 
@@ -150,7 +152,7 @@ static void _fons_render_draw(void *user_ptr, const float *verts, const float *t
     int height = fontitem->height;
 
     sg_image img = (sg_image){ .id=fontitem->imageid };
-    sgp_set_image(0, img);
+    sgp_set_view(0, fontitem->view);
     sg_sampler smp = (sg_sampler){ .id=fontitem->samplerid };
     sgp_set_sampler(0, smp);
 
@@ -180,8 +182,7 @@ static void _fons_render_draw(void *user_ptr, const float *verts, const float *t
         sgp_pop_transform();
 
     }
-
-    sgp_reset_image(0);
+    sgp_reset_view(0);
 }
 
 

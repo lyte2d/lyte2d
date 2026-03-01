@@ -262,31 +262,44 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
     shader_desc.label = "lyteshaderprogram";
     shd->num_uniform_floats = 0;
     shd->num_images = 0;
-
     // shader code
-    shader_desc.vs.source = full_code_vertex;
-    shader_desc.fs.source = full_code_fragment;
-    shader_desc.vs.entry = "main";
-    shader_desc.fs.entry = "main";
+    shader_desc.vertex_func.source = full_code_vertex;
+    shader_desc.fragment_func.source = full_code_fragment;
+    shader_desc.vertex_func.entry = "main";
+    shader_desc.fragment_func.entry = "main";
+
     // "MAGIC" uniforms: vec4 current_color and sampler2D current_image
-    shader_desc.fs.uniform_blocks->uniforms[0].name = "current_color";
-    shader_desc.fs.uniform_blocks->uniforms[0].type = (sg_uniform_type)LYTE_UNIFORMTYPE_VEC4;
-    shader_desc.fs.uniform_blocks->uniforms[0].array_count = 1;
-    shader_desc.vs.uniform_blocks->uniforms[0].name = "current_color";
-    shader_desc.vs.uniform_blocks->uniforms[0].type = (sg_uniform_type)LYTE_UNIFORMTYPE_VEC4;
-    shader_desc.vs.uniform_blocks->uniforms[0].array_count = 1;
+
+    shader_desc.uniform_blocks[0].stage = SG_SHADERSTAGE_VERTEX;
+    shader_desc.uniform_blocks[0].layout = SG_UNIFORMLAYOUT_NATIVE;
+    shader_desc.uniform_blocks[0].glsl_uniforms[0].glsl_name = "current_color";
+    shader_desc.uniform_blocks[0].glsl_uniforms[0].type = (sg_uniform_type)LYTE_UNIFORMTYPE_VEC4;
+    shader_desc.uniform_blocks[0].glsl_uniforms[0].array_count = 1;
+
+    shader_desc.uniform_blocks[1].stage = SG_SHADERSTAGE_FRAGMENT;
+    shader_desc.uniform_blocks[1].layout = SG_UNIFORMLAYOUT_NATIVE;
+    shader_desc.uniform_blocks[1].glsl_uniforms[0].glsl_name = "current_color";
+    shader_desc.uniform_blocks[1].glsl_uniforms[0].type = (sg_uniform_type)LYTE_UNIFORMTYPE_VEC4;
+    shader_desc.uniform_blocks[1].glsl_uniforms[0].array_count = 1;
 
     shd->num_uniform_floats += 4; // r,g,b,a for current_color
 
-    // if user calls draw_image, this is the corresponding MAGIC image name
-    shader_desc.fs.image_sampler_pairs[0].glsl_name = "current_image";
-    shader_desc.fs.image_sampler_pairs[0].used = true;
-    shader_desc.fs.image_sampler_pairs[0].image_slot = 0;
-    shader_desc.fs.image_sampler_pairs[0].sampler_slot = 0;
-    shader_desc.fs.samplers[0].used = true;
-    shader_desc.fs.images[0].used = true;
-    shader_desc.fs.images[0].image_type = SG_IMAGETYPE_2D;
-    shader_desc.fs.images[0].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
+    shader_desc.samplers[0].stage = SG_SHADERSTAGE_FRAGMENT;
+    shader_desc.samplers[0].sampler_type = SG_SAMPLERTYPE_FILTERING;
+    shader_desc.views[0] = (sg_shader_view) {
+        .texture = {
+            .stage = SG_SHADERSTAGE_FRAGMENT,
+            .image_type = SG_IMAGETYPE_2D,
+            .sample_type = SG_IMAGESAMPLETYPE_FLOAT,
+            .multisampled = false
+        },
+    };
+    shader_desc.texture_sampler_pairs[0] = (sg_shader_texture_sampler_pair){
+        .stage = SG_SHADERSTAGE_FRAGMENT,
+        .view_slot = 0,
+        .sampler_slot = 0,
+        .glsl_name = "current_image"
+    };
 
     shd->num_images += 1; // current_image
 
@@ -299,39 +312,50 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
         ShaderUniformDefinition *sud = &shd->uniform_definitions[i];
         if (sud->type == LYTE_UNIFORMTYPE_SAMPLER2D) {
             // image
-            shader_desc.fs.image_sampler_pairs[img_idx].glsl_name = sud->name;
-            shader_desc.fs.image_sampler_pairs[img_idx].used = true;
-            shader_desc.fs.image_sampler_pairs[img_idx].image_slot = img_idx;
-            shader_desc.fs.image_sampler_pairs[img_idx].sampler_slot = img_idx;
-            shader_desc.fs.samplers[img_idx].used = true;
-            shader_desc.fs.images[img_idx].used = true;
-            shader_desc.fs.images[img_idx].image_type = SG_IMAGETYPE_2D;
-            shader_desc.fs.images[img_idx].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
+            shader_desc.samplers[img_idx].stage = SG_SHADERSTAGE_FRAGMENT;
+            shader_desc.samplers[img_idx].sampler_type = SG_SAMPLERTYPE_FILTERING;
+            shader_desc.views[img_idx] = (sg_shader_view) {
+                .texture = {
+                    .stage = SG_SHADERSTAGE_FRAGMENT,
+                    .image_type = SG_IMAGETYPE_2D,
+                    .sample_type = SG_IMAGESAMPLETYPE_FLOAT,
+                    .multisampled = false
+                },
+            };
+            shader_desc.texture_sampler_pairs[img_idx] = (sg_shader_texture_sampler_pair){
+                .stage = SG_SHADERSTAGE_FRAGMENT,
+                .view_slot = img_idx,
+                .sampler_slot = img_idx,
+                .glsl_name = sud->name
+            };
             sud->location = img_idx;
             img_idx++;
             shd->num_images += 1;
         } else {
-            shader_desc.fs.uniform_blocks[0].uniforms[flt_idx].name = sud->name;
-            shader_desc.fs.uniform_blocks[0].uniforms[flt_idx].type = (sg_uniform_type)sud->type;
-            shader_desc.fs.uniform_blocks[0].uniforms[flt_idx].array_count = 1;
-            shader_desc.vs.uniform_blocks[0].uniforms[flt_idx].name = sud->name;
-            shader_desc.vs.uniform_blocks[0].uniforms[flt_idx].type = (sg_uniform_type)sud->type;
-            shader_desc.vs.uniform_blocks[0].uniforms[flt_idx].array_count = 1;
+            // vertex block
+            shader_desc.uniform_blocks[0].glsl_uniforms[flt_idx].glsl_name = sud->name;
+            shader_desc.uniform_blocks[0].glsl_uniforms[flt_idx].type = (sg_uniform_type)sud->type;
+            shader_desc.uniform_blocks[0].glsl_uniforms[flt_idx].array_count = 1;
+
+            // fragment block
+            shader_desc.uniform_blocks[1].glsl_uniforms[flt_idx].glsl_name = sud->name;
+            shader_desc.uniform_blocks[1].glsl_uniforms[flt_idx].type = (sg_uniform_type)sud->type;
+            shader_desc.uniform_blocks[1].glsl_uniforms[flt_idx].array_count = 1;
             flt_idx++;
             sud->location = shd->num_uniform_floats;
             shd->num_uniform_floats += sud->float_count;
         }
     }
 
-    shader_desc.fs.uniform_blocks[0].size = shd->num_uniform_floats * 4;
+    shader_desc.uniform_blocks[0].size = shd->num_uniform_floats * 4;
+    shader_desc.uniform_blocks[1].size = shd->num_uniform_floats * 4;
 
-    // sg_shader
-    sg_shader sgshd= sg_make_shader(&shader_desc);
-    // sgp pipeline
+    sg_shader sgshd = sg_make_shader(&shader_desc);
+
     sgp_pipeline_desc pip_desc = {0};
     pip_desc.blend_mode = (sgp_blend_mode)lytecore_state.blendmode;
     pip_desc.shader = sgshd;
-    //pip_desc.primitive_type = SG_PRIMITIVETYPE_ ; // TODO: do we need to set this?
+
     sg_pipeline pip = sgp_make_pipeline(&pip_desc);
     sg_resource_state state = sg_query_pipeline_state(pip);
     if (state != SG_RESOURCESTATE_VALID) {
@@ -349,7 +373,6 @@ int lyte_shaderbuilder_build(lyte_ShaderBuilder shaderbuilder, lyte_Shader *shad
     free((void *)uniforms_code);
     free((void *)full_code_vertex);
     free((void *)full_code_fragment);
-
     return 0;
 }
 
@@ -374,18 +397,18 @@ int lyte_set_shader(lyte_Shader shader) {
         return 1;
     }
     sgp_set_pipeline((sg_pipeline){.id=shd->pip_id});
-    memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
-    sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
+    sgp_set_uniform(
+        shd->uniform_floats, shd->num_uniform_floats*4,
+        shd->uniform_floats, shd->num_uniform_floats*4
+    );
     lyte_set_blendmode(lytecore_state.blendmode);
     lytecore_state.shader = shd;
-
     return 0;
 }
 
 int lyte_reset_shader(void) {
     lytecore_state.shader = NULL;
     sgp_reset_pipeline();
-
     return 0;
 }
 
@@ -394,9 +417,11 @@ int lyte_core_shader_set_color() {
     if (lytecore_state.shader) {
         ShaderItem *shd = lytecore_state.shader;
         memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
-        sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
+        sgp_set_uniform(
+            shd->uniform_floats, shd->num_uniform_floats*4,
+            shd->uniform_floats, shd->num_uniform_floats*4
+        );
     }
-    return 0;
 }
 
 int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_ShaderUniformValue uniform_value) {
@@ -420,7 +445,8 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
         case 0: { // float/int
             shd->uniform_floats[sud->location] = uniform_value.options.float_val;
             memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
-            sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
+            sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4,
+                shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
         case 1: { // vecX/ivecX. X = 2 or 3 or 4
@@ -434,14 +460,14 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
                 shd->uniform_floats[sud->location+i] = uniform_value.options.vec_val.data[i];
             }
             memcpy(shd->uniform_floats, lytecore_state.current_color, 16);
-            sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4);
+            sgp_set_uniform(shd->uniform_floats, shd->num_uniform_floats*4,
+                shd->uniform_floats, shd->num_uniform_floats*4);
         }
         break;
         case 2: { // sampler2D
             shd->images[sud->location] = uniform_value.options.sampler2D_val;
-            uint32_t img_id = *(uint32_t *)uniform_value.options.sampler2D_val; // **MAGIC_1** NOTE: uint32_t handle is the first item in ImageItem struct in core_image.c file this depens on that magic
-            sg_image sgimg = (sg_image){.id = img_id};
-            sgp_set_image(sud->location, sgimg);
+            ImageItem *i = (ImageItem *)uniform_value.options.sampler2D_val;
+            sgp_set_view(sud->location, i->view);
          }
          break;
         default: {
@@ -450,7 +476,6 @@ int lyte_set_shader_uniform(lyte_Shader shader, const char * uniform_name, lyte_
         }
         break;
     }
-
     return 0;
 }
 
