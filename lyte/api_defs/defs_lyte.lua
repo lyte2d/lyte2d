@@ -14,6 +14,7 @@ return process_def_tree(Namespace("lyte",
         Arg("window_height", Int),
         Arg("window_resized", Bool),
         Arg("is_fullscreen", Bool),
+        Arg("has_focus", Bool),
         Doc"Tick function. Should be created by the user.",
         UserImpl
     ),
@@ -317,6 +318,8 @@ end
     Function("set_window_margins", MapTo("lyte_core.set_window_margins")),
 
     Function("set_window_paddings", MapTo("lyte_core.set_window_paddings")),
+
+    Function("has_focus", MapTo("lyte_core.has_focus")),
 
     Function("is_key_down", MapTo("lyte_core.is_key_down")),
 

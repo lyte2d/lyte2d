@@ -475,6 +475,11 @@ return process_def_tree(Namespace("lyte_core", {
         Doc"Set the window paddings. Paddings are can be drawn on."
     ),
 
+    Function("has_focus",
+        Ret("val", Bool),
+        Doc"Check if the window has input focus."
+    ),
+
     Function("is_key_down",
         Arg("key", KeyboardKey),
         Ret("val", Bool),
