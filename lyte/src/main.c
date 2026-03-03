@@ -67,7 +67,9 @@ static void laction (int i) {
   lua_sethook(_global_L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
-static int traceback (lua_State *L) {
+static int traceback (lua_State *) {
+  return 1;
+  #if 0
   if (!lua_isstring(L, 1))  /* 'message' not a string? */
     return 1;  /* keep it intact */
   lua_getfield(L, LUA_GLOBALSINDEX, "debug");
@@ -84,6 +86,7 @@ static int traceback (lua_State *L) {
   lua_pushinteger(L, 2);  /* skip this function and traceback */
   lua_call(L, 2, 1);  /* call debug.traceback */
   return 1;
+  #endif
 }
 
 static inline int docall (lua_State *L, int narg, int clear) {
@@ -168,7 +171,7 @@ static int _try_load(lua_State *L) {
             lua_insert(L, 1);
             if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0) {
                 l_message(path_name, lua_pushfstring(L,
-                                    "error calling " LUA_QL("print") " (%s)",
+                                    "error calling 'print' (%s)",
                                     lua_tostring(L, -1)));
             }
             // quit on error for now
@@ -278,7 +281,7 @@ static void tick_fn_active(void *data, float dt, int width, int height, bool res
         lua_insert(L, 1);
         if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
             l_message("program_name", lua_pushfstring(L,
-                                "error calling " LUA_QL("print") " (%s)",
+                                "error calling 'print' (%s)",
                                 lua_tostring(L, -1)));
         // quit on error for now
         exit(1);
@@ -309,7 +312,7 @@ static void tick_fn_active_tick_loading(void *data, float dt, int width, int hei
         lua_insert(L, 1);
         if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0)
             l_message("program_name", lua_pushfstring(L,
-                                "error calling " LUA_QL("print") " (%s)",
+                                "error calling 'print' (%s)",
                                 lua_tostring(L, -1)));
         // quit on error for now
         exit(1);
