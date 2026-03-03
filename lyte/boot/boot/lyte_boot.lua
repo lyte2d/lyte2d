@@ -209,8 +209,6 @@ local function lyte_lua_loader(modulename)
     end
 end
 
-
-
 local function lyte_library_loader(modulename)
     local filename = modulename:gsub("%.", "/")
     modulename = filename:match("[^/]*$")
@@ -241,6 +239,7 @@ end
 
 local loaded_cfg, _cfg = pcall(require, "config")
 
+-- Magic variable read by main.c containing the initial application settings
 _Config = {
     window_width = _cfg.window_width or 800,
     window_height = _cfg.window_height or 500,
@@ -255,11 +254,12 @@ if not lyte.tick_loading then
     lyte.tick_loading = tick_loading
 end
 
-
--- -- before window opens
--- lyte_core.set_window_resizable(false)
--- lyte_core.set_window_resizable(_def.resizable)
-
--- -- window opens below
--- lyte.set_window_icon_file("lyte_boot_assets/icon.png")
-
+-- Called by main.c after all the subsystems have been initialized
+function lyte.post_init()
+    lyte.set_default_filtermode(_Config.default_filtermode)
+    lyte.set_default_blendmode(_Config.default_blendmode)
+    lyte._default_font = lyte.load_font('/lyte_boot_assets/monogram-extended.ttf', 13 * 2)
+    lyte.reset_font()
+    lyte.set_window_title(_Config.window_title)
+    lyte.set_window_icon_file('lyte_boot_assets/icon.png')
+end

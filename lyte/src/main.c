@@ -33,10 +33,6 @@ int luaopen_utf8 (lua_State *L);
 #define LYTE_APP_ZIP_MAX_SIZE (120*1024*1024)
 #define LYTE_APP_EXE_MAX_SIZE (120*1024*1024)
 
-// TODO: remove (from C config as well)
-#define LYTE_INIT_WIDTH 400 // not used
-#define LYTE_INIT_HEIGHT 260 // not used
-
 static bool _need_to_load_archives = false;
 
 static char *_app_modulename = "app";
@@ -404,11 +400,7 @@ static void sokol_init(void) {
     MUST(lyte_core_shader_init());
 
     int post_init_status = luaL_dostring(_global_L, "\
-        lyte.set_default_filtermode(_Config.default_filtermode) \
-        lyte.set_default_blendmode(_Config.default_blendmode) \
-        lyte._default_font = lyte.load_font('/lyte_boot_assets/monogram-extended.ttf', 13 * 2) \
-        lyte.reset_font() \
-        lyte.set_window_title(_Config.window_title) \
+        lyte.post_init() \
     ");
     MUST(post_init_status);
     lyte_core_set_loop(tick_fn_loading, _global_L);
