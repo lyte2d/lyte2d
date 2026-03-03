@@ -12,7 +12,7 @@ static inline void *_checklightuserdata(lua_State *L, int narg) {
     void *ret = lua_touserdata(L, narg);
     if (ret == NULL && !lua_islightuserdata(L, narg)) {
         // Lua 5.5 TODO
-        luaL_typerror(L, narg, lua_typename(L, LUA_TLIGHTUSERDATA));
+        //luaL_typerror(L, narg, lua_typename(L, LUA_TLIGHTUSERDATA));
     }
     return ret;
 }
