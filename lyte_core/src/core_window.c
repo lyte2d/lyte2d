@@ -128,12 +128,15 @@ int lyte_set_window_position(int x, int y) {
 }
 
 int lyte_set_fullscreen(bool fullscreen) {
-    fprintf(stderr, "set_fullscreen not implemented yet\n");
+    if (sapp_is_fullscreen() != fullscreen) {
+        sapp_toggle_fullscreen();
+        lytecore_state.fullscreen = fullscreen;
+    }
     return 0;
 }
 
 int lyte_is_fullscreen(bool *val) {
-    *val = lytecore_state.fullscreen;
+    *val = sapp_is_fullscreen();
     return 0;
 }
 
@@ -165,10 +168,6 @@ int lyte_set_window_icon_file(const char * path) {
         fprintf(stderr, "\nImage file failed to load: %s\n", path);
         return 2;
     }
-
-    //GLFWimage images[1];
-    //images[0].pixels = stbi_load_from_memory(buf, read_len, &images[0].width, &images[0].height, 0, 4);
-    printf("read %d byts\n", (int)read_len);
     sapp_range pixels = {
         .ptr = data,
         .size = width * height * 4
@@ -178,9 +177,7 @@ int lyte_set_window_icon_file(const char * path) {
             { .width = width, .height = height, .pixels = pixels }
         }
     };
-    printf("icon %d %d\n", width, height);
     sapp_set_icon(&icon_desc);
-
     stbi_image_free(data);
     free(buf);
     PHYSFS_close(file);

@@ -64,7 +64,6 @@ void lyte_core_input_event(const sapp_event * event) {
             fprintf(stderr, "Warning: Too many char inputs in one frame. Only few expected per frame.");
         }
         break;
-
     case SAPP_EVENTTYPE_MOUSE_DOWN:
         if (event->mouse_button < LYTE_MAX_MOUSEBUTTONS) {
             inputstate.mousebuttons_cur[event->mouse_button] = true;
