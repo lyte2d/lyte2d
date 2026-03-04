@@ -67,12 +67,10 @@ static void laction (int i) {
   lua_sethook(_global_L, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
 }
 
-static int traceback (lua_State *) {
-  return 1;
-  #if 0
+static int traceback (lua_State *L) {
   if (!lua_isstring(L, 1))  /* 'message' not a string? */
     return 1;  /* keep it intact */
-  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  lua_getglobal(L, "debug");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
     return 1;
@@ -86,7 +84,6 @@ static int traceback (lua_State *) {
   lua_pushinteger(L, 2);  /* skip this function and traceback */
   lua_call(L, 2, 1);  /* call debug.traceback */
   return 1;
-  #endif
 }
 
 static inline int docall (lua_State *L, int narg, int clear) {
@@ -104,107 +101,6 @@ static inline int docall (lua_State *L, int narg, int clear) {
 }
 
 // --end-- copied from lua.c
-
-
-// given module in 'bla.blo.blu' format and an extension: find the module name 'bla/blo/blu.lua'
-static inline bool _find_module_path(lua_State *L, char *str, const char *module_name, const char *ext) {
-    sprintf(str, "return (string.gsub('%s', '(%%w+)[.]', '%%1/') .. '%s')\n", module_name, ext);
-    int err = luaL_dostring(L, (const char *)str);
-    (void)err;
-    const char *path_name = luaL_checkstring(L, 1);
-    (void)path_name;
-    bool exists = true; // TODO: check via a '_path_exists(path_name);'
-
-    return exists;
-}
-
-static int _try_load(lua_State *L) {
-    CHK_STACK(1);
-    const char *module_name = luaL_checkstring(L, 1);
-    lua_pop(L, 1);
-    CHK_STACK(0);
-
-    char str[4096] = {0};
-    bool exists = false;
-    (void)exists;
-
-    exists = _find_module_path(L, str, module_name, ".lua"); // has side effect: pushes the module name to the path
-
-    CHK_STACK(1);
-
-    const char *path_name = luaL_checkstring(L, -1);
-
-    lua_pop(L, 1);
-    int err=0;
-
-    const char *file_content = NULL;
-    err = lyte_load_textfile(path_name, &file_content);
-    if (err) {
-        fprintf(stderr, "Warning: load failed: %s\n", path_name);
-        return 0;
-        // exit(1);
-    } else {
-        // printf("%s", file_content);
-    }
-
-    CHK_STACK(0);
-    lua_getglobal(L, "package");
-    CHK_STACK(1);
-    lua_getfield(L, 1, "loaded");
-    CHK_STACK(2);
-    lua_pushstring(L, module_name);
-    CHK_STACK(3);
-
-    char path_with_at[4096] = {0};
-    sprintf(path_with_at, "@%s", path_name); // @ in the path_name tells lua that this is a filepath and not part of code
-
-    size_t fc_len = strlen(file_content);
-    err = luaL_loadbuffer(L, (const char *)file_content,fc_len , (const char *)path_with_at);
-    if (err == 0) {
-        err = docall(L, 0, 0);
-        if (err &&  lua_gettop(L) > 0) {
-            // remove loaded modules..
-            lua_remove(L, 1);
-            lua_remove(L, 1);
-            lua_remove(L, 1);
-            lua_getglobal(L, "print");
-            lua_insert(L, 1);
-            if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != 0) {
-                l_message(path_name, lua_pushfstring(L,
-                                    "error calling 'print' (%s)",
-                                    lua_tostring(L, -1)));
-            }
-            // quit on error for now
-            exit(1);
-        }
-    } else if (err != 0)  {
-        fprintf(stderr, "Error: dostring() on file %s\n", path_name);
-        // traceback(L);
-        lua_error(L);
-        exit(1);
-    }
-    if (lua_gettop(L) == 3) {
-        lua_pushboolean(L, true);
-        //printf("error??");
-    } else {
-        // printf("package:  %s  top: %d \n", module_name, lua_gettop(L));
-    }
-
-    CHK_STACK(4);
-    lua_settable(L, 2);
-    CHK_STACK(2);
-
-    lua_settop(L, 0);
-    // free(module_file_buf);
-    return 0;
-}
-
-static inline int _load_lua_file(lua_State *L, const char *path, bool error_if_missing) {
-    (void)error_if_missing;
-    lua_pushstring(L, path);
-    // printf("Load_lua_file %s\n", path);
-    return _try_load(L);
-}
 
 static void _check_fetch_file_status(lua_State *L) {
     bool archive_done;
@@ -377,8 +273,16 @@ static int init(lyte_Config cfg) {
 
     lua_gc(L, LUA_GCCOLLECT, 0);
 
-    // LOAD BOOT
-    _load_lua_file(L, "lyte_boot", true);
+    const char * boot;
+    err = lyte_load_textfile("lyte_boot.lua", &boot);
+    if (err) {
+        abort();
+    }
+    err = luaL_dostring(_global_L, boot);
+    if (err) {
+        abort();
+    }
+    free((void*)boot);
 
     return err;
 }
@@ -391,7 +295,6 @@ static int cleanup(void) {
     err = lyte_core_font_cleanup();
     err = lyte_core_shader_cleanup();
     err = lyte_core_filesystem_cleanup();
-    // err = lyte_core_physics_cleanup();
 
     return err;
 }
@@ -407,7 +310,6 @@ int main(int argc, char *argv[]) {
         .vsync = true,
         .blendmode = LYTE_BLENDMODE_BLEND,
         .filtermode = LYTE_FILTERMODE_NEAREST,
-        // .window_title = "lyte",
         .window_size = (lyte_Size){ .width=LYTE_INIT_WIDTH, .height=LYTE_INIT_HEIGHT },
         .window_min_size = (lyte_Size){ .width=0, .height=0 },
     };

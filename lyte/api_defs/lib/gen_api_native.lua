@@ -9,7 +9,9 @@ local gen_c_helper_code = [[
 static inline void *_checklightuserdata(lua_State *L, int narg) {
     void *ret = lua_touserdata(L, narg);
     if (ret == NULL && !lua_islightuserdata(L, narg)) {
-        luaL_typerror(L, narg, lua_typename(L, LUA_TLIGHTUSERDATA));
+        const char *msg = lua_pushfstring(L, "light userdata expected, got %s",
+                                      luaL_typename(L, narg));
+        luaL_argerror(L, narg, msg);
     }
     return ret;
 }
