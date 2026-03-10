@@ -9,6 +9,9 @@
 #include "utf8encode.h"
 #include "sokol_app.h"
 
+#define MG_IMPLEMENTATION
+#include "minigamepad.h"
+
 #define LYTE_MAX_JOYSTICKS 16
 #define LYTE_MAX_KEYBOARD_KEYS (LYTE_KEYBOARDKEY_MENU+1)
 #define LYTE_MAX_MOUSEBUTTONS LYTE_MOUSEBUTTON_COUNT
@@ -27,6 +30,7 @@ typedef struct lyte_InputState {
     float mouse_x, mouse_y;
 
     // these two are handled by joystick connet/disconnect events
+    mg_gamepads gamepads;
     uint8_t joystick_connected[LYTE_MAX_JOYSTICKS];
     struct {
         int joystick_id;
@@ -40,6 +44,10 @@ typedef struct lyte_InputState {
 
 
 static lyte_InputState inputstate = {0};
+
+void lyte_core_input_poll(void) {
+    mg_gamepads_poll(&inputstate.gamepads);
+}
 
 void lyte_core_input_event(const sapp_event * event) {
     switch (event->type) {
@@ -96,6 +104,7 @@ void lyte_core_input_event(const sapp_event * event) {
     }
 }
 
+
 #if 0
 static void joystick_callback(int jid, int event) {
     if (event == GLFW_CONNECTED) {
@@ -133,6 +142,12 @@ static void mouse_scroll_reset(void) {
 
 int lyte_core_input_init(void) {
     textinput_reset(); // zero out first frame's text input
+    mg_gamepads_init(&inputstate.gamepads);
+    if (inputstate.gamepads.list.head == NULL) {
+        fprintf(stderr, "Not connected\n");
+    } else {
+        fprintf(stderr, "Gamepad found\n");
+    }
     return 0;
 }
 
@@ -249,14 +264,156 @@ int lyte_get_gamepad_name(int index, const char * *val) {
 }
 
 int lyte_is_gamepad_down(int index, lyte_GamepadButton gamepad_button, bool *val) {
-    //*val = inputstate.gamepad_states_cur[index].buttons[gamepad_button];
     *val = false;
+    if (inputstate.gamepads.list.head == NULL) {
+        return 0;
+    }
+    mg_gamepad * gamepad = inputstate.gamepads.list.head;
+    while (1) {
+        if (!gamepad->connected) {
+            return 0;
+        }
+        switch (gamepad_button) {
+            case LYTE_GAMEPADBUTTON_PAD_A:
+                if (gamepad->buttons[MG_BUTTON_SOUTH].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_PAD_B:
+                if (gamepad->buttons[MG_BUTTON_EAST].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_PAD_X:
+                if (gamepad->buttons[MG_BUTTON_WEST].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_PAD_Y:
+                if (gamepad->buttons[MG_BUTTON_NORTH].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_LEFT_BUMPER:
+                if (gamepad->buttons[MG_BUTTON_LEFT_SHOULDER].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_RIGHT_BUMPER:
+                if (gamepad->buttons[MG_BUTTON_RIGHT_SHOULDER].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_BACK:
+                if (gamepad->buttons[MG_BUTTON_BACK].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_START:
+                if (gamepad->buttons[MG_BUTTON_START].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_GUIDE:
+                if (gamepad->buttons[MG_BUTTON_GUIDE].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_LEFT_THUMB:
+                if (gamepad->buttons[MG_BUTTON_LEFT_STICK].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_RIGHT_THUMB:
+                if (gamepad->buttons[MG_BUTTON_RIGHT_STICK].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_UP:
+                if (gamepad->buttons[MG_BUTTON_DPAD_UP].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_RIGHT:
+                if (gamepad->buttons[MG_BUTTON_DPAD_RIGHT].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_DOWN:
+                if (gamepad->buttons[MG_BUTTON_DPAD_DOWN].current)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_LEFT:
+                if (gamepad->buttons[MG_BUTTON_DPAD_LEFT].current)
+                    *val = true;
+                break;
+        }
+        break;
+    }
     return 0;
 }
 
 int lyte_is_gamepad_pressed(int index, lyte_GamepadButton gamepad_button, bool *val) {
-    //*val = inputstate.gamepad_states_cur[index].buttons[gamepad_button] && !inputstate.gamepad_states_prev[index].buttons[gamepad_button];
     *val = false;
+    if (inputstate.gamepads.list.head == NULL) {
+        return 0;
+    }
+    mg_gamepad * gamepad = inputstate.gamepads.list.head;
+    while (1) {
+        if (!gamepad->connected) {
+            return 0;
+        }
+        switch (gamepad_button) {
+            case LYTE_GAMEPADBUTTON_PAD_A:
+                if (gamepad->buttons[MG_BUTTON_SOUTH].current && !gamepad->buttons[MG_BUTTON_SOUTH].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_PAD_B:
+                if (gamepad->buttons[MG_BUTTON_EAST].current && !gamepad->buttons[MG_BUTTON_EAST].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_PAD_X:
+                if (gamepad->buttons[MG_BUTTON_WEST].current && !gamepad->buttons[MG_BUTTON_WEST].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_PAD_Y:
+                if (gamepad->buttons[MG_BUTTON_NORTH].current && !gamepad->buttons[MG_BUTTON_NORTH].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_LEFT_BUMPER:
+                if (gamepad->buttons[MG_BUTTON_LEFT_SHOULDER].current && !gamepad->buttons[MG_BUTTON_LEFT_SHOULDER].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_RIGHT_BUMPER:
+                if (gamepad->buttons[MG_BUTTON_RIGHT_SHOULDER].current && !gamepad->buttons[MG_BUTTON_RIGHT_SHOULDER].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_BACK:
+                if (gamepad->buttons[MG_BUTTON_BACK].current && !gamepad->buttons[MG_BUTTON_BACK].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_START:
+                if (gamepad->buttons[MG_BUTTON_START].current && !gamepad->buttons[MG_BUTTON_START].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_GUIDE:
+                if (gamepad->buttons[MG_BUTTON_GUIDE].current && !gamepad->buttons[MG_BUTTON_GUIDE].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_LEFT_THUMB:
+                if (gamepad->buttons[MG_BUTTON_LEFT_STICK].current && !gamepad->buttons[MG_BUTTON_LEFT_STICK].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_RIGHT_THUMB:
+                if (gamepad->buttons[MG_BUTTON_RIGHT_STICK].current && !gamepad->buttons[MG_BUTTON_RIGHT_STICK].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_UP:
+                if (gamepad->buttons[MG_BUTTON_DPAD_UP].current && !gamepad->buttons[MG_BUTTON_DPAD_UP].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_RIGHT:
+                if (gamepad->buttons[MG_BUTTON_DPAD_RIGHT].current && !gamepad->buttons[MG_BUTTON_DPAD_RIGHT].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_DOWN:
+                if (gamepad->buttons[MG_BUTTON_DPAD_DOWN].current && !gamepad->buttons[MG_BUTTON_DPAD_DOWN].prev)
+                    *val = true;
+                break;
+            case LYTE_GAMEPADBUTTON_DPAD_LEFT:
+                if (gamepad->buttons[MG_BUTTON_DPAD_LEFT].current && !gamepad->buttons[MG_BUTTON_DPAD_LEFT].prev)
+                    *val = true;
+                break;
+        }
+        break;
+    }
     return 0;
 }
 

@@ -26,7 +26,11 @@
 #include "sokol_fetch.h"
 #include "sokol_args.h"
 
+#if defined(__EMSCRIPTEN__)
+#define SOKOL_GLES3
+#else
 #define SOKOL_GLCORE
+#endif
 
 #include "sokol_gfx.h"
 
@@ -59,3 +63,6 @@
 #if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
+
+//#define MG_IMPLEMENTATION
+#include "minigamepad.h"

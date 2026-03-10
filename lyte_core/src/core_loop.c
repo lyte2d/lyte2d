@@ -14,6 +14,8 @@
 
 static uint64_t curr_t, delta_time, last_t;
 
+void lyte_core_input_poll();
+
 static inline void _tick_function(void) {
 
 #if defined(__EMSCRIPTEN__)
@@ -101,6 +103,7 @@ static inline void _tick_function(void) {
     sgp_reset_transform();
     // sgp_scale(xscale, yscale);
     double delta_secs = stm_sec(delta_time);
+    lyte_core_input_poll();
     lytecore_state.tick_fn(lytecore_state.app_data, delta_secs, lytecore_state.window_size.width, lytecore_state.window_size.height, resized, lytecore_state.fullscreen);
     // lyte_pop_matrix();
 

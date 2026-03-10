@@ -61,4 +61,5 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/sokol_gp_a9dbdce
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/stb_013ac3b
     ${CMAKE_CURRENT_SOURCE_DIR}/../deps/fontstash_b5ddc97/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../deps/minigamepad
 )
