@@ -624,75 +624,6 @@ static int api_get_text_height(lua_State *L) { // arity: 1 => 1
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
-static int api_get_monitor_count(lua_State *L) { // arity: 0 => 1
-    (void)L; int err = 0;
-    int val;
-    err = _get_monitor_count(&val);
-    lua_pushinteger(L, val);
-    (void)err; // TODO: handle when err is not 0
-    return 1; // number of values returned in the stack
-}
-static int api_get_monitor_name(lua_State *L) { // arity: 1 => 1
-    (void)L; int err = 0;
-    int index; const char *val = {0};
-    index = luaL_checknumber(L, 1);
-    err = _get_monitor_name(index, &val);
-    lua_pushstring(L, val);
-    (void)err; // TODO: handle when err is not 0
-    return 1; // number of values returned in the stack
-}
-static int api_get_monitor_width(lua_State *L) { // arity: 1 => 1
-    (void)L; int err = 0;
-    int index; int val;
-    index = luaL_checknumber(L, 1);
-    err = _get_monitor_width(index, &val);
-    lua_pushinteger(L, val);
-    (void)err; // TODO: handle when err is not 0
-    return 1; // number of values returned in the stack
-}
-static int api_get_monitor_height(lua_State *L) { // arity: 1 => 1
-    (void)L; int err = 0;
-    int index; int val;
-    index = luaL_checknumber(L, 1);
-    err = _get_monitor_height(index, &val);
-    lua_pushinteger(L, val);
-    (void)err; // TODO: handle when err is not 0
-    return 1; // number of values returned in the stack
-}
-static int api_set_window_monitor(lua_State *L) { // arity: 1 => 0
-    (void)L; int err = 0;
-    int index;
-    index = luaL_checknumber(L, 1);
-    err = _set_window_monitor(index);
-    (void)err; // TODO: handle when err is not 0
-    return 0; // number of values returned in the stack
-}
-static int api_set_window_resizable(lua_State *L) { // arity: 1 => 0
-    (void)L; int err = 0;
-    bool resizable;
-    resizable = lua_toboolean(L, 1);
-    err = _set_window_resizable(resizable);
-    (void)err; // TODO: handle when err is not 0
-    return 0; // number of values returned in the stack
-}
-static int api_set_window_minsize(lua_State *L) { // arity: 2 => 0
-    (void)L; int err = 0;
-    int width; int height;
-    width = luaL_checknumber(L, 1);
-    height = luaL_checknumber(L, 2);
-    err = _set_window_minsize(width, height);
-    (void)err; // TODO: handle when err is not 0
-    return 0; // number of values returned in the stack
-}
-static int api_set_window_size(lua_State *L) { // arity: 2 => 0
-    (void)L; int err = 0;
-    int width; int height;
-    width = luaL_checknumber(L, 1);
-    height = luaL_checknumber(L, 2);
-    err = _set_window_size(width, height);
-    (void)err; // TODO: handle when err is not 0
-    return 0; // number of values returned in the stack
-}
 static int api_get_window_width(lua_State *L) { // arity: 0 => 1
     (void)L; int err = 0;
     int val;
@@ -708,15 +639,6 @@ static int api_get_window_height(lua_State *L) { // arity: 0 => 1
     lua_pushinteger(L, val);
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
-}
-static int api_set_window_position(lua_State *L) { // arity: 2 => 0
-    (void)L; int err = 0;
-    int x; int y;
-    x = luaL_checknumber(L, 1);
-    y = luaL_checknumber(L, 2);
-    err = _set_window_position(x, y);
-    (void)err; // TODO: handle when err is not 0
-    return 0; // number of values returned in the stack
 }
 static int api_set_fullscreen(lua_State *L) { // arity: 1 => 0
     (void)L; int err = 0;
@@ -1522,17 +1444,8 @@ static const struct luaL_Reg lyte_core_api_functions[] = {
     {"draw_text", api_draw_text},
     {"get_text_width", api_get_text_width},
     {"get_text_height", api_get_text_height},
-    {"get_monitor_count", api_get_monitor_count},
-    {"get_monitor_name", api_get_monitor_name},
-    {"get_monitor_width", api_get_monitor_width},
-    {"get_monitor_height", api_get_monitor_height},
-    {"set_window_monitor", api_set_window_monitor},
-    {"set_window_resizable", api_set_window_resizable},
-    {"set_window_minsize", api_set_window_minsize},
-    {"set_window_size", api_set_window_size},
     {"get_window_width", api_get_window_width},
     {"get_window_height", api_get_window_height},
-    {"set_window_position", api_set_window_position},
     {"set_fullscreen", api_set_fullscreen},
     {"is_fullscreen", api_is_fullscreen},
     {"set_window_title", api_set_window_title},

@@ -212,46 +212,6 @@ static inline int _get_text_height(const char *text, int *val) {
     err = lyte_get_text_height(text, val);
     return err;
 }
-static inline int _get_monitor_count(int *val) {
-int err = 0;
-    err = lyte_get_monitor_count(val);
-    return err;
-}
-static inline int _get_monitor_name(int index, const char **val) {
-    (void)index; int err = 0;
-    err = lyte_get_monitor_name(index, val);
-    return err;
-}
-static inline int _get_monitor_width(int index, int *val) {
-    (void)index; int err = 0;
-    err = lyte_get_monitor_width(index, val);
-    return err;
-}
-static inline int _get_monitor_height(int index, int *val) {
-    (void)index; int err = 0;
-    err = lyte_get_monitor_height(index, val);
-    return err;
-}
-static inline int _set_window_monitor(int index) {
-    (void)index; int err = 0;
-    err = lyte_set_window_monitor(index);
-    return err;
-}
-static inline int _set_window_resizable(bool resizable) {
-    (void)resizable; int err = 0;
-    err = lyte_set_window_resizable(resizable);
-    return err;
-}
-static inline int _set_window_minsize(int width, int height) {
-    (void)width; (void)height; int err = 0;
-    err = lyte_set_window_minsize(width, height);
-    return err;
-}
-static inline int _set_window_size(int width, int height) {
-    (void)width; (void)height; int err = 0;
-    err = lyte_set_window_size(width, height);
-    return err;
-}
 static inline int _get_window_width(int *val) {
 int err = 0;
     err = lyte_get_window_width(val);
@@ -260,11 +220,6 @@ int err = 0;
 static inline int _get_window_height(int *val) {
 int err = 0;
     err = lyte_get_window_height(val);
-    return err;
-}
-static inline int _set_window_position(int x, int y) {
-    (void)x; (void)y; int err = 0;
-    err = lyte_set_window_position(x, y);
     return err;
 }
 static inline int _set_fullscreen(bool fullscreen) {

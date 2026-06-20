@@ -368,51 +368,6 @@ return process_def_tree(Namespace("lyte_core", {
         Doc"Get the height of the given text line."
     ),
 
-    Function("get_monitor_count",
-        Ret("val", Int),
-        Doc"Get the number of currently connected monitors."
-    ),
-
-    Function("get_monitor_name",
-        Arg("index", Int),
-        Ret("val", String),
-        Doc"Get the name of the monitor at the index"
-    ),
-
-    Function("get_monitor_width",
-        Arg("index", Int),
-        Ret("val", Int),
-        Doc"Get the width of the monitor at the index"
-    ),
-
-    Function("get_monitor_height",
-        Arg("index", Int),
-        Ret("val", Int),
-        Doc"Get the height of the monitor at the index"
-    ),
-
-    Function("set_window_monitor",
-        Arg("index", Int),
-        Doc[[ Set the window's initial monitor to the indexed value. Must be set before the window is opened.]]
-    ),
-
-    Function("set_window_resizable",
-        Arg("resizable", Bool),
-        Doc[[ Set the window resizable flag to the given value. Must be set before the window is opened.]]
-    ),
-
-    Function("set_window_minsize",
-        Arg("width", Int),
-        Arg("height", Int),
-        Doc"Set the window's minimum possible size."
-    ),
-
-    Function("set_window_size",
-        Arg("width", Int),
-        Arg("height", Int),
-        Doc"Set the window's size."
-    ),
-
     Function("get_window_width",
         Ret("val", Int, Doc"Width of the window in pixels"),
         Doc"Get the width of the window."
@@ -421,12 +376,6 @@ return process_def_tree(Namespace("lyte_core", {
     Function("get_window_height",
         Ret("val", Int, Doc"Height of the window in pixels"),
         Doc"Get the height of the window."
-    ),
-
-    Function("set_window_position",
-        Arg("x", Int),
-        Arg("y", Int),
-        Doc"Set the window's position."
     ),
 
     Function("set_fullscreen",

@@ -68,50 +68,6 @@ int lyte_core_window_cleanup(void) {
     return 0;
 }
 
-int lyte_get_monitor_count(int *val) {
-    // TODO
-    (void)val;
-    return 0;
-}
-
-int lyte_get_monitor_name(int index, const char * *val) {
-    // TODO
-    (void)index; (void)val;
-    return 0;
-}
-
-int lyte_get_monitor_width(int index, int *val) {
-    // TODO
-    (void)index; (void)val;
-    return 0;
-}
-
-int lyte_get_monitor_height(int index, int *val) {
-    // TODO
-    return 0;
-}
-
-int lyte_set_window_monitor(int index) {
-    // TODO
-    (void)index;
-    return 0;
-}
-
-int lyte_set_window_resizable(bool resizable) {
-    fprintf(stderr, "set_window_resizable not supported\n");
-    return 0;
-}
-
-int lyte_set_window_minsize(int width, int height) {
-    fprintf(stderr, "set_window_minsize not supported\n");
-    return 0;
-}
-
-int lyte_set_window_size(int width, int height) {
-    fprintf(stderr, "set_window_size not supported\n");
-    return 0;
-}
-
 int lyte_get_window_width(int *val) {
     *val = lytecore_state.window_size.width;
     return 0;
@@ -119,11 +75,6 @@ int lyte_get_window_width(int *val) {
 
 int lyte_get_window_height(int *val) {
     *val = lytecore_state.window_size.height;
-    return 0;
-}
-
-int lyte_set_window_position(int x, int y) {
-    fprintf(stderr, "set_window_position not supported\n");
     return 0;
 }
 

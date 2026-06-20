@@ -280,27 +280,9 @@ end
 
     Function("get_text_height", MapTo("lyte_core.get_text_height")),
 
-    Function("get_monitor_count", MapTo("lyte_core.get_monitor_count")),
-
-    Function("get_monitor_name", MapTo("lyte_core.get_monitor_name")),
-
-    Function("get_monitor_width", MapTo("lyte_core.get_monitor_width")),
-
-    Function("get_monitor_height", MapTo("lyte_core.get_monitor_height")),
-
-    Function("set_window_monitor", MapTo("lyte_core.set_window_monitor")),
-
-    Function("set_window_resizable", MapTo("lyte_core.set_window_resizable")),
-
-    Function("set_window_minsize", MapTo("lyte_core.set_window_minsize")),
-
-    Function("set_window_size", MapTo("lyte_core.set_window_size")),
-
     Function("get_window_width", MapTo("lyte_core.get_window_width")),
 
     Function("get_window_height", MapTo("lyte_core.get_window_height")),
-
-    Function("set_window_position", MapTo("lyte_core.set_window_position")),
 
     Function("set_fullscreen", MapTo("lyte_core.set_fullscreen")),
 

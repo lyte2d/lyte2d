@@ -4,7 +4,7 @@ global record lyte
     -- functions
 
     -- Tick function. Should be created by the user. 
-    tick: function(delta_time: number, window_width: int, window_height: int, window_resized: boolean, is_fullscreen: boolean)
+    tick: function(delta_time: number, window_width: integer, window_height: integer, window_resized: boolean, is_fullscreen: boolean)
     -- Quit the application by closing the window. 
     quit: function()
     -- Clear the screen or current canvas if one is used. 
@@ -40,11 +40,11 @@ global record lyte
     -- Draw a rectangular area from the image. Angle, scale and origin values are all optional. 
     draw_image_rect: function(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     -- Get the width of the image. 
-    get_image_width: function(image: lyte.Image): int
+    get_image_width: function(image: lyte.Image): integer
     -- Get the height of the image. 
-    get_image_height: function(image: lyte.Image): int
+    get_image_height: function(image: lyte.Image): integer
     -- Create a canvas image with given width and height. 
-    new_canvas: function(width: int, height: int): lyte.Image
+    new_canvas: function(width: integer, height: integer): lyte.Image
     -- Set the effective canvas image. All draw operations will go to this canvas until it's reset. 
     set_canvas: function(canvas_image: lyte.Image)
     -- Reset the drawing target, back to screen. 
@@ -58,7 +58,7 @@ global record lyte
     -- Add a recta to the image batch (from it's initial image). `src_width` and `src_height` are optional and will default to the corresponding `dest_` values. 
     add_imagebatch_rect: function(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     -- Get the number of rects in the image batch. 
-    get_imagebatch_rect_count: function(imagebatch: lyte.ImageBatch): int
+    get_imagebatch_rect_count: function(imagebatch: lyte.ImageBatch): integer
     -- Draw the image batch. 
     draw_imagebatch: function(imagebatch: lyte.ImageBatch)
     -- Load the font specified in the path, and set the initial size. 
@@ -70,47 +70,25 @@ global record lyte
     -- Draw a text line. 
     draw_text: function(text: string, dest_x: number, dest_y: number)
     -- Get the width of the given text line. 
-    get_text_width: function(text: string): int
+    get_text_width: function(text: string): integer
     -- Get the height of the given text line. 
-    get_text_height: function(text: string): int
-    -- Get the number of currently connected monitors. 
-    get_monitor_count: function(): int
-    -- Get the name of the monitor at the index 
-    get_monitor_name: function(index: int): string
-    -- Get the width of the monitor at the index 
-    get_monitor_width: function(index: int): int
-    -- Get the height of the monitor at the index 
-    get_monitor_height: function(index: int): int
-    --  Set the window's initial monitor to the indexed value. Must be set before the window is opened. 
-    set_window_monitor: function(index: int)
-    --  Set the window resizable flag to the given value. Must be set before the window is opened. 
-    set_window_resizable: function(resizable: boolean)
-    -- Set the window's minimum possible size. 
-    set_window_minsize: function(width: int, height: int)
-    -- Set the window's size. 
-    set_window_size: function(width: int, height: int)
+    get_text_height: function(text: string): integer
     -- Get the width of the window. 
-    get_window_width: function(): int
+    get_window_width: function(): integer
     -- Get the height of the window. 
-    get_window_height: function(): int
-    -- Set the window's position. 
-    set_window_position: function(x: int, y: int)
+    get_window_height: function(): integer
     -- Set the window to fullscreen, or windowed mode. 
     set_fullscreen: function(fullscreen: boolean)
     -- Check if the window is set to fullscreen. 
     is_fullscreen: function(): boolean
     -- Set the window's title. 
     set_window_title: function(title: string)
-    -- Set the window vsync flag to the given value. 
-    set_window_vsync: function(vsync: boolean)
-    -- Check if the window vsync flag is set. 
-    is_window_vsync: function(): boolean
     -- Set the window icon. 
     set_window_icon_file: function(icon_path: string)
     -- Set the window margins. Margins are ignored and no drawing can be made there.. 
-    set_window_margins: function(left: int, right: int, top: int, bottom: int)
+    set_window_margins: function(left: integer, right: integer, top: integer, bottom: integer)
     -- Set the window paddings. Paddings are can be drawn on. 
-    set_window_paddings: function(left: int, right: int, top: int, bottom: int)
+    set_window_paddings: function(left: integer, right: integer, top: integer, bottom: integer)
     -- Check if the given key is down. 
     is_key_down: function(key: lyte.KeyboardKey): boolean
     -- Check if the given key is pressed. 
@@ -130,21 +108,21 @@ global record lyte
     -- Check if the given mouse button is released. 
     is_mouse_released: function(mouse_button: lyte.MouseButton): boolean
     -- Get the mouse x position. 
-    get_mouse_x: function(): int
+    get_mouse_x: function(): integer
     -- Get the mouse y position. 
-    get_mouse_y: function(): int
+    get_mouse_y: function(): integer
     -- Get the number of gamepads. 
-    get_gamepad_count: function(): int
+    get_gamepad_count: function(): integer
     -- Get the name of the gamepad at the given index. 
-    get_gamepad_name: function(index: int): string
+    get_gamepad_name: function(index: integer): string
     -- Check if the given button of the gamepad at the given index is down. 
-    is_gamepad_down: function(index: int, gamepad_button: lyte.GamepadButton): boolean
+    is_gamepad_down: function(index: integer, gamepad_button: lyte.GamepadButton): boolean
     -- Check if the given button of the gamepad at the given index is pressed. 
-    is_gamepad_pressed: function(index: int, gamepad_button: lyte.GamepadButton): boolean
+    is_gamepad_pressed: function(index: integer, gamepad_button: lyte.GamepadButton): boolean
     -- Check if the given button of the gamepad at the given index is released. 
-    is_gamepad_released: function(index: int, gamepad_button: lyte.GamepadButton): boolean
+    is_gamepad_released: function(index: integer, gamepad_button: lyte.GamepadButton): boolean
     -- Get the given axis of the gamepad at the given index. 
-    get_gamepad_axis: function(index: int, gamepad_axis: lyte.GamepadAxis): number
+    get_gamepad_axis: function(index: integer, gamepad_axis: lyte.GamepadAxis): number
     -- Set the master volume. 
     set_mastervolume: function(mastervolume: number)
     -- Get the master volume. 
@@ -270,13 +248,13 @@ global record lyte
     end
     -- Image type 
     record Image
-        width: int
-        height: int
+        width: integer
+        height: integer
         is_canvas: boolean
     end
     -- ImageBatch type. 
     record ImageBatch
-        rect_count: int
+        rect_count: integer
         add_rect: function(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
         draw: function(imagebatch: lyte.ImageBatch)
         reset: function(imagebatch: lyte.ImageBatch)
@@ -366,7 +344,6 @@ global record lyte
     end
     -- Acceptable filtermode values.
     enum FilterMode
-          "_invalid"
           "nearest"
           "linear"
     end
