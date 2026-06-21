@@ -348,9 +348,9 @@ lyte.draw_image_rect = function(image_wrapped, dest_x, dest_y, src_x, src_y, rec
         lyte_core.image_draw_rect_ex(image, dest_x, dest_y, src_x, src_y, rect_width, rect_height, angle, origin_x, origin_y, scale_x, scale_y)
     end
 end
-lyte.set_canvas = function(canvas_image_wrapped)
+lyte.set_canvas = function(canvas_image_wrapped, accumulate)
     local canvas_image = canvas_image_wrapped.id
-    lyte_core.image_set_canvas(canvas_image)
+    lyte_core.image_set_canvas(canvas_image, accumulate)
     lyte._current_canvas_save = canvas_image_wrapped
 end
 lyte.add_imagebatch_rect = function(imagebatch_wrapped, dest_x, dest_y, dest_width, dest_height, src_x, src_y, src_width, src_height)

@@ -477,11 +477,12 @@ static int api_image_new_canvas(lua_State *L) { // arity: 2 => 1
     (void)err; // TODO: handle when err is not 0
     return 1; // number of values returned in the stack
 }
-static int api_image_set_canvas(lua_State *L) { // arity: 1 => 0
+static int api_image_set_canvas(lua_State *L) { // arity: 2 => 0
     (void)L; int err = 0;
-    void *canvas_image;
+    void *canvas_image; bool accumulate;
     canvas_image = _checklightuserdata(L, 1);
-    err = _image_set_canvas(canvas_image);
+    accumulate = lua_toboolean(L, 2);
+    err = _image_set_canvas(canvas_image, accumulate);
     (void)err; // TODO: handle when err is not 0
     return 0; // number of values returned in the stack
 }

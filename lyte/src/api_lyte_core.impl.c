@@ -132,9 +132,9 @@ static inline int _image_new_canvas(int width, int height, void **val) {
     err = lyte_new_canvas(width, height, val); // edit
     return err;
 }
-static inline int _image_set_canvas(void *canvas_image) {
-    (void)canvas_image; int err = 0;
-    err = lyte_set_canvas(canvas_image);
+static inline int _image_set_canvas(void *canvas_image, bool accumulate) {
+    (void)canvas_image; (void)accumulate; int err = 0;
+    err = lyte_set_canvas(canvas_image, accumulate);
     return err;
 }
 static inline int _reset_canvas(void) {

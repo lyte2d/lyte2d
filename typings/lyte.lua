@@ -3,7 +3,7 @@
 --- @meta
 --- @class lyte
 --- Tick function. Should be created by the user. 
---- @field tick fun(delta_time: number, window_width: int, window_height: int, window_resized: boolean, is_fullscreen: boolean)
+--- @field tick fun(delta_time: number, window_width: integer, window_height: integer, window_resized: boolean, is_fullscreen: boolean)
     lyte = lyte or {}
 
 -- functions
@@ -60,16 +60,16 @@
 --- @type fun(image: lyte.Image, dest_x: number, dest_y: number, src_x: number, src_y: number, rect_width: number, rect_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     lyte.draw_image_rect = lyte.draw_image_rect and lyte.draw_image_rect or function() end
 --- Get the width of the image. 
---- @type fun(image: lyte.Image): int
+--- @type fun(image: lyte.Image): integer
     lyte.get_image_width = lyte.get_image_width and lyte.get_image_width or function() end
 --- Get the height of the image. 
---- @type fun(image: lyte.Image): int
+--- @type fun(image: lyte.Image): integer
     lyte.get_image_height = lyte.get_image_height and lyte.get_image_height or function() end
 --- Create a canvas image with given width and height. 
---- @type fun(width: int, height: int): lyte.Image
+--- @type fun(width: integer, height: integer): lyte.Image
     lyte.new_canvas = lyte.new_canvas and lyte.new_canvas or function() end
---- Set the effective canvas image. All draw operations will go to this canvas until it's reset. 
---- @type fun(canvas_image: lyte.Image)
+--- Set the effective canvas image. All draw operations will go to this canvas until it's reset. If accumulate=true, will not clear the target image first. 
+--- @type fun(canvas_image: lyte.Image, accumulate: boolean)
     lyte.set_canvas = lyte.set_canvas and lyte.set_canvas or function() end
 --- Reset the drawing target, back to screen. 
 --- @type fun()
@@ -87,7 +87,7 @@
 --- @type fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     lyte.add_imagebatch_rect = lyte.add_imagebatch_rect and lyte.add_imagebatch_rect or function() end
 --- Get the number of rects in the image batch. 
---- @type fun(imagebatch: lyte.ImageBatch): int
+--- @type fun(imagebatch: lyte.ImageBatch): integer
     lyte.get_imagebatch_rect_count = lyte.get_imagebatch_rect_count and lyte.get_imagebatch_rect_count or function() end
 --- Draw the image batch. 
 --- @type fun(imagebatch: lyte.ImageBatch)
@@ -105,43 +105,43 @@
 --- @type fun(text: string, dest_x: number, dest_y: number)
     lyte.draw_text = lyte.draw_text and lyte.draw_text or function() end
 --- Get the width of the given text line. 
---- @type fun(text: string): int
+--- @type fun(text: string): integer
     lyte.get_text_width = lyte.get_text_width and lyte.get_text_width or function() end
 --- Get the height of the given text line. 
---- @type fun(text: string): int
+--- @type fun(text: string): integer
     lyte.get_text_height = lyte.get_text_height and lyte.get_text_height or function() end
 --- Get the number of currently connected monitors. 
---- @type fun(): int
+--- @type fun(): integer
     lyte.get_monitor_count = lyte.get_monitor_count and lyte.get_monitor_count or function() end
 --- Get the name of the monitor at the index 
---- @type fun(index: int): string
+--- @type fun(index: integer): string
     lyte.get_monitor_name = lyte.get_monitor_name and lyte.get_monitor_name or function() end
 --- Get the width of the monitor at the index 
---- @type fun(index: int): int
+--- @type fun(index: integer): integer
     lyte.get_monitor_width = lyte.get_monitor_width and lyte.get_monitor_width or function() end
 --- Get the height of the monitor at the index 
---- @type fun(index: int): int
+--- @type fun(index: integer): integer
     lyte.get_monitor_height = lyte.get_monitor_height and lyte.get_monitor_height or function() end
 ---  Set the window's initial monitor to the indexed value. Must be set before the window is opened. 
---- @type fun(index: int)
+--- @type fun(index: integer)
     lyte.set_window_monitor = lyte.set_window_monitor and lyte.set_window_monitor or function() end
 ---  Set the window resizable flag to the given value. Must be set before the window is opened. 
 --- @type fun(resizable: boolean)
     lyte.set_window_resizable = lyte.set_window_resizable and lyte.set_window_resizable or function() end
 --- Set the window's minimum possible size. 
---- @type fun(width: int, height: int)
+--- @type fun(width: integer, height: integer)
     lyte.set_window_minsize = lyte.set_window_minsize and lyte.set_window_minsize or function() end
 --- Set the window's size. 
---- @type fun(width: int, height: int)
+--- @type fun(width: integer, height: integer)
     lyte.set_window_size = lyte.set_window_size and lyte.set_window_size or function() end
 --- Get the width of the window. 
---- @type fun(): int
+--- @type fun(): integer
     lyte.get_window_width = lyte.get_window_width and lyte.get_window_width or function() end
 --- Get the height of the window. 
---- @type fun(): int
+--- @type fun(): integer
     lyte.get_window_height = lyte.get_window_height and lyte.get_window_height or function() end
 --- Set the window's position. 
---- @type fun(x: int, y: int)
+--- @type fun(x: integer, y: integer)
     lyte.set_window_position = lyte.set_window_position and lyte.set_window_position or function() end
 --- Set the window to fullscreen, or windowed mode. 
 --- @type fun(fullscreen: boolean)
@@ -162,10 +162,10 @@
 --- @type fun(icon_path: string)
     lyte.set_window_icon_file = lyte.set_window_icon_file and lyte.set_window_icon_file or function() end
 --- Set the window margins. Margins are ignored and no drawing can be made there.. 
---- @type fun(left: int, right: int, top: int, bottom: int)
+--- @type fun(left: integer, right: integer, top: integer, bottom: integer)
     lyte.set_window_margins = lyte.set_window_margins and lyte.set_window_margins or function() end
 --- Set the window paddings. Paddings are can be drawn on. 
---- @type fun(left: int, right: int, top: int, bottom: int)
+--- @type fun(left: integer, right: integer, top: integer, bottom: integer)
     lyte.set_window_paddings = lyte.set_window_paddings and lyte.set_window_paddings or function() end
 --- Check if the given key is down. 
 --- @type fun(key: lyte.KeyboardKey): boolean
@@ -195,28 +195,28 @@
 --- @type fun(mouse_button: lyte.MouseButton): boolean
     lyte.is_mouse_released = lyte.is_mouse_released and lyte.is_mouse_released or function() end
 --- Get the mouse x position. 
---- @type fun(): int
+--- @type fun(): integer
     lyte.get_mouse_x = lyte.get_mouse_x and lyte.get_mouse_x or function() end
 --- Get the mouse y position. 
---- @type fun(): int
+--- @type fun(): integer
     lyte.get_mouse_y = lyte.get_mouse_y and lyte.get_mouse_y or function() end
 --- Get the number of gamepads. 
---- @type fun(): int
+--- @type fun(): integer
     lyte.get_gamepad_count = lyte.get_gamepad_count and lyte.get_gamepad_count or function() end
 --- Get the name of the gamepad at the given index. 
---- @type fun(index: int): string
+--- @type fun(index: integer): string
     lyte.get_gamepad_name = lyte.get_gamepad_name and lyte.get_gamepad_name or function() end
 --- Check if the given button of the gamepad at the given index is down. 
---- @type fun(index: int, gamepad_button: lyte.GamepadButton): boolean
+--- @type fun(index: integer, gamepad_button: lyte.GamepadButton): boolean
     lyte.is_gamepad_down = lyte.is_gamepad_down and lyte.is_gamepad_down or function() end
 --- Check if the given button of the gamepad at the given index is pressed. 
---- @type fun(index: int, gamepad_button: lyte.GamepadButton): boolean
+--- @type fun(index: integer, gamepad_button: lyte.GamepadButton): boolean
     lyte.is_gamepad_pressed = lyte.is_gamepad_pressed and lyte.is_gamepad_pressed or function() end
 --- Check if the given button of the gamepad at the given index is released. 
---- @type fun(index: int, gamepad_button: lyte.GamepadButton): boolean
+--- @type fun(index: integer, gamepad_button: lyte.GamepadButton): boolean
     lyte.is_gamepad_released = lyte.is_gamepad_released and lyte.is_gamepad_released or function() end
 --- Get the given axis of the gamepad at the given index. 
---- @type fun(index: int, gamepad_axis: lyte.GamepadAxis): number
+--- @type fun(index: integer, gamepad_axis: lyte.GamepadAxis): number
     lyte.get_gamepad_axis = lyte.get_gamepad_axis and lyte.get_gamepad_axis or function() end
 --- Set the master volume. 
 --- @type fun(mastervolume: number)
@@ -400,13 +400,13 @@
     lyte.ShaderDef = lyte.ShaderDef and lyte.ShaderDef or {}
 -- Image type 
 --- @class lyte.Image
-    --- @field width int
-    --- @field height int
+    --- @field width integer
+    --- @field height integer
     --- @field is_canvas boolean
     lyte.Image = lyte.Image and lyte.Image or {}
 -- ImageBatch type. 
 --- @class lyte.ImageBatch
-    --- @field rect_count int
+    --- @field rect_count integer
     --- @field add_rect fun(imagebatch: lyte.ImageBatch, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     --- @field draw fun(imagebatch: lyte.ImageBatch)
     --- @field reset fun(imagebatch: lyte.ImageBatch)
@@ -474,7 +474,7 @@
 --- Acceptable blendmode values.
 --- @alias lyte.BlendMode "none" | "blend" | "add" | "mod" | "mul"
 --- Acceptable filtermode values.
---- @alias lyte.FilterMode "_invalid" | "nearest" | "linear"
+--- @alias lyte.FilterMode "nearest" | "linear"
 --- Acceptable gamepadaxis values.
 --- @alias lyte.GamepadAxis "left_x" | "left_y" | "right_x" | "right_y" | "left_trigger" | "right_trigger"
 --- Acceptable gamepadbutton values.
@@ -553,16 +553,16 @@
 --- @type fun(image: userdata, dest_x: number, dest_y: number, src_x: number, src_y: number, src_width: number, src_height: number, angle: number, origin_x: number, origin_y: number, scale_x: number, scale_y: number)
     lyte_core.image_draw_rect_ex = lyte_core.image_draw_rect_ex and lyte_core.image_draw_rect_ex or function() end
 --- Get the width of the image. 
---- @type fun(image: userdata): int
+--- @type fun(image: userdata): integer
     lyte_core.image_get_width = lyte_core.image_get_width and lyte_core.image_get_width or function() end
 --- Get the height of the image. 
---- @type fun(image: userdata): int
+--- @type fun(image: userdata): integer
     lyte_core.image_get_height = lyte_core.image_get_height and lyte_core.image_get_height or function() end
 --- Create a canvas image with given width and height. 
---- @type fun(width: int, height: int): userdata
+--- @type fun(width: integer, height: integer): userdata
     lyte_core.image_new_canvas = lyte_core.image_new_canvas and lyte_core.image_new_canvas or function() end
---- Set the effective canvas image. All draw operations will go to this canvas until it's reset. 
---- @type fun(canvas_image: userdata)
+--- Set the effective canvas image. All draw operations will go to this canvas until it's reset. If accumuate=true, will not clear the target image first. 
+--- @type fun(canvas_image: userdata, accumulate: boolean)
     lyte_core.image_set_canvas = lyte_core.image_set_canvas and lyte_core.image_set_canvas or function() end
 --- Reset the drawing target, back to screen. 
 --- @type fun()
@@ -571,7 +571,7 @@
 --- @type fun(image: userdata): boolean
     lyte_core.image_is_canvas = lyte_core.image_is_canvas and lyte_core.image_is_canvas or function() end
 --- Note: slow. Capture render image. This is a slow operation! 
---- @type fun(x: int, y: int, w: int, h: int): userdata
+--- @type fun(x: integer, y: integer, w: integer, h: integer): userdata
     lyte_core.capture_image = lyte_core.capture_image and lyte_core.capture_image or function() end
 --- Free ImageBatch resources 
 --- @type fun(imagebatch: userdata)
@@ -586,7 +586,7 @@
 --- @type fun(imagebatch: userdata, dest_x: number, dest_y: number, dest_width: number, dest_height: number, src_x: number, src_y: number, src_width: number, src_height: number)
     lyte_core.imagebatch_add_rect = lyte_core.imagebatch_add_rect and lyte_core.imagebatch_add_rect or function() end
 --- Get the number of rects in the image batch. 
---- @type fun(imagebatch: userdata): int
+--- @type fun(imagebatch: userdata): integer
     lyte_core.imagebatch_get_rect_count = lyte_core.imagebatch_get_rect_count and lyte_core.imagebatch_get_rect_count or function() end
 --- Draw the image batch. 
 --- @type fun(imagebatch: userdata)
@@ -604,43 +604,43 @@
 --- @type fun(text: string, dest_x: number, dest_y: number)
     lyte_core.draw_text = lyte_core.draw_text and lyte_core.draw_text or function() end
 --- Get the width of the given text line. 
---- @type fun(text: string): int
+--- @type fun(text: string): integer
     lyte_core.get_text_width = lyte_core.get_text_width and lyte_core.get_text_width or function() end
 --- Get the height of the given text line. 
---- @type fun(text: string): int
+--- @type fun(text: string): integer
     lyte_core.get_text_height = lyte_core.get_text_height and lyte_core.get_text_height or function() end
 --- Get the number of currently connected monitors. 
---- @type fun(): int
+--- @type fun(): integer
     lyte_core.get_monitor_count = lyte_core.get_monitor_count and lyte_core.get_monitor_count or function() end
 --- Get the name of the monitor at the index 
---- @type fun(index: int): string
+--- @type fun(index: integer): string
     lyte_core.get_monitor_name = lyte_core.get_monitor_name and lyte_core.get_monitor_name or function() end
 --- Get the width of the monitor at the index 
---- @type fun(index: int): int
+--- @type fun(index: integer): integer
     lyte_core.get_monitor_width = lyte_core.get_monitor_width and lyte_core.get_monitor_width or function() end
 --- Get the height of the monitor at the index 
---- @type fun(index: int): int
+--- @type fun(index: integer): integer
     lyte_core.get_monitor_height = lyte_core.get_monitor_height and lyte_core.get_monitor_height or function() end
 ---  Set the window's initial monitor to the indexed value. Must be set before the window is opened. 
---- @type fun(index: int)
+--- @type fun(index: integer)
     lyte_core.set_window_monitor = lyte_core.set_window_monitor and lyte_core.set_window_monitor or function() end
 ---  Set the window resizable flag to the given value. Must be set before the window is opened. 
 --- @type fun(resizable: boolean)
     lyte_core.set_window_resizable = lyte_core.set_window_resizable and lyte_core.set_window_resizable or function() end
 --- Set the window's minimum possible size. 
---- @type fun(width: int, height: int)
+--- @type fun(width: integer, height: integer)
     lyte_core.set_window_minsize = lyte_core.set_window_minsize and lyte_core.set_window_minsize or function() end
 --- Set the window's size. 
---- @type fun(width: int, height: int)
+--- @type fun(width: integer, height: integer)
     lyte_core.set_window_size = lyte_core.set_window_size and lyte_core.set_window_size or function() end
 --- Get the width of the window. 
---- @type fun(): int
+--- @type fun(): integer
     lyte_core.get_window_width = lyte_core.get_window_width and lyte_core.get_window_width or function() end
 --- Get the height of the window. 
---- @type fun(): int
+--- @type fun(): integer
     lyte_core.get_window_height = lyte_core.get_window_height and lyte_core.get_window_height or function() end
 --- Set the window's position. 
---- @type fun(x: int, y: int)
+--- @type fun(x: integer, y: integer)
     lyte_core.set_window_position = lyte_core.set_window_position and lyte_core.set_window_position or function() end
 --- Set the window to fullscreen, or windowed mode. 
 --- @type fun(fullscreen: boolean)
@@ -661,10 +661,10 @@
 --- @type fun(icon_path: string)
     lyte_core.set_window_icon_file = lyte_core.set_window_icon_file and lyte_core.set_window_icon_file or function() end
 --- Set the window margins. Margins are ignored and no drawing can be made there.. 
---- @type fun(left: int, right: int, top: int, bottom: int)
+--- @type fun(left: integer, right: integer, top: integer, bottom: integer)
     lyte_core.set_window_margins = lyte_core.set_window_margins and lyte_core.set_window_margins or function() end
 --- Set the window paddings. Paddings are can be drawn on. 
---- @type fun(left: int, right: int, top: int, bottom: int)
+--- @type fun(left: integer, right: integer, top: integer, bottom: integer)
     lyte_core.set_window_paddings = lyte_core.set_window_paddings and lyte_core.set_window_paddings or function() end
 --- Check if the given key is down. 
 --- @type fun(key: lyte_core.KeyboardKey): boolean
@@ -694,28 +694,28 @@
 --- @type fun(mouse_button: lyte_core.MouseButton): boolean
     lyte_core.is_mouse_released = lyte_core.is_mouse_released and lyte_core.is_mouse_released or function() end
 --- Get the mouse x position. 
---- @type fun(): int
+--- @type fun(): integer
     lyte_core.get_mouse_x = lyte_core.get_mouse_x and lyte_core.get_mouse_x or function() end
 --- Get the mouse y position. 
---- @type fun(): int
+--- @type fun(): integer
     lyte_core.get_mouse_y = lyte_core.get_mouse_y and lyte_core.get_mouse_y or function() end
 --- Get the number of gamepads. 
---- @type fun(): int
+--- @type fun(): integer
     lyte_core.get_gamepad_count = lyte_core.get_gamepad_count and lyte_core.get_gamepad_count or function() end
 --- Get the name of the gamepad at the given index. 
---- @type fun(index: int): string
+--- @type fun(index: integer): string
     lyte_core.get_gamepad_name = lyte_core.get_gamepad_name and lyte_core.get_gamepad_name or function() end
 --- Check if the given button of the gamepad at the given index is down. 
---- @type fun(index: int, gamepad_button: lyte_core.GamepadButton): boolean
+--- @type fun(index: integer, gamepad_button: lyte_core.GamepadButton): boolean
     lyte_core.is_gamepad_down = lyte_core.is_gamepad_down and lyte_core.is_gamepad_down or function() end
 --- Check if the given button of the gamepad at the given index is pressed. 
---- @type fun(index: int, gamepad_button: lyte_core.GamepadButton): boolean
+--- @type fun(index: integer, gamepad_button: lyte_core.GamepadButton): boolean
     lyte_core.is_gamepad_pressed = lyte_core.is_gamepad_pressed and lyte_core.is_gamepad_pressed or function() end
 --- Check if the given button of the gamepad at the given index is released. 
---- @type fun(index: int, gamepad_button: lyte_core.GamepadButton): boolean
+--- @type fun(index: integer, gamepad_button: lyte_core.GamepadButton): boolean
     lyte_core.is_gamepad_released = lyte_core.is_gamepad_released and lyte_core.is_gamepad_released or function() end
 --- Get the given axis of the gamepad at the given index. 
---- @type fun(index: int, gamepad_axis: lyte_core.GamepadAxis): number
+--- @type fun(index: integer, gamepad_axis: lyte_core.GamepadAxis): number
     lyte_core.get_gamepad_axis = lyte_core.get_gamepad_axis and lyte_core.get_gamepad_axis or function() end
 --- Set the master volume. 
 --- @type fun(mastervolume: number)
@@ -927,7 +927,7 @@
 --- Acceptable blendmode values.
 --- @alias lyte_core.BlendMode "none" | "blend" | "add" | "mod" | "mul"
 --- Acceptable filtermode values.
---- @alias lyte_core.FilterMode "_invalid" | "nearest" | "linear"
+--- @alias lyte_core.FilterMode "nearest" | "linear"
 --- Acceptable gamepadaxis values.
 --- @alias lyte_core.GamepadAxis "left_x" | "left_y" | "right_x" | "right_y" | "left_trigger" | "right_trigger"
 --- Acceptable gamepadbutton values.

@@ -151,12 +151,13 @@ end
 
     Function("set_canvas",
         Arg("canvas_image", Wrap("Image")),
-        Doc"Set the effective canvas image. All draw operations will go to this canvas until it's reset.",
+        Arg("accumulate", Bool),
+        Doc"Set the effective canvas image. All draw operations will go to this canvas until it's reset. Will clear the canvas unless accumulate=true.",
         -- MapWrapTo("lyte_core.image_set_canvas"),
         LuaImpl,
-        Code[[function(canvas_image_wrapped)
+        Code[[function(canvas_image_wrapped, accumulate)
     local canvas_image = canvas_image_wrapped.id
-    lyte_core.image_set_canvas(canvas_image)
+    lyte_core.image_set_canvas(canvas_image, accumulate)
     lyte._current_canvas_save = canvas_image_wrapped
 end
 ]]
