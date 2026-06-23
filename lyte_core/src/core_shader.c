@@ -172,7 +172,11 @@ static const char *frag_sep = "// ---\n\n";
 
 static inline char *get_full_uniforms_code(ShaderBuilderItem *sbi) {
     size_t num_uniforms = sbi->num_uniform_definitions;
-    char *ret = malloc(256*(num_uniforms+1)); // TODO: free at lyte_shaderbuilder_build
+    size_t needed = strlen("// uniform declarations...\n") + 1;
+    for (int i = 0; i < (int)num_uniforms; i++) {
+        needed += 20 + strlen(sbi->uniform_definitions[i].name);
+    }
+    char *ret = malloc(needed); // TODO: free at lyte_shaderbuilder_build
     sprintf(ret, "// uniform declarations...\n");
     for (int i=0; i<num_uniforms;i++) {
         const char *type = NULL;
@@ -201,8 +205,9 @@ static inline char *get_full_uniforms_code(ShaderBuilderItem *sbi) {
 
 static inline char *get_full_vertex_code(ShaderBuilderItem *sbi, const char *uniforms_text) {
     char *str = (char *)sbi->vert_code;
-    size_t orig_len = strlen(str);
-    size_t new_len = orig_len + 1000;
+    size_t new_len = strlen(shader_header) + strlen(uniforms_text)
+                   + strlen(frag_sep) + strlen(str)
+                   + strlen(frag_sep) + strlen(vert_footer) + 1;
     char *ret = malloc(new_len); // TODO: free at lyte_shaderbuilder_build
     memset(ret, 0, new_len);
     sprintf(ret, "%s%s%s%s%s%s", shader_header, uniforms_text, frag_sep, str, frag_sep, vert_footer);
@@ -211,9 +216,11 @@ static inline char *get_full_vertex_code(ShaderBuilderItem *sbi, const char *uni
 
 static inline char *get_full_fragment_code(ShaderBuilderItem *sbi, const char *uniforms_text) {
     char *str = (char *)sbi->frag_code;
-    size_t orig_len = strlen(str);
-    size_t new_len = orig_len + 1000;
-    char *ret =malloc(new_len); // TODO: free at lyte_shaderbuilder_build
+    size_t new_len = strlen(shader_header) + strlen(frag_header_1)
+                   + strlen(frag_header_2) + strlen(frag_sep)
+                   + strlen(uniforms_text) + strlen(frag_sep)
+                   + strlen(str) + strlen(frag_footer) + 1;
+    char *ret = malloc(new_len); // TODO: free at lyte_shaderbuilder_build
     memset(ret, 0, new_len);
     sprintf(ret, "%s%s%s%s%s%s%s%s", shader_header, frag_header_1, frag_header_2, frag_sep, uniforms_text, frag_sep, str, frag_footer);
     return ret;
