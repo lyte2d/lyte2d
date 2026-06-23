@@ -239,7 +239,8 @@ return process_def_tree(Namespace("lyte_core", {
     -- RENAMED
     Function("image_set_canvas",
         Arg("canvas_image", Image_Ptr),
-        Doc"Set the effective canvas image. All draw operations will go to this canvas until it's reset.",
+        Arg("accumulate", Bool),
+        Doc"Set the effective canvas image. All draw operations will go to this canvas until it's reset. Will clear the canvas unless accumulate=true.",
         LuaImpl
     ),
 

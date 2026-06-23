@@ -286,7 +286,7 @@ int lyte_draw_image_rect_ex(lyte_Image image, double x, double y, double src_x, 
 }
 
 
-static int _lyte_set_canvas(lyte_Image image, bool updown) {
+static int _lyte_set_canvas(lyte_Image image, bool updown, bool accumulate) {
     if (current_canvas) {
         fprintf(stderr, "Canvas was already set.");
         return 1;
@@ -314,7 +314,7 @@ static int _lyte_set_canvas(lyte_Image image, bool updown) {
 
     sg_begin_pass(&(sg_pass) {
         .action = {
-            .colors[0].load_action = SG_LOADACTION_CLEAR
+            .colors[0].load_action = accumulate ? SG_LOADACTION_LOAD : SG_LOADACTION_CLEAR
         },
         .attachments = imageitem->attachments
     });
@@ -322,8 +322,8 @@ static int _lyte_set_canvas(lyte_Image image, bool updown) {
     return 0;
 }
 
-int lyte_set_canvas(lyte_Image image) {
-    return _lyte_set_canvas(image, false);
+int lyte_set_canvas(lyte_Image image, bool accumulate) {
+    return _lyte_set_canvas(image, false, accumulate);
 }
 
 
@@ -485,7 +485,7 @@ int lyte_capture_image(int x, int y, int w, int h, lyte_Image *val) {
     lyte_Image cvs;
 
     lyte_new_canvas(orig_w, orig_h, &cvs);
-    _lyte_set_canvas(cvs, true);
+    _lyte_set_canvas(cvs, true, false);
     lyte_cls(0,0,0,0);
     lyte_scale(1/xscale, 1/yscale);
     lyte_draw_image(ii, 0, 0);
