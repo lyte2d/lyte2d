@@ -2,25 +2,13 @@
 
 -- TODO: cleanup globals
 
-function classnew_ctor(ctor_method_name)
+local function classnew_ctor(ctor_method_name)
     ctor_method_name = ctor_method_name or "__new"
     assert(type(ctor_method_name == "string"))
 
     local classnew = function(tbl, ...)
         tbl.__index = tbl.__index or tbl
         local inst = {}
-        -- dtor (with the name __gc)
-        -- this works with types defined in lua tables in 5.1 via "newproxy(true)" hack
-        if tbl["__gc"] then
-            local proxy_for_gc = newproxy(true)
-            getmetatable(proxy_for_gc).__gc = function()
-                local ok, err = pcall(tbl.__gc, inst)
-                if  not ok then
-                    print(err)
-                end
-            end
-            inst[proxy_for_gc] = true
-        end
         inst = setmetatable(inst, tbl)
         -- ctor (with the given name. __new if nothing given)
         if tbl[ctor_method_name] then
@@ -113,8 +101,8 @@ _G.LYTE_TICK_ERROR_FUNC = function(dt, WW, HH)
 
         for error_line in error_text:gmatch(LINES_PATTERN) do
             max_line_width = math.max(max_line_width, lyte.get_text_width(error_line))
-            error_line = error_line:gsub("\t", TAB_WHITESPACE)
-            lyte.draw_text(error_line, PAD/2, (SC + y) * h2)
+            local e = error_line:gsub("\t", TAB_WHITESPACE)
+            lyte.draw_text(e, PAD/2, (SC + y) * h2)
             y = y + 1
         end
 
@@ -141,13 +129,13 @@ local function get_error_line(text)
     local line_i = 1
     for line in file:gmatch(LINES_PATTERN) do
         if line_i == line_num then
-            line = line:match("^[%s]*(.-)[%s]*$")
+            local l = line:match("^[%s]*(.-)[%s]*$")
             local prefix = path .. ":" .. line_num .. ": "
 
             return {
                 prefix = prefix,
                 line = line,
-                underline = ("~"):rep(#line),
+                underline = ("~"):rep(#l),
             }
         end
 
@@ -171,7 +159,7 @@ end
 
 local function run_many(codestr, filename, ...)
     local x,y,a,b,c,d,e,f,g
-    x,y,a,b,c,d,e,f,g = pcall(loadstring(codestr, "@"..filename), ...)
+    x,y,a,b,c,d,e,f,g = pcall(load(codestr, "@"..filename), ...)
     if x then
         return y, a, b, c, d, e, f, g
     else
@@ -218,10 +206,8 @@ local function lyte_library_loader(modulename)
     return package.loadlib(filename, "luaopen_" .. modulename), filename
 end
 
-
-
-table.insert(package.loaders, 2, lyte_lua_loader)
-table.insert(package.loaders, 3, lyte_library_loader)
+table.insert(package.searchers, 2, lyte_lua_loader)
+table.insert(package.searchers, 3, lyte_library_loader)
 
 -- load  generated APIs
 local req_gen_code, err_gen_code = pcall(require, "api_lyte_gen") -- Lua part of the generated API code

@@ -78,11 +78,11 @@ if(TOOLCHAIN_PREFIX STREQUAL x86_64-w64-mingw32)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../lyte_core ${CMAKE_CURRENT_BINARY_DIR}/lyte_core)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/lua-5.1.5 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../deps/lua-5.5.0 ${CMAKE_CURRENT_BINARY_DIR}/lua55)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     lyte_core
-    lua51-static
+    lua55-static
 )
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(CMAKE_THREAD_LIBS_INIT "-lpthread")

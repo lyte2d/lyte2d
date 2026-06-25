@@ -33,6 +33,9 @@ int lyte_load_image(const char *path, lyte_Image *img) {
         int errcode = PHYSFS_getLastErrorCode();
         const char *errstr = PHYSFS_getErrorByCode(errcode);
         fprintf(stderr, "\nFile '%s': '%s'\n", path, errstr);
+        // TODO: Can we easily wire up the nice error tick function rather than
+        // uncermoniously quitting?
+        abort();
         return errcode;
     }
     size_t len = PHYSFS_fileLength(file);
